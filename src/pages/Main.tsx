@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MainContent } from "@/components/main_content/MainContent";
 import { TableList } from "@/components/sub_idebar/TableList";
-import { DB_TYPE_POSTGRES_SQL } from "@/constants";
+import { DB_TYPE_POSTGRES_SQL, MAIN_CONTEN_TYPE_TABLE_DATA } from "@/constants";
 import { connect, getAllTables } from "@/databases/PostgreSQL/utils";
 import { useCoreStore } from "@/store";
 
@@ -10,8 +10,7 @@ export function Main() {
   const [isDragging, setIsDragging] = useState(false);
   const mouseInitialPosX = useRef(0); // 起始坐标
 
-  const { currentDbType, setCurrentDbType } = useCoreStore();
-  const [tablenames, setTablenames] = useState<string[]>([]);
+  const { currentDbType, setCurrentDbType, setMainContenType } = useCoreStore();
 
   const handleMouseDown = useCallback(() => {
     setIsDragging(true);
@@ -32,26 +31,9 @@ export function Main() {
     [isDragging],
   );
 
-  const testDb = async () => {
-    await connect({
-      user: "postgres",
-      host: "127.0.0.1",
-      dbname: "given_0315",
-      password: "postgres",
-      port: 5432,
-    });
-
-    const gat = await getAllTables();
-
-    setCurrentDbType(DB_TYPE_POSTGRES_SQL);
-    setTablenames(gat.data);
-  };
-
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
     mouseInitialPosX.current = 0; // 重置起始坐标
-
-    testDb();
   }, []);
 
   useEffect(() => {
@@ -64,6 +46,27 @@ export function Main() {
     };
   }, [handleMouseMove, handleMouseUp]);
 
+  // TODO: 库,差是否有连接配置, 有的话显示 MainContent ,没有的话显示 Index
+
+  const testDb = async () => {
+    const res = await connect({
+      user: "postgres",
+      host: "127.0.0.1",
+      dbname: "given_0315",
+      password: "postgres",
+      port: 5432,
+    });
+
+    console.log("connect res: ", res);
+
+    setCurrentDbType(DB_TYPE_POSTGRES_SQL);
+    setMainContenType(MAIN_CONTEN_TYPE_TABLE_DATA);
+  };
+
+  useEffect(() => {
+    testDb();
+  }, []);
+
   return (
     <div className="flex h-full">
       {/* 侧边栏 */}
@@ -71,7 +74,7 @@ export function Main() {
         {/* 侧边栏内容 */}
         <div className="p-4">
           {/* TODO: 链接对应的数据库并查询表格 */}
-          {currentDbType === DB_TYPE_POSTGRES_SQL && <TableList tableNameArray={tablenames} />}
+          {currentDbType === DB_TYPE_POSTGRES_SQL && <TableList />}
         </div>
 
         {/* 拖拽手柄 */}

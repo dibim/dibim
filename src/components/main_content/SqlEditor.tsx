@@ -1,3 +1,6 @@
+/**
+ * SQL 编辑器及其查询结果
+ */
 import { MainContentData } from "@/types/types";
 
 export function SqlEditor(props: MainContentData) {
