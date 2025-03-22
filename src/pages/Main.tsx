@@ -1,4 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { MainContent } from "@/components/main_content/MainContent";
+import { TableList } from "@/components/sub_idebar/TableList";
+import { DB_TYPE_POSTGRES_SQL } from "@/constants";
+import { connect, getAllTables } from "@/databases/PostgreSQL/utils";
 import { useCoreStore } from "@/store";
 
 export function Main() {
@@ -6,7 +10,8 @@ export function Main() {
   const [isDragging, setIsDragging] = useState(false);
   const mouseInitialPosX = useRef(0); // 起始坐标
 
-  const { currentDbType } = useCoreStore();
+  const { currentDbType, setCurrentDbType } = useCoreStore();
+  const [tablenames, setTablenames] = useState<string[]>([]);
 
   const handleMouseDown = useCallback(() => {
     setIsDragging(true);
@@ -27,9 +32,26 @@ export function Main() {
     [isDragging],
   );
 
+  const testDb = async () => {
+    await connect({
+      user: "postgres",
+      host: "127.0.0.1",
+      dbname: "given_0315",
+      password: "postgres",
+      port: 5432,
+    });
+
+    const gat = await getAllTables();
+
+    setCurrentDbType(DB_TYPE_POSTGRES_SQL);
+    setTablenames(gat.data);
+  };
+
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
     mouseInitialPosX.current = 0; // 重置起始坐标
+
+    testDb();
   }, []);
 
   useEffect(() => {
@@ -49,7 +71,7 @@ export function Main() {
         {/* 侧边栏内容 */}
         <div className="p-4">
           {/* TODO: 链接对应的数据库并查询表格 */}
-          {currentDbType}
+          {currentDbType === DB_TYPE_POSTGRES_SQL && <TableList tableNameArray={tablenames} />}
         </div>
 
         {/* 拖拽手柄 */}
@@ -60,7 +82,9 @@ export function Main() {
       </div>
 
       {/* 主内容区域 */}
-      <div className="flex-1 p-4">Main Content</div>
+      <div className="flex-1 p-4">
+        <MainContent />
+      </div>
     </div>
   );
 }
