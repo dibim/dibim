@@ -37,7 +37,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup key={"databases"}>
+        <SidebarGroup key={"tables"}>
           <SidebarGroupContent>
             <div className="flex">
               <Table />
@@ -46,7 +46,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup key={"databases"}>
+        <SidebarGroup key={"functions"}>
           <SidebarGroupContent>
             <div className="flex">
               <SquareFunction />
@@ -55,16 +55,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup key={"databases"}>
+        <SidebarGroup key={"views"}>
           <SidebarGroupContent>
             <div className="flex">
               <View />
-              <span className="ps-2 cursor-pointer">试图</span>
+              <span className="ps-2 cursor-pointer">视图</span>
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup key={"databases"}>
+        <SidebarGroup key={"queries"}>
           <SidebarGroupContent>
             <div className="flex">
               <ScanSearch />
@@ -73,7 +73,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup key={"databases"}>
+        <SidebarGroup key={"backup"}>
           <SidebarGroupContent>
             <div className="flex">
               <DatabaseBackup />

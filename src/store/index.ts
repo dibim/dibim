@@ -5,8 +5,11 @@ import { persist } from "zustand/middleware";
 export interface CoreStoreState {
   currentDbType: string; // 当前数据库类型
   currentDbNme: string; // 当前数据库名
-  currentTables: string[]; // 当前模块名
+  currentTable: string; // 当前表名
 
+  setCurrentDbType: (val: string) => void;
+  setCurrentDbName: (val: string) => void;
+  setCurrentTable: (val: string) => void;
   reset: () => void;
 }
 
@@ -16,18 +19,19 @@ export const useCoreStore = create<CoreStoreState>()(
     (set) => ({
       currentDbType: "",
       currentDbNme: "",
-      currentTables: [],
+      currentTable: "",
 
       // 更新状态
       setCurrentDbType: (val: string) => set({ currentDbType: val }),
       setCurrentDbName: (val: string) => set({ currentDbNme: val }),
-      setCurrentTables: (val: string[]) => set({ currentTables: val }),
+      setCurrentTable: (val: string) => set({ currentTable: val }),
 
       // 重置状态
       reset: () =>
         set({
           currentDbType: "",
-          currentTables: [],
+          currentDbNme: "",
+          currentTable: "",
         }),
     }),
     {
