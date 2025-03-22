@@ -9,7 +9,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/x_sidebar";
 import "@/styles/index.css";
 import { Main } from "./pages/Main";
 import { useCoreStore } from "./store";
@@ -17,10 +17,14 @@ import { useCoreStore } from "./store";
 export default function Page() {
   const { currentDbNme, currentTable } = useCoreStore();
 
+  // 侧边栏应该根据不同的语言设置合理的宽度
+  const SIDEBAR_WIDTH = "6rem";
+  const SIDEBAR_WIDTH_MOBILE = "15rem";
+
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <SidebarProvider>
-        <AppSidebar />
+      <SidebarProvider SIDEBAR_WIDTH={SIDEBAR_WIDTH} SIDEBAR_WIDTH_MOBILE={SIDEBAR_WIDTH_MOBILE}>
+        <AppSidebar SIDEBAR_WIDTH_MOBILE={SIDEBAR_WIDTH} />
         <SidebarInset>
           <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger className="-ml-1" />
