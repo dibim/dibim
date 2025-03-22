@@ -785,6 +785,7 @@ dependencies = [
  "base64 0.22.1",
  "lazy_static",
  "mysql_async",
+ "once_cell",
  "rusqlite",
  "serde",
  "serde_json",
@@ -793,6 +794,7 @@ dependencies = [
  "tauri-plugin-opener",
  "tokio",
  "tokio-postgres",
+ "uuid",
 ]
 
 [[package]]

@@ -14,17 +14,17 @@ fn greet(name: &str) -> String {
 
 /**
  * 连接到 my_sql
- * conn_string 连接字符串, 类似 "mysql://root:yourpassword@localhost:3306/testdb"
+ * url 连接字符串, 类似 "mysql://root:yourpassword@localhost:3306/testdb"
  */
 #[tauri::command]
-async fn connect_my_sql(conn_string: String) -> DbResult {
+async fn my_sql_connect(url: String) -> DbResult {
     let mut res = DbResult {
         error_message: "".to_string(),
         data: "".to_string(),
         column_name: "".to_string(),
     };
 
-    match my_sql::connect(conn_string).await {
+    match my_sql::connect(url).await {
         Ok(()) => res.data = "ok".to_string(),
         Err(e) => res.error_message = e.to_string(),
     }
@@ -36,7 +36,7 @@ async fn connect_my_sql(conn_string: String) -> DbResult {
  * 使用 my_sql 查询数据
  */
 #[tauri::command]
-async fn query_my_sql(sql: String) -> DbResult {
+async fn my_sql_query(sql: String) -> DbResult {
     let mut res = DbResult {
         error_message: "".to_string(),
         data: "".to_string(),
@@ -45,10 +45,8 @@ async fn query_my_sql(sql: String) -> DbResult {
 
     match my_sql::query(sql).await {
         Ok(o) => {
-            res.data = match serde_json::to_string(&o) {
-                Ok(oo) => oo,
-                Err(_) => "".to_string(),
-            };
+            res.column_name = o.column_name;
+            res.data = o.data;
         }
         Err(e) => res.error_message = e.to_string(),
     }
@@ -60,7 +58,7 @@ async fn query_my_sql(sql: String) -> DbResult {
  * 使用 my_sql 执行非查询语句
  */
 #[tauri::command]
-async fn exec_my_sql(sql: String) -> DbResult {
+async fn my_sql_exec(sql: String) -> DbResult {
     let mut res = DbResult {
         error_message: "".to_string(),
         data: "".to_string(),
@@ -82,17 +80,17 @@ async fn exec_my_sql(sql: String) -> DbResult {
 
 /**
  * 连接到 postgre_sql
- * conn_string 连接字符串, 类似 "host=localhost user=postgres password=yourpassword dbname=testdb"
+ * url 连接字符串, 类似 "host=localhost user=postgres password=yourpassword dbname=testdb"
  */
 #[tauri::command]
-fn connect_postgres_sql(conn_string: String) -> DbResult {
+async fn postgres_sql_connect(url: String) -> DbResult {
     let mut res = DbResult {
         error_message: "".to_string(),
         data: "".to_string(),
         column_name: "".to_string(),
     };
 
-    match postgres_sql::connect(conn_string) {
+    match postgres_sql::connect(url).await {
         Ok(()) => res.data = "ok".to_string(),
         Err(e) => res.error_message = e.to_string(),
     }
@@ -104,19 +102,17 @@ fn connect_postgres_sql(conn_string: String) -> DbResult {
  * 使用 postgre_sql 查询数据
  */
 #[tauri::command]
-fn query_postgre_sql(sql: String) -> DbResult {
+async fn postgres_sql_query(sql: String) -> DbResult {
     let mut res = DbResult {
         error_message: "".to_string(),
         data: "".to_string(),
         column_name: "".to_string(),
     };
 
-    match postgres_sql::query(sql) {
+    match postgres_sql::query(sql).await {
         Ok(o) => {
-            res.data = match serde_json::to_string(&o) {
-                Ok(oo) => oo,
-                Err(_) => "".to_string(),
-            };
+            res.column_name = o.column_name;
+            res.data = o.data;
         }
         Err(e) => res.error_message = e.to_string(),
     }
@@ -128,14 +124,14 @@ fn query_postgre_sql(sql: String) -> DbResult {
  * 使用 postgre_sql 执行非查询语句
  */
 #[tauri::command]
-fn exec_postgre_sql(sql: String) -> DbResult {
+async fn postgres_sql_exec(sql: String) -> DbResult {
     let mut res = DbResult {
         error_message: "".to_string(),
         data: "".to_string(),
         column_name: "".to_string(),
     };
 
-    match postgres_sql::exec(sql) {
+    match postgres_sql::exec(sql).await {
         Ok(o) => {
             res.data = match serde_json::to_string(&o) {
                 Ok(oo) => oo,
@@ -150,17 +146,17 @@ fn exec_postgre_sql(sql: String) -> DbResult {
 
 /**
  * 连接到 sqlite
- * conn_string 连接字符串, 类似 "host=localhost user=postgres password=yourpassword dbname=testdb"
+ * url 连接字符串, 类似 "host=localhost user=postgres password=yourpassword dbname=testdb"
  */
 #[tauri::command]
-fn connect_sqlite(conn_string: String) -> DbResult {
+fn sqlite_connect(url: String) -> DbResult {
     let mut res = DbResult {
         error_message: "".to_string(),
         data: "".to_string(),
         column_name: "".to_string(),
     };
 
-    match sqlite::connect(conn_string) {
+    match sqlite::connect(url) {
         Ok(()) => res.data = "ok".to_string(),
         Err(e) => res.error_message = e.to_string(),
     }
@@ -172,7 +168,7 @@ fn connect_sqlite(conn_string: String) -> DbResult {
  * 使用 sqlite 查询数据
  */
 #[tauri::command]
-async fn query_sqlite(sql: String) -> DbResult {
+async fn sqlite_query(sql: String) -> DbResult {
     let mut res = DbResult {
         error_message: "".to_string(),
         data: "".to_string(),
@@ -181,10 +177,8 @@ async fn query_sqlite(sql: String) -> DbResult {
 
     match sqlite::query(sql).await {
         Ok(o) => {
-            res.data = match serde_json::to_string(&o) {
-                Ok(oo) => oo,
-                Err(_) => "".to_string(),
-            };
+            res.column_name = o.column_name;
+            res.data = o.data;
         }
         Err(e) => res.error_message = e.to_string(),
     }
@@ -196,7 +190,7 @@ async fn query_sqlite(sql: String) -> DbResult {
  * 使用 sqlite 执行非查询语句
  */
 #[tauri::command]
-async fn exec_sqlite(sql: String) -> DbResult {
+async fn sqlite_exec(sql: String) -> DbResult {
     let mut res = DbResult {
         error_message: "".to_string(),
         data: "".to_string(),
@@ -222,15 +216,15 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             greet,
-            connect_my_sql,
-            query_my_sql,
-            exec_my_sql,
-            connect_postgres_sql,
-            query_postgre_sql,
-            exec_postgre_sql,
-            connect_sqlite,
-            query_sqlite,
-            exec_sqlite
+            my_sql_connect,
+            my_sql_query,
+            my_sql_exec,
+            postgres_sql_connect,
+            postgres_sql_query,
+            postgres_sql_exec,
+            sqlite_connect,
+            sqlite_query,
+            sqlite_exec
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

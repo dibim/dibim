@@ -1,26 +1,22 @@
-use lazy_static::lazy_static;
+use once_cell::sync::OnceCell;
 use serde_json::{Map as JsonMap, Value as JsonValue};
-use std::sync::Mutex;
-use tokio_postgres::{Client, Error, NoTls, Row};
+use tokio::sync::Mutex as AsyncMutex;
+use tokio_postgres::{Client, Error, Row};
 
 use crate::types::{ExecResult, QueryResult};
 
-lazy_static! {
-    static ref PG_CLIENT: Mutex<Option<Client>> = Mutex::new(None);
-}
+// 使用 OnceCell + AsyncMutex 保证线程安全
+static PG_CLIENT: OnceCell<AsyncMutex<Option<Client>>> = OnceCell::new();
 
 /**
- * conn_string 连接字符串, 类似 "host=localhost user=postgres password=yourpassword dbname=testdb";
+ * 连接数据库（保持原函数签名）
  */
-#[tokio::main]
 pub async fn connect(conn_string: String) -> Result<(), Error> {
-    // 连接数据库
-    let (client, connection) = tokio_postgres::connect(&conn_string, NoTls).await?;
+    let (client, connection) = tokio_postgres::connect(&conn_string, tokio_postgres::NoTls).await?;
 
-    // 将连接对象存储到全局变量
-    *PG_CLIENT.lock().unwrap() = Some(client);
+    // 初始化全局客户端
+    PG_CLIENT.get_or_init(|| AsyncMutex::new(Some(client)));
 
-    // 启动连接任务
     tokio::spawn(async move {
         if let Err(e) = connection.await {
             eprintln!("Connection error: {}", e);
@@ -31,116 +27,113 @@ pub async fn connect(conn_string: String) -> Result<(), Error> {
 }
 
 /**
- * 执行查询语句
+ * 执行查询（保持原函数签名）
  */
-#[tokio::main]
 pub async fn query(query_string: String) -> Result<QueryResult, Box<dyn std::error::Error>> {
-    // 初始结果
     let mut query_result = QueryResult {
         column_name: "".to_string(),
         data: "".to_string(),
     };
 
-    let mut json_rows: Vec<JsonValue> = Vec::new();
-    let mut columns: Vec<String> = [].to_vec();
-
-    if let Some(client) = PG_CLIENT.lock().unwrap().as_ref() {
+    // 安全获取异步锁
+    let guard = PG_CLIENT.get().ok_or("Not connected")?.lock().await;
+    if let Some(client) = guard.as_ref() {
         let rows = client.query(&query_string, &[]).await?;
-        if rows.len() == 0 {
-            return Ok(query_result);
-        }
 
-        // 获取列名
-        let columns_data = rows[0].columns();
-        for c in columns_data {
-            columns.push(c.name().to_string());
-        }
+        if !rows.is_empty() {
+            // 处理列名
+            let columns = rows[0]
+                .columns()
+                .iter()
+                .map(|c| c.name().to_string())
+                .collect::<Vec<_>>();
 
-        for row in rows {
-            let json_value = postgres_row_to_json(row).await?;
-            json_rows.push(json_value)
+            // 处理行数据
+            let json_rows = rows
+                .into_iter()
+                .map(postgres_row_to_json)
+                .collect::<Result<Vec<_>, _>>()?;
+
+            query_result.column_name = serde_json::to_string(&columns)?;
+            query_result.data = serde_json::to_string(&json_rows)?;
         }
     }
 
-    query_result.column_name = serde_json::to_string(&columns)?;
-    query_result.data = serde_json::to_string(&json_rows)?;
     Ok(query_result)
 }
 
 /**
- * 执行非查询的语句
- * 
- * 当 SQL 语句包含 RETURNING 子句时，必须使用 query 方法而非 execute，原因如下：
- * 方法	    返回值类型	        适用场景
- * execute	u64（受影响的行数）	执行不返回数据的语句（如纯 UPDATE）
- * query	Vec<Row>（结果集）	执行返回数据的语句（如 SELECT 或含 RETURNING 的 UPDATE）
- * 
- * execute 设计用于执行不返回结果集的语句。而 RETURNING 子句会显式要求数据库返回修改后的数据（如 UPDATE ... RETURNING id），此时语句已具备查询特性。
- * 
- * 
- * 因此, 要获得 last_insert_id 需要调用 query , 使用的语句类似 "INSERT INTO table (column) VALUES ($1) RETURNING id"
- * 或者  "UPDATE your_table SET column = $1 WHERE condition = $2 RETURNING id, name"
- * 然后遍历返回的行, 使用 row.get("id") 获取才行.
- * 
+ * 执行非查询（保持原函数签名）
  */
-#[tokio::main]
 pub async fn exec(query_string: String) -> Result<ExecResult, Box<dyn std::error::Error>> {
     let mut query_result = ExecResult {
         affected_rows: 0,
         last_insert_id: 0,
     };
 
-    if let Some(client) = PG_CLIENT.lock().unwrap().as_ref() {
-        let affected_rows = client.execute(&query_string, &[]).await?;
-
-        query_result.affected_rows = affected_rows;
-        // query_result.last_insert_id = ;
+    let guard = PG_CLIENT.get().ok_or("Not connected")?.lock().await;
+    if let Some(client) = guard.as_ref() {
+        let affected = client.execute(&query_string, &[]).await?;
+        query_result.affected_rows = affected;
     }
 
     Ok(query_result)
 }
 
 /**
- * 把行数据转为 json
+ * 同步行转换函数（修复 async 问题）
  */
-async fn postgres_row_to_json(row: Row) -> Result<JsonValue, Box<dyn std::error::Error>> {
-    let mut json_map = JsonMap::new();
+fn postgres_row_to_json(row: Row) -> Result<JsonValue, Box<dyn std::error::Error>> {
+    let mut map = JsonMap::new();
 
-    for column in row.columns() {
-        let column_name = column.name().to_string();
-        let column_type = column.type_().name().to_string();
+    for (idx, column) in row.columns().iter().enumerate() {
+        let col_name = column.name().to_string();
 
-        // 获取字段值
-        let value = match column_type.as_str() {
-            "int2" | "int4" | "int8" => {
-                let val: i64 = row.try_get(column.name())?;
-                JsonValue::Number(serde_json::Number::from(val))
-            }
-            "float4" | "float8" => {
-                let val: f64 = row.try_get(column.name())?;
-                JsonValue::Number(serde_json::Number::from_f64(val).unwrap())
-            }
-            "bool" => {
-                let val: bool = row.try_get(column.name())?;
-                JsonValue::Bool(val)
-            }
-            "text" | "varchar" | "uuid" => {
-                let val: String = row.try_get(column.name())?;
-                JsonValue::String(val)
-            }
-            "date" | "timestamp" | "timestamptz" => {
-                let val: String = row.try_get(column.name())?;
-                JsonValue::String(val)
-            }
-            "json" | "jsonb" => {
-                let json_str: String = row.try_get(column.name())?;
-                serde_json::from_str(&json_str)? // 解析 JSON 字符串
-            }
-            _ => JsonValue::Null, // 不支持的类型返回 null
-        };
+        // FIXME: column.type_().name() 返回的总是 "name" 这个字符串
+        // let value =  JsonValue::String(column.type_().name().to_string());
+        // let value = match column.type_().name() {
+        //     "int2" | "int4" | "int8" => {
+        //         let val: i64 = row.try_get(column.name())?;
+        //         JsonValue::Number(serde_json::Number::from(val))
+        //     }
+        //     "float4" | "float8" => {
+        //         let val: f64 = row.try_get(column.name())?;
+        //         JsonValue::Number(serde_json::Number::from_f64(val).unwrap())
+        //     }
+        //     "bool" => {
+        //         let val: bool = row.try_get(column.name())?;
+        //         JsonValue::Bool(val)
+        //     }
+        //     "text" | "varchar" | "uuid" => {
+        //         let val: String = row.try_get(column.name())?;
+        //         JsonValue::String(val)
+        //     }
+        //     "date" | "timestamp" | "timestamptz" => {
+        //         let val: String = row.try_get(column.name())?;
+        //         JsonValue::String(val)
+        //     }
+        //     "json" => {
+        //         let val: String = row.try_get(column.name())?;
+        //         JsonValue::String(val)
+        //     }
+        //     // "jsonb" => {
+        //     // TODO:
+        //     // let val: String = row.try_get(column.name())?;
+        //     // JsonValue::Bool(val)
+        //     // }
+        //     "bytea" => {
+        //         let bytes: Vec<u8> = row.get(idx);
+        //         JsonValue::String(base64::encode(bytes))
+        //     }
+        //     _ => JsonValue::Null, // 其他类型返回 null
+        // };
 
-        json_map.insert(column_name, value);
+        // TODO: 这里临时全部按照字符串处理
+        let val: String = row.try_get(column.name())?;
+        let value = JsonValue::String(val);
+
+        map.insert(col_name, value);
     }
 
-    Ok(JsonValue::Object(json_map))
+    Ok(JsonValue::Object(map))
 }
