@@ -15,7 +15,7 @@ import { Main } from "./pages/Main";
 import { useCoreStore } from "./store";
 
 export default function Page() {
-  const { currentDbNme, currentTable } = useCoreStore();
+  const { currentDbNme, currentTableName: currentTable } = useCoreStore();
 
   // 侧边栏应该根据不同的语言设置合理的宽度
   const SIDEBAR_WIDTH = "6rem";

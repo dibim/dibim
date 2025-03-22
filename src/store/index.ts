@@ -1,15 +1,18 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { DbType, MainContenType } from "@/types/types";
 
 // 定义 store 的类型
 export interface CoreStoreState {
-  currentDbType: string; // 当前数据库类型
+  currentDbType: DbType; // 当前数据库类型
   currentDbNme: string; // 当前数据库名
-  currentTable: string; // 当前表名
+  currentTableName: string; // 当前表名
+  mainContenType: MainContenType; // 主要区域的类型
 
-  setCurrentDbType: (val: string) => void;
+  setCurrentDbType: (val: DbType) => void;
   setCurrentDbName: (val: string) => void;
-  setCurrentTable: (val: string) => void;
+  setCurrentTableName: (val: string) => void;
+  setMainContenType: (val: MainContenType) => void;
   reset: () => void;
 }
 
@@ -19,19 +22,21 @@ export const useCoreStore = create<CoreStoreState>()(
     (set) => ({
       currentDbType: "",
       currentDbNme: "",
-      currentTable: "",
+      currentTableName: "",
+      mainContenType: "",
 
       // 更新状态
-      setCurrentDbType: (val: string) => set({ currentDbType: val }),
+      setCurrentDbType: (val: DbType) => set({ currentDbType: val }),
       setCurrentDbName: (val: string) => set({ currentDbNme: val }),
-      setCurrentTable: (val: string) => set({ currentTable: val }),
+      setCurrentTableName: (val: string) => set({ currentTableName: val }),
+      setMainContenType: (val: MainContenType) => set({ mainContenType: val }),
 
       // 重置状态
       reset: () =>
         set({
           currentDbType: "",
           currentDbNme: "",
-          currentTable: "",
+          currentTableName: "",
         }),
     }),
     {
