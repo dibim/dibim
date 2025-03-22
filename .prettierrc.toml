@@ -1,0 +1,28 @@
+# 格式化代码(指定目录): `npx prettier --write "src/modules/**"`
+#
+# 经过测试, 使用 cjs 或 ts 有问题, 使用 toml 格式对于在命令行和 vscode 中使用快捷键调用 prettier 的结果是一样的, 不会存在存在差异。
+# 在vscode中如果没有按照配置文件格式化, 确保 **Prettier: Require Config** 选项已启用。这会强制 Prettier 使用项目中的配置文件。
+
+# 基本配置
+htmlWhitespaceSensitivity = "ignore" # 忽略空白字符
+
+# 插件列表
+plugins = [
+  "@trivago/prettier-plugin-sort-imports", # 对 import 排序的配置
+]
+
+# import 相关配置
+importOrder = [
+  "^react",         # react 开头的
+  "^vue",           # vue 开头的
+  "^element-plus$", # element-plus 
+  "^@element-plus", # @element-plus 开头的
+  "^[a-zA-Z]",      # 字母开头的
+  "^@(?!/).*",      # @开头的, 但不是 @/ 开头的  
+  "^@/",            # 别名路径
+  "^[./]",          # 相对路径
+]
+importOrderSortSpecifiers = true # 对导入的成员排序
+
+# 以下是和默认值不一样的配置
+printWidth = 120      # 每行最大字符数，超过会换行
