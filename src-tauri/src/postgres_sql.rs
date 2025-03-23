@@ -130,7 +130,7 @@ fn postgres_row_to_json(row: Row) -> Result<JsonValue, Box<dyn std::error::Error
 
         // TODO: 这里临时全部按照字符串处理
         let val: String = row.try_get(column.name())?;
-        let value = JsonValue::String(val);
+        let value = JsonValue::String(format!("{:?}", val));
 
         map.insert(col_name, value);
     }

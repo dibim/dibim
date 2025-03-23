@@ -11,6 +11,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/x_sidebar";
 import "@/styles/index.css";
+import "@/styles/theme.scss";
 import { Main } from "./pages/Main";
 import { useCoreStore } from "./store";
 
