@@ -25,7 +25,7 @@ export function TableList(props: TableListData) {
   }, []);
 
   return (
-    <div className="h-full">
+    <div>
       {tablenames.map((item, index) => (
         <p
           className="py-1 cursor-pointer flex justify-between"
