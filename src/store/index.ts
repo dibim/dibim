@@ -10,10 +10,14 @@ export interface CoreStoreState {
   currentTableName: string; // 当前表名
   mainContenType: MainContenType; // 主要区域的类型
 
+  // 侧边栏
+  sidebarOpen: boolean;
+
   setCurrentDbType: (val: DbType) => void;
   setCurrentDbName: (val: string) => void;
   setCurrentTableName: (val: string) => void;
   setMainContenType: (val: MainContenType) => void;
+  setSidebarOpen: (val: boolean) => void;
   reset: () => void;
 }
 
@@ -26,11 +30,15 @@ export const useCoreStore = create<CoreStoreState>()(
       currentTableName: "",
       mainContenType: STR_EMPTY,
 
+      // 侧边栏
+      sidebarOpen: true,
+
       // 更新状态
       setCurrentDbType: (val: DbType) => set({ currentDbType: val }),
       setCurrentDbName: (val: string) => set({ currentDbNme: val }),
       setCurrentTableName: (val: string) => set({ currentTableName: val }),
       setMainContenType: (val: MainContenType) => set({ mainContenType: val }),
+      setSidebarOpen: (val: boolean) => set({ sidebarOpen: val }),
 
       // 重置状态
       reset: () =>
@@ -39,6 +47,7 @@ export const useCoreStore = create<CoreStoreState>()(
           currentDbNme: "",
           currentTableName: "",
           mainContenType: STR_EMPTY,
+          sidebarOpen: true,
         }),
     }),
     {
