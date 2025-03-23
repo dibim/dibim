@@ -5,6 +5,19 @@ import { GetTableDataParam } from "./types";
 
 // 连接数据库的参数不同, 直接调用各自目录里的
 
+
+/**
+ * postgres://user:pass@host:port/db  # PostgreSQL
+ * mysql://user:pass@host:port/db     # MySQL
+ * sqlite:///path/to/database.db      # SQLite
+ */
+
+/**
+ * 
+ * @param dbType 
+ * @returns 
+ */
+
 // 获取所有表格名
 export async function getAllTables(dbType: DbType) {
   if (dbType === DB_TYPE_MY_SQL) {

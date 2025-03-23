@@ -1,7 +1,7 @@
 /**
  * 点击表格显示数据
  */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { getTableData } from "@/databases/adapter,";
 import { cn } from "@/lib/utils";
@@ -22,38 +22,46 @@ import {
 
 export function TableEditorData(props: MainContentData) {
   const { currentDbType, currentTableName } = useCoreStore();
+  const [tableData, setTableData] = useState<any[]>([]); // 表格数据
+  const [colNames, setColNames] = useState<string[]>([]); // 列名
 
   // 获取表格数据
   const getData = async () => {
-    await getTableData(currentDbType, {
+    const res = await getTableData(currentDbType, {
       tableName: currentTableName,
       orderBy: "",
       currentPage: 1,
       pageSize: 20,
     });
+
+    if (res && res.data) {
+      setTableData(res.data);
+
+      const firstRow = res.data[0];
+      const names: string[] = [];
+      for (const key in firstRow) {
+        names.push(key);
+      }
+
+      setColNames(names);
+    }
   };
+
+  useEffect(() => {
+    getData();
+  }, [currentTableName]);
 
   useEffect(() => {
     getData();
   }, []);
 
-  const testData = [
-    {
-      invoice: "INV001",
-      paymentStatus: "Paid",
-      totalAmount: "$250.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV002",
-      paymentStatus: "Pending",
-      totalAmount: "$150.00",
-      paymentMethod: "PayPal",
-    },
-  ];
+  const renderRow = (row: { [key: string]: any }) => {
+    return colNames.map((colName) => <TableCell className="font-medium">{row[colName]}</TableCell>);
+  };
 
   return (
     <>
+      {/* 按钮栏 */}
       <div className="flex">
         <div className={cn("gap-4 px-2.5 sm:pl-2.5 inline-flex items-center justify-center ")}>
           {/* 刷新 */}
@@ -99,23 +107,18 @@ export function TableEditorData(props: MainContentData) {
         </Pagination>
       </div>
 
+      {/* 主体表格 */}
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Invoice</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Method</TableHead>
-            <TableHead>Amount</TableHead>
+            {colNames.map((colName) => (
+              <TableHead>{colName}</TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {testData.map((invoice) => (
-            <TableRow key={invoice.invoice}>
-              <TableCell className="font-medium">{invoice.invoice}</TableCell>
-              <TableCell>{invoice.paymentStatus}</TableCell>
-              <TableCell>{invoice.paymentMethod}</TableCell>
-              <TableCell className="text-right">{invoice.totalAmount}</TableCell>
-            </TableRow>
+          {tableData.map((item) => (
+            <TableRow key={item.invoice}>{renderRow(item)}</TableRow>
           ))}
         </TableBody>
       </Table>
