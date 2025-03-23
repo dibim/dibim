@@ -30,3 +30,4 @@ tokio = { version = "1", features = ["full"] }
 tokio-postgres = "0.7"
 mysql_async = "0.35.1"
 rusqlite = { version = "0.34.0", features = ["bundled"] }
+sqlx = { version = "0.8", features = [ "runtime-tokio", "tls-native-tls" ] }

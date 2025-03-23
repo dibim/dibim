@@ -37,17 +37,19 @@ export async function getAllTables() {
 }
 
 // 获取表格数据
-export async function getTableData(params: GetTableDataParam) {
+export async function getTableData(p: GetTableDataParam) {
   const sql = `
-    SELECT 
-        tablename 
-    FROM 
-        pg_catalog.pg_tables 
-    WHERE 
-        schemaname NOT IN ('pg_catalog', 'information_schema')
+    SELECT * 
+    FROM ${p.tableName}
+    ${p.orderBy ? "ORDER BY " + p.orderBy : ""}
+    LIMIT ${p.pageSize}
     ;`;
 
+  console.log("sql:::", sql);
+
   const dbRes = await invoker.query(sql);
+
+  console.log("dbRes:::", dbRes);
 
   // 整理成以为数组
   const data = JSON.parse(dbRes.data) as { tablename: string }[];
