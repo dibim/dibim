@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { MainContent } from "@/components/main_content/MainContent";
 import { TableList } from "@/components/sub_idebar/TableList";
 import { DB_TYPE_POSTGRES_SQL, MAIN_CONTEN_TYPE_TABLE_DATA } from "@/constants";
-import { connect, getAllTables } from "@/databases/PostgreSQL/utils";
+import { connect } from "@/databases/PostgreSQL/utils";
 import { useCoreStore } from "@/store";
 
 export function Main() {
@@ -68,11 +68,15 @@ export function Main() {
   }, []);
 
   return (
-    <div className="flex h-full">
-      {/* 侧边栏 */}
-      <div className="h-full bg-background border-r relative" style={{ width: sidebarWidth }}>
-        {/* 侧边栏内容 */}
-        <div className="p-4">
+    <div className="flex">
+      {/* 次级侧边栏 */}
+      <div className="flex border-r relative" style={{ width: sidebarWidth }}>
+        {/* 次级侧边栏内容 */}
+        {/* 这里的 height 是屏幕高度减去 header 的高度 */}
+        <div
+          className="flex-1 overflow-y-scroll py-2 ps-2 pe-4"
+          style={{ height: "calc(100vh - var(--spacing) * 12)" }}
+        >
           {/* TODO: 链接对应的数据库并查询表格 */}
           {currentDbType === DB_TYPE_POSTGRES_SQL && <TableList />}
         </div>

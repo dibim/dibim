@@ -26,7 +26,7 @@ export default function Page() {
       <SidebarProvider SIDEBAR_WIDTH={SIDEBAR_WIDTH} SIDEBAR_WIDTH_MOBILE={SIDEBAR_WIDTH_MOBILE}>
         <AppSidebar SIDEBAR_WIDTH_MOBILE={SIDEBAR_WIDTH} />
         <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+          <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
