@@ -25,9 +25,37 @@ serde_json = "1"
 base64 = "0.22.1"
 once_cell = "1.21.1"
 uuid = "1.16.0"
+bigdecimal = "0.4.7"
 lazy_static = "1.5.0"
 tokio = { version = "1", features = ["full"] }
-tokio-postgres = "0.7"
-mysql_async = "0.35.1"
-rusqlite = { version = "0.34.0", features = ["bundled"] }
-sqlx = { version = "0.8", features = [ "runtime-tokio", "tls-native-tls" ] }
+sqlx = { version = "0.8", features = [ 
+     # 所有数据库驱动
+    "postgres",      # PostgreSQL
+    "mysql",         # MySQL/MariaDB
+    "sqlite",        # SQLite
+    # "mssql",         # Microsoft SQL Server（需 Rust 1.65+）
+
+    # 动态多数据库支持（可选）
+    "any",           # 允许运行时动态切换数据库
+
+    #
+    "derive",
+    "macros",
+    "migrate",
+  
+
+    # 异步运行时（必选一个）
+    "runtime-tokio-native-tls",  # 使用 Tokio + 操作系统 TLS 库
+    # "runtime-async-std-native-tls", # 使用 async-std 运行时
+
+    # 扩展功能
+    "chrono",        # 日期时间支持（chrono 库）
+    "json",          # JSON 类型支持（serde_json）
+    "uuid",          # UUID 类型支持
+    "time",          # 时间类型支持（time 库）
+    # "bstr", # Add support for bstr::BString
+    "bigdecimal", # Add support for NUMERIC using the bigdecimal crate.
+    # "rust_decimal", # Add support for NUMERIC using the rust_decimal crate.
+    "ipnetwork", # Add support for INET and CIDR (in postgres) using the ipnetwork crate.
+    
+ ] }

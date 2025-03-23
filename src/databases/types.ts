@@ -1,3 +1,31 @@
+import {
+  SSL_MODE_ALLOW,
+  SSL_MODE_DISABLE,
+  SSL_MODE_PREFER,
+  SSL_MODE_REQUIRE,
+  SSL_MODE_VERIFY_CA,
+  SSL_MODE_VERIFY_FULL,
+} from "./constants";
+
+// rust 的 sqlx 在连接字符串中添加 sslmode 参数控制 TLS 行为
+export type SslMode =
+  | typeof SSL_MODE_DISABLE
+  | typeof SSL_MODE_ALLOW
+  | typeof SSL_MODE_PREFER
+  | typeof SSL_MODE_REQUIRE
+  | typeof SSL_MODE_VERIFY_CA
+  | typeof SSL_MODE_VERIFY_FULL;
+
+// 链接数据库的参数
+export interface DbConnectionParams {
+  user: string;
+  host: string;
+  dbname: string;
+  password: string;
+  port: number;
+  sslmode?: SslMode;
+}
+
 export type GetTableDataParam = {
   tableName: string;
   orderBy: string;
