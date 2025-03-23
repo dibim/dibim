@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MainContent } from "@/components/main_content/MainContent";
 import { TableList } from "@/components/sub_idebar/TableList";
-import { DB_TYPE_POSTGRES_SQL, MAIN_CONTEN_TYPE_TABLE_DATA } from "@/constants";
+import { DB_TYPE_POSTGRES_SQL, MAIN_CONTEN_TYPE_TABLE_EDITOR } from "@/constants";
 import { connect } from "@/databases/PostgreSQL/utils";
 import { useCoreStore } from "@/store";
 
@@ -60,7 +60,7 @@ export function Main() {
     console.log("connect res: ", res);
 
     setCurrentDbType(DB_TYPE_POSTGRES_SQL);
-    setMainContenType(MAIN_CONTEN_TYPE_TABLE_DATA);
+    setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
   };
 
   useEffect(() => {

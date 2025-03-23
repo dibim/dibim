@@ -1,16 +1,20 @@
-import { GetTableDataParam } from "../types";
+import { DbConnectionParams, GetTableDataParam } from "../types";
 import { invoker } from "./invoke";
+
+const testConnName = "testPg";
 
 /**
  * 连接到 postgre_sql
- * 连接字符串, 类似 "host=localhost user=postgres password=yourpassword dbname=testdb"
  *
- * TODO: 支持 tls
+ * "postgres://user:password@localhost:5432/mydb?sslmode=require";
+ *
  *
  */
-export async function connect(p: PostgresConnectionParams) {
+export async function connect(p: DbConnectionParams) {
   return await invoker.connect(
-    `host=${p.host} port=${p.port} user=${p.user} password=${p.password} dbname=${p.dbname}`,
+    testConnName,
+    // `host=${p.host} port=${p.port} user=${p.user} password=${p.password} dbname=${p.dbname}`,
+    `postgres://${p.user}:${p.password}@${p.host}:${p.port}/${p.dbname}`,
   );
 }
 
@@ -25,19 +29,20 @@ export async function getAllTables() {
         schemaname NOT IN ('pg_catalog', 'information_schema')
     ;`;
 
-  const dbRes = await invoker.query(sql);
+  const dbRes = await invoker.query(testConnName, sql);
 
-  // 整理成以为数组
-  const data = JSON.parse(dbRes.data) as { tablename: string }[];
+  // 把表名整理成一维数组
+  const dataArr = dbRes.data ? (JSON.parse(dbRes.data) as { tablename: string }[]) : [];
 
   return {
-    columnName: JSON.parse(dbRes.columnName) as string[],
-    data: data.map((item) => item.tablename),
+    columnName: dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : [],
+    data: dataArr.map((item) => item.tablename),
   };
 }
 
 // 获取表格数据
 export async function getTableData(p: GetTableDataParam) {
+  // TODO: 添加分页
   const sql = `
     SELECT * 
     FROM ${p.tableName}
@@ -45,17 +50,10 @@ export async function getTableData(p: GetTableDataParam) {
     LIMIT ${p.pageSize}
     ;`;
 
-  console.log("sql:::", sql);
-
-  const dbRes = await invoker.query(sql);
-
-  console.log("dbRes:::", dbRes);
-
-  // 整理成以为数组
-  const data = JSON.parse(dbRes.data) as { tablename: string }[];
+  const dbRes = await invoker.query(testConnName, sql);
 
   return {
-    columnName: JSON.parse(dbRes.columnName) as string[],
-    data: data.map((item) => item.tablename),
+    columnName: dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : [],
+    data: dbRes.data ? (JSON.parse(dbRes.data) as { tablename: string }[]) : [],
   };
 }

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { STR_EMPTY } from "@/constants";
 import { DbType, MainContenType } from "@/types/types";
 
 // 定义 store 的类型
@@ -20,10 +21,10 @@ export interface CoreStoreState {
 export const useCoreStore = create<CoreStoreState>()(
   persist(
     (set) => ({
-      currentDbType: "",
+      currentDbType: STR_EMPTY,
       currentDbNme: "",
       currentTableName: "",
-      mainContenType: "",
+      mainContenType: STR_EMPTY,
 
       // 更新状态
       setCurrentDbType: (val: DbType) => set({ currentDbType: val }),
@@ -34,9 +35,10 @@ export const useCoreStore = create<CoreStoreState>()(
       // 重置状态
       reset: () =>
         set({
-          currentDbType: "",
+          currentDbType: STR_EMPTY,
           currentDbNme: "",
           currentTableName: "",
+          mainContenType: STR_EMPTY,
         }),
     }),
     {
