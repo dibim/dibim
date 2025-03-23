@@ -3,84 +3,88 @@ import { Database, DatabaseBackup, ScanSearch, SquareFunction, Table, View } fro
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/x_sidebar";
+} from "@/components/ui/sidebar";
+import { useCoreStore } from "@/store";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { sidebarOpen } = useCoreStore();
+
   return (
-    <Sidebar {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
-              <span className="text-xl font-semibold cursor-pointer">DIBIM</span>
+            <SidebarMenuButton>
+              {sidebarOpen ? (
+                <span className="text-xl font-semibold cursor-pointer">DIBIM</span>
+              ) : (
+                // TODO: 做一个自己的图标
+                <p></p>
+              )}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
       <SidebarContent>
-        {/* We create a SidebarGroup for each parent. */}
-
-        <SidebarGroup key={"databases"}>
-          <SidebarGroupContent>
-            <div className="flex">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip={"数据库"}>
               <Database />
-              <span className="ps-2 cursor-pointer">数据库</span>
-            </div>
-          </SidebarGroupContent>
-        </SidebarGroup>
+              <span>数据库</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
 
-        <SidebarGroup key={"tables"}>
-          <SidebarGroupContent>
-            <div className="flex">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip={"表格"}>
               <Table />
-              <span className="ps-2 cursor-pointer">表</span>
-            </div>
-          </SidebarGroupContent>
-        </SidebarGroup>
+              <span>表格</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
 
-        <SidebarGroup key={"functions"}>
-          <SidebarGroupContent>
-            <div className="flex">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip={"函数"}>
               <SquareFunction />
-              <span className="ps-2 cursor-pointer">函数</span>
-            </div>
-          </SidebarGroupContent>
-        </SidebarGroup>
+              <span>函数</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
 
-        <SidebarGroup key={"views"}>
-          <SidebarGroupContent>
-            <div className="flex">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip={"视图"}>
               <View />
-              <span className="ps-2 cursor-pointer">视图</span>
-            </div>
-          </SidebarGroupContent>
-        </SidebarGroup>
+              <span>视图</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
 
-        <SidebarGroup key={"queries"}>
-          <SidebarGroupContent>
-            <div className="flex">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip={"查询"}>
               <ScanSearch />
-              <span className="ps-2 cursor-pointer">查询</span>
-            </div>
-          </SidebarGroupContent>
-        </SidebarGroup>
+              <span>查询</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
 
-        <SidebarGroup key={"backup"}>
-          <SidebarGroupContent>
-            <div className="flex">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip={"备份"}>
               <DatabaseBackup />
-              <span className="ps-2 cursor-pointer">备份</span>
-            </div>
-          </SidebarGroupContent>
-        </SidebarGroup>
+              <span>备份</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
