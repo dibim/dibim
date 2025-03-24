@@ -9,6 +9,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { APP_NAME } from "@/constants";
 import { useCoreStore } from "@/store";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -21,7 +22,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton>
               {sidebarOpen ? (
-                <span className="text-xl font-semibold cursor-pointer">DIBIM</span>
+                <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>
               ) : (
                 // TODO: 做一个自己的图标
                 <p></p>

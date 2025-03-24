@@ -1,4 +1,8 @@
+export const APP_NAME = "DIBIM";
+
 export const STR_EMPTY = "";
+
+export const HEDAER_H = 12; // header 的 h- 属性值, 对应 tailwindcss 的
 
 // 数据库类性
 export const DB_TYPE_MY_SQL = "MySQL";
