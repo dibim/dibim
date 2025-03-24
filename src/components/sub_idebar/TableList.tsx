@@ -17,8 +17,6 @@ export function TableList(props: TableListData) {
   };
 
   const clickItem = (item: string) => {
-    console.log("TableList clickItem:::: ", item);
-
     setCurrentTableName(item);
     setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
   };
