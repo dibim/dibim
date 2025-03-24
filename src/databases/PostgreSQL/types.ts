@@ -1,4 +1,5 @@
 // 基础列信息
+// 成员的属性名为字段名
 export type TableStructureCol = {
   character_maximum_length: number | null; // 字符类型最大长度
   character_octet_length: number | null; // 字符类型的字节长度
@@ -46,10 +47,12 @@ export type TableStructureCol = {
   udt_schema: string; // 用户定义类型所属模式（如 "pg_catalog"）
 };
 
+// 成员的属性名为字段名
 export type PrimaryKeysRes = {
   column_name: string;
 };
 
+// 成员的属性名为字段名
 export type ForeignKeysRes = {
   constraint_name: string;
   referenced_table: string;
@@ -57,26 +60,31 @@ export type ForeignKeysRes = {
   referenced_column: string;
 };
 
+// 成员的属性名为字段名
 export type UniqueKeysResRes = {
   column_name: string;
   constraint_name: string;
 };
 
+// 成员的属性名为字段名
 export type NotNullRes = {
   column_name: string;
   is_nullable: boolean;
 };
 
+// 成员的属性名为字段名
 export type CheckConstraintsRes = {
   constraint_name: string;
   check_condition: boolean;
 };
 
+// 成员的属性名为字段名
 export type CommentRes = {
   column_name: string;
   comment: string;
 };
 
+// 成员的属性名为字段名
 export type TableStructurePostgresql = TableStructureCol & {
   is_primary_key: boolean; // 是否主键
   is_unique: boolean; // 是否唯一约束

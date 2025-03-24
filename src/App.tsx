@@ -5,6 +5,7 @@ import "@/styles/app.scss";
 import "@/styles/index.css";
 import "@/styles/theme.scss";
 import { Main } from "./pages/Main";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 export default function Page() {
   return (
@@ -15,10 +16,12 @@ export default function Page() {
           "--sidebar-width-mobile": "20rem",
         }}
       >
-        <AppSidebar />
-        <SidebarInset>
-          <Main />
-        </SidebarInset>
+        <TooltipProvider>
+          <AppSidebar />
+          <SidebarInset>
+            <Main />
+          </SidebarInset>
+        </TooltipProvider>
       </SidebarProvider>
     </ThemeProvider>
   );

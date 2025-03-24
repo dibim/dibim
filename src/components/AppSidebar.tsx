@@ -22,7 +22,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton>
-              {sidebarOpen ? <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span> : <Logo />}
+              {sidebarOpen ? (
+                <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>
+              ) : (
+                <Logo className="-p-2 -m-2" />
+              )}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
