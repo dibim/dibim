@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="100mm"
+   height="100mm"
+   viewBox="0 0 100 100"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="logo.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.4752525"
+     inkscape:cx="303.3379"
+     inkscape:cy="227.75762"
+     inkscape:window-width="1920"
+     inkscape:window-height="1012"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <linearGradient
+       id="linearGradient3217"
+       inkscape:swatch="solid">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3215" />
+    </linearGradient>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter3227"
+       x="-0.064419778"
+       y="-0.064419778"
+       width="1.1288396"
+       height="1.1288396">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.064000228"
+         id="feGaussianBlur3229" />
+    </filter>
+  </defs>
+  <g
+     inkscape:label="图层 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path365"
+       style="fill:none;stroke-width:10;fill-opacity:1;stroke:#53b677;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;stroke-linejoin:round;stroke-linecap:round;paint-order:normal;filter:url(#filter3227)"
+       d="M 50.000049 9.9999064 A 40 40 0 0 0 9.9999064 50.000049 A 40 40 0 0 0 50.000049 90.000191 L 69.999862 90.000191 A 20 20 0 0 0 90.000191 69.999862 A 20 20 0 0 0 69.999862 50.000049 A 20 20 0 0 0 90.000191 30.000236 A 20 20 0 0 0 69.999862 9.9999064 L 50.000049 9.9999064 z " />
+    <rect
+       style="fill:#53b677;fill-opacity:1;stroke:none;stroke-width:1.39642;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1152"
+       width="10"
+       height="78"
+       x="45"
+       y="10" />
+  </g>
+</svg>
