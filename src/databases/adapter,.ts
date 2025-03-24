@@ -1,5 +1,5 @@
 import { DB_TYPE_MY_SQL, DB_TYPE_POSTGRES_SQL, DB_TYPE_SQLITE } from "@/constants";
-import { getAllTablesPg, getTableDataPg, getTableStructurePg } from "@/databases/PostgreSQL/utils";
+import { getAllTablesPg, getTableDataPg, getTableDdlPg, getTableStructurePg } from "@/databases/PostgreSQL/utils";
 import { DbType } from "@/types/types";
 import { GetTableDataParam } from "./types";
 
@@ -37,6 +37,19 @@ export async function getTableStructure(dbType: DbType, tbName: string) {
   }
   if (dbType === DB_TYPE_POSTGRES_SQL) {
     return getTableStructurePg(tbName);
+  }
+  if (dbType === DB_TYPE_SQLITE) {
+    // TODO:
+  }
+}
+
+// 获取表格的 DDL
+export async function getTableDdl(dbType: DbType, tbName: string) {
+  if (dbType === DB_TYPE_MY_SQL) {
+    // TODO:
+  }
+  if (dbType === DB_TYPE_POSTGRES_SQL) {
+    return getTableDdlPg(tbName);
   }
   if (dbType === DB_TYPE_SQLITE) {
     // TODO:

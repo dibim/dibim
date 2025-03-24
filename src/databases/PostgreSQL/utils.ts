@@ -106,19 +106,6 @@ export async function getTableStructurePg(tbName: string) {
       AND tc.constraint_type = 'UNIQUE';
   `,
   );
-  // 非空约束
-  // const notNullRes = await invoker.query(
-  //   testConnName,
-  //   `
-  //   SELECT
-  //     column_name,
-  //     is_nullable
-  //   FROM
-  //     information_schema.columns
-  //   WHERE
-  //     table_name = '${tbName}';
-  //   `,
-  // );
 
   //  检查约束
   const constraintsRes = await invoker.query(
@@ -156,11 +143,8 @@ export async function getTableStructurePg(tbName: string) {
   const checkConstraintsResArr = constraintsRes.data ? (JSON.parse(constraintsRes.data) as CheckConstraintsRes[]) : [];
   const commentResArr = commentRes.data ? (JSON.parse(commentRes.data) as CommentRes[]) : [];
   const foreignKeysResArr = foreignKeysRes.data ? (JSON.parse(foreignKeysRes.data) as ForeignKeysRes[]) : [];
-  // const notNullResArr = notNullRes.data ? (JSON.parse(notNullRes.data) as NotNullRes[]) : [];
   const primaryKeysResArr = primaryKeysRes.data ? (JSON.parse(primaryKeysRes.data) as PrimaryKeysRes[]) : [];
   const uniqueKeysResArr = UniqueKeysRes.data ? (JSON.parse(UniqueKeysRes.data) as UniqueKeysResRes[]) : [];
-
-  console.log("primaryKeysResArr:::", primaryKeysResArr);
 
   function getcomment(column_name: string) {
     const res = commentResArr.find((fk) => fk.column_name === column_name);
@@ -184,6 +168,19 @@ export async function getTableStructurePg(tbName: string) {
   };
 }
 
+// 获取表格的 DDL
+// FIXME: 实现比较复杂, 推迟
+export async function getTableDdlPg(tbName: string) {
+  const sql = `SELECT pg_get_tabledef('${tbName}');`;
+  const dbRes = await invoker.query(testConnName, sql);
+
+  console.log(" getTableDdlPg::::dbRes  ", dbRes);
+
+  return {
+    columnName: dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : [],
+    data: dbRes.data ? (JSON.parse(dbRes.data) as { tablename: string }[]) : [],
+  };
+}
 // 获取表格数据
 export async function getTableDataPg(p: GetTableDataParam) {
   // TODO: 添加分页

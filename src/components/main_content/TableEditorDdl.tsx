@@ -1,13 +1,28 @@
 /**
  * 表格 DDL
+ * 
+ * FIXME: 实现比较复杂, 推迟
  */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { getTableDdl } from "@/databases/adapter,";
+import { useCoreStore } from "@/store";
 import { MainContentData } from "@/types/types";
 
 export function TableEditorDdl(props: MainContentData) {
+  const { currentDbType, currentTableName } = useCoreStore();
+
+  const [tableData, setTableData] = useState<any[]>([]); // 表结构
+
   const getData = async () => {
-    //
+    const res = await getTableDdl(currentDbType, currentTableName);
+    if (res && res.data) {
+      setTableData(res.data);
+    }
   };
+
+  useEffect(() => {
+    getData();
+  }, [currentTableName]);
 
   useEffect(() => {
     getData();
@@ -15,7 +30,7 @@ export function TableEditorDdl(props: MainContentData) {
 
   return (
     <>
-      <p>待实现</p>
+      <p>{tableData}</p>
     </>
   );
 }
