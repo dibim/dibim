@@ -2,26 +2,47 @@
  * 表格结构
  */
 import { useEffect, useState } from "react";
-import { DB_TYPE_MY_SQL, DB_TYPE_POSTGRES_SQL, DB_TYPE_SQLITE } from "@/constants";
+import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
+import { DB_TYPE_MY_SQL, DB_TYPE_POSTGRES_SQL, DB_TYPE_SQLITE, HEDAER_H } from "@/constants";
 import { TableStructureMysql } from "@/databases/MySQL/types";
+import { AlterActionData } from "@/databases/PostgreSQL/alter";
 import { TableStructurePostgresql } from "@/databases/PostgreSQL/types";
 import { TableStructureSqlite } from "@/databases/SQLite/types";
 import { getTableStructure } from "@/databases/adapter,";
+import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
 import { MainContentData } from "@/types/types";
+import { Button } from "../ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 export function TableEditorStructure(props: MainContentData) {
   const { currentDbType, currentTableName } = useCoreStore();
 
   const [tableData, setTableData] = useState<any[]>([]); // 表结构
-
   const getData = async () => {
     const res = await getTableStructure(currentDbType, currentTableName);
     if (res && res.data) {
       setTableData(res.data);
     }
   };
+  const [alterData, setAlterData] = useState<AlterActionData[]>([]); // 表结构的修改数据
+  // TODO: 实现 src/databases/PostgreSQL/alter.ts 里的功能
+
+  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+  const handleRowClick = (id: number) => {
+    const newSelectedRows = new Set(selectedRows);
+    if (newSelectedRows.has(id)) {
+      newSelectedRows.delete(id);
+    } else {
+      newSelectedRows.add(id);
+    }
+    setSelectedRows(newSelectedRows);
+  };
+
+  useEffect(() => {
+    getData();
+  }, [currentTableName]);
 
   useEffect(() => {
     getData();
@@ -37,15 +58,21 @@ export function TableEditorStructure(props: MainContentData) {
       const tableDataPg = tableData as unknown as TableStructurePostgresql[];
       return tableDataPg.map((row, index) => (
         <>
-          <TableRow>
+          <TableRow
+            onClick={() => handleRowClick(index)}
+            style={{
+              color: selectedRows.has(index) ? "var(--fvm-primary-clr)" : "",
+              cursor: "pointer",
+            }}
+          >
             <TableCell>{index + 1}</TableCell>
             <TableCell>{row.column_name}</TableCell>
             <TableCell>{row.data_type}</TableCell>
-            <TableCell>{row.is_primary_key ? "YES" : ""}</TableCell>
-            <TableCell>{row.has_foreign_key ? "YES" : ""}</TableCell>
-            <TableCell>{row.is_unique ? "YES" : ""}</TableCell>
-            <TableCell>{row.has_check_conditions ? "YES" : ""}</TableCell>
-            <TableCell>{row.is_nullable === "YES" ? "YES" : ""}</TableCell>
+            <TableCell>{row.is_primary_key ? "✅" : ""}</TableCell>
+            <TableCell>{row.has_foreign_key ? "✅" : ""}</TableCell>
+            <TableCell>{row.is_unique ? "✅" : ""}</TableCell>
+            <TableCell>{row.has_check_conditions ? "✅" : ""}</TableCell>
+            <TableCell>{row.is_nullable === "YES" ? "✅" : ""}</TableCell>
             <TableCell>{row.column_default}</TableCell>
             <TableCell>{row.comment}</TableCell>
           </TableRow>
@@ -62,24 +89,73 @@ export function TableEditorStructure(props: MainContentData) {
   };
 
   return (
-    <>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>#</TableHead>
-            <TableHead>列名</TableHead>
-            <TableHead>数据类型</TableHead>
-            <TableHead>主键</TableHead>
-            <TableHead>外键</TableHead>
-            <TableHead>唯一</TableHead>
-            <TableHead>条件</TableHead>
-            <TableHead>非空</TableHead>
-            <TableHead>默认值</TableHead>
-            <TableHead>备注</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>{renderBody()}</TableBody>
-      </Table>
-    </>
+    <div>
+      {/* 按钮栏 */}
+      <div className="flex">
+        <div className={cn("gap-4 px-2 pb-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <RotateCw color="var(--fvm-info-clr)" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>刷新</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <CirclePlus color="var(--fvm-primary-clr)" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>添加列</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <CircleMinus color="var(--fvm-danger-clr)" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>删除列</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <CircleCheck color="var(--fvm-success-clr)" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>应用</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <CircleX color="var(--fvm-warning-clr)" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>取消</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
+
+      {/* 主体表格 */}
+      <div className="flex-1 overflow-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})` }}>
+        <Table className="border-y">
+          <TableHeader>
+            <TableRow>
+              <TableHead>#</TableHead>
+              <TableHead>列名</TableHead>
+              <TableHead>数据类型</TableHead>
+              <TableHead>主键</TableHead>
+              <TableHead>外键</TableHead>
+              <TableHead>唯一</TableHead>
+              <TableHead>条件</TableHead>
+              <TableHead>非空</TableHead>
+              <TableHead>默认值</TableHead>
+              <TableHead>备注</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>{renderBody()}</TableBody>
+        </Table>
+      </div>
+    </div>
   );
 }

@@ -14,14 +14,16 @@ export function TableEditor(props: MainContentData) {
   const tabDdl = "tab2";
   const tabConstraint = "tab3";
   const tabData = "tab4";
+  const tabPart = "tab5";
 
   return (
     <Tabs defaultValue={tabData} className="w-full">
-      <TabsList className="grid grid-cols-4">
+      <TabsList className="grid grid-cols-2">
         <TabsTrigger value={tabStructure}>表结构</TabsTrigger>
-        <TabsTrigger value={tabDdl}>DDL</TabsTrigger>
-        <TabsTrigger value={tabConstraint}>约束</TabsTrigger>
+        {/* <TabsTrigger value={tabDdl}>DDL</TabsTrigger> */}
+        {/* <TabsTrigger value={tabConstraint}>约束</TabsTrigger> */}
         <TabsTrigger value={tabData}>数据</TabsTrigger>
+        {/* <TabsTrigger value={tabPart}>分区</TabsTrigger> */}
       </TabsList>
       <TabsContent value={tabStructure}>
         <Card>

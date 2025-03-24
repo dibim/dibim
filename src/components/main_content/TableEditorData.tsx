@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
 import { MainContentData } from "@/types/types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import {
   Pagination,
   PaginationContent,
@@ -61,20 +62,50 @@ export function TableEditorData(props: MainContentData) {
   };
 
   return (
-    <div className="relative">
+    <div>
       {/* 按钮栏 */}
       <div className="flex">
-        <div className={cn("gap-4 px-2.5 sm:pl-2.5 inline-flex items-center justify-center ")}>
-          {/* 刷新 */}
-          <RotateCw color="var(--fvm-info-clr)" />
-          {/* 添加行 */}
-          <CirclePlus color="var(--fvm-primary-clr)" />
-          {/* 删除行 */}
-          <CircleMinus color="var(--fvm-danger-clr)" />
-          {/* 应用 */}
-          <CircleCheck color="var(--fvm-success-clr)" />
-          {/* 取消 */}
-          <CircleX color="var(--fvm-warning-clr)" />
+        <div className={cn("gap-4 px-2 pb-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <RotateCw color="var(--fvm-info-clr)" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>刷新</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <CirclePlus color="var(--fvm-primary-clr)" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>添加行</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <CircleMinus color="var(--fvm-danger-clr)" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>删除行</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <CircleCheck color="var(--fvm-success-clr)" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>应用</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <CircleX color="var(--fvm-warning-clr)" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>取消</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
         <Pagination className="justify-start">
           <PaginationContent>
@@ -110,7 +141,7 @@ export function TableEditorData(props: MainContentData) {
 
       {/* 主体表格 */}
       <div className="flex-1 overflow-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})` }}>
-        <Table>
+        <Table className="border-y">
           <TableHeader>
             <TableRow>
               {colNames.map((colName) => (
