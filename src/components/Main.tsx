@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CirclePlus, FilePenLine, Link, PanelLeftIcon, Settings } from "lucide-react";
+import { PanelLeftIcon } from "lucide-react";
 import { Separator } from "@radix-ui/react-separator";
 import { MainContent } from "@/components/main_content/MainContent";
 import { TableList } from "@/components/sub_idebar/TableList";
@@ -9,7 +9,6 @@ import { APP_NAME, DB_TYPE_POSTGRES_SQL, HEDAER_H, MAIN_CONTEN_TYPE_TABLE_EDITOR
 import { connectPg } from "@/databases/PostgreSQL/utils";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function Main() {
   const { currentDbType, setCurrentDbType, setMainContenType, sidebarOpen, setSidebarOpen } = useCoreStore();
@@ -100,37 +99,6 @@ export function Main() {
         </Button>
 
         <Separator orientation="vertical" className="mr-2 h-4" />
-
-        {/* TODO: 实现下面的按钮的功能 */}
-
-        <div className="flex gap-4">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link color="var(--fvm-info-clr)" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>添加数据库连接</p>
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <FilePenLine color="var(--fvm-info-clr)" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>打开SQL编辑器</p>
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Settings color="var(--fvm-info-clr)" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>设置</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
       </header>
 
       <div className="flex">

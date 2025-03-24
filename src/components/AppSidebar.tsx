@@ -1,9 +1,20 @@
 import * as React from "react";
-import { Database, DatabaseBackup, ScanSearch, SquareFunction, Table, View } from "lucide-react";
+import {
+  Database,
+  DatabaseBackup,
+  FilePenLine,
+  Link,
+  ScanSearch,
+  Settings,
+  SquareFunction,
+  Table,
+  View,
+} from "lucide-react";
 import Logo from "@/assets/logo.svg?react";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -87,6 +98,34 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip={"添加数据库"}>
+              <Link color="var(--fvm-info-clr)" />
+              <span>添加数据库</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip={"SQL编辑器"}>
+              <FilePenLine color="var(--fvm-info-clr)" />
+              <span>SQL编辑器</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip={"设置"}>
+              <Settings color="var(--fvm-info-clr)" />
+              <span>设置</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
