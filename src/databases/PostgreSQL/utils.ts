@@ -184,26 +184,19 @@ export async function getTableDdlPg(tbName: string) {
 // 获取表格数据
 export async function getTableDataPg(p: GetTableDataParam) {
   const dbResTotal = await invoker.query(testConnName, `SELECT COUNT(*) AS total FROM "${p.tableName}";`);
-  console.log("dbResTotal>>>>   ", dbResTotal);
+  console.log("getTableDataPg dbResTotal>>>>   ", dbResTotal);
 
   let itemsTotal = 0; // 总条数
   if (dbResTotal && dbResTotal.data) {
-    const bbCountRes = JSON.parse(dbResTotal.data) as DbCountRes;
-    itemsTotal = bbCountRes.total;
+    const bbCountRes = JSON.parse(dbResTotal.data) as DbCountRes[];
+
+    if (bbCountRes.length > 0) itemsTotal = bbCountRes[0].total;
   }
 
   const pageTotal = Math.ceil(itemsTotal / p.pageSize); // 页数
 
-  // TODO: 必须找到一个排序字段, 优先级: 主键 > 唯一索引 > 索引 > 第一个字段
-  //       数值、日期/时间类型 优先, 字符串类型 次之,
-  //       BOOLEAN 不能用 , JSON 或复杂类型 行为可能未定义或不符合预期
-  if (p.orderBy) {
-    // TODO: 临时使用 id
-    p.orderBy = "id ASC";
-    // TODO: 查询表结构后使用 getRankField
-  }
-
   // 如果没有主键, 且没有指定排序字段
+  // TODO: 实现逻辑
   const sqlNoPkey = `  
     WITH numbered_rows AS (
         SELECT 
@@ -216,14 +209,16 @@ export async function getTableDataPg(p: GetTableDataParam) {
     WHERE row_num BETWEEN 11 AND 20; -- 第二页，每页 10 条数据
   `;
 
-  //
+  // 有指定排序数据的
+  const where = p.lastOrderByValue === null ? "" : `WHERE ${p.sortField} > ${p.lastOrderByValue}`;
   const sqlHasPkey = `
     SELECT 
       * 
     FROM 
       "${p.tableName}"
+    ${where}
     ORDER BY 
-      ${p.orderBy}
+      ${p.sortField} ${p.sortOrder}    
     LIMIT 
       ${p.pageSize}
     ;`;
@@ -239,7 +234,7 @@ export async function getTableDataPg(p: GetTableDataParam) {
 }
 
 /**
- * 查询表格数据的时候, 必须找到一个排序字段
+ * 查询表格数据的时候, 必须使用一个排序字段
  *
  * 优先级: 主键 > 唯一索引 > 索引 > 普通字段
  * 普通字段的优先级: 数值、日期/时间类型 > 字符串类型(按字符的编码排序, 比如 UTF-8)
@@ -247,7 +242,7 @@ export async function getTableDataPg(p: GetTableDataParam) {
  *
  * @param tsa 表结构数据
  */
-export function getRankField(tsa: TableStructurePostgresql[]) {
+export function getDefultOrderField(tsa: TableStructurePostgresql[]) {
   // 优先使用索引字段
   for (const f of tsa) {
     // 主键
@@ -285,10 +280,12 @@ export function getRankField(tsa: TableStructurePostgresql[]) {
   }
 
   // 找字符串字段
-  // 找不到索引字段的, 也找数字或时间字段, 找字符串字段  
+  // 找不到索引字段的, 也找数字或时间字段, 找字符串字段
   for (const f of tsa) {
     if (f.data_type.includes("text") || f.data_type.includes("char")) {
       return f.column_name;
     }
   }
+
+  return "";
 }

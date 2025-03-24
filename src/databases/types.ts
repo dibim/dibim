@@ -29,9 +29,11 @@ export interface DbConnectionParams {
 
 export type GetTableDataParam = {
   tableName: string;
-  orderBy: string;
+  sortField: string; // 排序字段
+  sortOrder: "ASC" | "DESC"; // 排序顺序
   currentPage: number; // 当前页码
   pageSize: number; // 每页的数据条数
+  lastOrderByValue: any; // 上一次查询的结果集里最后一条数据里的和 orderBy 对应的字段的值
 };
 
 export type GetTableDataRes = {
