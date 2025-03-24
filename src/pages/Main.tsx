@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
-import { DB_TYPE_POSTGRES_SQL, MAIN_CONTEN_TYPE_TABLE_EDITOR } from "@/constants";
-import { connect } from "@/databases/PostgreSQL/utils";
+import { APP_NAME, DB_TYPE_POSTGRES_SQL, HEDAER_H, MAIN_CONTEN_TYPE_TABLE_EDITOR } from "@/constants";
+import { connectPg } from "@/databases/PostgreSQL/utils";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
 
@@ -69,7 +69,7 @@ export function Main() {
   // TODO: 库,差是否有连接配置, 有的话显示 MainContent ,没有的话显示 Index
 
   const testDb = async () => {
-    const res = await connect({
+    const res = await connectPg({
       user: "postgres",
       host: "127.0.0.1",
       dbname: "given_0315",
@@ -92,8 +92,8 @@ export function Main() {
 
   return (
     <>
-      <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
-        {!sidebarOpen && <span className="text-xl font-semibold cursor-pointer">DIBIM</span>}
+      <header className={`flex h-${HEDAER_H} shrink-0 items-center gap-2 border-b px-4`}>
+        {!sidebarOpen && <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>}
 
         {/* 复制 sidebar-trigger 过来, 这里添加了函数, 记录 sidebar 的状态*/}
         <Button
@@ -135,7 +135,7 @@ export function Main() {
           {/* 这里的 height 是屏幕高度减去 header 的高度 */}
           <div
             className="flex-1 overflow-y-scroll py-2 ps-2 pe-4"
-            style={{ height: "calc(100vh - var(--spacing) * 12)" }}
+            style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}
           >
             {/* TODO: 链接对应的数据库并查询表格 */}
             {currentDbType === DB_TYPE_POSTGRES_SQL && <TableList />}
@@ -149,7 +149,7 @@ export function Main() {
         </div>
 
         {/* 主内容区域 */}
-        <div className="flex-1 p-4">
+        <div className="flex-1 p-4 overflow-y-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}>
           <MainContent />
         </div>
       </div>

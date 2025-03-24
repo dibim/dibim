@@ -5,18 +5,24 @@ import { DbType, MainContenType } from "@/types/types";
 
 // 定义 store 的类型
 export interface CoreStoreState {
-  currentDbType: DbType; // 当前数据库类型
-  currentDbNme: string; // 当前数据库名
-  currentTableName: string; // 当前表名
-  mainContenType: MainContenType; // 主要区域的类型
+  // 当前数据库类型
+  currentDbType: DbType;
+  setCurrentDbType: (val: DbType) => void;
+
+  // 当前数据库名
+  currentDbNme: string;
+  setCurrentDbName: (val: string) => void;
+
+  // 当前表名
+  currentTableName: string;
+  setCurrentTableName: (val: string) => void;
+
+  // 主要区域的类型
+  mainContenType: MainContenType;
+  setMainContenType: (val: MainContenType) => void;
 
   // 侧边栏
   sidebarOpen: boolean;
-
-  setCurrentDbType: (val: DbType) => void;
-  setCurrentDbName: (val: string) => void;
-  setCurrentTableName: (val: string) => void;
-  setMainContenType: (val: MainContenType) => void;
   setSidebarOpen: (val: boolean) => void;
   reset: () => void;
 }
@@ -26,18 +32,18 @@ export const useCoreStore = create<CoreStoreState>()(
   persist(
     (set) => ({
       currentDbType: STR_EMPTY,
-      currentDbNme: "",
-      currentTableName: "",
-      mainContenType: STR_EMPTY,
-
-      // 侧边栏
-      sidebarOpen: true,
-
-      // 更新状态
       setCurrentDbType: (val: DbType) => set({ currentDbType: val }),
+
+      currentDbNme: "",
       setCurrentDbName: (val: string) => set({ currentDbNme: val }),
+
+      currentTableName: "",
       setCurrentTableName: (val: string) => set({ currentTableName: val }),
+
+      mainContenType: STR_EMPTY,
       setMainContenType: (val: MainContenType) => set({ mainContenType: val }),
+
+      sidebarOpen: true,
       setSidebarOpen: (val: boolean) => set({ sidebarOpen: val }),
 
       // 重置状态
