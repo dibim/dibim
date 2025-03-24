@@ -3,6 +3,7 @@
  */
 import { useEffect, useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
+import { HEDAER_H } from "@/constants";
 import { getTableData } from "@/databases/adapter,";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
@@ -60,7 +61,7 @@ export function TableEditorData(props: MainContentData) {
   };
 
   return (
-    <>
+    <div className="relative">
       {/* 按钮栏 */}
       <div className="flex">
         <div className={cn("gap-4 px-2.5 sm:pl-2.5 inline-flex items-center justify-center ")}>
@@ -108,20 +109,22 @@ export function TableEditorData(props: MainContentData) {
       </div>
 
       {/* 主体表格 */}
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {colNames.map((colName) => (
-              <TableHead>{colName}</TableHead>
+      <div className="flex-1 overflow-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})` }}>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {colNames.map((colName) => (
+                <TableHead>{colName}</TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tableData.map((item) => (
+              <TableRow key={item.invoice}>{renderRow(item)}</TableRow>
             ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {tableData.map((item) => (
-            <TableRow key={item.invoice}>{renderRow(item)}</TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </>
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 }
