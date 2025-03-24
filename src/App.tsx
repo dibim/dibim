@@ -4,7 +4,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import "@/styles/app.scss";
 import "@/styles/index.css";
 import "@/styles/theme.scss";
-import { Main } from "./pages/Main";
+import { Main } from "./components/Main";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 export default function Page() {

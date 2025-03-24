@@ -1,33 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { PanelLeftIcon } from "lucide-react";
+import { CirclePlus, FilePenLine, Link, PanelLeftIcon, Settings } from "lucide-react";
 import { Separator } from "@radix-ui/react-separator";
 import { MainContent } from "@/components/main_content/MainContent";
 import { TableList } from "@/components/sub_idebar/TableList";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { APP_NAME, DB_TYPE_POSTGRES_SQL, HEDAER_H, MAIN_CONTEN_TYPE_TABLE_EDITOR } from "@/constants";
 import { connectPg } from "@/databases/PostgreSQL/utils";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function Main() {
-  const {
-    currentDbType,
-    setCurrentDbType,
-    setMainContenType,
-    currentDbNme,
-    currentTableName,
-    sidebarOpen,
-    setSidebarOpen,
-  } = useCoreStore();
+  const { currentDbType, setCurrentDbType, setMainContenType, sidebarOpen, setSidebarOpen } = useCoreStore();
 
   const { toggleSidebar, setOpenMobile, setOpen } = useSidebar();
 
@@ -102,7 +87,7 @@ export function Main() {
           variant="ghost"
           size="icon"
           className={cn("size-7")}
-          onClick={(event) => {
+          onClick={() => {
             setOpenMobile(!sidebarOpen);
             setOpen(!sidebarOpen);
             toggleSidebar();
@@ -115,17 +100,37 @@ export function Main() {
         </Button>
 
         <Separator orientation="vertical" className="mr-2 h-4" />
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="#">{currentDbNme}</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="hidden md:block" />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{currentTableName}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+
+        {/* TODO: 实现下面的按钮的功能 */}
+
+        <div className="flex gap-4">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link color="var(--fvm-info-clr)" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>添加数据库连接</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <FilePenLine color="var(--fvm-info-clr)" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>打开SQL编辑器</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Settings color="var(--fvm-info-clr)" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>设置</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
       </header>
 
       <div className="flex">
