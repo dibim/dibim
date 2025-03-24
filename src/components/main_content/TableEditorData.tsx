@@ -35,8 +35,11 @@ export function TableEditorData(props: MainContentData) {
 
   // 获取表格数据
   const getData = async (page: number) => {
-    const orderBy = getDefultOrderField(currentTableStructure);
+    // 整理字段名
+    setColNames(currentTableStructure.map((f) => f.column_name));
 
+    // 整理参数
+    const orderBy = getDefultOrderField(currentTableStructure);
     const lastRow = tableData[tableData.length - 1];
     const lastOrderByValue = lastRow ? lastRow[orderBy] : null;
 
@@ -55,14 +58,6 @@ export function TableEditorData(props: MainContentData) {
       setTableData(res.data);
       setItemsTotal(res.itemsTotal);
       setPageTotal(res.pageTotal);
-
-      const firstRow = res.data[0];
-      const names: string[] = [];
-      for (const key in firstRow) {
-        names.push(key);
-      }
-
-      setColNames(names);
     }
   };
 
