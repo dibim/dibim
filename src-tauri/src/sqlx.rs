@@ -137,13 +137,7 @@ async fn process_pg_query(
         let mut json_row = json!({});
         for column in row.columns() {
             let col_name = column.name();
-
-            println!(
-                "列名: {:?}, 值的类型: {:?}",
-                col_name,
-                column.type_info().name()
-            );
-
+  
             // 参考: /xxx/cargo/registry/src/mirrors.tuna.tsinghua.edu.cn-e791a3f93f26854f/sqlx-postgres-0.8.3/src/type_info.rs
             // 里的 pub(crate) fn display_name(&self) -> &str { 部分
             //
