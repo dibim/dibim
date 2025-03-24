@@ -52,29 +52,29 @@ export function TableEditor(props: MainContentData) {
         </TabsList>
       </div>
       <TabsContent value={tabStructure}>
-        <Card>
-          <CardContent className="space-y-2">
+        <Card className="p-4">
+          <CardContent className="p-0">
             <TableEditorStructure getStructure={getStructure} />
           </CardContent>
         </Card>
       </TabsContent>
       <TabsContent value={tabDdl}>
-        <Card>
-          <CardContent className="space-y-2">
+        <Card className="p-4">
+          <CardContent className="p-0">
             <TableEditorDdl />
           </CardContent>
         </Card>
       </TabsContent>
       <TabsContent value={tabConstraint}>
-        <Card>
-          <CardContent className="space-y-2">
+        <Card className="p-4">
+          <CardContent className="p-0">
             <TableEditorConstraint />
           </CardContent>
         </Card>
       </TabsContent>
       <TabsContent value={tabData}>
-        <Card>
-          <CardContent className="space-y-2">
+        <Card className="p-4">
+          <CardContent className="p-0">
             <TableEditorData />
           </CardContent>
         </Card>
