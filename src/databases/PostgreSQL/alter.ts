@@ -34,14 +34,6 @@ export const genAlterSql = (pa: AlterActionData[]) => {
   let res: string[] = [];
 
   for (const p of pa) {
-    // 修改列名
-    if (p.action === ACTION_C_COLNAME) {
-      // TODO: 重命名字段的可能导致别的修改还在操作原先的字段名, 要处理
-      res.push(`
-        ALTER TABLE table_name RENAME COLUMN old_column_name TO new_column_name;
-      `);
-    }
-
     // 修改数据类型
     if (p.action === ACTION_C_DATATYPE) {
       res.push(`
@@ -103,6 +95,14 @@ export const genAlterSql = (pa: AlterActionData[]) => {
     if (p.action === ACTION_D_COL) {
       res.push(`
         ALTER TABLE employees DROP COLUMN age;
+      `);
+    }
+
+    // 修改列名
+    // 修改列名可能导致别的修改还在操作原先的字段名, 要放在最后处理
+    if (p.action === ACTION_C_COLNAME) {
+      res.push(`
+            ALTER TABLE table_name RENAME COLUMN old_column_name TO new_column_name;
       `);
     }
 

@@ -1,4 +1,4 @@
-import { DbConnectionParams, GetTableDataParam } from "../types";
+import { DbConnectionParams, DbCountRes, GetTableDataParam } from "../types";
 import { invoker } from "./invoke";
 import {
   CheckConstraintsRes,
@@ -183,18 +183,111 @@ export async function getTableDdlPg(tbName: string) {
 }
 // 获取表格数据
 export async function getTableDataPg(p: GetTableDataParam) {
-  // TODO: 添加分页
-  const sql = `
+  const dbResTotal = await invoker.query(testConnName, `SELECT COUNT(*) AS total FROM "${p.tableName}";`);
+  console.log("dbResTotal>>>>   ", dbResTotal);
+
+  let itemsTotal = 0; // 总条数
+  if (dbResTotal && dbResTotal.data) {
+    const bbCountRes = JSON.parse(dbResTotal.data) as DbCountRes;
+    itemsTotal = bbCountRes.total;
+  }
+
+  const pageTotal = Math.ceil(itemsTotal / p.pageSize); // 页数
+
+  // TODO: 必须找到一个排序字段, 优先级: 主键 > 唯一索引 > 索引 > 第一个字段
+  //       数值、日期/时间类型 优先, 字符串类型 次之,
+  //       BOOLEAN 不能用 , JSON 或复杂类型 行为可能未定义或不符合预期
+  if (p.orderBy) {
+    // TODO: 临时使用 id
+    p.orderBy = "id ASC";
+    // TODO: 查询表结构后使用 getRankField
+  }
+
+  // 如果没有主键, 且没有指定排序字段
+  const sqlNoPkey = `  
+    WITH numbered_rows AS (
+        SELECT 
+            *, 
+            ROW_NUMBER() OVER (ORDER BY created_at) AS row_num
+        FROM products
+    )
     SELECT * 
-    FROM ${p.tableName}
-    ${p.orderBy ? "ORDER BY " + p.orderBy : ""}
-    LIMIT ${p.pageSize}
+    FROM numbered_rows
+    WHERE row_num BETWEEN 11 AND 20; -- 第二页，每页 10 条数据
+  `;
+
+  //
+  const sqlHasPkey = `
+    SELECT 
+      * 
+    FROM 
+      "${p.tableName}"
+    ORDER BY 
+      ${p.orderBy}
+    LIMIT 
+      ${p.pageSize}
     ;`;
 
-  const dbRes = await invoker.query(testConnName, sql);
+  const dbRes = await invoker.query(testConnName, sqlHasPkey);
 
   return {
+    itemsTotal,
+    pageTotal,
     columnName: dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : [],
     data: dbRes.data ? (JSON.parse(dbRes.data) as { tablename: string }[]) : [],
   };
+}
+
+/**
+ * 查询表格数据的时候, 必须找到一个排序字段
+ *
+ * 优先级: 主键 > 唯一索引 > 索引 > 第一个字段
+ * 数值、日期/时间类型 优先, 字符串类型 次之,
+ * BOOLEAN 不能用 , JSON 或复杂类型 行为可能未定义或不符合预期
+ *
+ * @param tsa 表结构数据
+ */
+export function getRankField(tsa: TableStructurePostgresql[]) {
+  // 优先使用索引字段
+  for (const f of tsa) {
+    // 主键
+    if (f.is_primary_key) {
+      return f.column_name;
+    }
+
+    // 唯一索引
+    if (f.is_unique) {
+      return f.column_name;
+    }
+  }
+
+  // 找不到索引字段的, 找数字或时间字段
+  // 找数字字段
+  for (const f of tsa) {
+    if (
+      f.data_type.includes("int") ||
+      f.data_type.includes("float") ||
+      f.data_type.includes("serial") ||
+      f.data_type.includes("numeric") ||
+      f.data_type.includes("decimal") ||
+      f.data_type.includes("real") ||
+      f.data_type.includes("double") ||
+      f.data_type.includes("money")
+    ) {
+      return f.column_name;
+    }
+  }
+  // 找时间字段
+  for (const f of tsa) {
+    if (f.data_type.includes("time") || f.data_type.includes("date")) {
+      return f.column_name;
+    }
+  }
+  // 找不到索引字段的, 也找数字或时间字段, 找字符串字段
+  // 找字符串字段
+  for (const f of tsa) {
+    if (f.data_type.includes("text") || f.data_type.includes("char")) {
+      return f.column_name;
+    }
+  }
 }

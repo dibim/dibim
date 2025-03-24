@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { STR_EMPTY } from "@/constants";
+import { TableStructure } from "@/databases/types";
 import { DbType, MainContenType } from "@/types/types";
 
 // 定义 store 的类型
@@ -16,6 +17,10 @@ export interface CoreStoreState {
   // 当前表名
   currentTableName: string;
   setCurrentTableName: (val: string) => void;
+
+  // 当前表结构
+  currentTableStructure: TableStructure[];
+  setCurrentTableStructure: (val: TableStructure[]) => void;
 
   // 主要区域的类型
   mainContenType: MainContenType;
@@ -40,6 +45,10 @@ export const useCoreStore = create<CoreStoreState>()(
       currentTableName: "",
       setCurrentTableName: (val: string) => set({ currentTableName: val }),
 
+      // 当前表结构
+      currentTableStructure: [],
+      setCurrentTableStructure: (val: TableStructure[]) => set({ currentTableStructure: val }),
+
       mainContenType: STR_EMPTY,
       setMainContenType: (val: MainContenType) => set({ mainContenType: val }),
 
@@ -52,6 +61,7 @@ export const useCoreStore = create<CoreStoreState>()(
           currentDbType: STR_EMPTY,
           currentDbNme: "",
           currentTableName: "",
+          currentTableStructure: [],
           mainContenType: STR_EMPTY,
           sidebarOpen: true,
         }),

@@ -1,6 +1,9 @@
 /**
  * 点击表格显示数据
  */
+import { useEffect } from "react";
+import { getTableStructure } from "@/databases/adapter,";
+import { useCoreStore } from "@/store";
 import { MainContentData } from "@/types/types";
 import { Card, CardContent } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
@@ -10,11 +13,29 @@ import { TableEditorDdl } from "./TableEditorDdl";
 import { TableEditorStructure } from "./TableEditorStructure";
 
 export function TableEditor(props: MainContentData) {
+  const { currentDbType, currentTableName, setCurrentTableStructure } = useCoreStore();
+
+  // 获取表结构, 会在多个地方用, 在这里记录到 store
+  const getStructure = async () => {
+    const res = await getTableStructure(currentDbType, currentTableName);
+    if (res && res.data) {
+      setCurrentTableStructure(res.data);
+    }
+  };
+
   const tabStructure = "tab1";
   const tabDdl = "tab2";
   const tabConstraint = "tab3";
   const tabData = "tab4";
   const tabPart = "tab5";
+
+  useEffect(() => {
+    getStructure();
+  }, [currentTableName]);
+
+  useEffect(() => {
+    getStructure();
+  }, []);
 
   return (
     <Tabs defaultValue={tabData} className="w-full">
@@ -28,7 +49,7 @@ export function TableEditor(props: MainContentData) {
       <TabsContent value={tabStructure}>
         <Card>
           <CardContent className="space-y-2">
-            <TableEditorStructure />
+            <TableEditorStructure getStructure={getStructure} />
           </CardContent>
         </Card>
       </TabsContent>

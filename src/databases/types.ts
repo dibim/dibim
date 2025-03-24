@@ -1,3 +1,4 @@
+import { TableStructurePostgresql } from "./PostgreSQL/types";
 import {
   SSL_MODE_ALLOW,
   SSL_MODE_DISABLE,
@@ -39,3 +40,11 @@ export type GetTableDataRes = {
   pageSize: number; // 每页的数据条数
   data: string; // 当前页的数据, json 字符串
 };
+
+// 从数据库统计数字的结果, 要搭配字段别名 total
+export type DbCountRes = {
+  total: number;
+};
+
+// 表结构
+export type TableStructure = TableStructurePostgresql;

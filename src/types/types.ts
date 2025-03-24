@@ -34,8 +34,16 @@ export type MainContentData = {
   //
 };
 
+// 表结构
+export type MainContentStructure = {
+  getStructure: () => void;
+};
+
 // 数据库类型
 export type DbType = typeof STR_EMPTY | typeof DB_TYPE_MY_SQL | typeof DB_TYPE_POSTGRES_SQL | typeof DB_TYPE_SQLITE;
 
 // 主要区域的类型
-export type MainContenType = typeof STR_EMPTY | typeof MAIN_CONTEN_TYPE_TABLE_EDITOR | typeof MAIN_CONTEN_TYPE_SQL_EDITOR;
+export type MainContenType =
+  | typeof STR_EMPTY
+  | typeof MAIN_CONTEN_TYPE_TABLE_EDITOR
+  | typeof MAIN_CONTEN_TYPE_SQL_EDITOR;

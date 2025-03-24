@@ -1,31 +1,20 @@
 /**
  * 表格结构
  */
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { DB_TYPE_MY_SQL, DB_TYPE_POSTGRES_SQL, DB_TYPE_SQLITE, HEDAER_H } from "@/constants";
-import { TableStructureMysql } from "@/databases/MySQL/types";
 import { AlterActionData } from "@/databases/PostgreSQL/alter";
 import { TableStructurePostgresql } from "@/databases/PostgreSQL/types";
-import { TableStructureSqlite } from "@/databases/SQLite/types";
-import { getTableStructure } from "@/databases/adapter,";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
-import { MainContentData } from "@/types/types";
-import { Button } from "../ui/button";
+import { MainContentStructure } from "@/types/types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
-export function TableEditorStructure(props: MainContentData) {
-  const { currentDbType, currentTableName } = useCoreStore();
+export function TableEditorStructure(props: MainContentStructure) {
+  const { currentDbType, currentTableStructure } = useCoreStore();
 
-  const [tableData, setTableData] = useState<any[]>([]); // 表结构
-  const getData = async () => {
-    const res = await getTableStructure(currentDbType, currentTableName);
-    if (res && res.data) {
-      setTableData(res.data);
-    }
-  };
   const [alterData, setAlterData] = useState<AlterActionData[]>([]); // 表结构的修改数据
   // TODO: 实现 src/databases/PostgreSQL/alter.ts 里的功能
 
@@ -40,22 +29,13 @@ export function TableEditorStructure(props: MainContentData) {
     setSelectedRows(newSelectedRows);
   };
 
-  useEffect(() => {
-    getData();
-  }, [currentTableName]);
-
-  useEffect(() => {
-    getData();
-  }, []);
-
   const renderBody = () => {
     if (currentDbType === DB_TYPE_MY_SQL) {
-      const tableDataPg = tableData as unknown as TableStructureMysql[];
       // TODO: 实现逻辑
     }
 
     if (currentDbType === DB_TYPE_POSTGRES_SQL) {
-      const tableDataPg = tableData as unknown as TableStructurePostgresql[];
+      const tableDataPg = currentTableStructure as unknown as TableStructurePostgresql[];
       return tableDataPg.map((row, index) => (
         <>
           <TableRow
@@ -81,7 +61,6 @@ export function TableEditorStructure(props: MainContentData) {
     }
 
     if (currentDbType === DB_TYPE_SQLITE) {
-      const tableDataPg = tableData as unknown as TableStructureSqlite[];
       // TODO: 实现逻辑
     }
 
@@ -95,7 +74,7 @@ export function TableEditorStructure(props: MainContentData) {
         <div className={cn("gap-4 px-2 pb-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <RotateCw color="var(--fvm-info-clr)" />
+              <RotateCw color="var(--fvm-info-clr)" onClick={() => props.getStructure()} />
             </TooltipTrigger>
             <TooltipContent>
               <p>刷新</p>
