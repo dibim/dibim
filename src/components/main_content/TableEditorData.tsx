@@ -2,28 +2,28 @@
  * 点击表格显示数据
  */
 import { useEffect, useState } from "react";
-import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
+import { CircleCheck, CircleMinus, CirclePlus, CircleX, CornerDownLeft, RotateCw } from "lucide-react";
 import { HEDAER_H } from "@/constants";
+import { getDefultOrderField } from "@/databases/PostgreSQL/utils";
 import { getTableData } from "@/databases/adapter,";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
 import { MainContentData } from "@/types/types";
+import { Input } from "../ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationFirst,
   PaginationItem,
   PaginationLast,
-  PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "../ui/x_pagination";
 
 export function TableEditorData(props: MainContentData) {
-  const { currentDbType, currentTableName } = useCoreStore();
+  const { currentDbType, currentTableName, currentTableStructure } = useCoreStore();
   const [tableData, setTableData] = useState<any[]>([]); // 表格数据
   const [colNames, setColNames] = useState<string[]>([]); // 列名
 
@@ -31,15 +31,25 @@ export function TableEditorData(props: MainContentData) {
   const [pageSize, setPageSize] = useState<number>(100); // 页面大小
   const [pageTotal, setPageTotal] = useState<number>(0); // 页数
   const [itemsTotal, setItemsTotal] = useState<number>(0); // 数据总条数
+  const [inputedPage, setInputedPage] = useState<number>(1); // 输入的页码
 
   // 获取表格数据
   const getData = async (page: number) => {
+    const orderBy = getDefultOrderField(currentTableStructure);
+
+    const lastRow = tableData[tableData.length - 1];
+    const lastOrderByValue = lastRow ? lastRow[orderBy] : null;
+
     const res = await getTableData(currentDbType, {
       tableName: currentTableName,
-      orderBy: "",
+      sortField: orderBy,
+      sortOrder: "ASC",
       currentPage: page,
       pageSize: pageSize,
+      lastOrderByValue,
     });
+
+    console.log("getData 结果::: ", res);
 
     if (res) {
       setTableData(res.data);
@@ -85,6 +95,11 @@ export function TableEditorData(props: MainContentData) {
     }
   };
 
+  // 输入框里的页面跟随当前页码变化
+  useEffect(() => {
+    setInputedPage(currentPage);
+  }, [currentPage]);
+
   useEffect(() => {
     getData(currentPage);
   }, [currentTableName]);
@@ -100,7 +115,7 @@ export function TableEditorData(props: MainContentData) {
   return (
     <div>
       {/* 按钮栏 */}
-      <div className="flex">
+      <div className="flex pb-2">
         <div className={cn("gap-4 px-2 pb-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -143,36 +158,42 @@ export function TableEditorData(props: MainContentData) {
             </TooltipContent>
           </Tooltip>
         </div>
-        <Pagination className="justify-start">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationFirst href="#" text={""} onClick={() => firstPage()} />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationPrevious href="#" text={""} onClick={() => prevPage()} />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">1</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#" isActive>
-                2
-              </PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">3</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext href="#" text={""} onClick={() => nextPage()} />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLast href="#" text={""} onClick={() => lastPage()} />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+        <div className="flex flex-1 justify-between">
+          <Pagination className="flex-1 justify-start px-8">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationFirst className="!px-1" href="#" text={""} onClick={() => firstPage()} />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationPrevious className="!px-1" href="#" text={""} onClick={() => prevPage()} />
+              </PaginationItem>
+              <PaginationItem className="flex">
+                <div className="pe-2 w-20">
+                  <Input
+                    value={inputedPage}
+                    onChange={(e) => {
+                      try {
+                        setInputedPage(parseInt(e.target.value));
+                      } catch (error) {}
+                    }}
+                  />
+                </div>
+                <div className="flex items-center pe-4">
+                  <CornerDownLeft />
+                </div>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext className="!px-1" href="#" text={""} onClick={() => nextPage()} />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLast className="!px-1" href="#" text={""} onClick={() => lastPage()} />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+          <div className="ppp">
+            {currentPage} / {pageTotal} <strong>页</strong> {itemsTotal} <strong>行</strong>
+          </div>
+        </div>
       </div>
 
       {/* 主体表格 */}
