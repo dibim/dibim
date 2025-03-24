@@ -27,17 +27,24 @@ export function TableEditorData(props: MainContentData) {
   const [tableData, setTableData] = useState<any[]>([]); // 表格数据
   const [colNames, setColNames] = useState<string[]>([]); // 列名
 
+  const [currentPage, setCurrentPage] = useState<number>(1); // 当前页码
+  const [pageSize, setPageSize] = useState<number>(100); // 页面大小
+  const [pageTotal, setPageTotal] = useState<number>(0); // 页数
+  const [itemsTotal, setItemsTotal] = useState<number>(0); // 数据总条数
+
   // 获取表格数据
-  const getData = async () => {
+  const getData = async (page: number) => {
     const res = await getTableData(currentDbType, {
       tableName: currentTableName,
       orderBy: "",
-      currentPage: 1,
-      pageSize: 20,
+      currentPage: page,
+      pageSize: pageSize,
     });
 
-    if (res && res.data) {
+    if (res) {
       setTableData(res.data);
+      setItemsTotal(res.itemsTotal);
+      setPageTotal(res.pageTotal);
 
       const firstRow = res.data[0];
       const names: string[] = [];
@@ -49,12 +56,41 @@ export function TableEditorData(props: MainContentData) {
     }
   };
 
+  // 第一页
+  const firstPage = () => {
+    let page = 1;
+    getData(page);
+    setCurrentPage(page);
+  };
+  // 最后一页
+  const lastPage = () => {
+    let page = pageTotal;
+    getData(page);
+    setCurrentPage(page);
+  };
+  // 上一页
+  const prevPage = () => {
+    let page = currentPage - 1;
+    if (page > 0) {
+      getData(page);
+      setCurrentPage(page);
+    }
+  };
+  // 下一页
+  const nextPage = () => {
+    let page = currentPage + 1;
+    if (page <= pageTotal) {
+      getData(page);
+      setCurrentPage(page);
+    }
+  };
+
   useEffect(() => {
-    getData();
+    getData(currentPage);
   }, [currentTableName]);
 
   useEffect(() => {
-    getData();
+    getData(currentPage);
   }, []);
 
   const renderRow = (row: { [key: string]: any }) => {
@@ -68,7 +104,7 @@ export function TableEditorData(props: MainContentData) {
         <div className={cn("gap-4 px-2 pb-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <RotateCw color="var(--fvm-info-clr)" />
+              <RotateCw color="var(--fvm-info-clr)" onClick={() => getData(currentPage)} />
             </TooltipTrigger>
             <TooltipContent>
               <p>刷新</p>
@@ -110,10 +146,10 @@ export function TableEditorData(props: MainContentData) {
         <Pagination className="justify-start">
           <PaginationContent>
             <PaginationItem>
-              <PaginationFirst href="#" text={""} />
+              <PaginationFirst href="#" text={""} onClick={() => firstPage()} />
             </PaginationItem>
             <PaginationItem>
-              <PaginationPrevious href="#" text={""} />
+              <PaginationPrevious href="#" text={""} onClick={() => prevPage()} />
             </PaginationItem>
             <PaginationItem>
               <PaginationLink href="#">1</PaginationLink>
@@ -130,10 +166,10 @@ export function TableEditorData(props: MainContentData) {
               <PaginationEllipsis />
             </PaginationItem>
             <PaginationItem>
-              <PaginationNext href="#" text={""} />
+              <PaginationNext href="#" text={""} onClick={() => nextPage()} />
             </PaginationItem>
             <PaginationItem>
-              <PaginationLast href="#" text={""} />
+              <PaginationLast href="#" text={""} onClick={() => lastPage()} />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
