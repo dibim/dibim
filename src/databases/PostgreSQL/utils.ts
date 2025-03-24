@@ -241,9 +241,9 @@ export async function getTableDataPg(p: GetTableDataParam) {
 /**
  * 查询表格数据的时候, 必须找到一个排序字段
  *
- * 优先级: 主键 > 唯一索引 > 索引 > 第一个字段
- * 数值、日期/时间类型 优先, 字符串类型 次之,
- * BOOLEAN 不能用 , JSON 或复杂类型 行为可能未定义或不符合预期
+ * 优先级: 主键 > 唯一索引 > 索引 > 普通字段
+ * 普通字段的优先级: 数值、日期/时间类型 > 字符串类型(按字符的编码排序, 比如 UTF-8)
+ * BOOLEAN 不能用, JSON 或复杂类型 行为可能未定义或不符合预期
  *
  * @param tsa 表结构数据
  */
@@ -283,8 +283,9 @@ export function getRankField(tsa: TableStructurePostgresql[]) {
       return f.column_name;
     }
   }
-  // 找不到索引字段的, 也找数字或时间字段, 找字符串字段
+
   // 找字符串字段
+  // 找不到索引字段的, 也找数字或时间字段, 找字符串字段  
   for (const f of tsa) {
     if (f.data_type.includes("text") || f.data_type.includes("char")) {
       return f.column_name;
