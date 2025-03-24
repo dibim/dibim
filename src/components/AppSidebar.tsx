@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Database, DatabaseBackup, ScanSearch, SquareFunction, Table, View } from "lucide-react";
+import Logo from "@/assets/logo.svg?react";
 import {
   Sidebar,
   SidebarContent,
@@ -21,12 +22,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton>
-              {sidebarOpen ? (
-                <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>
-              ) : (
-                // TODO: 做一个自己的图标
-                <p></p>
-              )}
+              {sidebarOpen ? <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span> : <Logo />}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
