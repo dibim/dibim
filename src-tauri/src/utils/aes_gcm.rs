@@ -7,7 +7,6 @@ use base64::{engine::general_purpose, Engine as _};
 use sha2::{digest::generic_array::GenericArray, Digest, Sha256};
 
 // 常量配置
-const NONCE_LENGTH: usize = 12;
 const KEY_LENGTH: usize = 32;
 const NONCE_TAIL_LENGTH: usize = 12; // 从SHA256最后取12字节作为nonce
 const MIN_KEY_LENGTH: usize = 6;
