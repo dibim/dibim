@@ -2,10 +2,10 @@ import { useCoreStore } from "@/store";
 import { DbConnections } from "@/types/conf_file";
 
 export function DatabaseList() {
-  const { configFile } = useCoreStore();
+  const { config: configFile } = useCoreStore();
 
   const clickItem = (conn: DbConnections) => {
-    //  TODO: 实现逻辑
+    //  TODO: 实现逻辑, 点击后打开这个数据库的表
   };
 
   return (

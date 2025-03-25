@@ -18,11 +18,19 @@ import {
 import { connectPg } from "@/databases/PostgreSQL/utils";
 import { invoker } from "@/invoke";
 import { useCoreStore } from "@/store";
+import { readConfigFile } from "@/utils/config_file";
 import { DatabaseList } from "./sub_sidebar/DatabaseList";
 
 export function Main() {
-  const { currentDbType, setCurrentDbType, setMainContenType, subSidebarType, sidebarOpen, setSidebarOpen } =
-    useCoreStore();
+  const {
+    mainPasswordSha,
+    setConfig,
+    setCurrentDbType,
+    setMainContenType,
+    subSidebarType,
+    sidebarOpen,
+    setSidebarOpen,
+  } = useCoreStore();
 
   const { toggleSidebar, setOpenMobile, setOpen } = useSidebar();
 
@@ -68,6 +76,15 @@ export function Main() {
     const res = await invoker.pathExists(CONFIG_FILE_ENC);
 
     console.log("检查配置文件 :::res ::: ", res);
+
+    if (res) {
+      const conf = await readConfigFile(CONFIG_FILE_ENC, mainPasswordSha);
+      try {
+        setConfig(JSON.parse(conf), true);
+      } catch (error) {
+        console.log("解析配置文件出错, 文件内容为: ", conf);
+      }
+    }
   };
   // ========== 读取配置文件 结束 ==========
 

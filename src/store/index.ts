@@ -1,15 +1,24 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { DB_TYPE_POSTGRESQL, MAIN_CONTEN_TYPE_ADD_CONNECTION, SUB_SIDEBAR_TYPE_DB_LIST } from "@/constants";
+import {
+  DB_TYPE_POSTGRESQL,
+  DEFAULT_MAIN_PASSWORD,
+  MAIN_CONTEN_TYPE_WELCOME,
+  SUB_SIDEBAR_TYPE_DB_LIST,
+} from "@/constants";
 import { TableStructure } from "@/databases/types";
+import { invoker } from "@/invoke";
 import { ConfigFile } from "@/types/conf_file";
 import { DbType, MainContenType, SubSidebarType } from "@/types/types";
+import { saveConfigFile } from "@/utils/config_file";
 
 // 定义 store 的类型
 export interface CoreStoreState {
-  // 配置文件
-  configFile: ConfigFile;
-  setConfigFile: (val: ConfigFile) => void;
+  // 配置文件相关
+  config: ConfigFile;
+  setConfig: (val: ConfigFile, notWriteToFile?: boolean) => void;
+  mainPasswordSha: string;
+  setMainPasswordSha: (val: string) => void;
 
   // 当前数据库类型
   currentDbType: DbType;
@@ -43,19 +52,30 @@ export interface CoreStoreState {
   reset: () => void;
 }
 
+const emptyConfigFile = {
+  dbConnections: [],
+  settings: {
+    theme: "",
+    timeFormat: "",
+    lang: "",
+  },
+} as ConfigFile;
+
+export const defaultMainPasswordSha = await invoker.sha256(DEFAULT_MAIN_PASSWORD);
+
 // 创建一个 store
 export const useCoreStore = create<CoreStoreState>()(
   persist(
-    (set) => ({
-      configFile: {
-        dbConnections: [],
-        settings: {
-          theme: "",
-          timeFormat: "",
-          lang: "",
-        },
+    (set, get) => ({
+      config: emptyConfigFile,
+      setConfig: (val: ConfigFile, notWrite?: boolean) => {
+        set({ config: val });
+        if (notWrite !== true) {
+          saveConfigFile(JSON.stringify(val), get().mainPasswordSha); // 保存到配置文件
+        }
       },
-      setConfigFile: (val: ConfigFile) => set({ configFile: val }),
+      mainPasswordSha: defaultMainPasswordSha,
+      setMainPasswordSha: (val: string) => set({ mainPasswordSha: val }),
 
       currentDbType: DB_TYPE_POSTGRESQL,
       setCurrentDbType: (val: DbType) => set({ currentDbType: val }),
@@ -72,7 +92,7 @@ export const useCoreStore = create<CoreStoreState>()(
       subSidebarType: SUB_SIDEBAR_TYPE_DB_LIST,
       setSubSidebarType: (val: SubSidebarType) => set({ subSidebarType: val }),
 
-      mainContenType: MAIN_CONTEN_TYPE_ADD_CONNECTION,
+      mainContenType: MAIN_CONTEN_TYPE_WELCOME,
       setMainContenType: (val: MainContenType) => set({ mainContenType: val }),
 
       sidebarOpen: true,
@@ -81,29 +101,19 @@ export const useCoreStore = create<CoreStoreState>()(
       // 重置状态
       reset: () =>
         set({
+          config: emptyConfigFile,
+          mainPasswordSha: defaultMainPasswordSha,
           currentDbType: DB_TYPE_POSTGRESQL,
           currentDbNme: "",
           currentTableName: "",
           currentTableStructure: [],
           subSidebarType: SUB_SIDEBAR_TYPE_DB_LIST,
-          mainContenType: MAIN_CONTEN_TYPE_ADD_CONNECTION,
+          mainContenType: MAIN_CONTEN_TYPE_WELCOME,
           sidebarOpen: true,
         }),
     }),
     {
       name: "core-store", // localStorage key
-      storage: {
-        getItem: (name) => {
-          const value = localStorage.getItem(name);
-          return value ? JSON.parse(value) : null;
-        },
-        setItem: (name, value) => {
-          localStorage.setItem(name, JSON.stringify(value));
-        },
-        removeItem: (name) => {
-          localStorage.removeItem(name);
-        },
-      },
     },
   ),
 );

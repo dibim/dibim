@@ -6,8 +6,10 @@ export const HEDAER_H = 12; // header 的 h- 属性值, 对应 tailwindcss 的
 
 export const SUB_SIDEBAR_MIN_WIDTH = 50; // 次级侧边栏的最小宽度
 
-// 配置文件
-export const CONFIG_FILE_ENC = "./config.json.enc"; // 加密的
+// 配置文件相关
+export const DEFAULT_MAIN_PASSWORD = "DIBIM@2025-03-22 08:41^c3dd4147ea11b63c2cd776a0602930692ba34c43$"; // 默认主密码
+export const CONFIG_FILE_ENC = "./dibim_config.bin"; // 配置文件
+export const QUERY_HISTORY_FILE = "./dibim_query_history.bin"; // 查询记录
 
 // 数据库类性
 export const DB_TYPE_MYSQL = "MySQL";
@@ -19,6 +21,7 @@ export const SUB_SIDEBAR_TYPE_DB_LIST = "dbList";
 export const SUB_SIDEBAR_TYPE_TABLE_LIST = "tableList";
 
 // 主要区域的类型
+export const MAIN_CONTEN_TYPE_WELCOME = "welcome";
 export const MAIN_CONTEN_TYPE_ADD_CONNECTION = "addConnection";
 export const MAIN_CONTEN_TYPE_TABLE_EDITOR = "tableEditor";
 export const MAIN_CONTEN_TYPE_SETTINGS = "settings";
