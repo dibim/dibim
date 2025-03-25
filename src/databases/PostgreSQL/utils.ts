@@ -1,4 +1,4 @@
-import { DbConnectionParams, DbCountRes, GetTableDataParam } from "../types";
+import { DbConnectionParam, DbCountRes, GetTableDataParam } from "../types";
 import { invoker } from "./invoke";
 import {
   CheckConstraintsRes,
@@ -19,7 +19,7 @@ const testConnName = "testPg";
  *
  *
  */
-export async function connectPg(p: DbConnectionParams) {
+export async function connectPg(p: DbConnectionParam) {
   return await invoker.connect(
     testConnName,
     // `host=${p.host} port=${p.port} user=${p.user} password=${p.password} dbname=${p.dbname}`,

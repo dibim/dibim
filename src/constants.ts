@@ -4,6 +4,9 @@ export const STR_EMPTY = "";
 
 export const HEDAER_H = 12; // header 的 h- 属性值, 对应 tailwindcss 的
 
+// 配置文件
+export const CONFIG_FILE_ENC = "./config.json.enc"; // 加密的
+
 // 数据库类性
 export const DB_TYPE_MY_SQL = "MySQL";
 export const DB_TYPE_POSTGRES_SQL = "PostgreSQL ";

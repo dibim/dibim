@@ -17,6 +17,7 @@ export const invoker = {
     invoke<AesRes>("aes_gcm_decrypt_base64", { base64String: str, sql: key }),
 
   // fs
+  pathExists: (pathString: string) => invoke<boolean>("path_exists", { pathString }),
   readFileText: (pathString: string) => invoke<FileReadRes>("read_file_text", { pathString }),
   readFileBase64: (pathString: string) => invoke<FileReadRes>("read_file_base64", { pathString }),
   writeFileText: (pathString: string, content: string) =>

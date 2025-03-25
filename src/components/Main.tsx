@@ -5,8 +5,9 @@ import { MainContent } from "@/components/main_content/MainContent";
 import { TableList } from "@/components/sub_idebar/TableList";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
-import { APP_NAME, DB_TYPE_POSTGRES_SQL, HEDAER_H, MAIN_CONTEN_TYPE_TABLE_EDITOR } from "@/constants";
+import { APP_NAME, CONFIG_FILE_ENC, DB_TYPE_POSTGRES_SQL, HEDAER_H, MAIN_CONTEN_TYPE_TABLE_EDITOR } from "@/constants";
 import { connectPg } from "@/databases/PostgreSQL/utils";
+import { invoker } from "@/invoke";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
 
@@ -50,6 +51,14 @@ export function Main() {
   }, [handleMouseMove, handleMouseUp]);
   // ========== 控制次级侧边栏 结束 ==========
 
+  // ========== 读取配置文件  ==========
+  const checkConfigFile = async () => {
+    const res = await invoker.pathExists(CONFIG_FILE_ENC);
+
+    console.log("检查配置文件 :::res ::: ", res);
+  };
+  // ========== 读取配置文件 结束 ==========
+
   // TODO: 库,差是否有连接配置, 有的话显示 MainContent ,没有的话显示 Index
 
   const testDb = async () => {
@@ -68,7 +77,9 @@ export function Main() {
   };
 
   useEffect(() => {
-    testDb();
+    // testDb();
+
+    checkConfigFile();
 
     setOpenMobile(sidebarOpen);
     setOpen(sidebarOpen);
