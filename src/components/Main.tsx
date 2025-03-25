@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { PanelLeftIcon } from "lucide-react";
 import { Separator } from "@radix-ui/react-separator";
 import { MainContent } from "@/components/main_content/MainContent";
-import { TableList } from "@/components/sub_idebar/TableList";
+import { TableList } from "@/components/sub_sidebar/TableList";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import {
@@ -18,7 +18,7 @@ import {
 import { connectPg } from "@/databases/PostgreSQL/utils";
 import { invoker } from "@/invoke";
 import { useCoreStore } from "@/store";
-import { DatabaseList } from "./sub_idebar/DatabaseList";
+import { DatabaseList } from "./sub_sidebar/DatabaseList";
 
 export function Main() {
   const { currentDbType, setCurrentDbType, setMainContenType, subSidebarType, sidebarOpen, setSidebarOpen } =
