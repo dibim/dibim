@@ -1,5 +1,3 @@
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-
 use crate::types::DbResult;
 use crate::utils::sqlx;
 
@@ -8,11 +6,7 @@ use crate::utils::sqlx;
  */
 #[tauri::command]
 pub async fn sqlx_connect(conn_name: String, url: String) -> DbResult {
-    let mut res = DbResult {
-        error_message: "".to_string(),
-        data: "".to_string(),
-        column_name: "".to_string(),
-    };
+    let mut res = DbResult::new();
 
     match sqlx::connect(&conn_name, &url).await {
         Ok(()) => res.data = "ok".to_string(),
@@ -30,11 +24,7 @@ pub async fn sqlx_connect(conn_name: String, url: String) -> DbResult {
  */
 #[tauri::command]
 pub async fn sqlx_query(conn_name: String, sql: String) -> DbResult {
-    let mut res = DbResult {
-        error_message: "".to_string(),
-        data: "".to_string(),
-        column_name: "".to_string(),
-    };
+    let mut res = DbResult::new();
 
     match sqlx::query(&conn_name, &sql).await {
         Ok(o) => {
@@ -55,11 +45,7 @@ pub async fn sqlx_query(conn_name: String, sql: String) -> DbResult {
  */
 #[tauri::command]
 pub async fn sqlx_exec(conn_name: String, sql: String) -> DbResult {
-    let mut res = DbResult {
-        error_message: "".to_string(),
-        data: "".to_string(),
-        column_name: "".to_string(),
-    };
+    let mut res = DbResult::new();
 
     match sqlx::exec(&conn_name, &sql).await {
         Ok(o) => {

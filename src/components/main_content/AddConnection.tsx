@@ -11,7 +11,7 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 
 export function AddConnection() {
-  const { configFile } = useCoreStore();
+  const { config: configFile } = useCoreStore();
 
   const [name, setName] = useState<string>(""); // 连接名称
   const [dbType, setDbType] = useState<DbType>(DB_TYPE_POSTGRESQL); // 默认类型是 PostgreSQL
