@@ -8,7 +8,6 @@ import { getDefultOrderField } from "@/databases/PostgreSQL/utils";
 import { getTableData } from "@/databases/adapter,";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
-import { MainContentData } from "@/types/types";
 import { Input } from "../ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
@@ -22,7 +21,7 @@ import {
   PaginationPrevious,
 } from "../ui/x_pagination";
 
-export function TableEditorData(props: MainContentData) {
+export function TableEditorData() {
   const { currentDbType, currentTableName, currentTableStructure } = useCoreStore();
   const [tableData, setTableData] = useState<any[]>([]); // 表格数据
   const [colNames, setColNames] = useState<string[]>([]); // 列名

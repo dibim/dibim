@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { STR_EMPTY } from "@/constants";
+import { DB_TYPE_POSTGRESQL, MAIN_CONTEN_TYPE_ADD_CONNECTION, SUB_SIDEBAR_TYPE_DB_LIST } from "@/constants";
 import { TableStructure } from "@/databases/types";
 import { ConfigFile } from "@/types/conf_file";
-import { DbType, MainContenType } from "@/types/types";
+import { DbType, MainContenType, SubSidebarType } from "@/types/types";
 
 // 定义 store 的类型
 export interface CoreStoreState {
@@ -27,6 +27,10 @@ export interface CoreStoreState {
   currentTableStructure: TableStructure[];
   setCurrentTableStructure: (val: TableStructure[]) => void;
 
+  // 次级侧边栏的类型
+  subSidebarType: SubSidebarType;
+  setSubSidebarType: (val: SubSidebarType) => void;
+
   // 主要区域的类型
   mainContenType: MainContenType;
   setMainContenType: (val: MainContenType) => void;
@@ -48,12 +52,12 @@ export const useCoreStore = create<CoreStoreState>()(
         settings: {
           theme: "",
           timeFormat: "",
-          lang: ""
+          lang: "",
         },
       },
       setConfigFile: (val: ConfigFile) => set({ configFile: val }),
 
-      currentDbType: STR_EMPTY,
+      currentDbType: DB_TYPE_POSTGRESQL,
       setCurrentDbType: (val: DbType) => set({ currentDbType: val }),
 
       currentDbNme: "",
@@ -62,11 +66,13 @@ export const useCoreStore = create<CoreStoreState>()(
       currentTableName: "",
       setCurrentTableName: (val: string) => set({ currentTableName: val }),
 
-      // 当前表结构
       currentTableStructure: [],
       setCurrentTableStructure: (val: TableStructure[]) => set({ currentTableStructure: val }),
 
-      mainContenType: STR_EMPTY,
+      subSidebarType: SUB_SIDEBAR_TYPE_DB_LIST,
+      setSubSidebarType: (val: SubSidebarType) => set({ subSidebarType: val }),
+
+      mainContenType: MAIN_CONTEN_TYPE_ADD_CONNECTION,
       setMainContenType: (val: MainContenType) => set({ mainContenType: val }),
 
       sidebarOpen: true,
@@ -75,11 +81,12 @@ export const useCoreStore = create<CoreStoreState>()(
       // 重置状态
       reset: () =>
         set({
-          currentDbType: STR_EMPTY,
+          currentDbType: DB_TYPE_POSTGRESQL,
           currentDbNme: "",
           currentTableName: "",
           currentTableStructure: [],
-          mainContenType: STR_EMPTY,
+          subSidebarType: SUB_SIDEBAR_TYPE_DB_LIST,
+          mainContenType: MAIN_CONTEN_TYPE_ADD_CONNECTION,
           sidebarOpen: true,
         }),
     }),

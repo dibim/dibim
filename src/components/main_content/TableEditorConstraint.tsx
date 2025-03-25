@@ -4,9 +4,8 @@
 import { useEffect } from "react";
 import { getTableStructure } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
-import { MainContentData } from "@/types/types";
 
-export function TableEditorConstraint(props: MainContentData) {
+export function TableEditorConstraint() {
   const { currentDbType, currentTableName } = useCoreStore();
 
   const getData = async () => {

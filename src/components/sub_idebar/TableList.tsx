@@ -4,6 +4,8 @@ import { getAllTables } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
 import { TableListData } from "@/types/types";
 
+// TODO: 排序方式支持按表名和表的大小排序
+
 export function TableList(props: TableListData) {
   const { setCurrentTableName, setMainContenType, currentDbType } = useCoreStore();
   const [tablenames, setTablenames] = useState<string[]>([]);
@@ -27,7 +29,7 @@ export function TableList(props: TableListData) {
 
   return (
     <div>
-      <div>TODO: 控制排序方式</div>
+      <div>TableList</div>
       {tablenames.map((item, index) => (
         <p
           className="py-1 cursor-pointer flex justify-between"

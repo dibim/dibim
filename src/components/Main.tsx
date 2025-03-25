@@ -5,14 +5,24 @@ import { MainContent } from "@/components/main_content/MainContent";
 import { TableList } from "@/components/sub_idebar/TableList";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
-import { APP_NAME, CONFIG_FILE_ENC, DB_TYPE_POSTGRES_SQL, HEDAER_H, MAIN_CONTEN_TYPE_TABLE_EDITOR } from "@/constants";
+import {
+  APP_NAME,
+  CONFIG_FILE_ENC,
+  DB_TYPE_POSTGRESQL,
+  HEDAER_H,
+  MAIN_CONTEN_TYPE_TABLE_EDITOR,
+  SUB_SIDEBAR_MIN_WIDTH,
+  SUB_SIDEBAR_TYPE_DB_LIST,
+  SUB_SIDEBAR_TYPE_TABLE_LIST,
+} from "@/constants";
 import { connectPg } from "@/databases/PostgreSQL/utils";
 import { invoker } from "@/invoke";
-import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
+import { DatabaseList } from "./sub_idebar/DatabaseList";
 
 export function Main() {
-  const { currentDbType, setCurrentDbType, setMainContenType, sidebarOpen, setSidebarOpen } = useCoreStore();
+  const { currentDbType, setCurrentDbType, setMainContenType, subSidebarType, sidebarOpen, setSidebarOpen } =
+    useCoreStore();
 
   const { toggleSidebar, setOpenMobile, setOpen } = useSidebar();
 
@@ -31,7 +41,9 @@ export function Main() {
       }
 
       // 计算新宽度
-      const newWidth = subSidebarWidth + e.clientX - mouseInitialPosX.current;
+      let newWidth = subSidebarWidth + e.clientX - mouseInitialPosX.current;
+      if (newWidth < SUB_SIDEBAR_MIN_WIDTH) newWidth = SUB_SIDEBAR_MIN_WIDTH;
+
       setSubSidebarWidth(newWidth);
     },
     [isDragging],
@@ -72,7 +84,7 @@ export function Main() {
 
     console.log("connect res: ", res);
 
-    setCurrentDbType(DB_TYPE_POSTGRES_SQL);
+    setCurrentDbType(DB_TYPE_POSTGRESQL);
     setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
   };
 
@@ -93,15 +105,11 @@ export function Main() {
         {/* 复制 sidebar-trigger 过来, 这里添加了函数, 记录 sidebar 的状态*/}
         <Button
           data-sidebar="trigger"
-          data-slot="sidebar-trigger"
           variant="ghost"
-          size="icon"
-          className={cn("size-7")}
           onClick={() => {
             setOpenMobile(!sidebarOpen);
             setOpen(!sidebarOpen);
             toggleSidebar();
-
             setSidebarOpen(!sidebarOpen);
           }}
         >
@@ -121,8 +129,8 @@ export function Main() {
             className="flex-1 overflow-y-scroll py-2 ps-2 pe-4"
             style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}
           >
-            {/* TODO: 链接对应的数据库并查询表格 */}
-            {currentDbType === DB_TYPE_POSTGRES_SQL && <TableList />}
+            {subSidebarType === SUB_SIDEBAR_TYPE_DB_LIST && <DatabaseList />}
+            {subSidebarType === SUB_SIDEBAR_TYPE_TABLE_LIST && <TableList />}
           </div>
 
           {/* 拖拽手柄 */}
