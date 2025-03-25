@@ -1,13 +1,13 @@
 import { invoke } from "@tauri-apps/api/core";
 
-// AES-GCM 加密解密的结果
-export type AesRes = [result: string, errorMessage: string];
+// AES-GCM 加密解密的结果, 第一项为结果, 第二项为错误消息
+export type AesRes = { result: string; errorMessage: string };
 
-// 读取文件的结果
-export type FileReadRes = [result: string | null, errorMessage: string | null];
+// 读取文件的结果, 第一项为结果, 第二项为错误消息
+export type FileReadRes = { result: string; errorMessage: string };
 
-// 写入文件的结果
-export type FileWriteRes = [result: boolean | null, errorMessage: string | null];
+// 写入文件的结果, 第一项为结果, 第二项为错误消息
+export type FileWriteRes = { result: boolean; errorMessage: string };
 
 export const invoker = {
   // SHA
