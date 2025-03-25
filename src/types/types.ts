@@ -1,10 +1,15 @@
+import { FunctionComponent, SVGProps } from "react";
 import {
-  DB_TYPE_MY_SQL,
-  DB_TYPE_POSTGRES_SQL,
+  DB_TYPE_MYSQL,
+  DB_TYPE_POSTGRESQL,
   DB_TYPE_SQLITE,
+  MAIN_CONTEN_TYPE_ADD_CONNECTION,
+  MAIN_CONTEN_TYPE_SETTINGS,
   MAIN_CONTEN_TYPE_SQL_EDITOR,
   MAIN_CONTEN_TYPE_TABLE_EDITOR,
   STR_EMPTY,
+  SUB_SIDEBAR_TYPE_DB_LIST,
+  SUB_SIDEBAR_TYPE_TABLE_LIST,
 } from "@/constants";
 
 // 数据库返回的数据
@@ -40,10 +45,23 @@ export type MainContentStructure = {
 };
 
 // 数据库类型
-export type DbType = typeof STR_EMPTY | typeof DB_TYPE_MY_SQL | typeof DB_TYPE_POSTGRES_SQL | typeof DB_TYPE_SQLITE;
+export type DbType = typeof DB_TYPE_MYSQL | typeof DB_TYPE_POSTGRESQL | typeof DB_TYPE_SQLITE;
+
+// 次级侧边栏的类型
+export type SubSidebarType = typeof SUB_SIDEBAR_TYPE_DB_LIST | typeof SUB_SIDEBAR_TYPE_TABLE_LIST;
 
 // 主要区域的类型
 export type MainContenType =
-  | typeof STR_EMPTY
+  | typeof MAIN_CONTEN_TYPE_SETTINGS
+  | typeof MAIN_CONTEN_TYPE_ADD_CONNECTION
   | typeof MAIN_CONTEN_TYPE_TABLE_EDITOR
   | typeof MAIN_CONTEN_TYPE_SQL_EDITOR;
+
+// 导入的 svg 的属性
+export type SvgComponentProps = SVGProps<SVGSVGElement> & {
+  title?: string;
+  titleId?: string;
+  desc?: string;
+  descId?: string;
+};
+export type SvgComponentType = FunctionComponent<SvgComponentProps>;

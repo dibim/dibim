@@ -4,7 +4,6 @@
 import { useEffect } from "react";
 import { getTableStructure } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
-import { MainContentData } from "@/types/types";
 import { Card, CardContent } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { TableEditorConstraint } from "./TableEditorConstraint";
@@ -12,7 +11,7 @@ import { TableEditorData } from "./TableEditorData";
 import { TableEditorDdl } from "./TableEditorDdl";
 import { TableEditorStructure } from "./TableEditorStructure";
 
-export function TableEditor(props: MainContentData) {
+export function TableEditor() {
   const { currentDbType, currentTableName, setCurrentTableStructure } = useCoreStore();
 
   // 获取表结构, 会在多个地方用, 在这里记录到 store
