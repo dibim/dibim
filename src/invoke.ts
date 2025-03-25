@@ -10,6 +10,9 @@ export type FileReadRes = [result: string | null, errorMessage: string | null];
 export type FileWriteRes = [result: boolean | null, errorMessage: string | null];
 
 export const invoker = {
+  // SHA
+  sha256: (str: string) => invoke<string>("sha256", { string: str }),
+
   // AES-GCM
   aesGcmEncryptString: (str: string, key: string) =>
     invoke<AesRes>("aes_gcm_encrypt_string", { string: str, url: key }),
