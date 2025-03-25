@@ -3,7 +3,7 @@
  */
 import { useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
-import { DB_TYPE_MY_SQL, DB_TYPE_POSTGRES_SQL, DB_TYPE_SQLITE, HEDAER_H } from "@/constants";
+import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE, HEDAER_H } from "@/constants";
 import { AlterActionData } from "@/databases/PostgreSQL/alter";
 import { TableStructurePostgresql } from "@/databases/PostgreSQL/types";
 import { cn } from "@/lib/utils";
@@ -30,11 +30,11 @@ export function TableEditorStructure(props: MainContentStructure) {
   };
 
   const renderBody = () => {
-    if (currentDbType === DB_TYPE_MY_SQL) {
+    if (currentDbType === DB_TYPE_MYSQL) {
       // TODO: 实现逻辑
     }
 
-    if (currentDbType === DB_TYPE_POSTGRES_SQL) {
+    if (currentDbType === DB_TYPE_POSTGRESQL) {
       const tableDataPg = currentTableStructure as unknown as TableStructurePostgresql[];
       return tableDataPg.map((row, index) => (
         <>

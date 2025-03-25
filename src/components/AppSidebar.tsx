@@ -21,11 +21,18 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { APP_NAME } from "@/constants";
+import {
+  APP_NAME,
+  MAIN_CONTEN_TYPE_ADD_CONNECTION,
+  MAIN_CONTEN_TYPE_SETTINGS,
+  MAIN_CONTEN_TYPE_SQL_EDITOR,
+  SUB_SIDEBAR_TYPE_DB_LIST,
+  SUB_SIDEBAR_TYPE_TABLE_LIST,
+} from "@/constants";
 import { useCoreStore } from "@/store";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { sidebarOpen } = useCoreStore();
+  const { sidebarOpen, setMainContenType, setSubSidebarType } = useCoreStore();
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -46,7 +53,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip={"数据库"}>
+            <SidebarMenuButton
+              tooltip={"数据库"}
+              onClick={() => {
+                setSubSidebarType(SUB_SIDEBAR_TYPE_DB_LIST);
+              }}
+            >
               <Database />
               <span>数据库</span>
             </SidebarMenuButton>
@@ -55,7 +67,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip={"表格"}>
+            <SidebarMenuButton
+              tooltip={"表格"}
+              onClick={() => {
+                setSubSidebarType(SUB_SIDEBAR_TYPE_TABLE_LIST);
+              }}
+            >
               <Table />
               <span>表格</span>
             </SidebarMenuButton>
@@ -101,7 +118,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip={"添加数据库"}>
+            <SidebarMenuButton
+              tooltip={"添加数据库"}
+              onClick={() => {
+                setMainContenType(MAIN_CONTEN_TYPE_ADD_CONNECTION);
+              }}
+            >
               <Link color="var(--fvm-info-clr)" />
               <span>添加数据库</span>
             </SidebarMenuButton>
@@ -110,7 +132,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip={"SQL编辑器"}>
+            <SidebarMenuButton
+              tooltip={"SQL编辑器"}
+              onClick={() => {
+                setMainContenType(MAIN_CONTEN_TYPE_SQL_EDITOR);
+              }}
+            >
               <FilePenLine color="var(--fvm-info-clr)" />
               <span>SQL编辑器</span>
             </SidebarMenuButton>
@@ -119,7 +146,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip={"设置"}>
+            <SidebarMenuButton
+              tooltip={"设置"}
+              onClick={() => {
+                setMainContenType(MAIN_CONTEN_TYPE_SETTINGS);
+              }}
+            >
               <Settings color="var(--fvm-info-clr)" />
               <span>设置</span>
             </SidebarMenuButton>

@@ -1,13 +1,12 @@
 /**
- * 表格 DDL
+ * 设置
  *
- * FIXME: 实现比较复杂, 推迟
  */
 import { useEffect, useState } from "react";
 import { getTableDdl } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
 
-export function TableEditorDdl() {
+export function Settings() {
   const { currentDbType, currentTableName } = useCoreStore();
 
   const [tableData, setTableData] = useState<any[]>([]); // 表结构
@@ -29,7 +28,7 @@ export function TableEditorDdl() {
 
   return (
     <>
-      <p>{tableData}</p>
+      <p>设置</p>
     </>
   );
 }
