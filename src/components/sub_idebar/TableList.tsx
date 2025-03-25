@@ -12,7 +12,7 @@ export function TableList(props: TableListData) {
     const res = await getAllTables(currentDbType);
 
     if (res) {
-      setTablenames(res.data);
+      setTablenames(res.data.sort());
     }
   };
 
@@ -27,6 +27,7 @@ export function TableList(props: TableListData) {
 
   return (
     <div>
+      <div>TODO: 控制排序方式</div>
       {tablenames.map((item, index) => (
         <p
           className="py-1 cursor-pointer flex justify-between"
