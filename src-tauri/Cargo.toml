@@ -33,16 +33,12 @@ sqlx = { version = "0.8", features = [
     "postgres",      # PostgreSQL
     "mysql",         # MySQL/MariaDB
     "sqlite",        # SQLite
-    # "mssql",         # Microsoft SQL Server（需 Rust 1.65+）
-
-    # 动态多数据库支持（可选）
-    "any",           # 允许运行时动态切换数据库
+    # "mssql",         # Microsoft SQL Server (报错说没有)
 
     #
     "derive",
     "macros",
-    "migrate",
-  
+    "migrate",  
 
     # 异步运行时（必选一个）
     "runtime-tokio-native-tls",  # 使用 Tokio + 操作系统 TLS 库
@@ -53,9 +49,13 @@ sqlx = { version = "0.8", features = [
     "json",          # JSON 类型支持（serde_json）
     "uuid",          # UUID 类型支持
     "time",          # 时间类型支持（time 库）
-    # "bstr", # Add support for bstr::BString
+    # "bstr", # Add support for bstr::BString  (报错说没有)
     "bigdecimal", # Add support for NUMERIC using the bigdecimal crate.
     # "rust_decimal", # Add support for NUMERIC using the rust_decimal crate.
     "ipnetwork", # Add support for INET and CIDR (in postgres) using the ipnetwork crate.
-    
  ] }
+ aes-gcm = "0.10.3"
+ anyhow = "1.0.97"
+ rand = "0.9.0"
+ sha2 = "0.10.8"
+ getrandom = "0.3.2"
