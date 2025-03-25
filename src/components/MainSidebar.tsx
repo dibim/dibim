@@ -31,7 +31,7 @@ import {
 } from "@/constants";
 import { useCoreStore } from "@/store";
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { sidebarOpen, setMainContenType, setSubSidebarType } = useCoreStore();
 
   return (
