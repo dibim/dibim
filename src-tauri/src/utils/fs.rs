@@ -2,6 +2,10 @@ use anyhow::{Context, Result};
 use base64::{engine::general_purpose, Engine as _};
 use std::{fs, path::Path};
 
+pub fn path_exists(path: String) -> bool {
+    Path::new(&path).exists()
+}
+
 /// 读取文件的文本
 pub fn read_file_text(input_path: String) -> Result<String> {
     let input_path = Path::new(&input_path);

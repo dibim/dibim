@@ -2,10 +2,15 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { STR_EMPTY } from "@/constants";
 import { TableStructure } from "@/databases/types";
+import { ConfigFile } from "@/types/conf_file";
 import { DbType, MainContenType } from "@/types/types";
 
 // 定义 store 的类型
 export interface CoreStoreState {
+  // 配置文件
+  configFile: ConfigFile;
+  setConfigFile: (val: ConfigFile) => void;
+
   // 当前数据库类型
   currentDbType: DbType;
   setCurrentDbType: (val: DbType) => void;
@@ -29,6 +34,8 @@ export interface CoreStoreState {
   // 侧边栏
   sidebarOpen: boolean;
   setSidebarOpen: (val: boolean) => void;
+
+  // 重置
   reset: () => void;
 }
 
@@ -36,6 +43,16 @@ export interface CoreStoreState {
 export const useCoreStore = create<CoreStoreState>()(
   persist(
     (set) => ({
+      configFile: {
+        dbConnections: [],
+        settings: {
+          theme: "",
+          timeFormat: "",
+          lang: ""
+        },
+      },
+      setConfigFile: (val: ConfigFile) => set({ configFile: val }),
+
       currentDbType: STR_EMPTY,
       setCurrentDbType: (val: DbType) => set({ currentDbType: val }),
 
