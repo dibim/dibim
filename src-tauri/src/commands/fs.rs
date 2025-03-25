@@ -1,6 +1,11 @@
 use crate::utils::fs::{self};
 
 #[tauri::command]
+pub fn path_exists(path_string: String) -> bool {
+    fs::path_exists(path_string)
+}
+
+#[tauri::command]
 pub fn read_file_text(path_string: String) -> (Option<String>, Option<String>) {
     match fs::read_file_text(path_string) {
         Ok(crypto_result) => (Some(crypto_result), None),

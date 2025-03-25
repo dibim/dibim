@@ -15,6 +15,7 @@ pub fn run() {
             commands::fs::read_file_base64,
             commands::fs::write_file_text,
             commands::fs::write_file_base64,
+            commands::fs::path_exists,
             commands::sql::sqlx_connect,
             commands::sql::sqlx_exec,
             commands::sql::sqlx_query,

@@ -18,7 +18,7 @@ export type SslMode =
   | typeof SSL_MODE_VERIFY_FULL;
 
 // 链接数据库的参数
-export interface DbConnectionParams {
+export interface DbConnectionParam {
   user: string;
   host: string;
   dbname: string;
