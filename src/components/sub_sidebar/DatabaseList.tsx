@@ -9,7 +9,7 @@ import { connectPg } from "@/databases/PostgreSQL/utils";
 import { useCoreStore } from "@/store";
 import { DbConnections } from "@/types/conf_file";
 import { ConfirmDialog } from "../ConfirmDialog";
-import { DropdownList, ListItem } from "../DropdownList";
+import { ListWithAction, ListItem } from "../ListWithAction";
 import { EmptyList } from "../EmptyList";
 
 export function DatabaseList() {
@@ -45,8 +45,8 @@ export function DatabaseList() {
     }
   };
 
+  // 列表数据
   const [listData, setListData] = useState<ListItem[]>([]);
-
   const getData = () => {
     const arr: ListItem[] = [];
     config.dbConnections.map((item, index) => {
@@ -102,7 +102,7 @@ export function DatabaseList() {
       <div>
         {!config.dbConnections && <EmptyList />}
 
-        {config.dbConnections && <DropdownList items={listData} itemClassName="py-2 cursor-pointer" />}
+        {config.dbConnections && <ListWithAction items={listData} itemClassName="py-2 cursor-pointer" />}
       </div>
 
       <ConfirmDialog
