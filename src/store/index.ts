@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import {
   DB_TYPE_POSTGRESQL,
-  DEFAULT_MAIN_PASSWORD,
+  MAIN_PASSWORD_DEFAULT,
   MAIN_CONTEN_TYPE_WELCOME,
   SUB_SIDEBAR_TYPE_DB_LIST,
 } from "@/constants";
@@ -61,9 +61,15 @@ const emptyConfigFile = {
   },
 } as ConfigFile;
 
-export const defaultMainPasswordSha = await invoker.sha256(DEFAULT_MAIN_PASSWORD);
+export const defaultMainPasswordSha = await invoker.sha256(MAIN_PASSWORD_DEFAULT);
 
-// 创建一个 store
+const storeName = "core-store";
+
+// 其空当前 store 的数据
+export function clearCoreStore() {
+  localStorage.removeItem(storeName);
+}
+
 export const useCoreStore = create<CoreStoreState>()(
   persist(
     (set, get) => ({
@@ -113,7 +119,7 @@ export const useCoreStore = create<CoreStoreState>()(
         }),
     }),
     {
-      name: "core-store", // localStorage key
+      name: storeName, // localStorage key
     },
   ),
 );
