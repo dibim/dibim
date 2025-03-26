@@ -118,13 +118,8 @@ export function Main() {
   };
   // ========== 配置初始化 结束 ==========
 
-  // TODO: 库,差是否有连接配置, 有的话显示 MainContent ,没有的话显示 Index
-
   useEffect(() => {
-    // testDb();
-
     checkConfigFile();
-
     setOpenMobile(sidebarOpen);
     setOpen(sidebarOpen);
   }, []);

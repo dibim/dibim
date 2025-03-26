@@ -1,11 +1,13 @@
 export const APP_NAME = "DIBIM";
 
 export const STR_EMPTY = "";
+export const STR_ADD = "add";
+export const STR_EDIT = "edit";
 
 export const HEDAER_H = 12; // header 的 h- 属性值, 对应 tailwindcss 的
 
 // 次级侧边栏
-export const SUB_SIDEBAR_DEFAULT_WIDTH = 160; // 默认宽度
+export const SUB_SIDEBAR_DEFAULT_WIDTH = 180; // 默认宽度
 export const SUB_SIDEBAR_MIN_WIDTH = 50; // 最小宽度
 
 // 配置文件相关
@@ -28,6 +30,7 @@ export const SUB_SIDEBAR_TYPE_FUNC_LIST = "funcLst";
 // 主要区域的类型
 export const MAIN_CONTEN_TYPE_WELCOME = "welcome";
 export const MAIN_CONTEN_TYPE_ADD_CONNECTION = "addConnection";
+export const MAIN_CONTEN_TYPE_EDIT_CONNECTION = "editConnection";
 export const MAIN_CONTEN_TYPE_TABLE_EDITOR = "tableEditor";
 export const MAIN_CONTEN_TYPE_SETTINGS = "settings";
 export const MAIN_CONTEN_TYPE_SQL_EDITOR = "sqlEditor";

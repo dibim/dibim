@@ -34,6 +34,10 @@ export function TableEditorData() {
 
   // 获取表格数据
   const getData = async (page: number) => {
+    if (currentTableName === "") {
+      return;
+    }
+
     // 整理字段名
     setColNames(currentTableStructure.map((f) => f.column_name));
 
@@ -41,6 +45,11 @@ export function TableEditorData() {
     const orderBy = getDefultOrderField(currentTableStructure);
     const lastRow = tableData[tableData.length - 1];
     const lastOrderByValue = lastRow ? lastRow[orderBy] : null;
+
+    if (orderBy === "") {
+      console.log("orderBy 为空字符串");
+      return;
+    }
 
     const res = await getTableData(currentDbType, {
       tableName: currentTableName,
