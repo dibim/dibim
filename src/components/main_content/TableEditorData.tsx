@@ -95,6 +95,15 @@ export function TableEditorData() {
       setCurrentPage(page);
     }
   };
+  // 跳转到指定的页码
+  const goToPage = () => {
+    let page = inputedPage;
+    if (page <= 0) page = 1;
+    if (page > pageTotal) page = pageTotal;
+
+    getData(page);
+    setCurrentPage(page);
+  };
 
   // 输入框里的页面跟随当前页码变化
   useEffect(() => {
@@ -182,12 +191,14 @@ export function TableEditorData() {
                     onChange={(e) => {
                       try {
                         setInputedPage(parseInt(e.target.value));
-                      } catch (error) {}
+                      } catch (error) {
+                        console.log("解析要跳转额页码出错: ", error);
+                      }
                     }}
                   />
                 </div>
                 <div className="flex items-center pe-4">
-                  <CornerDownLeft />
+                  <CornerDownLeft onClick={goToPage} />
                 </div>
               </PaginationItem>
               <PaginationItem>
