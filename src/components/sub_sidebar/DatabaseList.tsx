@@ -1,33 +1,62 @@
+import { useEffect } from "react";
+import { Edit, Trash } from "lucide-react";
+import { SUB_SIDEBAR_TYPE_TABLE_LIST } from "@/constants";
 import { useCoreStore } from "@/store";
 import { DbConnections } from "@/types/conf_file";
-import { EmptyList } from "./EmptyList";
+import { DropdownList } from "../DropdownList";
+import { EmptyList } from "../EmptyList";
 
 export function DatabaseList() {
-  const { config: configFile } = useCoreStore();
+  const { config, setCurrentDbName, setSubSidebarType } = useCoreStore();
 
-  const clickItem = (conn: DbConnections) => {
-    //  TODO: 实现逻辑, 点击后打开这个数据库的表
-    console.log("clickItem conn", conn);
+  const clickTableName = (conn: DbConnections) => {
+    //  TODO: 检查啊, 没有连接的要啊
+
+    setCurrentDbName(conn.dbname);
+    setSubSidebarType(SUB_SIDEBAR_TYPE_TABLE_LIST);
   };
+
+  const listData = [
+    {
+      id: 1,
+      content: <div>Document.pdf</div>,
+      menuItems: [
+        {
+          label: "编辑",
+          onClick: () => console.log("Edit file 1"),
+          icon: <Edit className="h-4 w-4" />,
+        },
+
+        {
+          label: "删除",
+          onClick: () => console.log("Delete file 1"),
+          icon: <Trash className="h-4 w-4" />,
+          disabled: true,
+        },
+      ],
+    },
+  ];
+
+  // TODO: 动态生成列表里的数据
+  const getData = () => {
+    //
+  };
+
+  useEffect(() => {
+    getData();
+  }, [config]);
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <div>
-      <div>DatabaseList</div>
+      {!config.dbConnections && <EmptyList />}
 
-      {!configFile.dbConnections && <EmptyList />}
-
-      {configFile.dbConnections &&
-        configFile.dbConnections.map((item, index) => (
-          <p
-            className="py-1 cursor-pointer flex justify-between"
-            key={index}
-            onClick={() => {
-              clickItem(item);
-            }}
-          >
-            <span>{item.name || "未命名"}</span>
-            <span></span>
-          </p>
+      {config.dbConnections &&
+        config.dbConnections.map((item, index) => (
+          <DropdownList items={listData} itemClassName="py-2 cursor-pointer" />
         ))}
     </div>
   );

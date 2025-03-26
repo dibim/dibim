@@ -22,6 +22,8 @@ export const DB_TYPE_SQLITE = "SQLite";
 // 次级侧边栏的类型
 export const SUB_SIDEBAR_TYPE_DB_LIST = "dbList";
 export const SUB_SIDEBAR_TYPE_TABLE_LIST = "tableList";
+export const SUB_SIDEBAR_TYPE_VIEW_LIST = "viewList";
+export const SUB_SIDEBAR_TYPE_FUNC_LIST = "funcLst";
 
 // 主要区域的类型
 export const MAIN_CONTEN_TYPE_WELCOME = "welcome";
