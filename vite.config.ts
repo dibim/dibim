@@ -36,4 +36,7 @@ export default defineConfig(async () => ({
       ignored: ["**/src-tauri/**"],
     },
   },
+  build: {
+    target: 'esnext' // 支持顶级 await
+  }
 }));
