@@ -5,8 +5,8 @@ import { toast } from "sonner";
 import { MAIN_CONTEN_TYPE_TABLE_EDITOR } from "@/constants";
 import { getAllTableName, getAllTableSize } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
+import { ListWithAction, ListItem } from "../ListWithAction";
 import { EmptyList } from "../EmptyList";
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 type TableData = {
@@ -20,38 +20,8 @@ export function TableList() {
 
   const [tablData, setTableData] = useState<TableData[]>([]);
 
-  const getData = async () => {
-    // 获取表名
-    const res = await getAllTableName(currentDbType);
-
-    if (res && res.data) {
-      // 获取表格大小
-      const sizeRes = await getAllTableSize(currentDbType);
-
-      if (sizeRes && sizeRes.data) {
-        const arr: TableData[] = [];
-
-        // 合并数据
-        for (const tn of res.data.sort()) {
-          for (const sr of sizeRes.data) {
-            if (sr.table_name == tn) {
-              arr.push({
-                tableName: tn,
-                size: sr.total_size,
-                bytes: bytes(sr.total_size) || 0,
-              });
-              break;
-            }
-          }
-        }
-
-        setTableData(arr);
-      }
-    }
-  };
-
-  const clickItem = (item: string) => {
-    setCurrentTableName(item);
+  const clickItem = (item: ListItem) => {
+    setCurrentTableName(item.id);
     setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
   };
 
@@ -121,8 +91,117 @@ export function TableList() {
   };
   // ========== 上下文按钮功能 结束 ==========
 
+  // 列表数据
+  const [listData, setListData] = useState<ListItem[]>([]);
+
+  const getData = async () => {
+    // 获取表名
+    const res = await getAllTableName(currentDbType);
+
+    if (res && res.data) {
+      // 获取表格大小
+      const sizeRes = await getAllTableSize(currentDbType);
+
+      if (sizeRes && sizeRes.data) {
+        const arrTb: TableData[] = [];
+
+        // 合并数据
+        for (const tn of res.data.sort()) {
+          for (const sr of sizeRes.data) {
+            if (sr.table_name == tn) {
+              arrTb.push({
+                tableName: tn,
+                size: sr.total_size,
+                bytes: bytes(sr.total_size) || 0,
+              });
+              break;
+            }
+          }
+        }
+
+        setTableData(arrTb);
+      }
+    }
+  };
+
+  // 生成带按钮的列表数据
+  function genListData() {
+    const arr: ListItem[] = [];
+    tablData.map((item, index) => {
+      arr.push({
+        id: item.tableName,
+        content: (
+          <div className="py-1 cursor-pointer flex justify-between items-center" key={index}>
+            {/* 表名部分 - 占用剩余空间，不换行，超出显示省略号 */}
+            <div className="flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" title={item.tableName}>
+              {item.tableName}
+            </div>
+
+            {/* 大小部分 - 不收缩，优先显示 */}
+            <div className="flex-shrink-0 bg-muted">{item.size}</div>
+          </div>
+        ),
+        contentOnClick: async (item) => {
+          clickItem(item);
+        },
+        menuItems: [
+          {
+            label: "重命名",
+            onClick: () => {
+              handleRename(item.tableName);
+            },
+          },
+          {
+            label: "复制表名",
+            onClick: () => {
+              handleCopy(item.tableName);
+            },
+          },
+          {
+            label: "导入",
+            onClick: () => {
+              handleImport(item.tableName);
+            },
+          },
+
+          {
+            label: "导出",
+            onClick: () => {
+              handleExport(item.tableName);
+            },
+          },
+          {
+            label: "截断",
+            className: "text-[var(--fvm-warning-clr)]",
+            onClick: () => {
+              handleDelete(item.tableName);
+            },
+          },
+          {
+            label: "删除",
+            className: "text-[var(--fvm-danger-clr)]",
+            onClick: () => {
+              handleImport(item.tableName);
+            },
+          },
+        ],
+      });
+    });
+
+    setListData(arr);
+  }
+
+  useEffect(() => {
+    genListData();
+  }, [tablData]);
+
   useEffect(() => {
     getData();
+
+    // 监听 store 的变化
+    useCoreStore.subscribe(() => {
+      getData();
+    });
   }, []);
 
   return (
@@ -135,75 +214,7 @@ export function TableList() {
       </div>
       {!tablData || (tablData.length === 0 && <EmptyList />)}
 
-      {tablData.map((item, index) => (
-        <ContextMenu>
-          <ContextMenuTrigger>
-            <div
-              className="py-1 cursor-pointer flex justify-between items-center"
-              key={index}
-              onClick={() => {
-                clickItem(item.tableName);
-              }}
-            >
-              {/* 表名部分 - 占用剩余空间，不换行，超出显示省略号 */}
-              <div className="flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" title={item.tableName}>
-                {item.tableName}
-              </div>
-
-              {/* 大小部分 - 不收缩，优先显示 */}
-              <div className="flex-shrink-0 bg-muted">{item.size}</div>
-            </div>
-          </ContextMenuTrigger>
-          <ContextMenuContent>
-            <ContextMenuItem
-              onClick={() => {
-                handleRename(item.tableName);
-              }}
-            >
-              重命名
-            </ContextMenuItem>
-            <ContextMenuItem
-              onClick={() => {
-                handleCopy(item.tableName);
-              }}
-            >
-              复制表名
-            </ContextMenuItem>
-            <hr />
-            <ContextMenuItem
-              onClick={() => {
-                handleImport(item.tableName);
-              }}
-            >
-              导入
-            </ContextMenuItem>
-            <ContextMenuItem
-              onClick={() => {
-                handleExport(item.tableName);
-              }}
-            >
-              导出
-            </ContextMenuItem>
-            <hr />
-            <ContextMenuItem
-              className="text-[var(--fvm-warning-clr)]"
-              onClick={() => {
-                handleTruncate(item.tableName);
-              }}
-            >
-              截断
-            </ContextMenuItem>
-            <ContextMenuItem
-              className="text-[var(--fvm-danger-clr)]"
-              onClick={() => {
-                handleDelete(item.tableName);
-              }}
-            >
-              删除
-            </ContextMenuItem>
-          </ContextMenuContent>
-        </ContextMenu>
-      ))}
+      {tablData.length > 0 && <ListWithAction items={listData} itemClassName="py-2 cursor-pointer" />}
     </div>
   );
 }
