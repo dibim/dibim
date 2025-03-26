@@ -13,7 +13,7 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 
 export function AddConnection() {
-  const { config: configFile } = useCoreStore();
+  const { config, setConfig } = useCoreStore();
 
   const [name, setName] = useState<string>(""); // 连接名称
   const [dbType, setDbType] = useState<DbType>(DB_TYPE_POSTGRESQL); // 默认类型是 PostgreSQL
@@ -23,9 +23,10 @@ export function AddConnection() {
   const [password, setPassword] = useState<string>("");
   const [dbname, setDbName] = useState<string>("");
   const [filePath, setFilePath] = useState<string>(""); // 文件路径, 用于 sqite
-  const [color, setColor] = useState<string>("");
+  const [color, setColor] = useState<string>("#33d17a");
 
   const [errorMessage, setErrorMessage] = useState<string>(""); // 错误消息
+  const [okMessage, setOkMessage] = useState<string>(""); // 成功消息
 
   function onInputName(event: React.ChangeEvent<HTMLInputElement>) {
     setName(event.target.value || "");
@@ -52,28 +53,21 @@ export function AddConnection() {
     setColor(event.target.value || "");
   }
 
-  function onSubmit() {
+  function valueIsError(condition: boolean, msg: string) {
+    if (condition) {
+      setErrorMessage(`请输入${msg}`);
+      return true;
+    }
+    return false;
+  }
+
+  async function onSubmit() {
     if (dbType === DB_TYPE_MYSQL || dbType === DB_TYPE_POSTGRESQL) {
-      if (host === "") {
-        setErrorMessage("请输入主机地址");
-        return;
-      }
-      if (port === 0) {
-        setErrorMessage("请输入端口");
-        return;
-      }
-      if (user === "") {
-        setErrorMessage("请输入用户名");
-        return;
-      }
-      if (password === "") {
-        setErrorMessage("请输入密码");
-        return;
-      }
-      if (dbname === "") {
-        setErrorMessage("请输入数据库名");
-        return;
-      }
+      if (valueIsError(host === "", "主机地址")) return;
+      if (valueIsError(port === 0, "端口")) return;
+      if (valueIsError(user === "", "用户名")) return;
+      if (valueIsError(password === "", "密码")) return;
+      if (valueIsError(dbname === "", "数据库名")) return;
     }
 
     if (dbType === DB_TYPE_SQLITE) {
@@ -92,7 +86,11 @@ export function AddConnection() {
       name,
       color,
     };
-    configFile.dbConnections.push(dbConf);
+
+    config.dbConnections.push(dbConf);
+    await setConfig(config);
+
+    setOkMessage("添加成功");
   }
 
   const handleClickDbLogo = (dbType: DbType) => {
@@ -117,7 +115,7 @@ export function AddConnection() {
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4">
-      <Card className="w-200">
+      <Card className="w-150">
         <CardHeader>
           <CardTitle>添加数据库</CardTitle>
           <CardDescription></CardDescription>
@@ -170,6 +168,14 @@ export function AddConnection() {
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>错误提示</AlertTitle>
               <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
+
+          {okMessage && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>提示</AlertTitle>
+              <AlertDescription>{okMessage}</AlertDescription>
             </Alert>
           )}
         </CardContent>

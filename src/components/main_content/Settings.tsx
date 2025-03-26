@@ -8,7 +8,6 @@ import { DIR_H, MAIN_PASSWORD_MIN_LEN } from "@/constants";
 import { getTableDdl } from "@/databases/adapter,";
 import { invoker } from "@/invoke";
 import { useCoreStore } from "@/store";
-import { ConfigFile } from "@/types/conf_file";
 import { LabeledDiv } from "../LabeledDiv";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
@@ -16,13 +15,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "../ui/input";
 
 export function Settings() {
-  const { currentDbType, currentTableName, mainPasswordSha, setMainPasswordSha, config, setConfig } = useCoreStore();
+  const { currentDbType, currentTableName, setMainPasswordSha, config, setConfig } = useCoreStore();
 
   const [mainPassword, setMainPassword] = useState<string>("");
   const [theme, setTheme] = useState<string>("");
   const [lang, setLang] = useState<string>("");
   const [timeFormat, setTimeFormat] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>(""); // 错误消息
+  const [okMessage, setOkMessage] = useState<string>(""); // 成功消息
 
   async function onInputMainPassword(event: React.ChangeEvent<HTMLInputElement>) {
     setMainPassword(event.target.value || "");
@@ -46,7 +46,9 @@ export function Settings() {
     config.settings.lang = lang;
     config.settings.theme = theme;
     config.settings.timeFormat = timeFormat;
-    setConfig(config);
+    await setConfig(config);
+
+    setOkMessage("保存成功");
   }
 
   const getData = async () => {
@@ -62,6 +64,10 @@ export function Settings() {
 
   useEffect(() => {
     getData();
+
+    // TODO: 这几行视为了编译不报错
+    setLang("");
+    setTimeFormat("");
   }, []);
 
   return (
@@ -89,6 +95,14 @@ export function Settings() {
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>错误提示</AlertTitle>
               <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
+
+          {okMessage && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>提示</AlertTitle>
+              <AlertDescription>{okMessage}</AlertDescription>
             </Alert>
           )}
         </CardContent>

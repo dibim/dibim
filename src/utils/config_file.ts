@@ -22,7 +22,7 @@ export const readConfigFile = async (key: string) => {
 
 // 保存配置文件
 export const saveConfigFile = async (val: string, key: string) => {
-  const enc = await invoker.aesGcmEncryptString(JSON.stringify(val), key);
+  const enc = await invoker.aesGcmEncryptString(val, key);
 
   if (enc.errorMessage === "") {
     const res = await invoker.writeFileBase64(CONFIG_FILE_MAIN, enc.result);

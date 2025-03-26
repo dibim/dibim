@@ -51,8 +51,6 @@ export function TableEditorData() {
       lastOrderByValue,
     });
 
-    console.log("getData 结果::: ", res);
-
     if (res) {
       setTableData(res.data);
       setItemsTotal(res.itemsTotal);
@@ -100,6 +98,9 @@ export function TableEditorData() {
 
   useEffect(() => {
     getData(currentPage);
+
+    // TODO: 为了编译不报错
+    setPageSize(100);
   }, []);
 
   const renderRow = (row: { [key: string]: any }) => {
@@ -109,7 +110,7 @@ export function TableEditorData() {
   return (
     <div>
       {/* 按钮栏 */}
-      <div className="flex pb-2">
+      <div className="flex flex-wrap pb-2">
         <div className={cn("gap-4 px-2 pb-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
           <Tooltip>
             <TooltipTrigger asChild>

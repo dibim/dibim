@@ -26,7 +26,7 @@ export function TableEditor() {
   const tabDdl = "tab2";
   const tabConstraint = "tab3";
   const tabData = "tab4";
-  const tabPart = "tab5";
+  // const tabPart = "tab5";
 
   useEffect(() => {
     getStructure();
