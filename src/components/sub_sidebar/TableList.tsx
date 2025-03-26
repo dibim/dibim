@@ -3,10 +3,10 @@ import bytes from "bytes";
 import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 import { MAIN_CONTEN_TYPE_TABLE_EDITOR } from "@/constants";
-import { getAllTableName, getAllTableSize } from "@/databases/adapter,";
+import { deleteTable, getAllTableName, getAllTableSize, truncateTable } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
-import { ListWithAction, ListItem } from "../ListWithAction";
 import { EmptyList } from "../EmptyList";
+import { ListItem, ListWithAction } from "../ListWithAction";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 type TableData = {
@@ -67,7 +67,8 @@ export function TableList() {
 
   // ========== 上下文按钮功能 ==========
   const handleRename = async (text: string) => {
-    // TODO:
+    // FIXME: 需要弹窗, 获取新名字
+    // renameTable(currentDbType, text);
   };
   const handleCopy = async (text: string) => {
     try {
@@ -84,10 +85,12 @@ export function TableList() {
     // TODO:
   };
   const handleTruncate = async (text: string) => {
-    // TODO:
+    // TODO: 弹出确认
+    truncateTable(currentDbType, text);
   };
   const handleDelete = async (text: string) => {
-    // TODO:
+    // TODO: 弹出确认
+    deleteTable(currentDbType, text);
   };
   // ========== 上下文按钮功能 结束 ==========
 
@@ -174,14 +177,14 @@ export function TableList() {
             label: "截断",
             className: "text-[var(--fvm-warning-clr)]",
             onClick: () => {
-              handleDelete(item.tableName);
+              handleTruncate(item.tableName);
             },
           },
           {
             label: "删除",
             className: "text-[var(--fvm-danger-clr)]",
             onClick: () => {
-              handleImport(item.tableName);
+              handleDelete(item.tableName);
             },
           },
         ],

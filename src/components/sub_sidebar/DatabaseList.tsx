@@ -9,8 +9,8 @@ import { connectPg } from "@/databases/PostgreSQL/utils";
 import { useCoreStore } from "@/store";
 import { DbConnections } from "@/types/conf_file";
 import { ConfirmDialog } from "../ConfirmDialog";
-import { ListWithAction, ListItem } from "../ListWithAction";
 import { EmptyList } from "../EmptyList";
+import { ListItem, ListWithAction } from "../ListWithAction";
 
 export function DatabaseList() {
   const { config, setConfig, setMainContenType, setSubSidebarType } = useCoreStore();
@@ -52,7 +52,7 @@ export function DatabaseList() {
     config.dbConnections.map((item, index) => {
       arr.push({
         id: item.name,
-        content: <div>{item.name}</div>,
+        content: <div className="cursor-pointer">{item.name}</div>,
         contentOnClick: async () => {
           clickConn(item);
         },
