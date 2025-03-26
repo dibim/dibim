@@ -24,7 +24,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card"
 import { Input } from "./ui/input";
 
 export function Main() {
-  const { setConfig, subSidebarType, sidebarOpen, setSidebarOpen, setMainPasswordSha } = useCoreStore();
+  const { setConfig, subSidebarType, sidebarOpen, setSidebarOpen, setMainPasswordSha, subSidebarOpen } = useCoreStore();
 
   const { toggleSidebar, setOpenMobile, setOpen } = useSidebar();
 
@@ -179,23 +179,25 @@ export function Main() {
 
           <div className="flex">
             {/* 次级侧边栏 */}
-            <div className="flex border-r relative" style={{ width: subSidebarWidth }}>
-              {/* 次级侧边栏内容 */}
-              {/* 这里的 height 是屏幕高度减去 header 的高度 */}
-              <div
-                className="flex-1 overflow-y-scroll py-2 ps-2 pe-4"
-                style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}
-              >
-                {subSidebarType === SUB_SIDEBAR_TYPE_DB_LIST && <DatabaseList />}
-                {subSidebarType === SUB_SIDEBAR_TYPE_TABLE_LIST && <TableList />}
-              </div>
+            {subSidebarOpen && (
+              <div className="flex border-r relative" style={{ width: subSidebarWidth }}>
+                {/* 次级侧边栏内容 */}
+                {/* 这里的 height 是屏幕高度减去 header 的高度 */}
+                <div
+                  className="flex-1 overflow-y-scroll py-2 ps-2 pe-4"
+                  style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}
+                >
+                  {subSidebarType === SUB_SIDEBAR_TYPE_DB_LIST && <DatabaseList />}
+                  {subSidebarType === SUB_SIDEBAR_TYPE_TABLE_LIST && <TableList />}
+                </div>
 
-              {/* 拖拽手柄 */}
-              <div
-                className="absolute -right-1 top-0 w-2 h-full cursor-col-resize hover:bg-primary/50"
-                onMouseDown={handleMouseDown}
-              />
-            </div>
+                {/* 拖拽手柄 */}
+                <div
+                  className="absolute -right-1 top-0 w-2 h-full cursor-col-resize hover:bg-primary/50"
+                  onMouseDown={handleMouseDown}
+                />
+              </div>
+            )}
 
             {/* 主内容区域 */}
             <div
