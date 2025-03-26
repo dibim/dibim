@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AlertCircle } from "lucide-react";
 import MysqlLogo from "@/assets/db_logo/mysql.svg?react";
 import PostgresqlLogo from "@/assets/db_logo/postgresql.svg?react";
 import SqliteLogo from "@/assets/db_logo/sqlite.svg?react";
@@ -7,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE, DIR_H } from "@/constants";
 import { useCoreStore } from "@/store";
 import { DbType, SvgComponentType } from "@/types/types";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 
@@ -115,7 +117,6 @@ export function AddConnection() {
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4">
-      {/* Card 组件，设置固定宽度和响应式宽度 */}
       <Card className="w-200">
         <CardHeader>
           <CardTitle>添加数据库</CardTitle>
@@ -163,6 +164,14 @@ export function AddConnection() {
           <LabeledDiv direction={DIR_H} label={"颜色"} className="py-2">
             <Input type="color" value={color} onInput={onInputColor} />
           </LabeledDiv>
+
+          {errorMessage && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>错误提示</AlertTitle>
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
         </CardContent>
         <CardFooter className="flex justify-between">
           {/* <Button variant="outline">取消</Button> */}
