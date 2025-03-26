@@ -14,10 +14,9 @@ export const invoker = {
   sha256: (str: string) => invoke<string>("sha256", { string: str }),
 
   // AES-GCM
-  aesGcmEncryptString: (str: string, key: string) =>
-    invoke<AesRes>("aes_gcm_encrypt_string", { string: str, url: key }),
+  aesGcmEncryptString: (str: string, key: string) => invoke<AesRes>("aes_gcm_encrypt_string", { string: str, key }),
   aesGcmDecryptBase64: (str: string, key: string) =>
-    invoke<AesRes>("aes_gcm_decrypt_base64", { base64String: str, sql: key }),
+    invoke<AesRes>("aes_gcm_decrypt_base64", { base64String: str, key }),
 
   // fs
   pathExists: (pathString: string) => invoke<boolean>("path_exists", { pathString }),

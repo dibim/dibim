@@ -1,8 +1,9 @@
+import { CONFIG_FILE_MAIN } from "@/constants";
 import { invoker } from "@/invoke";
 
 // 读取配置文件
-export const readConfigFile = async (pathString: string, key: string) => {
-  const res = await invoker.readFileBase64(pathString);
+export const readConfigFile = async (key: string) => {
+  const res = await invoker.readFileBase64(CONFIG_FILE_MAIN);
 
   if (res.errorMessage === "") {
     const dec = await invoker.aesGcmDecryptBase64(res.result, key);
@@ -24,7 +25,7 @@ export const saveConfigFile = async (val: string, key: string) => {
   const enc = await invoker.aesGcmEncryptString(JSON.stringify(val), key);
 
   if (enc.errorMessage === "") {
-    const res = await invoker.writeFileBase64(enc.result, key);
+    const res = await invoker.writeFileBase64(CONFIG_FILE_MAIN, enc.result);
 
     if (res.errorMessage === "") {
       return res.result;
