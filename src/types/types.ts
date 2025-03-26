@@ -9,7 +9,9 @@ import {
   MAIN_CONTEN_TYPE_TABLE_EDITOR,
   MAIN_CONTEN_TYPE_WELCOME,
   SUB_SIDEBAR_TYPE_DB_LIST,
+  SUB_SIDEBAR_TYPE_FUNC_LIST,
   SUB_SIDEBAR_TYPE_TABLE_LIST,
+  SUB_SIDEBAR_TYPE_VIEW_LIST,
 } from "@/constants";
 
 // 数据库返回的数据
@@ -40,7 +42,11 @@ export type MainContentStructure = {
 export type DbType = typeof DB_TYPE_MYSQL | typeof DB_TYPE_POSTGRESQL | typeof DB_TYPE_SQLITE;
 
 // 次级侧边栏的类型
-export type SubSidebarType = typeof SUB_SIDEBAR_TYPE_DB_LIST | typeof SUB_SIDEBAR_TYPE_TABLE_LIST;
+export type SubSidebarType =
+  | typeof SUB_SIDEBAR_TYPE_DB_LIST
+  | typeof SUB_SIDEBAR_TYPE_TABLE_LIST
+  | typeof SUB_SIDEBAR_TYPE_VIEW_LIST
+  | typeof SUB_SIDEBAR_TYPE_FUNC_LIST;
 
 // 主要区域的类型
 export type MainContenType =
