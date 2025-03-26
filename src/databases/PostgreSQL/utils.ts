@@ -28,7 +28,7 @@ export async function connectPg(p: DbConnectionParam) {
 }
 
 // 获取所有表格名
-export async function getAllTablesPg() {
+export async function getAllTableNamePg() {
   const sql = `
     SELECT 
         tablename 
@@ -46,6 +46,36 @@ export async function getAllTablesPg() {
   return {
     columnName: dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : [],
     data: dataArr.map((item) => item.tablename),
+  };
+}
+
+// 获取所有表格的大小
+type getAllTableSizeRes = {
+  table_name: string;
+  total_size: string;
+};
+export async function getAllTableSizePg() {
+  const sql = `
+    SELECT
+        schemaname AS schema_name,
+        tablename AS table_name,
+        pg_size_pretty(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS total_size,
+        pg_size_pretty(pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS table_size,
+        pg_size_pretty(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)) - 
+                      pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS index_size
+    FROM
+        pg_tables
+    WHERE
+        schemaname NOT IN ('pg_catalog', 'information_schema')
+    ORDER BY
+        pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)) DESC;
+    `;
+
+  const dbRes = await invoker.querySql(testConnName, sql);
+
+  return {
+    columnName: dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : [],
+    data: dbRes.data ? (JSON.parse(dbRes.data) as getAllTableSizeRes[]) : [],
   };
 }
 
