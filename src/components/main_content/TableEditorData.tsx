@@ -112,8 +112,12 @@ export function TableEditorData() {
     setPageSize(100);
   }, []);
 
-  const renderRow = (row: { [key: string]: any }) => {
-    return colNames.map((colName) => <TableCell className="font-medium">{row[colName]}</TableCell>);
+  const renderRow = (row: { [key: string]: any }, indexRow: number) => {
+    return colNames.map((colName, indexCell) => (
+      <TableCell className="font-medium" key={`r${indexRow}|c${indexCell}`}>
+        {row[colName]}
+      </TableCell>
+    ));
   };
 
   return (
@@ -205,14 +209,14 @@ export function TableEditorData() {
         <Table className="border-y">
           <TableHeader>
             <TableRow>
-              {colNames.map((colName) => (
-                <TableHead>{colName}</TableHead>
+              {colNames.map((colName, index) => (
+                <TableHead key={`h${index}`}>{colName}</TableHead>
               ))}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {tableData.map((item) => (
-              <TableRow key={item.invoice}>{renderRow(item)}</TableRow>
+            {tableData.map((item, index) => (
+              <TableRow key={`r${index}`}>{renderRow(item, index)}</TableRow>
             ))}
           </TableBody>
         </Table>
