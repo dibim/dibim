@@ -31,14 +31,6 @@ export type ExecResult = {
   lastInsertId: number;
 };
 
-// 表格列表
-export type TableListData = {};
-
-// 主要区域
-export type MainContentData = {
-  //
-};
-
 // 表结构
 export type MainContentStructure = {
   getStructure: () => void;

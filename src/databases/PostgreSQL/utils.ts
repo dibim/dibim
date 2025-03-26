@@ -197,17 +197,17 @@ export async function getTableDataPg(p: GetTableDataParam) {
 
   // 如果没有主键, 且没有指定排序字段
   // TODO: 实现逻辑
-  const sqlNoPkey = `  
-    WITH numbered_rows AS (
-        SELECT 
-            *, 
-            ROW_NUMBER() OVER (ORDER BY created_at) AS row_num
-        FROM products
-    )
-    SELECT * 
-    FROM numbered_rows
-    WHERE row_num BETWEEN 11 AND 20; -- 第二页，每页 10 条数据
-  `;
+  // const sqlNoPkey = `  
+  //   WITH numbered_rows AS (
+  //       SELECT 
+  //           *, 
+  //           ROW_NUMBER() OVER (ORDER BY created_at) AS row_num
+  //       FROM products
+  //   )
+  //   SELECT * 
+  //   FROM numbered_rows
+  //   WHERE row_num BETWEEN 11 AND 20; -- 第二页，每页 10 条数据
+  // `;
 
   // 有指定排序数据的
   const where = p.lastOrderByValue === null ? "" : `WHERE ${p.sortField} > ${p.lastOrderByValue}`;

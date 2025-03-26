@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import {
   DB_TYPE_POSTGRESQL,
-  MAIN_PASSWORD_DEFAULT,
   MAIN_CONTEN_TYPE_WELCOME,
+  MAIN_PASSWORD_DEFAULT,
   SUB_SIDEBAR_TYPE_DB_LIST,
 } from "@/constants";
 import { TableStructure } from "@/databases/types";
@@ -16,7 +16,7 @@ import { saveConfigFile } from "@/utils/config_file";
 export interface CoreStoreState {
   // 配置文件相关
   config: ConfigFile;
-  setConfig: (val: ConfigFile, notWriteToFile?: boolean) => void;
+  setConfig: (val: ConfigFile, notWriteToFile?: boolean) => Promise<void>;
   mainPasswordSha: string;
   setMainPasswordSha: (val: string) => void;
 
@@ -61,6 +61,7 @@ const emptyConfigFile = {
   },
 } as ConfigFile;
 
+// 按照默认密码生成默认的 sha
 export const defaultMainPasswordSha = await invoker.sha256(MAIN_PASSWORD_DEFAULT);
 
 const storeName = "core-store";
@@ -74,10 +75,10 @@ export const useCoreStore = create<CoreStoreState>()(
   persist(
     (set, get) => ({
       config: emptyConfigFile,
-      setConfig: (val: ConfigFile, notWrite?: boolean) => {
+      setConfig: async (val: ConfigFile, notWrite?: boolean) => {
         set({ config: val });
         if (notWrite !== true) {
-          saveConfigFile(JSON.stringify(val), get().mainPasswordSha); // 保存到配置文件
+          await saveConfigFile(JSON.stringify(val), get().mainPasswordSha); // 保存到配置文件
         }
       },
       mainPasswordSha: defaultMainPasswordSha,

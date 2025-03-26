@@ -10,6 +10,7 @@ import {
   CONFIG_FILE_MAIN,
   HEDAER_H,
   MAIN_PASSWORD_DEFAULT,
+  SUB_SIDEBAR_DEFAULT_WIDTH,
   SUB_SIDEBAR_MIN_WIDTH,
   SUB_SIDEBAR_TYPE_DB_LIST,
   SUB_SIDEBAR_TYPE_TABLE_LIST,
@@ -28,7 +29,7 @@ export function Main() {
   const { toggleSidebar, setOpenMobile, setOpen } = useSidebar();
 
   // ========== 控制次级侧边栏 ==========
-  const [subSidebarWidth, setSubSidebarWidth] = useState(240);
+  const [subSidebarWidth, setSubSidebarWidth] = useState(SUB_SIDEBAR_DEFAULT_WIDTH);
   const [isDragging, setIsDragging] = useState(false);
   const mouseInitialPosX = useRef(0); // 起始坐标
   const handleMouseDown = useCallback(() => {
@@ -90,7 +91,7 @@ export function Main() {
   async function initConfFile(pwd: string, isDefultPwd: boolean) {
     const conf = await readConfigFile(pwd);
     try {
-      setConfig(JSON.parse(conf), true);
+      await setConfig(JSON.parse(conf), true);
       return true;
     } catch (error) {
       console.log(
@@ -108,7 +109,8 @@ export function Main() {
 
     if (res) {
       // 先尝试使用默认密码副去, 出错的再弹出主密码输入框
-      const success = await initConfFile(MAIN_PASSWORD_DEFAULT, true);
+      const sha256 = await invoker.sha256(MAIN_PASSWORD_DEFAULT);
+      const success = await initConfFile(sha256, true);
       if (success) setShowPwdInput(false);
     } else {
       setShowPwdInput(false);

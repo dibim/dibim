@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE, HEDAER_H } from "@/constants";
-import { AlterActionData } from "@/databases/PostgreSQL/alter";
+// import { AlterActionData } from "@/databases/PostgreSQL/alter";
 import { TableStructurePostgresql } from "@/databases/PostgreSQL/types";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
@@ -15,7 +15,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 export function TableEditorStructure(props: MainContentStructure) {
   const { currentDbType, currentTableStructure } = useCoreStore();
 
-  const [alterData, setAlterData] = useState<AlterActionData[]>([]); // 表结构的修改数据
+  // const [alterData, setAlterData] = useState<AlterActionData[]>([]); // 表结构的修改数据
   // TODO: 实现 src/databases/PostgreSQL/alter.ts 里的功能
 
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());

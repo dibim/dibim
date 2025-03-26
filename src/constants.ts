@@ -4,7 +4,9 @@ export const STR_EMPTY = "";
 
 export const HEDAER_H = 12; // header 的 h- 属性值, 对应 tailwindcss 的
 
-export const SUB_SIDEBAR_MIN_WIDTH = 50; // 次级侧边栏的最小宽度
+// 次级侧边栏
+export const SUB_SIDEBAR_DEFAULT_WIDTH = 160; // 默认宽度
+export const SUB_SIDEBAR_MIN_WIDTH = 50; // 最小宽度
 
 // 配置文件相关
 export const MAIN_PASSWORD_DEFAULT = "DIBIM@2025-03-22 08:41^c3dd4147ea11b63c2cd776a0602930692ba34c43$"; // 默认主密码
