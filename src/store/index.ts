@@ -36,6 +36,10 @@ export interface CoreStoreState {
   currentTableStructure: TableStructure[];
   setCurrentTableStructure: (val: TableStructure[]) => void;
 
+  // 侧边栏
+  sidebarOpen: boolean;
+  setSidebarOpen: (val: boolean) => void;
+
   // 次级侧边栏的类型
   subSidebarType: SubSidebarType;
   setSubSidebarType: (val: SubSidebarType) => void;
@@ -44,9 +48,9 @@ export interface CoreStoreState {
   mainContenType: MainContenType;
   setMainContenType: (val: MainContenType) => void;
 
-  // 侧边栏
-  sidebarOpen: boolean;
-  setSidebarOpen: (val: boolean) => void;
+  // 要编辑的数据库连接
+  editDbConnIndex: number;
+  setEditDbConnndex: (val: number) => void;
 
   // 重置
   reset: () => void;
@@ -96,14 +100,17 @@ export const useCoreStore = create<CoreStoreState>()(
       currentTableStructure: [],
       setCurrentTableStructure: (val: TableStructure[]) => set({ currentTableStructure: val }),
 
+      sidebarOpen: true,
+      setSidebarOpen: (val: boolean) => set({ sidebarOpen: val }),
+
       subSidebarType: SUB_SIDEBAR_TYPE_DB_LIST,
       setSubSidebarType: (val: SubSidebarType) => set({ subSidebarType: val }),
 
       mainContenType: MAIN_CONTEN_TYPE_WELCOME,
       setMainContenType: (val: MainContenType) => set({ mainContenType: val }),
 
-      sidebarOpen: true,
-      setSidebarOpen: (val: boolean) => set({ sidebarOpen: val }),
+      editDbConnIndex: 0,
+      setEditDbConnndex: (val: number) => set({ editDbConnIndex: val }),
 
       // 重置状态
       reset: () =>
@@ -114,9 +121,10 @@ export const useCoreStore = create<CoreStoreState>()(
           currentDbNme: "",
           currentTableName: "",
           currentTableStructure: [],
+          sidebarOpen: true,
           subSidebarType: SUB_SIDEBAR_TYPE_DB_LIST,
           mainContenType: MAIN_CONTEN_TYPE_WELCOME,
-          sidebarOpen: true,
+          editDbConnIndex: 0,
         }),
     }),
     {

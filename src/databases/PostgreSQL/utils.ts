@@ -1,5 +1,5 @@
+import { invoker } from "@/invoke";
 import { DbConnectionParam, DbCountRes, GetTableDataParam } from "../types";
-import { invoker } from "./invoke";
 import {
   CheckConstraintsRes,
   CommentRes,
@@ -20,10 +20,10 @@ const testConnName = "testPg";
  *
  */
 export async function connectPg(p: DbConnectionParam) {
-  return await invoker.connect(
+  return await invoker.connectSql(
     testConnName,
     // `host=${p.host} port=${p.port} user=${p.user} password=${p.password} dbname=${p.dbname}`,
-    `postgres://${p.user}:${p.password}@${p.host}:${p.port}/${p.dbname}`,
+    `postgres://${p.user}:${p.password}@${p.host}:${p.port}/${p.dbName}`,
   );
 }
 
@@ -38,7 +38,7 @@ export async function getAllTablesPg() {
         schemaname NOT IN ('pg_catalog', 'information_schema')
     ;`;
 
-  const dbRes = await invoker.query(testConnName, sql);
+  const dbRes = await invoker.querySql(testConnName, sql);
 
   // 把表名整理成一维数组
   const dataArr = dbRes.data ? (JSON.parse(dbRes.data) as { tablename: string }[]) : [];
@@ -58,10 +58,10 @@ export async function getTableStructurePg(tbName: string) {
     WHERE table_name = '${tbName}';
     ;`;
 
-  const dbRes = await invoker.query(testConnName, sql);
+  const dbRes = await invoker.querySql(testConnName, sql);
 
   // 主键信息
-  const primaryKeysRes = await invoker.query(
+  const primaryKeysRes = await invoker.querySql(
     testConnName,
     `
     SELECT column_name 
@@ -75,7 +75,7 @@ export async function getTableStructurePg(tbName: string) {
   );
 
   // 外键信息
-  const foreignKeysRes = await invoker.query(
+  const foreignKeysRes = await invoker.querySql(
     testConnName,
     `
     SELECT 
@@ -91,7 +91,7 @@ export async function getTableStructurePg(tbName: string) {
   );
 
   // 唯一约束
-  const UniqueKeysRes = await invoker.query(
+  const UniqueKeysRes = await invoker.querySql(
     testConnName,
     `
     SELECT 
@@ -108,7 +108,7 @@ export async function getTableStructurePg(tbName: string) {
   );
 
   //  检查约束
-  const constraintsRes = await invoker.query(
+  const constraintsRes = await invoker.querySql(
     testConnName,
     `
     SELECT 
@@ -123,7 +123,7 @@ export async function getTableStructurePg(tbName: string) {
   );
 
   // 备注
-  const commentRes = await invoker.query(
+  const commentRes = await invoker.querySql(
     testConnName,
     `
     SELECT 
@@ -172,7 +172,7 @@ export async function getTableStructurePg(tbName: string) {
 // FIXME: 实现比较复杂, 推迟
 export async function getTableDdlPg(tbName: string) {
   const sql = `SELECT pg_get_tabledef('${tbName}');`;
-  const dbRes = await invoker.query(testConnName, sql);
+  const dbRes = await invoker.querySql(testConnName, sql);
 
   console.log(" getTableDdlPg::::dbRes  ", dbRes);
 
@@ -181,9 +181,10 @@ export async function getTableDdlPg(tbName: string) {
     data: dbRes.data ? (JSON.parse(dbRes.data) as { tablename: string }[]) : [],
   };
 }
+
 // 获取表格数据
 export async function getTableDataPg(p: GetTableDataParam) {
-  const dbResTotal = await invoker.query(testConnName, `SELECT COUNT(*) AS total FROM "${p.tableName}";`);
+  const dbResTotal = await invoker.querySql(testConnName, `SELECT COUNT(*) AS total FROM "${p.tableName}";`);
   console.log("getTableDataPg dbResTotal>>>>   ", dbResTotal);
 
   let itemsTotal = 0; // 总条数
@@ -197,14 +198,14 @@ export async function getTableDataPg(p: GetTableDataParam) {
 
   // 如果没有主键, 且没有指定排序字段
   // TODO: 实现逻辑
-  // const sqlNoPkey = `  
+  // const sqlNoPkey = `
   //   WITH numbered_rows AS (
-  //       SELECT 
-  //           *, 
+  //       SELECT
+  //           *,
   //           ROW_NUMBER() OVER (ORDER BY created_at) AS row_num
   //       FROM products
   //   )
-  //   SELECT * 
+  //   SELECT *
   //   FROM numbered_rows
   //   WHERE row_num BETWEEN 11 AND 20; -- 第二页，每页 10 条数据
   // `;
@@ -223,7 +224,7 @@ export async function getTableDataPg(p: GetTableDataParam) {
       ${p.pageSize}
     ;`;
 
-  const dbRes = await invoker.query(testConnName, sqlHasPkey);
+  const dbRes = await invoker.querySql(testConnName, sqlHasPkey);
 
   return {
     itemsTotal,
