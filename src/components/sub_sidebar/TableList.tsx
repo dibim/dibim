@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { MAIN_CONTEN_TYPE_TABLE_EDITOR } from "@/constants";
 import { getAllTables } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
-import { EmptyList } from "./EmptyList";
+import { EmptyList } from "../EmptyList";
 
 // TODO: 排序方式支持按表名和表的大小排序
 
@@ -29,8 +29,6 @@ export function TableList() {
 
   return (
     <div>
-      <div>TableList</div>
-
       {!tablenames || (tablenames.length === 0 && <EmptyList />)}
 
       {tablenames.map((item, index) => (
