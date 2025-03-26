@@ -7,9 +7,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface ListItem {
-  id: string | number;
+export interface ListItem {
+  id: string;
   content: React.ReactNode; // 主内容显示
+  contentOnClick: (tableName: string) => void;
   menuItems: {
     label: string;
     onClick: () => void;
@@ -36,7 +37,14 @@ export function DropdownList({
       {items.map((item) => (
         <DropdownMenu key={item.id}>
           <div className={`flex items-center justify-between ${itemClassName}`}>
-            {item.content}
+            <div
+              className="flex-1"
+              onClick={() => {
+                item.contentOnClick(item.id);
+              }}
+            >
+              {item.content}
+            </div>
 
             <DropdownMenuTrigger asChild>
               <EllipsisVertical />

@@ -1,19 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AlertCircle } from "lucide-react";
 import MysqlLogo from "@/assets/db_logo/mysql.svg?react";
 import PostgresqlLogo from "@/assets/db_logo/postgresql.svg?react";
 import SqliteLogo from "@/assets/db_logo/sqlite.svg?react";
 import { LabeledDiv } from "@/components/LabeledDiv";
 import { Input } from "@/components/ui/input";
-import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE, DIR_H } from "@/constants";
+import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE, DIR_H, STR_ADD, STR_EDIT } from "@/constants";
 import { useCoreStore } from "@/store";
 import { DbType, SvgComponentType } from "@/types/types";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 
-export function AddConnection() {
-  const { config, setConfig } = useCoreStore();
+type ConnectionProp = {
+  action: typeof STR_ADD | typeof STR_EDIT;
+};
+
+export function Connection(props: ConnectionProp) {
+  const { config, setConfig, editDbConnIndex } = useCoreStore();
 
   const [name, setName] = useState<string>(""); // 连接名称
   const [dbType, setDbType] = useState<DbType>(DB_TYPE_POSTGRESQL); // 默认类型是 PostgreSQL
@@ -21,7 +25,7 @@ export function AddConnection() {
   const [port, setPort] = useState<number>(5432); // 默认类型是 PostgreSQL
   const [user, setUser] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [dbname, setDbName] = useState<string>("");
+  const [dbName, setDbName] = useState<string>("");
   const [filePath, setFilePath] = useState<string>(""); // 文件路径, 用于 sqite
   const [color, setColor] = useState<string>("#33d17a");
 
@@ -67,7 +71,7 @@ export function AddConnection() {
       if (valueIsError(port === 0, "端口")) return;
       if (valueIsError(user === "", "用户名")) return;
       if (valueIsError(password === "", "密码")) return;
-      if (valueIsError(dbname === "", "数据库名")) return;
+      if (valueIsError(dbName === "", "数据库名")) return;
     }
 
     if (dbType === DB_TYPE_SQLITE) {
@@ -78,19 +82,30 @@ export function AddConnection() {
     }
 
     const dbConf = {
-      user,
+      color,
+      dbName,
+      dbType,
+      filePath,
       host,
-      dbname,
+      name,
       password,
       port,
-      name,
-      color,
+      user,
     };
 
-    config.dbConnections.push(dbConf);
-    await setConfig(config);
+    if (props.action === STR_ADD) {
+      config.dbConnections.push(dbConf);
+      await setConfig(config);
 
-    setOkMessage("添加成功");
+      setOkMessage("添加成功");
+    }
+
+    if (props.action === STR_EDIT) {
+      config.dbConnections[editDbConnIndex] = dbConf;
+      await setConfig(config);
+
+      setOkMessage("编辑成功");
+    }
   }
 
   const handleClickDbLogo = (dbType: DbType) => {
@@ -113,11 +128,27 @@ export function AddConnection() {
     );
   }
 
+  useEffect(() => {
+    // 编辑连接的要获取数据
+    if (props.action === STR_EDIT) {
+      const conn = config.dbConnections[editDbConnIndex];
+      setColor(conn.color);
+      setDbName(conn.dbName);
+      setDbType(conn.dbType);
+      setFilePath(conn.filePath);
+      setHost(conn.host);
+      setName(conn.name);
+      setPassword(conn.password);
+      setPort(conn.port);
+      setUser(conn.user);
+    }
+  }, []);
+
   return (
     <div className="flex items-center justify-center min-h-screen p-4">
       <Card className="w-150">
         <CardHeader>
-          <CardTitle>添加数据库</CardTitle>
+          <CardTitle>{props.action}数据库</CardTitle>
           <CardDescription></CardDescription>
         </CardHeader>
         <CardContent>
@@ -148,7 +179,7 @@ export function AddConnection() {
                 <Input value={password} onInput={onInputPassword} />
               </LabeledDiv>
               <LabeledDiv direction={DIR_H} label={"数据库名"} className="py-2">
-                <Input value={dbname} onInput={onInputDbName} />
+                <Input value={dbName} onInput={onInputDbName} />
               </LabeledDiv>
             </>
           )}

@@ -1,63 +1,121 @@
-import { useEffect } from "react";
-import { Edit, Trash } from "lucide-react";
-import { SUB_SIDEBAR_TYPE_TABLE_LIST } from "@/constants";
+import { useEffect, useState } from "react";
+import { Edit, Trash, Unlink } from "lucide-react";
+import {
+  MAIN_CONTEN_TYPE_EDIT_CONNECTION,
+  MAIN_CONTEN_TYPE_TABLE_EDITOR,
+  SUB_SIDEBAR_TYPE_TABLE_LIST,
+} from "@/constants";
+import { connectPg } from "@/databases/PostgreSQL/utils";
 import { useCoreStore } from "@/store";
 import { DbConnections } from "@/types/conf_file";
-import { DropdownList } from "../DropdownList";
+import { ConfirmDialog } from "../ConfirmDialog";
+import { DropdownList, ListItem } from "../DropdownList";
 import { EmptyList } from "../EmptyList";
 
 export function DatabaseList() {
-  const { config, setCurrentDbName, setSubSidebarType } = useCoreStore();
+  const { config, setConfig, setMainContenType, setSubSidebarType } = useCoreStore();
 
-  const clickTableName = (conn: DbConnections) => {
-    //  TODO: 检查啊, 没有连接的要啊
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [itemIndex, setItemIndex] = useState<number>(-1);
 
-    setCurrentDbName(conn.dbname);
-    setSubSidebarType(SUB_SIDEBAR_TYPE_TABLE_LIST);
+  // 删除
+  const delItem = () => {
+    config.dbConnections.splice(itemIndex, 1);
+    setConfig(config);
+
+    setShowDialog(false);
   };
 
-  const listData = [
-    {
-      id: 1,
-      content: <div>Document.pdf</div>,
-      menuItems: [
-        {
-          label: "编辑",
-          onClick: () => console.log("Edit file 1"),
-          icon: <Edit className="h-4 w-4" />,
-        },
+  // 点击连接
+  const clickConn = async (conn: DbConnections) => {
+    const res = await connectPg({
+      dbName: conn.dbName,
+      host: conn.host,
+      password: conn.password,
+      port: conn.port,
+      user: conn.user,
+    });
 
-        {
-          label: "删除",
-          onClick: () => console.log("Delete file 1"),
-          icon: <Trash className="h-4 w-4" />,
-          disabled: true,
-        },
-      ],
-    },
-  ];
+    if (res.errorMessage === "") {
+      setSubSidebarType(SUB_SIDEBAR_TYPE_TABLE_LIST);
+      setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
+    } else {
+      // TODO: 优化一下报错
+      console.log("打开数据库连接出错: ", res.errorMessage);
+    }
+  };
 
-  // TODO: 动态生成列表里的数据
+  const [listData, setListData] = useState<ListItem[]>([]);
+
   const getData = () => {
-    //
+    const arr: ListItem[] = [];
+    config.dbConnections.map((item, index) => {
+      arr.push({
+        id: item.name,
+        content: <div>{item.name}</div>,
+        contentOnClick: async () => {
+          clickConn(item);
+        },
+        menuItems: [
+          {
+            label: "编辑",
+            onClick: () => {
+              setMainContenType(MAIN_CONTEN_TYPE_EDIT_CONNECTION);
+            },
+            icon: <Edit className="h-4 w-4" />,
+          },
+
+          {
+            label: "断开链接",
+            onClick: () => {
+              //  TODO:
+            },
+            icon: <Unlink className="h-4 w-4" color="var(--fvm-warning-clr)" />,
+          },
+
+          {
+            label: "删除",
+            onClick: () => {
+              setItemIndex(index);
+              setShowDialog(true);
+            },
+            icon: <Trash className="h-4 w-4" color="var(--fvm-danger-clr)" />,
+          },
+        ],
+      });
+    });
+
+    setListData(arr);
   };
 
   useEffect(() => {
     getData();
-  }, [config]);
 
-  useEffect(() => {
-    getData();
+    // 监听 store 的变化
+    useCoreStore.subscribe(() => {
+      getData();
+    });
   }, []);
 
   return (
-    <div>
-      {!config.dbConnections && <EmptyList />}
+    <>
+      <div>
+        {!config.dbConnections && <EmptyList />}
 
-      {config.dbConnections &&
-        config.dbConnections.map((item, index) => (
-          <DropdownList items={listData} itemClassName="py-2 cursor-pointer" />
-        ))}
-    </div>
+        {config.dbConnections && <DropdownList items={listData} itemClassName="py-2 cursor-pointer" />}
+      </div>
+
+      <ConfirmDialog
+        open={showDialog}
+        title={`确认要删除吗`}
+        content={""}
+        cancelText={"取消"}
+        cancelCb={() => {
+          setShowDialog(false);
+        }}
+        okText={"确定"}
+        okCb={delItem}
+      />
+    </>
   );
 }
