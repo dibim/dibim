@@ -1,5 +1,5 @@
 import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE } from "@/constants";
-import { getAllTablesPg, getTableDataPg, getTableDdlPg, getTableStructurePg } from "@/databases/PostgreSQL/utils";
+import { getAllTableNamePg, getAllTableSizePg, getTableDataPg, getTableDdlPg, getTableStructurePg } from "@/databases/PostgreSQL/utils";
 import { DbType } from "@/types/types";
 import { GetTableDataParam } from "./types";
 
@@ -17,13 +17,26 @@ import { GetTableDataParam } from "./types";
  * @returns
  */
 
-// 获取所有表格名
-export async function getAllTables(dbType: DbType) {
+// 获取所有表名
+export async function getAllTableName(dbType: DbType) {
   if (dbType === DB_TYPE_MYSQL) {
     // TODO:
   }
   if (dbType === DB_TYPE_POSTGRESQL) {
-    return getAllTablesPg();
+    return getAllTableNamePg();
+  }
+  if (dbType === DB_TYPE_SQLITE) {
+    // TODO:
+  }
+}
+
+// 获取所有表格的大小
+export async function getAllTableSize(dbType: DbType) {
+  if (dbType === DB_TYPE_MYSQL) {
+    // TODO:
+  }
+  if (dbType === DB_TYPE_POSTGRESQL) {
+    return getAllTableSizePg();
   }
   if (dbType === DB_TYPE_SQLITE) {
     // TODO:

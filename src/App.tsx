@@ -6,6 +6,7 @@ import "@/styles/app.scss";
 import "@/styles/index.css";
 import "@/styles/theme.scss";
 import { Main } from "./components/Main";
+import { Toaster } from "./components/ui/sonner";
 
 export function App() {
   return (
@@ -23,6 +24,8 @@ export function App() {
           </SidebarInset>
         </TooltipProvider>
       </SidebarProvider>
+
+      <Toaster />
     </ThemeProvider>
   );
 }

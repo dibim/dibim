@@ -61,6 +61,7 @@ export function TableEditor() {
           >
             表结构
           </TabsTrigger>
+
           <TabsTrigger
             value={TAB_DDL}
             onClick={() => {
@@ -69,6 +70,7 @@ export function TableEditor() {
           >
             DDL
           </TabsTrigger>
+
           <TabsTrigger
             value={TAB_CONSTRAINT}
             onClick={() => {
@@ -77,14 +79,7 @@ export function TableEditor() {
           >
             约束
           </TabsTrigger>
-          <TabsTrigger
-            value={TAB_DATA}
-            onClick={() => {
-              setTabName(TAB_DATA);
-            }}
-          >
-            数据
-          </TabsTrigger>
+
           <TabsTrigger
             value={TAB_PART}
             onClick={() => {
@@ -92,6 +87,15 @@ export function TableEditor() {
             }}
           >
             分区
+          </TabsTrigger>
+
+          <TabsTrigger
+            value={TAB_DATA}
+            onClick={() => {
+              setTabName(TAB_DATA);
+            }}
+          >
+            数据
           </TabsTrigger>
         </TabsList>
       </div>
