@@ -179,10 +179,24 @@ export function TableEditorData() {
           <Pagination className="flex-1 justify-start px-8">
             <PaginationContent>
               <PaginationItem>
-                <PaginationFirst className="!px-1" href="#" text={""} onClick={() => firstPage()} />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <PaginationFirst className="!px-1" href="#" text={""} onClick={() => firstPage()} />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>第一页</p>
+                  </TooltipContent>
+                </Tooltip>
               </PaginationItem>
               <PaginationItem>
-                <PaginationPrevious className="!px-1" href="#" text={""} onClick={() => prevPage()} />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <PaginationPrevious className="!px-1" href="#" text={""} onClick={() => prevPage()} />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>上一页</p>
+                  </TooltipContent>
+                </Tooltip>
               </PaginationItem>
               <PaginationItem className="flex">
                 <div className="pe-2 w-20">
@@ -197,15 +211,36 @@ export function TableEditorData() {
                     }}
                   />
                 </div>
-                <div className="flex items-center pe-4">
-                  <CornerDownLeft onClick={goToPage} />
-                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center pe-4">
+                      <CornerDownLeft onClick={goToPage} />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>跳转到第{inputedPage}页</p>
+                  </TooltipContent>
+                </Tooltip>
               </PaginationItem>
               <PaginationItem>
-                <PaginationNext className="!px-1" href="#" text={""} onClick={() => nextPage()} />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <PaginationNext className="!px-1" href="#" text={""} onClick={() => nextPage()} />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>下一页</p>
+                  </TooltipContent>
+                </Tooltip>
               </PaginationItem>
               <PaginationItem>
-                <PaginationLast className="!px-1" href="#" text={""} onClick={() => lastPage()} />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <PaginationLast className="!px-1" href="#" text={""} onClick={() => lastPage()} />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>最后一页</p>
+                  </TooltipContent>
+                </Tooltip>
               </PaginationItem>
             </PaginationContent>
           </Pagination>
