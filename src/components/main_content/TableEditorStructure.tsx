@@ -2,30 +2,67 @@
  * 表格结构
  */
 import { useState } from "react";
-import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
-import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE, HEDAER_H } from "@/constants";
-import { AlterActionData } from "@/databases/PostgreSQL/alter";
+import { AlertCircle, CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
+import {
+  DB_TYPE_MYSQL,
+  DB_TYPE_POSTGRESQL,
+  DB_TYPE_SQLITE,
+  DIR_H,
+  HEDAER_H,
+  STR_ADD,
+  STR_EDIT,
+  STR_EMPTY,
+} from "@/constants";
+
 import { TableStructurePostgresql } from "@/databases/PostgreSQL/types";
 import { exec, genDeleteFieldCmd } from "@/databases/adapter,";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
 import { MainContentStructure } from "@/types/types";
 import { ConfirmDialog } from "../ConfirmDialog";
+import { LabeledDiv } from "../LabeledDiv";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Input } from "../ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { ColumnAlterAction } from "@/databases/types";
+
+const INDEX_PRIMARY_KEY = "PRIMARY KEY";
+const INDEX_UNIQUE = "UNIQUE";
+
+type IndexType = typeof STR_EMPTY | typeof INDEX_PRIMARY_KEY | typeof INDEX_UNIQUE;
+type DialogAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT;
 
 export function TableEditorStructure(props: MainContentStructure) {
   const { currentDbType, currentTableStructure, currentTableName } = useCoreStore();
 
-  const [alterData, setAlterData] = useState<AlterActionData[]>([]); // 表结构的修改数据
+  const [alterData, setAlterData] = useState<ColumnAlterAction[]>([]); // 表结构的修改数据
   // TODO: 实现 src/databases/PostgreSQL/alter.ts 里的功能
 
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set()); // 选中的行
   const [operateRowIndex, setOperateRowIndex] = useState<number>(0); // 现在操作的行的索引
   const [operateFieldName, setOperateFieldName] = useState<string>(""); // 现在操作的行的索引
   const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
+  const [dialogAction, setDialogAction] = useState<DialogAction>("");
+  const [showDialogEdit, setShowDialogEdit] = useState<boolean>(false);
   const [showDialogDelete, setShowDialogDelete] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>(""); // 错误消息
+  const [okMessage, setOkMessage] = useState<string>(""); // 成功消息
+
+  // 对话框里的数据
+  const [fieldName, setFieldName] = useState<string>(""); // 字段名
+  const [fieldType, setFieldType] = useState<string>(""); // 字段类型
+  const [fieldSize, setFieldSize] = useState<string>(""); // 字段大小
+  const [fieldDefalut, setFieldDefault] = useState<string>(""); // 字段默认值
+  const [fieldNotNull, setFieldNotNull] = useState<boolean>(false); // 字段非空
+  const [fieldIndexType, setFieldIndexType] = useState<IndexType>(""); // 字段索引类型
+  const [fieldIndexAutoIncrement, setFieldIndexAutoIncrement] = useState<boolean>(false); // 字段主键自增
+  const [fieldIndexName, setFieldIndexName] = useState<string>(""); // 字段索引名
+  const [fieldComment, setFieldComment] = useState<string>(""); // 字段备注
 
   // 选中行, 删除的时候使用
   const handleSelectRow = (id: number) => {
@@ -41,6 +78,9 @@ export function TableEditorStructure(props: MainContentStructure) {
   // 添加列
   function handleAddCol() {
     console.log("添加列");
+
+    setShowDialogEdit(true);
+    setDialogAction(STR_ADD);
   }
 
   // 删除选中的列
@@ -60,22 +100,20 @@ export function TableEditorStructure(props: MainContentStructure) {
 
   // 弹出确认编辑列
   function handleEditColPopup(index: number) {
-    console.log("editCol");
-
     setOperateRowIndex(index);
+    setShowDialogEdit(true);
+    setDialogAction(STR_EDIT);
   }
   function handleEditCol(index: number) {
     console.log("editCol");
 
     setOperateRowIndex(index);
+    setDialogAction(STR_EMPTY);
   }
 
   // 弹出确认删除1列
   function handleDeleteColPopup(index: number) {
     const fieldName = findFieldName(index);
-
-    console.log("fieldName:: ", fieldName, index, currentDbType);
-
     if (fieldName !== "") {
       setOperateFieldName(fieldName);
       setShowDialogDelete(true);
@@ -87,6 +125,17 @@ export function TableEditorStructure(props: MainContentStructure) {
   // 执行删除字段
   function handleDelete() {
     exec(currentDbType, willExecCmd);
+  }
+
+  // 提交变更
+  async function onSubmit() {
+    if (dialogAction === STR_ADD) {
+      // TODO: 添加记录, 等电影应用按钮的时候再执行修改
+    }
+
+    if (dialogAction === STR_EDIT) {
+      // TODO: 执行修改
+    }
   }
 
   /**
@@ -124,7 +173,9 @@ export function TableEditorStructure(props: MainContentStructure) {
         <ContextMenuTrigger asChild>{node}</ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuItem onClick={() => handleEditColPopup(index)}>编辑</ContextMenuItem>
-          <ContextMenuItem onClick={() => handleDeleteColPopup(index)}>删除</ContextMenuItem>
+          <ContextMenuItem onClick={() => handleDeleteColPopup(index)} className={`text-[var(--fvm-danger-clr)]`}>
+            删除
+          </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
     );
@@ -256,6 +307,115 @@ export function TableEditorStructure(props: MainContentStructure) {
           <TableBody>{renderBody()}</TableBody>
         </Table>
       </div>
+
+      <Dialog open={showDialogEdit} onOpenChange={setShowDialogEdit}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{dialogAction === STR_ADD ? "添加" : "编辑"}字段</DialogTitle>
+          </DialogHeader>
+
+          <LabeledDiv direction={DIR_H} label={"字段名"}>
+            <Input value={fieldName} onInput={(e) => setFieldName(e.currentTarget.value)} />
+          </LabeledDiv>
+
+          <LabeledDiv direction={DIR_H} label={"类型"}>
+            <Input value={fieldType} onInput={(e) => setFieldType(e.currentTarget.value)} />
+          </LabeledDiv>
+
+          <LabeledDiv direction={DIR_H} label={"大小"}>
+            <Input value={fieldSize} onInput={(e) => setFieldSize(e.currentTarget.value)} />
+          </LabeledDiv>
+
+          <LabeledDiv direction={DIR_H} label={"默认值"}>
+            <Input value={fieldDefalut} onInput={(e) => setFieldDefault(e.currentTarget.value)} />
+            <div className="flex items-center pt-2">
+              <Checkbox
+                checked={fieldNotNull}
+                onClick={() => setFieldNotNull(!fieldNotNull)}
+                className="me-4"
+                id="fieldNotNull"
+              />
+              <label htmlFor="fieldNotNull" className="text-sm font-medium">
+                非空
+              </label>
+            </div>
+          </LabeledDiv>
+
+          <LabeledDiv direction={DIR_H} label={"索引"}>
+            <div className="flex gap-4">
+              <div className="flex items-center">
+                <Checkbox
+                  checked={fieldIndexType === INDEX_PRIMARY_KEY}
+                  onClick={() =>
+                    setFieldIndexType(fieldIndexType === INDEX_PRIMARY_KEY ? STR_EMPTY : INDEX_PRIMARY_KEY)
+                  }
+                  className="me-4"
+                  id="INDEX_PRIMARY_KEY"
+                />
+                <label htmlFor="INDEX_PRIMARY_KEY" className="text-sm font-medium">
+                  主键
+                </label>
+              </div>
+
+              <div className="flex items-center">
+                <Checkbox
+                  checked={fieldIndexAutoIncrement}
+                  onClick={() => setFieldIndexAutoIncrement(!fieldIndexAutoIncrement)}
+                  className="me-4"
+                  id="fieldIndexAutoIncrement"
+                  disabled={fieldIndexType === STR_EMPTY}
+                />
+                <label htmlFor="fieldIndexAutoIncrement" className="text-sm font-medium">
+                  主键自增
+                </label>
+              </div>
+
+              <div className="flex items-center">
+                <Checkbox
+                  checked={fieldIndexType === INDEX_UNIQUE}
+                  onClick={() => setFieldIndexType(fieldIndexType === INDEX_UNIQUE ? STR_EMPTY : INDEX_UNIQUE)}
+                  className="me-4"
+                  id="INDEX_UNIQUE"
+                />
+                <label htmlFor="INDEX_UNIQUE" className="text-sm font-medium">
+                  唯一
+                </label>
+              </div>
+            </div>
+            <div className="pt-2">
+              <Input
+                value={fieldIndexName}
+                onInput={(e) => setFieldIndexName(e.currentTarget.value)}
+                placeholder="索引名"
+                disabled={fieldIndexType === STR_EMPTY}
+              />
+            </div>
+          </LabeledDiv>
+          <LabeledDiv direction={DIR_H} label={"备注"}>
+            <Input value={fieldComment} onInput={(e) => setFieldComment(e.currentTarget.value)} />
+          </LabeledDiv>
+
+          {errorMessage && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>错误提示</AlertTitle>
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
+
+          {okMessage && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>提示</AlertTitle>
+              <AlertDescription>{okMessage}</AlertDescription>
+            </Alert>
+          )}
+
+          <DialogFooter>
+            <Button type="submit">Save changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <ConfirmDialog
         open={showDialogDelete}

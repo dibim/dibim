@@ -1,6 +1,7 @@
 import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE } from "@/constants";
 import {
   execPg,
+  genCreateTableCmdPg,
   genDeleteFieldCmdPg,
   genDeleteTableCmdPg,
   genRenameFieldCmdPg,
@@ -134,6 +135,18 @@ export function genDeleteFieldCmd(dbType: DbType, tbName: string, fieldName: str
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
 
   if (dbType === DB_TYPE_POSTGRESQL) return genDeleteFieldCmdPg(tbName, fieldName);
+
+  if (dbType === DB_TYPE_SQLITE) return; // TODO:
+
+  return "";
+}
+
+// 生成建表语句
+// FIXME: 实现功能
+export function genCreateTableCmd(dbType: DbType, tbName: string) {
+  if (dbType === DB_TYPE_MYSQL) return; // TODO:
+
+  if (dbType === DB_TYPE_POSTGRESQL) return genCreateTableCmdPg(tbName);
 
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
 

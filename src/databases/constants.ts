@@ -15,3 +15,14 @@ export const SSL_MODE_PREFER = "prefer";
 export const SSL_MODE_REQUIRE = "require";
 export const SSL_MODE_VERIFY_CA = "verify-ca";
 export const SSL_MODE_VERIFY_FULL = "verify-full";
+
+// 表结构相关
+export const ACTION_C_COLNAME = "cColName"; // 修改列名
+export const ACTION_C_DATATYPE = "cDataType"; // 修改数据类型
+export const ACTION_C_IS_PRIMARY_KEY = "cIsPrimaryKey"; // 修改是主键
+export const ACTION_C_IS_UNIQUE = "cIsUnique"; // 修改是唯一索引
+export const ACTION_C_NULLABLE = "cNullable"; // 修改非空
+export const ACTION_C_DEFAULT = "cDefault"; // 修改默认值
+export const ACTION_C_COL_COMMENT = "cColComment"; // 修改列备注
+export const ACTION_C_TBL_COMMENT = "cTblComment"; // 修改表备注
+export const ACTION_D_COL = "dCol"; // 删除列

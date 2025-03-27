@@ -1,36 +1,21 @@
 /**
  * 修改变革的功能
  */
-
-// TODO: 实现表结构的编辑, 逻辑很复杂
-export const ACTION_C_COLNAME = "cColName"; // 修改列名
-export const ACTION_C_DATATYPE = "cDataType"; // 修改数据类型
-export const ACTION_C_IS_PRIMARY_KEY = "cIsPrimaryKey"; // 修改是主键
-export const ACTION_C_IS_UNIQUE = "cIsUnique"; // 修改是唯一索引
-export const ACTION_C_NULLABLE = "cNullable"; // 修改非空
-export const ACTION_C_DEFAULT = "cDefault"; // 修改默认值
-export const ACTION_C_COL_COMMENT = "cColComment"; // 修改列备注
-export const ACTION_C_TBL_COMMENT = "cTblComment"; // 修改表备注
-export const ACTION_D_COL = "dCol"; // 删除列
-export type AlterAction =
-  | typeof ACTION_C_COLNAME
-  | typeof ACTION_C_DATATYPE
-  | typeof ACTION_C_IS_PRIMARY_KEY
-  | typeof ACTION_C_IS_UNIQUE
-  | typeof ACTION_C_NULLABLE
-  | typeof ACTION_C_DEFAULT
-  | typeof ACTION_C_COL_COMMENT
-  | typeof ACTION_C_TBL_COMMENT
-  | typeof ACTION_D_COL;
-
-export type AlterActionData = {
-  column_name: string;
-  action: AlterAction;
-  actionValue: any; // 类型根据 action 变化
-};
+import {
+  ACTION_C_COLNAME,
+  ACTION_C_COL_COMMENT,
+  ACTION_C_DATATYPE,
+  ACTION_C_DEFAULT,
+  ACTION_C_IS_PRIMARY_KEY,
+  ACTION_C_IS_UNIQUE,
+  ACTION_C_NULLABLE,
+  ACTION_C_TBL_COMMENT,
+  ACTION_D_COL,
+} from "../constants";
+import { ColumnAlterAction } from "../types";
 
 // TODO: 生成修改语句, 逻辑很复杂
-export const genAlterSql = (pa: AlterActionData[]) => {
+export const genAlterSql = (pa: ColumnAlterAction[]) => {
   let res: string[] = [];
 
   for (const p of pa) {

@@ -1,5 +1,14 @@
 import { TableStructurePostgresql } from "./PostgreSQL/types";
 import {
+  ACTION_C_COLNAME,
+  ACTION_C_COL_COMMENT,
+  ACTION_C_DATATYPE,
+  ACTION_C_DEFAULT,
+  ACTION_C_IS_PRIMARY_KEY,
+  ACTION_C_IS_UNIQUE,
+  ACTION_C_NULLABLE,
+  ACTION_C_TBL_COMMENT,
+  ACTION_D_COL,
   SSL_MODE_ALLOW,
   SSL_MODE_DISABLE,
   SSL_MODE_PREFER,
@@ -50,3 +59,22 @@ export type DbCountRes = {
 
 // 表结构
 export type TableStructure = TableStructurePostgresql;
+
+// 变更表更表结构的动作类性
+export type AlterAction =
+  | typeof ACTION_C_COLNAME
+  | typeof ACTION_C_DATATYPE
+  | typeof ACTION_C_IS_PRIMARY_KEY
+  | typeof ACTION_C_IS_UNIQUE
+  | typeof ACTION_C_NULLABLE
+  | typeof ACTION_C_DEFAULT
+  | typeof ACTION_C_COL_COMMENT
+  | typeof ACTION_C_TBL_COMMENT
+  | typeof ACTION_D_COL;
+
+// 列的修改数据
+export type ColumnAlterAction = {
+  column_name: string;
+  action: AlterAction;
+  actionValue: any; // 类型根据 action 变化
+};
