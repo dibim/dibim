@@ -79,43 +79,6 @@ export async function getAllTableSizePg() {
   };
 }
 
-// 重命名表格
-export async function renameTablePg(oldName: string, newName: string) {
-  const sql = `ALTER TABLE "${oldName}" RENAME TO "${newName}";`;
-
-  const dbRes = await invoker.execSql(testConnName, sql);
-
-  return {
-    affectedRows: dbRes.affectedRows,
-  };
-}
-
-// 截断表格
-export async function truncateTablePg(tbName: string) {
-  const sql = `TRUNCATE TABLE "${tbName}";`;
-
-  const dbRes = await invoker.execSql(testConnName, sql);
-
-  return {
-    affectedRows: dbRes.affectedRows,
-  };
-}
-
-// 删除表格
-export async function deleteTablePg(tbName: string) {
-  const sql = `DROP TABLE "${tbName}";`;
-
-  const dbRes = await invoker.querySql(testConnName, sql);
-
-  // 把表名整理成一维数组
-  const dataArr = dbRes.data ? (JSON.parse(dbRes.data) as { tablename: string }[]) : [];
-
-  return {
-    columnName: dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : [],
-    data: dataArr.map((item) => item.tablename),
-  };
-}
-
 // 获取表结构
 export async function getTableStructurePg(tbName: string) {
   // 基础列信息
@@ -356,4 +319,24 @@ export function getDefultOrderField(tsa: TableStructurePostgresql[]) {
   }
 
   return "";
+}
+
+// 执行语句
+export async function execPg(sql: string) {
+  return await invoker.execSql(testConnName, sql);
+}
+
+// 生成重命名表格的语句
+export function genRenameTableCmdPg(oldName: string, newName: string) {
+  return `ALTER TABLE "${oldName}" RENAME TO "${newName}";`;
+}
+
+// 生成截断表格的语句
+export function genTruncateTableCmdPg(tbName: string) {
+  return `TRUNCATE TABLE "${tbName}";`;
+}
+
+// 生成删除表格的语句
+export function genDeleteTableCmdPg(tbName: string) {
+  return `DROP TABLE "${tbName}";`;
 }

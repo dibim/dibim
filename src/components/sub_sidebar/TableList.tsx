@@ -3,10 +3,19 @@ import bytes from "bytes";
 import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 import { MAIN_CONTEN_TYPE_TABLE_EDITOR } from "@/constants";
-import { deleteTable, getAllTableName, getAllTableSize, truncateTable } from "@/databases/adapter,";
+import {
+  exec,
+  genDeleteTableCmd,
+  genRenameTableCmd,
+  genTruncateTableCmd,
+  getAllTableName,
+  getAllTableSize,
+} from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
+import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
+import { Input } from "../ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 type TableData = {
@@ -26,25 +35,17 @@ export function TableList() {
   };
 
   // ========== 排序 ==========
-  // 正序排序 (A-Z)
-  const sortByNameAsc = () => {
-    setTableData([...tablData].sort((a, b) => a.tableName.localeCompare(b.tableName)));
-  };
+  // 按表名正序排序 (A-Z)
+  const sortByNameAsc = () => setTableData([...tablData].sort((a, b) => a.tableName.localeCompare(b.tableName)));
 
-  // 倒序排序 (Z-A)
-  const sortByNameDesc = () => {
-    setTableData([...tablData].sort((a, b) => b.tableName.localeCompare(a.tableName)));
-  };
+  // 按表名倒序排序 (Z-A)
+  const sortByNameDesc = () => setTableData([...tablData].sort((a, b) => b.tableName.localeCompare(a.tableName)));
 
-  // 正序排序 (小到大)
-  const sortByBytesAsc = () => {
-    setTableData([...tablData].sort((a, b) => a.bytes - b.bytes));
-  };
+  // 按大小正序排序 (小到大)
+  const sortByBytesAsc = () => setTableData([...tablData].sort((a, b) => a.bytes - b.bytes));
 
-  // 倒序排序 (大到小)
-  const sortByBytesDesc = () => {
-    setTableData([...tablData].sort((a, b) => b.bytes - a.bytes));
-  };
+  // 按大小倒序排序 (大到小)
+  const sortByBytesDesc = () => setTableData([...tablData].sort((a, b) => b.bytes - a.bytes));
 
   const renderSortBtn = (sortByNameAsc: () => void, Icon: LucideIcon, text: string) => {
     return (
@@ -66,31 +67,71 @@ export function TableList() {
   // ========== 排序 结束 ==========
 
   // ========== 上下文按钮功能 ==========
-  const handleRename = async (text: string) => {
-    // FIXME: 需要弹窗, 获取新名字
-    // renameTable(currentDbType, text);
+
+  const [operatTableName, setOperatTableName] = useState<string>(""); // 现在操作的表名
+  const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
+  const [showDialogRename, setShowDialogRename] = useState<boolean>(false);
+  const [showDialogTruncate, setShowDialogTruncate] = useState<boolean>(false);
+  const [showDialogDelete, setShowDialogDelete] = useState<boolean>(false);
+
+  // 弹出确认重命名表
+  const handleRenamePopup = async (tableName: string) => {
+    setOperatTableName(tableName);
+    setShowDialogRename(true);
   };
-  const handleCopy = async (text: string) => {
+  // 复制表名
+  const handleCopy = async (tableName: string) => {
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(tableName);
       toast("复制成功");
     } catch (err) {
       toast("复制失败");
     }
   };
-  const handleImport = async (text: string) => {
+  // 导入数据
+  const handleImport = async (tableName: string) => {
     // TODO:
   };
-  const handleExport = async (text: string) => {
+  // 导出数据
+  const handleExport = async (tableName: string) => {
     // TODO:
   };
-  const handleTruncate = async (text: string) => {
-    // TODO: 弹出确认
-    truncateTable(currentDbType, text);
+  // 弹出确认截断表
+  const handleTruncatePopup = async (tableName: string) => {
+    setOperatTableName(tableName);
+    setWillExecCmd(genTruncateTableCmd(currentDbType, tableName));
+    setShowDialogTruncate(true);
   };
-  const handleDelete = async (text: string) => {
-    // TODO: 弹出确认
-    deleteTable(currentDbType, text);
+  // 弹出确认删除表
+  const handleDeletePopup = async (tableName: string) => {
+    setOperatTableName(tableName);
+    setWillExecCmd(genDeleteTableCmd(currentDbType, tableName));
+    setShowDialogDelete(true);
+  };
+
+  //
+  //
+
+  // 处理重命名表格的输入
+  const handleRenameInput = async (e: React.FormEvent<HTMLInputElement>) => {
+    setWillExecCmd(genRenameTableCmd(currentDbType, operatTableName, e.currentTarget.value));
+  };
+
+  // 执行重命名表
+  const handleRename = async () => {
+    exec(currentDbType, willExecCmd);
+    getData();
+  };
+
+  // 执行截断表
+  const handleTruncate = async () => {
+    exec(currentDbType, willExecCmd);
+    getData();
+  };
+  // 执行删除表
+  const handleDelete = async () => {
+    exec(currentDbType, willExecCmd);
+    getData();
   };
   // ========== 上下文按钮功能 结束 ==========
 
@@ -151,7 +192,7 @@ export function TableList() {
           {
             label: "重命名",
             onClick: () => {
-              handleRename(item.tableName);
+              handleRenamePopup(item.tableName);
             },
           },
           {
@@ -177,14 +218,14 @@ export function TableList() {
             label: "截断",
             className: "text-[var(--fvm-warning-clr)]",
             onClick: () => {
-              handleTruncate(item.tableName);
+              handleTruncatePopup(item.tableName);
             },
           },
           {
             label: "删除",
             className: "text-[var(--fvm-danger-clr)]",
             onClick: () => {
-              handleDelete(item.tableName);
+              handleDeletePopup(item.tableName);
             },
           },
         ],
@@ -218,6 +259,68 @@ export function TableList() {
       {!tablData || (tablData.length === 0 && <EmptyList />)}
 
       {tablData.length > 0 && <ListWithAction items={listData} itemClassName="py-2 cursor-pointer" />}
+
+      <ConfirmDialog
+        open={showDialogRename}
+        title={`确认要重命名吗?`}
+        content={
+          <>
+            <div className="flex items-center">
+              <div className="pe-4">新名字</div>
+              <div className="flex-1">
+                <Input onInput={handleRenameInput} />
+              </div>
+            </div>
+            <div className="pt-4">
+              <div className="pb-4">将要执行的语句:</div>
+              <div>{willExecCmd}</div>
+            </div>
+          </>
+        }
+        cancelText={"取消"}
+        cancelCb={() => {
+          setShowDialogRename(false);
+        }}
+        okText={"确定"}
+        okCb={handleRename}
+      />
+
+      <ConfirmDialog
+        open={showDialogTruncate}
+        title={`确认要截断${operatTableName}吗?`}
+        content={
+          <>
+            <div className="pt-4">
+              <div className="pb-4">将要执行的语句:</div>
+              <div>{willExecCmd}</div>
+            </div>
+          </>
+        }
+        cancelText={"取消"}
+        cancelCb={() => {
+          setShowDialogTruncate(false);
+        }}
+        okText={"确定"}
+        okCb={handleTruncate}
+      />
+      <ConfirmDialog
+        open={showDialogDelete}
+        title={`确认要删除${operatTableName}吗?`}
+        content={
+          <>
+            <div className="pt-4">
+              <div className="pb-4">将要执行的语句:</div>
+              <div>{willExecCmd}</div>
+            </div>
+          </>
+        }
+        cancelText={"取消"}
+        cancelCb={() => {
+          setShowDialogDelete(false);
+        }}
+        okText={"确定"}
+        okCb={handleDelete}
+      />
     </div>
   );
 }
