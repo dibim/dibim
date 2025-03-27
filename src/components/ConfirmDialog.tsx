@@ -3,7 +3,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -25,7 +24,7 @@ export function ConfirmDialog(props: ConfirmDialogProp) {
       <AlertDialogContent>
         <AlertDialogHeader>
           {props.title && <AlertDialogTitle>{props.title}</AlertDialogTitle>}
-          {props.content && <AlertDialogDescription>{props.content}</AlertDialogDescription>}
+          {props.content && <div className="text-neutral-500">{props.content}</div>}
         </AlertDialogHeader>
         <AlertDialogFooter>
           {props.cancelText && (

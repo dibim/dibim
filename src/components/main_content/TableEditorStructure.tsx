@@ -6,20 +6,26 @@ import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-
 import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE, HEDAER_H } from "@/constants";
 import { AlterActionData } from "@/databases/PostgreSQL/alter";
 import { TableStructurePostgresql } from "@/databases/PostgreSQL/types";
+import { exec, genDeleteFieldCmd } from "@/databases/adapter,";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
 import { MainContentStructure } from "@/types/types";
+import { ConfirmDialog } from "../ConfirmDialog";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export function TableEditorStructure(props: MainContentStructure) {
-  const { currentDbType, currentTableStructure } = useCoreStore();
+  const { currentDbType, currentTableStructure, currentTableName } = useCoreStore();
 
   const [alterData, setAlterData] = useState<AlterActionData[]>([]); // 表结构的修改数据
   // TODO: 实现 src/databases/PostgreSQL/alter.ts 里的功能
 
-  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set()); // 选中的行
+  const [operateRowIndex, setOperateRowIndex] = useState<number>(0); // 现在操作的行的索引
+  const [operateFieldName, setOperateFieldName] = useState<string>(""); // 现在操作的行的索引
+  const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
+  const [showDialogDelete, setShowDialogDelete] = useState<boolean>(false);
 
   // 选中行, 删除的时候使用
   const handleSelectRow = (id: number) => {
@@ -32,45 +38,79 @@ export function TableEditorStructure(props: MainContentStructure) {
     setSelectedRows(newSelectedRows);
   };
 
-  // 点击行
-  function handleClickRow(index: number) {
-    console.log("点击行:: ", index);
-  }
-
   // 添加列
-  function addCol() {
+  function handleAddCol() {
     console.log("添加列");
   }
 
   // 删除选中的列
-  function delSelectedCol() {
+  function handleDelSelectedCol() {
     console.log("删除列");
   }
 
   // 应用
-  function apply() {
+  function handleApply() {
     console.log("应用");
   }
 
   // 取消
-  function cancel() {
+  function handleCancel() {
     console.log("取消");
   }
 
-  // 重命名列
-  function renameCol() {
-    console.log("renameCol");
-  }
-
-  // 编辑列
-  function editCol() {
+  // 弹出确认编辑列
+  function handleEditColPopup(index: number) {
     console.log("editCol");
+
+    setOperateRowIndex(index);
+  }
+  function handleEditCol(index: number) {
+    console.log("editCol");
+
+    setOperateRowIndex(index);
   }
 
-  // 删除1列
-  function delCol() {
-    console.log("delCol");
+  // 弹出确认删除1列
+  function handleDeleteColPopup(index: number) {
+    const fieldName = findFieldName(index);
+
+    console.log("fieldName:: ", fieldName, index, currentDbType);
+
+    if (fieldName !== "") {
+      setOperateFieldName(fieldName);
+      setShowDialogDelete(true);
+      setWillExecCmd(genDeleteFieldCmd(currentDbType, currentTableName, fieldName) || "");
+    } else {
+      // TODO: 报错
+    }
   }
+  // 执行删除字段
+  function handleDelete() {
+    exec(currentDbType, willExecCmd);
+  }
+
+  /**
+   * 根据索引找到字段名
+   * @param index
+   * @returns
+   */
+  const findFieldName = (index: number) => {
+    if (currentDbType === DB_TYPE_MYSQL) {
+      // TODO: 实现逻辑
+    }
+
+    if (currentDbType === DB_TYPE_POSTGRESQL) {
+      const tableDataPg = currentTableStructure as unknown as TableStructurePostgresql[];
+
+      console.log("tableDataPg.length:: ", tableDataPg.length);
+
+      if (index <= tableDataPg.length) {
+        return tableDataPg[index].column_name;
+      }
+    }
+
+    return "";
+  };
 
   /**
    * 给每一行套上一个菜单
@@ -83,9 +123,8 @@ export function TableEditorStructure(props: MainContentStructure) {
       <ContextMenu key={index}>
         <ContextMenuTrigger asChild>{node}</ContextMenuTrigger>
         <ContextMenuContent>
-          <ContextMenuItem onClick={renameCol}>重命名</ContextMenuItem>
-          <ContextMenuItem onClick={editCol}>编辑</ContextMenuItem>
-          <ContextMenuItem onClick={delCol}>删除</ContextMenuItem>
+          <ContextMenuItem onClick={() => handleEditColPopup(index)}>编辑</ContextMenuItem>
+          <ContextMenuItem onClick={() => handleDeleteColPopup(index)}>删除</ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
     );
@@ -105,37 +144,36 @@ export function TableEditorStructure(props: MainContentStructure) {
             <TableCell
               className="cursor-grab"
               onClick={() => {
-                handleClickRow(index);
                 handleSelectRow(index);
               }}
             >
               <div>{index + 1}</div>
             </TableCell>
-            <TableCell onClick={() => handleClickRow(index)}>
+            <TableCell>
               <div>{row.column_name}</div>
             </TableCell>
-            <TableCell onClick={() => handleClickRow(index)}>
+            <TableCell>
               <div>{row.data_type}</div>
             </TableCell>
-            <TableCell onClick={() => handleClickRow(index)}>
+            <TableCell>
               <div>{row.is_primary_key ? "✅" : ""}</div>
             </TableCell>
-            <TableCell onClick={() => handleClickRow(index)}>
+            <TableCell>
               <div>{row.has_foreign_key ? "✅" : ""}</div>
             </TableCell>
-            <TableCell onClick={() => handleClickRow(index)}>
+            <TableCell>
               <div>{row.is_unique ? "✅" : ""}</div>
             </TableCell>
-            <TableCell onClick={() => handleClickRow(index)}>
+            <TableCell>
               <div>{row.has_check_conditions ? "✅" : ""}</div>
             </TableCell>
-            <TableCell onClick={() => handleClickRow(index)}>
+            <TableCell>
               <div>{row.is_nullable === "YES" ? "✅" : ""}</div>
             </TableCell>
-            <TableCell onClick={() => handleClickRow(index)}>
+            <TableCell>
               <div>{row.column_default}</div>
             </TableCell>
-            <TableCell onClick={() => handleClickRow(index)}>
+            <TableCell>
               <div className="w-full">{row.comment}</div>
             </TableCell>
           </TableRow>,
@@ -165,7 +203,7 @@ export function TableEditorStructure(props: MainContentStructure) {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <CirclePlus color="var(--fvm-primary-clr)" onClick={addCol} />
+              <CirclePlus color="var(--fvm-primary-clr)" onClick={handleAddCol} />
             </TooltipTrigger>
             <TooltipContent>
               <p>添加列</p>
@@ -173,7 +211,7 @@ export function TableEditorStructure(props: MainContentStructure) {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <CircleMinus color="var(--fvm-danger-clr)" onClick={delSelectedCol} />
+              <CircleMinus color="var(--fvm-danger-clr)" onClick={handleDelSelectedCol} />
             </TooltipTrigger>
             <TooltipContent>
               <p>删除列</p>
@@ -181,7 +219,7 @@ export function TableEditorStructure(props: MainContentStructure) {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <CircleCheck color="var(--fvm-success-clr)" onClick={apply} />
+              <CircleCheck color="var(--fvm-success-clr)" onClick={handleApply} />
             </TooltipTrigger>
             <TooltipContent>
               <p>应用</p>
@@ -189,7 +227,7 @@ export function TableEditorStructure(props: MainContentStructure) {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <CircleX color="var(--fvm-warning-clr)" onClick={cancel} />
+              <CircleX color="var(--fvm-warning-clr)" onClick={handleCancel} />
             </TooltipTrigger>
             <TooltipContent>
               <p>取消</p>
@@ -218,6 +256,25 @@ export function TableEditorStructure(props: MainContentStructure) {
           <TableBody>{renderBody()}</TableBody>
         </Table>
       </div>
+
+      <ConfirmDialog
+        open={showDialogDelete}
+        title={`确认要删除字段${operateFieldName}吗?`}
+        content={
+          <>
+            <div className="pt-4">
+              <div className="pb-4">将要执行的语句:</div>
+              <div>{willExecCmd}</div>
+            </div>
+          </>
+        }
+        cancelText={"取消"}
+        cancelCb={() => {
+          setShowDialogDelete(false);
+        }}
+        okText={"确定"}
+        okCb={handleDelete}
+      />
     </div>
   );
 }

@@ -340,3 +340,13 @@ export function genTruncateTableCmdPg(tbName: string) {
 export function genDeleteTableCmdPg(tbName: string) {
   return `DROP TABLE "${tbName}";`;
 }
+
+// 生成重命名字段的语句
+export function genRenameFieldCmdPg(tbName: string, oldName: string, newName: string) {
+  return `ALTER TABLE "${tbName}" RENAME COLUMN "${oldName}" TO "${newName}";`;
+}
+
+// 生成删除字段的语句
+export function genDeleteFieldCmdPg(tbName: string, fieldName: string) {
+  return `ALTER TABLE IF EXISTS "${tbName}" DROP COLUMN IF EXISTS "${fieldName}" CASCADE;`;
+}

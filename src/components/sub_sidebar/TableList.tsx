@@ -80,7 +80,7 @@ export function TableList() {
   };
   // 处理重命名表格的输入
   const handleRenameInput = async (e: React.FormEvent<HTMLInputElement>) => {
-    setWillExecCmd(genRenameTableCmd(currentDbType, operateTableName, e.currentTarget.value));
+    setWillExecCmd(genRenameTableCmd(currentDbType, operateTableName, e.currentTarget.value) || "");
   };
   // 执行重命名表
   const handleRename = async () => {
@@ -111,7 +111,7 @@ export function TableList() {
   // 弹出确认截断表
   const handleTruncatePopup = async (tableName: string) => {
     setOperateTableName(tableName);
-    setWillExecCmd(genTruncateTableCmd(currentDbType, tableName));
+    setWillExecCmd(genTruncateTableCmd(currentDbType, tableName) || "");
     setShowDialogTruncate(true);
   };
   // 执行截断表
@@ -123,7 +123,7 @@ export function TableList() {
   // 弹出确认删除表
   const handleDeletePopup = async (tableName: string) => {
     setOperateTableName(tableName);
-    setWillExecCmd(genDeleteTableCmd(currentDbType, tableName));
+    setWillExecCmd(genDeleteTableCmd(currentDbType, tableName) || "");
     setShowDialogDelete(true);
   };
   // 执行删除表
@@ -303,7 +303,7 @@ export function TableList() {
       />
       <ConfirmDialog
         open={showDialogDelete}
-        title={`确认要删除${operateTableName}吗?`}
+        title={`确认要删除表格${operateTableName}吗?`}
         content={
           <>
             <div className="pt-4">
