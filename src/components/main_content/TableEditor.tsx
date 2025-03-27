@@ -11,11 +11,12 @@ import { TableEditorData } from "./TableEditorData";
 import { TableEditorDdl } from "./TableEditorDdl";
 import { TableEditorStructure } from "./TableEditorStructure";
 
-const TAB_STRUCTURE = "tab1";
-const TAB_DDL = "tab2";
-const TAB_CONSTRAINT = "tab3";
-const TAB_DATA = "tab4";
-const TAB_PART = "tab5";
+const TAB_STRUCTURE = "TAB_STRUCTURE";
+const TAB_DDL = "TAB_DDL";
+const TAB_CONSTRAINT = "TAB_CONSTRAINT";
+const TAB_DATA = "TAB_DATA";
+const TAB_PARTITION = "TAB_PARTITION";
+const TAB_FOREIGN_KEY = "TAB_FOREIGN_KEY";
 
 export function TableEditor() {
   const { currentDbType, currentTableName, setCurrentTableStructure } = useCoreStore();
@@ -52,7 +53,7 @@ export function TableEditor() {
         <div className="flex items-center pe-4">
           <strong>{currentTableName}</strong>{" "}
         </div>
-        <TabsList className="grid grid-cols-5">
+        <TabsList className="grid grid-cols-6">
           <TabsTrigger
             value={TAB_STRUCTURE}
             onClick={() => {
@@ -81,9 +82,18 @@ export function TableEditor() {
           </TabsTrigger>
 
           <TabsTrigger
-            value={TAB_PART}
+            value={TAB_FOREIGN_KEY}
             onClick={() => {
-              setTabName(TAB_PART);
+              setTabName(TAB_FOREIGN_KEY);
+            }}
+          >
+            外键
+          </TabsTrigger>
+
+          <TabsTrigger
+            value={TAB_PARTITION}
+            onClick={() => {
+              setTabName(TAB_PARTITION);
             }}
           >
             分区
