@@ -4,22 +4,25 @@
 import { useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE, HEDAER_H } from "@/constants";
-// import { AlterActionData } from "@/databases/PostgreSQL/alter";
+import { AlterActionData } from "@/databases/PostgreSQL/alter";
 import { TableStructurePostgresql } from "@/databases/PostgreSQL/types";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
 import { MainContentStructure } from "@/types/types";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export function TableEditorStructure(props: MainContentStructure) {
   const { currentDbType, currentTableStructure } = useCoreStore();
 
-  // const [alterData, setAlterData] = useState<AlterActionData[]>([]); // 表结构的修改数据
+  const [alterData, setAlterData] = useState<AlterActionData[]>([]); // 表结构的修改数据
   // TODO: 实现 src/databases/PostgreSQL/alter.ts 里的功能
 
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
-  const handleRowClick = (id: number) => {
+
+  // 选中行, 删除的时候使用
+  const handleSelectRow = (id: number) => {
     const newSelectedRows = new Set(selectedRows);
     if (newSelectedRows.has(id)) {
       newSelectedRows.delete(id);
@@ -27,6 +30,59 @@ export function TableEditorStructure(props: MainContentStructure) {
       newSelectedRows.add(id);
     }
     setSelectedRows(newSelectedRows);
+  };
+
+  // 点击行
+  function handleClickRow(index: number) {
+    console.log("点击行:: ", index);
+  }
+
+  // 添加列
+  function addCol() {
+    console.log("添加列");
+  }
+
+  // 删除选中的列
+  function delSelectedCol() {
+    console.log("删除列");
+  }
+
+  // 应用
+  function apply() {
+    console.log("应用");
+  }
+
+  // 取消
+  function cancel() {
+    console.log("取消");
+  }
+
+  // 重命名列
+  function renameCol() {
+    console.log("renameCol");
+  }
+
+  // 编辑列
+  function editCol() {
+    console.log("editCol");
+  }
+
+  // 删除1列
+  function delCol() {
+    console.log("delCol");
+  }
+
+  const renderContextMenu = (node: React.ReactNode) => {
+    return (
+      <ContextMenu>
+        <ContextMenuTrigger className="block">{node}</ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem onClick={renameCol}>重命名</ContextMenuItem>
+          <ContextMenuItem onClick={editCol}>编辑</ContextMenuItem>
+          <ContextMenuItem onClick={delCol}>删除</ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+    );
   };
 
   const renderBody = () => {
@@ -37,26 +93,48 @@ export function TableEditorStructure(props: MainContentStructure) {
     if (currentDbType === DB_TYPE_POSTGRESQL) {
       const tableDataPg = currentTableStructure as unknown as TableStructurePostgresql[];
       return tableDataPg.map((row, index) => (
-        <>
-          <TableRow
-            onClick={() => handleRowClick(index)}
-            style={{
-              color: selectedRows.has(index) ? "var(--fvm-primary-clr)" : "",
-              cursor: "pointer",
+        <TableRow
+          key={index}
+          className={`${selectedRows.has(index) ? "text-[var(--fvm-primary-clr)]  font-bold" : ""}`}
+        >
+          <TableCell
+            className="cursor-grab"
+            onClick={() => {
+              handleClickRow(index);
+              handleSelectRow(index);
             }}
           >
-            <TableCell>{index + 1}</TableCell>
-            <TableCell>{row.column_name}</TableCell>
-            <TableCell>{row.data_type}</TableCell>
-            <TableCell>{row.is_primary_key ? "✅" : ""}</TableCell>
-            <TableCell>{row.has_foreign_key ? "✅" : ""}</TableCell>
-            <TableCell>{row.is_unique ? "✅" : ""}</TableCell>
-            <TableCell>{row.has_check_conditions ? "✅" : ""}</TableCell>
-            <TableCell>{row.is_nullable === "YES" ? "✅" : ""}</TableCell>
-            <TableCell>{row.column_default}</TableCell>
-            <TableCell>{row.comment}</TableCell>
-          </TableRow>
-        </>
+            {renderContextMenu(<div>{index + 1}</div>)}
+          </TableCell>
+          {/* 注意: 下面使用全角空格"　"我为占位符, 避免内容为孔子阿福传右键菜单不显示 */}
+          <TableCell onClick={() => handleClickRow(index)}>
+            {renderContextMenu(<div>{row.column_name || "　"}</div>)}
+          </TableCell>
+          <TableCell onClick={() => handleClickRow(index)}>
+            {renderContextMenu(<div>{row.data_type || "　"}</div>)}
+          </TableCell>
+          <TableCell onClick={() => handleClickRow(index)}>
+            {renderContextMenu(<div>{row.is_primary_key ? "✅" : "　"}</div>)}
+          </TableCell>
+          <TableCell onClick={() => handleClickRow(index)}>
+            {renderContextMenu(<div>{row.has_foreign_key ? "✅" : "　"}</div>)}
+          </TableCell>
+          <TableCell onClick={() => handleClickRow(index)}>
+            {renderContextMenu(<div>{row.is_unique ? "✅" : "　"}</div>)}
+          </TableCell>
+          <TableCell onClick={() => handleClickRow(index)}>
+            {renderContextMenu(<div>{row.has_check_conditions ? "✅" : "　"}</div>)}
+          </TableCell>
+          <TableCell onClick={() => handleClickRow(index)}>
+            {renderContextMenu(<div>{row.is_nullable === "YES" ? "✅" : "　"}</div>)}
+          </TableCell>
+          <TableCell onClick={() => handleClickRow(index)}>
+            {renderContextMenu(<div>{row.column_default || "　"}</div>)}
+          </TableCell>
+          <TableCell onClick={() => handleClickRow(index)}>
+            {renderContextMenu(<div className="w-full">{row.comment || "　"}</div>)}
+          </TableCell>
+        </TableRow>
       ));
     }
 
@@ -82,7 +160,7 @@ export function TableEditorStructure(props: MainContentStructure) {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <CirclePlus color="var(--fvm-primary-clr)" />
+              <CirclePlus color="var(--fvm-primary-clr)" onClick={addCol} />
             </TooltipTrigger>
             <TooltipContent>
               <p>添加列</p>
@@ -90,7 +168,7 @@ export function TableEditorStructure(props: MainContentStructure) {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <CircleMinus color="var(--fvm-danger-clr)" />
+              <CircleMinus color="var(--fvm-danger-clr)" onClick={delSelectedCol} />
             </TooltipTrigger>
             <TooltipContent>
               <p>删除列</p>
@@ -98,7 +176,7 @@ export function TableEditorStructure(props: MainContentStructure) {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <CircleCheck color="var(--fvm-success-clr)" />
+              <CircleCheck color="var(--fvm-success-clr)" onClick={apply} />
             </TooltipTrigger>
             <TooltipContent>
               <p>应用</p>
@@ -106,7 +184,7 @@ export function TableEditorStructure(props: MainContentStructure) {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <CircleX color="var(--fvm-warning-clr)" />
+              <CircleX color="var(--fvm-warning-clr)" onClick={cancel} />
             </TooltipTrigger>
             <TooltipContent>
               <p>取消</p>
