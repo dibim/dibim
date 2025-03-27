@@ -256,7 +256,7 @@ export function TableList() {
       </div>
       {!tablData || (tablData.length === 0 && <EmptyList />)}
 
-      {tablData.length > 0 && <ListWithAction items={listData} itemClassName="py-2 cursor-pointer" />}
+      {tablData.length > 0 && <ListWithAction items={listData} itemClassName="cursor-pointer" />}
 
       <ConfirmDialog
         open={showDialogRename}
