@@ -42,7 +42,7 @@ export interface CoreStoreState {
 
   // 次级侧边栏的类型
   subSidebarOpen: boolean;
-  subSetSidebarOpen: (val: boolean) => void;
+  setSubSidebarOpen: (val: boolean) => void;
   subSidebarType: SubSidebarType;
   setSubSidebarType: (val: SubSidebarType) => void;
 
@@ -106,7 +106,7 @@ export const useCoreStore = create<CoreStoreState>()(
       setSidebarOpen: (val: boolean) => set({ sidebarOpen: val }),
 
       subSidebarOpen: true,
-      subSetSidebarOpen: (val: boolean) => set({ subSidebarOpen: val }),
+      setSubSidebarOpen: (val: boolean) => set({ subSidebarOpen: val }),
       subSidebarType: SUB_SIDEBAR_TYPE_DB_LIST,
       setSubSidebarType: (val: SubSidebarType) => set({ subSidebarType: val }),
 
