@@ -1,13 +1,14 @@
 import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE } from "@/constants";
 import {
-  deleteTablePg,
+  execPg,
+  genDeleteTableCmdPg,
+  genRenameTableCmdPg,
+  genTruncateTableCmdPg,
   getAllTableNamePg,
   getAllTableSizePg,
   getTableDataPg,
   getTableDdlPg,
   getTableStructurePg,
-  renameTablePg,
-  truncateTablePg,
 } from "@/databases/PostgreSQL/utils";
 import { DbType } from "@/types/types";
 import { GetTableDataParam } from "./types";
@@ -52,45 +53,6 @@ export async function getAllTableSize(dbType: DbType) {
   }
 }
 
-// 重命名表格
-export async function renameTable(dbType: DbType, oldName: string, newName: string) {
-  if (dbType === DB_TYPE_MYSQL) {
-    // TODO:
-  }
-  if (dbType === DB_TYPE_POSTGRESQL) {
-    return renameTablePg(oldName, newName);
-  }
-  if (dbType === DB_TYPE_SQLITE) {
-    // TODO:
-  }
-}
-
-// 截断表格
-export async function truncateTable(dbType: DbType, tbName: string) {
-  if (dbType === DB_TYPE_MYSQL) {
-    // TODO:
-  }
-  if (dbType === DB_TYPE_POSTGRESQL) {
-    return truncateTablePg(tbName);
-  }
-  if (dbType === DB_TYPE_SQLITE) {
-    // TODO:
-  }
-}
-
-// 删除表格
-export async function deleteTable(dbType: DbType, tbName: string) {
-  if (dbType === DB_TYPE_MYSQL) {
-    // TODO:
-  }
-  if (dbType === DB_TYPE_POSTGRESQL) {
-    return deleteTablePg(tbName);
-  }
-  if (dbType === DB_TYPE_SQLITE) {
-    // TODO:
-  }
-}
-
 // 获取表格数据
 export async function getTableStructure(dbType: DbType, tbName: string) {
   if (dbType === DB_TYPE_MYSQL) {
@@ -128,4 +90,64 @@ export async function getTableData(dbType: DbType, params: GetTableDataParam) {
   if (dbType === DB_TYPE_SQLITE) {
     // TODO:
   }
+}
+
+// 生成重命名表格的语句
+export function exec(dbType: DbType, sql: string) {
+  if (dbType === DB_TYPE_MYSQL) {
+    // TODO:
+  }
+  if (dbType === DB_TYPE_POSTGRESQL) {
+    return execPg(sql);
+  }
+  if (dbType === DB_TYPE_SQLITE) {
+    // TODO:
+  }
+
+  return "";
+}
+
+// 生成重命名表格的语句
+export function genRenameTableCmd(dbType: DbType, oldName: string, newName: string) {
+  if (dbType === DB_TYPE_MYSQL) {
+    // TODO:
+  }
+  if (dbType === DB_TYPE_POSTGRESQL) {
+    return genRenameTableCmdPg(oldName, newName);
+  }
+  if (dbType === DB_TYPE_SQLITE) {
+    // TODO:
+  }
+
+  return "";
+}
+
+// 生成截断表格的语句
+export function genTruncateTableCmd(dbType: DbType, tbName: string) {
+  if (dbType === DB_TYPE_MYSQL) {
+    // TODO:
+  }
+  if (dbType === DB_TYPE_POSTGRESQL) {
+    return genTruncateTableCmdPg(tbName);
+  }
+  if (dbType === DB_TYPE_SQLITE) {
+    // TODO:
+  }
+
+  return "";
+}
+
+// 生成删除表格的语句
+export function genDeleteTableCmd(dbType: DbType, tbName: string) {
+  if (dbType === DB_TYPE_MYSQL) {
+    // TODO:
+  }
+  if (dbType === DB_TYPE_POSTGRESQL) {
+    return genDeleteTableCmdPg(tbName);
+  }
+  if (dbType === DB_TYPE_SQLITE) {
+    // TODO:
+  }
+
+  return "";
 }

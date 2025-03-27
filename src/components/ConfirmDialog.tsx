@@ -12,7 +12,7 @@ import {
 export type ConfirmDialogProp = {
   open: boolean;
   title: string;
-  content: string;
+  content: React.ReactNode;
   cancelText: string; // 取消按钮的文字
   cancelCb: () => void; // 点击编辑按钮的回调函数
   okText: string; // 确认按钮的文字
