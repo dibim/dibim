@@ -67,8 +67,7 @@ export function TableList() {
   // ========== 排序 结束 ==========
 
   // ========== 上下文按钮功能 ==========
-
-  const [operatTableName, setOperatTableName] = useState<string>(""); // 现在操作的表名
+  const [operateTableName, setOperateTableName] = useState<string>(""); // 现在操作的表名
   const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
   const [showDialogRename, setShowDialogRename] = useState<boolean>(false);
   const [showDialogTruncate, setShowDialogTruncate] = useState<boolean>(false);
@@ -76,9 +75,19 @@ export function TableList() {
 
   // 弹出确认重命名表
   const handleRenamePopup = async (tableName: string) => {
-    setOperatTableName(tableName);
+    setOperateTableName(tableName);
     setShowDialogRename(true);
   };
+  // 处理重命名表格的输入
+  const handleRenameInput = async (e: React.FormEvent<HTMLInputElement>) => {
+    setWillExecCmd(genRenameTableCmd(currentDbType, operateTableName, e.currentTarget.value));
+  };
+  // 执行重命名表
+  const handleRename = async () => {
+    exec(currentDbType, willExecCmd);
+    getData();
+  };
+
   // 复制表名
   const handleCopy = async (tableName: string) => {
     try {
@@ -88,45 +97,34 @@ export function TableList() {
       toast("复制失败");
     }
   };
+
   // 导入数据
   const handleImport = async (tableName: string) => {
     // TODO:
   };
+
   // 导出数据
   const handleExport = async (tableName: string) => {
     // TODO:
   };
+
   // 弹出确认截断表
   const handleTruncatePopup = async (tableName: string) => {
-    setOperatTableName(tableName);
+    setOperateTableName(tableName);
     setWillExecCmd(genTruncateTableCmd(currentDbType, tableName));
     setShowDialogTruncate(true);
   };
-  // 弹出确认删除表
-  const handleDeletePopup = async (tableName: string) => {
-    setOperatTableName(tableName);
-    setWillExecCmd(genDeleteTableCmd(currentDbType, tableName));
-    setShowDialogDelete(true);
-  };
-
-  //
-  //
-
-  // 处理重命名表格的输入
-  const handleRenameInput = async (e: React.FormEvent<HTMLInputElement>) => {
-    setWillExecCmd(genRenameTableCmd(currentDbType, operatTableName, e.currentTarget.value));
-  };
-
-  // 执行重命名表
-  const handleRename = async () => {
-    exec(currentDbType, willExecCmd);
-    getData();
-  };
-
   // 执行截断表
   const handleTruncate = async () => {
     exec(currentDbType, willExecCmd);
     getData();
+  };
+
+  // 弹出确认删除表
+  const handleDeletePopup = async (tableName: string) => {
+    setOperateTableName(tableName);
+    setWillExecCmd(genDeleteTableCmd(currentDbType, tableName));
+    setShowDialogDelete(true);
   };
   // 执行删除表
   const handleDelete = async () => {
@@ -287,7 +285,7 @@ export function TableList() {
 
       <ConfirmDialog
         open={showDialogTruncate}
-        title={`确认要截断${operatTableName}吗?`}
+        title={`确认要截断${operateTableName}吗?`}
         content={
           <>
             <div className="pt-4">
@@ -305,7 +303,7 @@ export function TableList() {
       />
       <ConfirmDialog
         open={showDialogDelete}
-        title={`确认要删除${operatTableName}吗?`}
+        title={`确认要删除${operateTableName}吗?`}
         content={
           <>
             <div className="pt-4">
