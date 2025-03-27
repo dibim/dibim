@@ -244,8 +244,8 @@ export function TableEditorData() {
               </PaginationItem>
             </PaginationContent>
           </Pagination>
-          <div className="ppp">
-            {currentPage} / {pageTotal} <strong>页</strong> {itemsTotal} <strong>行</strong>
+          <div className="text-muted-foreground">
+            {currentPage} / {pageTotal} <strong>页</strong> 共 {itemsTotal} 行
           </div>
         </div>
       </div>
