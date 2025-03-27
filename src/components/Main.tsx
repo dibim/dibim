@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AlertCircle, PanelLeftIcon } from "lucide-react";
+import { AlertCircle, PanelLeftDashed, PanelLeftIcon } from "lucide-react";
 import { Separator } from "@radix-ui/react-separator";
 import { MainContent } from "@/components/main_content/MainContent";
 import { TableList } from "@/components/sub_sidebar/TableList";
@@ -24,7 +24,15 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card"
 import { Input } from "./ui/input";
 
 export function Main() {
-  const { setConfig, subSidebarType, sidebarOpen, setSidebarOpen, setMainPasswordSha, subSidebarOpen } = useCoreStore();
+  const {
+    setConfig,
+    subSidebarType,
+    sidebarOpen,
+    setSidebarOpen,
+    subSidebarOpen,
+    setSubSidebarOpen,
+    setMainPasswordSha,
+  } = useCoreStore();
 
   const { toggleSidebar, setOpenMobile, setOpen } = useSidebar();
 
@@ -172,6 +180,17 @@ export function Main() {
             >
               <PanelLeftIcon />
               <span className="sr-only">Toggle Sidebar</span>
+            </Button>
+
+            <Button
+              data-sidebar="trigger"
+              variant="ghost"
+              onClick={() => {
+                setSubSidebarOpen(!subSidebarOpen);
+              }}
+            >
+              <PanelLeftDashed />
+              <span className="sr-only">Toggle SubSidebar</span>
             </Button>
 
             <Separator orientation="vertical" className="mr-2 h-4" />
