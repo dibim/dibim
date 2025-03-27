@@ -51,9 +51,9 @@ export function ListWithAction({
       {triggerMethod === STR_BTN &&
         items.map((item) => (
           <DropdownMenu key={item.id}>
-            <div className={`flex items-center justify-between ${itemClassName}`}>
+            <div className={`flex items-center justify-between`}>
               <div
-                className="flex-1"
+                className={`flex-1 ${itemClassName}`}
                 onClick={() => {
                   item.contentOnClick(item);
                 }}
@@ -90,6 +90,7 @@ export function ListWithAction({
           <ContextMenu key={item.id}>
             <ContextMenuTrigger>
               <div
+                className={`${itemClassName}`}
                 onClick={() => {
                   item.contentOnClick(item);
                 }}
