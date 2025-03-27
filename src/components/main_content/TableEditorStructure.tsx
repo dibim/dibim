@@ -72,10 +72,16 @@ export function TableEditorStructure(props: MainContentStructure) {
     console.log("delCol");
   }
 
-  const renderContextMenu = (node: React.ReactNode) => {
+  /**
+   * 给每一行套上一个菜单
+   * @param index 行的索引
+   * @param node 行的节点
+   * @returns
+   */
+  const renderContextMenu = (index: number, node: React.ReactNode) => {
     return (
-      <ContextMenu>
-        <ContextMenuTrigger className="block">{node}</ContextMenuTrigger>
+      <ContextMenu key={index}>
+        <ContextMenuTrigger asChild>{node}</ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuItem onClick={renameCol}>重命名</ContextMenuItem>
           <ContextMenuItem onClick={editCol}>编辑</ContextMenuItem>
@@ -92,50 +98,49 @@ export function TableEditorStructure(props: MainContentStructure) {
 
     if (currentDbType === DB_TYPE_POSTGRESQL) {
       const tableDataPg = currentTableStructure as unknown as TableStructurePostgresql[];
-      return tableDataPg.map((row, index) => (
-        <TableRow
-          key={index}
-          className={`${selectedRows.has(index) ? "text-[var(--fvm-primary-clr)]  font-bold" : ""}`}
-        >
-          <TableCell
-            className="cursor-grab"
-            onClick={() => {
-              handleClickRow(index);
-              handleSelectRow(index);
-            }}
-          >
-            {renderContextMenu(<div>{index + 1}</div>)}
-          </TableCell>
-          {/* 注意: 下面使用全角空格"　"我为占位符, 避免内容为孔子阿福传右键菜单不显示 */}
-          <TableCell onClick={() => handleClickRow(index)}>
-            {renderContextMenu(<div>{row.column_name || "　"}</div>)}
-          </TableCell>
-          <TableCell onClick={() => handleClickRow(index)}>
-            {renderContextMenu(<div>{row.data_type || "　"}</div>)}
-          </TableCell>
-          <TableCell onClick={() => handleClickRow(index)}>
-            {renderContextMenu(<div>{row.is_primary_key ? "✅" : "　"}</div>)}
-          </TableCell>
-          <TableCell onClick={() => handleClickRow(index)}>
-            {renderContextMenu(<div>{row.has_foreign_key ? "✅" : "　"}</div>)}
-          </TableCell>
-          <TableCell onClick={() => handleClickRow(index)}>
-            {renderContextMenu(<div>{row.is_unique ? "✅" : "　"}</div>)}
-          </TableCell>
-          <TableCell onClick={() => handleClickRow(index)}>
-            {renderContextMenu(<div>{row.has_check_conditions ? "✅" : "　"}</div>)}
-          </TableCell>
-          <TableCell onClick={() => handleClickRow(index)}>
-            {renderContextMenu(<div>{row.is_nullable === "YES" ? "✅" : "　"}</div>)}
-          </TableCell>
-          <TableCell onClick={() => handleClickRow(index)}>
-            {renderContextMenu(<div>{row.column_default || "　"}</div>)}
-          </TableCell>
-          <TableCell onClick={() => handleClickRow(index)}>
-            {renderContextMenu(<div className="w-full">{row.comment || "　"}</div>)}
-          </TableCell>
-        </TableRow>
-      ));
+      return tableDataPg.map((row, index) =>
+        renderContextMenu(
+          index,
+          <TableRow className={`${selectedRows.has(index) ? "text-[var(--fvm-primary-clr)] font-bold" : ""}`}>
+            <TableCell
+              className="cursor-grab"
+              onClick={() => {
+                handleClickRow(index);
+                handleSelectRow(index);
+              }}
+            >
+              <div>{index + 1}</div>
+            </TableCell>
+            <TableCell onClick={() => handleClickRow(index)}>
+              <div>{row.column_name}</div>
+            </TableCell>
+            <TableCell onClick={() => handleClickRow(index)}>
+              <div>{row.data_type}</div>
+            </TableCell>
+            <TableCell onClick={() => handleClickRow(index)}>
+              <div>{row.is_primary_key ? "✅" : ""}</div>
+            </TableCell>
+            <TableCell onClick={() => handleClickRow(index)}>
+              <div>{row.has_foreign_key ? "✅" : ""}</div>
+            </TableCell>
+            <TableCell onClick={() => handleClickRow(index)}>
+              <div>{row.is_unique ? "✅" : ""}</div>
+            </TableCell>
+            <TableCell onClick={() => handleClickRow(index)}>
+              <div>{row.has_check_conditions ? "✅" : ""}</div>
+            </TableCell>
+            <TableCell onClick={() => handleClickRow(index)}>
+              <div>{row.is_nullable === "YES" ? "✅" : ""}</div>
+            </TableCell>
+            <TableCell onClick={() => handleClickRow(index)}>
+              <div>{row.column_default}</div>
+            </TableCell>
+            <TableCell onClick={() => handleClickRow(index)}>
+              <div className="w-full">{row.comment}</div>
+            </TableCell>
+          </TableRow>,
+        ),
+      );
     }
 
     if (currentDbType === DB_TYPE_SQLITE) {
