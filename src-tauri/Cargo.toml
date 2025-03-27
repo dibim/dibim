@@ -29,33 +29,35 @@ bigdecimal = "0.4.7"
 lazy_static = "1.5.0"
 tokio = { version = "1", features = ["full"] }
 sqlx = { version = "0.8", features = [ 
-     # 所有数据库驱动
-    "postgres",      # PostgreSQL
-    "mysql",         # MySQL/MariaDB
-    "sqlite",        # SQLite
-    # "mssql",         # Microsoft SQL Server (报错说没有)
+   # 所有数据库驱动
+   "postgres",      # PostgreSQL
+   "mysql",         # MySQL/MariaDB
+   "sqlite",        # SQLite
+   # "mssql",         # Microsoft SQL Server (报错说没有)
 
-    #
-    "derive",
-    "macros",
-    "migrate",  
+   #
+   "derive",
+   "macros",
+   "migrate",  
 
-    # 异步运行时（必选一个）
-    "runtime-tokio-native-tls",  # 使用 Tokio + 操作系统 TLS 库
-    # "runtime-async-std-native-tls", # 使用 async-std 运行时
+   # 异步运行时（必选一个）
+   "runtime-tokio-native-tls",  # 使用 Tokio + 操作系统 TLS 库
+   # "runtime-async-std-native-tls", # 使用 async-std 运行时
 
-    # 扩展功能
-    "chrono",        # 日期时间支持（chrono 库）
-    "json",          # JSON 类型支持（serde_json）
-    "uuid",          # UUID 类型支持
-    "time",          # 时间类型支持（time 库）
-    # "bstr", # Add support for bstr::BString  (报错说没有)
-    "bigdecimal", # Add support for NUMERIC using the bigdecimal crate.
-    # "rust_decimal", # Add support for NUMERIC using the rust_decimal crate.
-    "ipnetwork", # Add support for INET and CIDR (in postgres) using the ipnetwork crate.
- ] }
- aes-gcm = "0.10.3"
- anyhow = "1.0.97"
- rand = "0.9.0"
- sha2 = "0.10.8"
- getrandom = "0.3.2"
+   # 扩展功能
+   "chrono",        # 日期时间支持（chrono 库）
+   "json",          # JSON 类型支持（serde_json）
+   "uuid",          # UUID 类型支持
+   "time",          # 时间类型支持（time 库）
+   # "bstr", # Add support for bstr::BString  (报错说没有)
+   "bigdecimal", # Add support for NUMERIC using the bigdecimal crate.
+   # "rust_decimal", # Add support for NUMERIC using the rust_decimal crate.
+   "ipnetwork", # Add support for INET and CIDR (in postgres) using the ipnetwork crate.
+] }
+aes-gcm = "0.10.3"
+anyhow = "1.0.97"
+rand = "0.9.0"
+sha2 = "0.10.8"
+getrandom = "0.3.2"
+# argon2 = "0.5.3"
+# zeroize = "1.8.1"
