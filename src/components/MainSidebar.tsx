@@ -34,7 +34,7 @@ import {
 import { useCoreStore } from "@/store";
 
 export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { sidebarOpen, setMainContenType, subSidebarType, setSubSidebarType, subSetSidebarOpen } = useCoreStore();
+  const { sidebarOpen, setMainContenType, subSidebarType, setSubSidebarType, setSubSidebarOpen } = useCoreStore();
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -56,7 +56,7 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               tooltip={"数据库"}
               onClick={() => {
                 setSubSidebarType(SUB_SIDEBAR_TYPE_DB_LIST);
-                subSetSidebarOpen(true);
+                setSubSidebarOpen(true);
               }}
             >
               <Database />
@@ -75,7 +75,7 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               tooltip={"表格"}
               onClick={() => {
                 setSubSidebarType(SUB_SIDEBAR_TYPE_TABLE_LIST);
-                subSetSidebarOpen(true);
+                setSubSidebarOpen(true);
               }}
             >
               <Table />
@@ -94,7 +94,7 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               tooltip={"函数"}
               onClick={() => {
                 setSubSidebarType(SUB_SIDEBAR_TYPE_FUNC_LIST);
-                subSetSidebarOpen(true);
+                setSubSidebarOpen(true);
               }}
             >
               <SquareFunction />
@@ -113,7 +113,7 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               tooltip={"视图"}
               onClick={() => {
                 setSubSidebarType(SUB_SIDEBAR_TYPE_VIEW_LIST);
-                subSetSidebarOpen(true);
+                setSubSidebarOpen(true);
               }}
             >
               <View />
@@ -133,7 +133,7 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               tooltip={"添加数据库"}
               onClick={() => {
                 setMainContenType(MAIN_CONTEN_TYPE_ADD_CONNECTION);
-                subSetSidebarOpen(true);
+                setSubSidebarOpen(true);
               }}
             >
               <Link color="var(--fvm-info-clr)" />
@@ -148,7 +148,7 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               tooltip={"SQL编辑器"}
               onClick={() => {
                 setMainContenType(MAIN_CONTEN_TYPE_SQL_EDITOR);
-                subSetSidebarOpen(true);
+                setSubSidebarOpen(true);
               }}
             >
               <FilePenLine color="var(--fvm-info-clr)" />
@@ -163,7 +163,7 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               tooltip={"备份"}
               onClick={() => {
                 // setMainContenType(MAIN_CONTEN_TYPE_SETTINGS);
-                subSetSidebarOpen(true);
+                setSubSidebarOpen(true);
               }}
             >
               <DatabaseBackup color="var(--fvm-info-clr)" />
@@ -178,7 +178,7 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               tooltip={"设置"}
               onClick={() => {
                 setMainContenType(MAIN_CONTEN_TYPE_SETTINGS);
-                subSetSidebarOpen(true);
+                setSubSidebarOpen(true);
               }}
             >
               <Settings color="var(--fvm-info-clr)" />
