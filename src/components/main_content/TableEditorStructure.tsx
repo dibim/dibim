@@ -13,9 +13,10 @@ import {
   STR_EDIT,
   STR_EMPTY,
 } from "@/constants";
-
 import { TableStructurePostgresql } from "@/databases/PostgreSQL/types";
 import { exec, genDeleteFieldCmd } from "@/databases/adapter,";
+import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "@/databases/constants";
+import { ColumnAlterAction } from "@/databases/types";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
 import { MainContentStructure } from "@/types/types";
@@ -29,10 +30,6 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Input } from "../ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { ColumnAlterAction } from "@/databases/types";
-
-const INDEX_PRIMARY_KEY = "PRIMARY KEY";
-const INDEX_UNIQUE = "UNIQUE";
 
 type IndexType = typeof STR_EMPTY | typeof INDEX_PRIMARY_KEY | typeof INDEX_UNIQUE;
 type DialogAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT;
@@ -60,7 +57,7 @@ export function TableEditorStructure(props: MainContentStructure) {
   const [fieldDefalut, setFieldDefault] = useState<string>(""); // 字段默认值
   const [fieldNotNull, setFieldNotNull] = useState<boolean>(false); // 字段非空
   const [fieldIndexType, setFieldIndexType] = useState<IndexType>(""); // 字段索引类型
-  const [fieldIndexAutoIncrement, setFieldIndexAutoIncrement] = useState<boolean>(false); // 字段主键自增
+  const [fieldIndexPkAutoIncrement, setFieldIndexPkAutoIncrement] = useState<boolean>(false); // 字段主键自增
   const [fieldIndexName, setFieldIndexName] = useState<string>(""); // 字段索引名
   const [fieldComment, setFieldComment] = useState<string>(""); // 字段备注
 
@@ -117,14 +114,14 @@ export function TableEditorStructure(props: MainContentStructure) {
     if (fieldName !== "") {
       setOperateFieldName(fieldName);
       setShowDialogDelete(true);
-      setWillExecCmd(genDeleteFieldCmd( currentTableName, fieldName) || "");
+      setWillExecCmd(genDeleteFieldCmd(currentTableName, fieldName) || "");
     } else {
       // TODO: 报错
     }
   }
   // 执行删除字段
   function handleDelete() {
-    exec( willExecCmd);
+    exec(willExecCmd);
   }
 
   // 提交变更
@@ -359,8 +356,8 @@ export function TableEditorStructure(props: MainContentStructure) {
 
               <div className="flex items-center">
                 <Checkbox
-                  checked={fieldIndexAutoIncrement}
-                  onClick={() => setFieldIndexAutoIncrement(!fieldIndexAutoIncrement)}
+                  checked={fieldIndexPkAutoIncrement}
+                  onClick={() => setFieldIndexPkAutoIncrement(!fieldIndexPkAutoIncrement)}
                   className="me-4"
                   id="fieldIndexAutoIncrement"
                   disabled={fieldIndexType === STR_EMPTY}

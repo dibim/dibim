@@ -1,6 +1,6 @@
 import { invoker } from "@/invoke";
 import { CommonSQLValue, DbConnectionParam, DbCountRes, GetTableDataParam } from "../types";
-import { formatSQLValueCommon } from "../utils";
+import { formatToSqlValueCommon } from "../utils";
 import {
   CheckConstraintsRes,
   CommentRes,
@@ -11,24 +11,67 @@ import {
   UniqueKeysResRes,
 } from "./types";
 
-// PostgreSQL 特有类型处理
-export function formatSQLValue(value: unknown): string {
-  // 先尝试通用处理
+// PostgreSQL 特有类型
+export type PGValue =
+  | CommonSQLValue // 继承通用类型
+  | Uint8Array // PostgreSQL 的 bytea 类型
+  | Record<string, any> // JSON/JSONB 类型
+  | any[] // 数组类型（PostgreSQL 有更丰富的数组支持）
+  | RegExp // 可以转换为 TEXT 或 JSON
+  | Map<any, any> // 可以转换为 JSON
+  | Set<any>; // 可以转换为 JSON 数组
+
+// 格式化 PostgreSQL 的数据类型
+export function formatToSqlValuePg(value: PGValue): string {
+  // 首先尝试通用格式化
   try {
-    return formatSQLValueCommon(value as CommonSQLValue);
-  } catch {
-    // 处理PostgreSQL特有类型
-    if (value instanceof Uint8Array) {
-      return `'\\x${Buffer.from(value).toString("hex")}'`;
-    }
-
-    if (typeof value === "object" && value !== null) {
-      // JSON类型
-      return `'${JSON.stringify(value)}'::jsonb`;
-    }
-
-    throw new Error(`Unsupported PostgreSQL type: ${typeof value}`);
+    return formatToSqlValueCommon(value as CommonSQLValue);
+  } catch (e) {
+    // 如果通用格式化失败，继续处理 PG 特有类型
   }
+
+  // 处理 PostgreSQL 特有类型
+  if (value instanceof Uint8Array) {
+    return `'\\x${Buffer.from(value).toString("hex")}'`; // bytea 格式
+  }
+
+  if (value instanceof RegExp) {
+    return `'${value.source}'`; // 将正则转换为其字符串形式
+  }
+
+  if (value instanceof Map) {
+    return formatToSqlValuePg(Object.fromEntries(value)); // 转换为 JSON 对象
+  }
+
+  if (value instanceof Set) {
+    return formatToSqlValuePg([...value]); // 转换为数组
+  }
+
+  // 处理 JSON/JSONB 类型
+  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    return `'${JSON.stringify(value)}'::jsonb`;
+  }
+
+  // 处理 PostgreSQL 数组类型（多维数组）
+  if (Array.isArray(value)) {
+    const formattedArray = value
+      .map((v) => {
+        // 特殊处理数组中的 null 值
+        if (v === null) return "NULL";
+
+        // 递归格式化每个元素
+        const element = formatToSqlValuePg(v);
+
+        // 处理元素中的引号和转义
+        return typeof v === "string" ? `"${element.replace(/"/g, '""')}"` : element;
+      })
+      .join(", ");
+
+    return `ARRAY[${formattedArray}]`;
+  }
+
+  // 默认处理（不应执行到这里）
+  throw new Error(`Unsupported PostgreSQL type: ${typeof value}`);
 }
 
 /**
