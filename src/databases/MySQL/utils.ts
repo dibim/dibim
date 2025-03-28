@@ -1,5 +1,5 @@
 import { CommonSQLValue } from "../types";
-import { formatSQLValueCommon } from "../utils";
+import { formatToSqlValueCommon } from "../utils";
 import { invoker } from "./invoke";
 
 const testConnName = "testPg";
@@ -7,7 +7,7 @@ const testConnName = "testPg";
 // MySQL 特有类型处理
 export function formatMySQLValue(value: unknown): string {
   try {
-    return formatSQLValueCommon(value as CommonSQLValue);
+    return formatToSqlValueCommon(value as CommonSQLValue);
   } catch {
     // 处理MySQL特有类型
     if (value instanceof Uint8Array) {
