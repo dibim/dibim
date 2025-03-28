@@ -19,7 +19,7 @@ const TAB_PARTITION = "TAB_PARTITION";
 const TAB_FOREIGN_KEY = "TAB_FOREIGN_KEY";
 
 export function TableEditor() {
-  const { currentDbType, currentTableName, setCurrentTableStructure } = useCoreStore();
+  const { currentTableName, setCurrentTableStructure } = useCoreStore();
 
   // tabName 先使用空的, 避免表结构没获取到就查询表数据出问题
   // 注意: 使用 value 控制 Tabs 组件的显示, TabsTrigger 要添加 onClick 修改 tabName
@@ -31,7 +31,7 @@ export function TableEditor() {
       return;
     }
 
-    const res = await getTableStructure(currentDbType, currentTableName);
+    const res = await getTableStructure(currentTableName);
 
     if (res && res.data) {
       setCurrentTableStructure(res.data);

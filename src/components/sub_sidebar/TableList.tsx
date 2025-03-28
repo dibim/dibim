@@ -25,7 +25,7 @@ type TableData = {
 };
 
 export function TableList() {
-  const { setCurrentTableName, setMainContenType, currentDbType } = useCoreStore();
+  const { setCurrentTableName, setMainContenType } = useCoreStore();
 
   const [tablData, setTableData] = useState<TableData[]>([]);
 
@@ -80,11 +80,11 @@ export function TableList() {
   };
   // 处理重命名表格的输入
   const handleRenameInput = async (e: React.FormEvent<HTMLInputElement>) => {
-    setWillExecCmd(genRenameTableCmd(currentDbType, operateTableName, e.currentTarget.value) || "");
+    setWillExecCmd(genRenameTableCmd(operateTableName, e.currentTarget.value) || "");
   };
   // 执行重命名表
   const handleRename = async () => {
-    exec(currentDbType, willExecCmd);
+    exec(willExecCmd);
     getData();
   };
 
@@ -111,24 +111,24 @@ export function TableList() {
   // 弹出确认截断表
   const handleTruncatePopup = async (tableName: string) => {
     setOperateTableName(tableName);
-    setWillExecCmd(genTruncateTableCmd(currentDbType, tableName) || "");
+    setWillExecCmd(genTruncateTableCmd(tableName) || "");
     setShowDialogTruncate(true);
   };
   // 执行截断表
   const handleTruncate = async () => {
-    exec(currentDbType, willExecCmd);
+    exec(willExecCmd);
     getData();
   };
 
   // 弹出确认删除表
   const handleDeletePopup = async (tableName: string) => {
     setOperateTableName(tableName);
-    setWillExecCmd(genDeleteTableCmd(currentDbType, tableName) || "");
+    setWillExecCmd(genDeleteTableCmd(tableName) || "");
     setShowDialogDelete(true);
   };
   // 执行删除表
   const handleDelete = async () => {
-    exec(currentDbType, willExecCmd);
+    exec(willExecCmd);
     getData();
   };
   // ========== 上下文按钮功能 结束 ==========
@@ -138,11 +138,11 @@ export function TableList() {
 
   const getData = async () => {
     // 获取表名
-    const res = await getAllTableName(currentDbType);
+    const res = await getAllTableName();
 
     if (res && res.data) {
       // 获取表格大小
-      const sizeRes = await getAllTableSize(currentDbType);
+      const sizeRes = await getAllTableSize();
 
       if (sizeRes && sizeRes.data) {
         const arrTb: TableData[] = [];

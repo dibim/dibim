@@ -22,7 +22,7 @@ import {
 } from "../ui/x_pagination";
 
 export function TableEditorData() {
-  const { currentDbType, currentTableName, currentTableStructure } = useCoreStore();
+  const { currentTableName, currentTableStructure } = useCoreStore();
   const [tableData, setTableData] = useState<any[]>([]); // 表格数据
   const [colNames, setColNames] = useState<string[]>([]); // 列名
 
@@ -51,7 +51,7 @@ export function TableEditorData() {
       return;
     }
 
-    const res = await getTableData(currentDbType, {
+    const res = await getTableData({
       tableName: currentTableName,
       sortField: orderBy,
       sortOrder: "ASC",

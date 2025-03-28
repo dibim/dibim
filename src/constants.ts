@@ -1,9 +1,12 @@
+// 常用字符串
 export const APP_NAME = "DIBIM";
 
 export const STR_EMPTY = "";
 export const STR_ADD = "add";
 export const STR_EDIT = "edit";
+export const STR_DELETE = "delete";
 
+// 样式
 export const HEDAER_H = 12; // header 的 h- 属性值, 对应 tailwindcss 的
 
 // 次级侧边栏

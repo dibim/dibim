@@ -1,5 +1,6 @@
 import { invoker } from "@/invoke";
-import { DbConnectionParam, DbCountRes, GetTableDataParam } from "../types";
+import { CommonSQLValue, DbConnectionParam, DbCountRes, GetTableDataParam } from "../types";
+import { formatSQLValueCommon } from "../utils";
 import {
   CheckConstraintsRes,
   CommentRes,
@@ -10,7 +11,25 @@ import {
   UniqueKeysResRes,
 } from "./types";
 
-const testConnName = "testPg";
+// PostgreSQL 特有类型处理
+export function formatSQLValue(value: unknown): string {
+  // 先尝试通用处理
+  try {
+    return formatSQLValueCommon(value as CommonSQLValue);
+  } catch {
+    // 处理PostgreSQL特有类型
+    if (value instanceof Uint8Array) {
+      return `'\\x${Buffer.from(value).toString("hex")}'`;
+    }
+
+    if (typeof value === "object" && value !== null) {
+      // JSON类型
+      return `'${JSON.stringify(value)}'::jsonb`;
+    }
+
+    throw new Error(`Unsupported PostgreSQL type: ${typeof value}`);
+  }
+}
 
 /**
  * 连接到 postgre_sql
@@ -19,16 +38,16 @@ const testConnName = "testPg";
  *
  *
  */
-export async function connectPg(p: DbConnectionParam) {
+export async function connectPg(connName: string, p: DbConnectionParam) {
   return await invoker.connectSql(
-    testConnName,
+    connName,
     // `host=${p.host} port=${p.port} user=${p.user} password=${p.password} dbname=${p.dbname}`,
     `postgres://${p.user}:${p.password}@${p.host}:${p.port}/${p.dbName}`,
   );
 }
 
 // 获取所有表格名
-export async function getAllTableNamePg() {
+export async function getAllTableNamePg(connName: string) {
   const sql = `
     SELECT 
         tablename 
@@ -38,7 +57,7 @@ export async function getAllTableNamePg() {
         schemaname NOT IN ('pg_catalog', 'information_schema')
     ;`;
 
-  const dbRes = await invoker.querySql(testConnName, sql);
+  const dbRes = await invoker.querySql(connName, sql);
 
   // 把表名整理成一维数组
   const dataArr = dbRes.data ? (JSON.parse(dbRes.data) as { tablename: string }[]) : [];
@@ -54,7 +73,7 @@ type getAllTableSizeRes = {
   table_name: string;
   total_size: string;
 };
-export async function getAllTableSizePg() {
+export async function getAllTableSizePg(connName: string) {
   const sql = `
     SELECT
         schemaname AS schema_name,
@@ -71,7 +90,7 @@ export async function getAllTableSizePg() {
         pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)) DESC;
     `;
 
-  const dbRes = await invoker.querySql(testConnName, sql);
+  const dbRes = await invoker.querySql(connName, sql);
 
   return {
     columnName: dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : [],
@@ -80,7 +99,7 @@ export async function getAllTableSizePg() {
 }
 
 // 获取表结构
-export async function getTableStructurePg(tbName: string) {
+export async function getTableStructurePg(connName: string, tbName: string) {
   // 基础列信息
   const sql = `
     SELECT *
@@ -88,11 +107,11 @@ export async function getTableStructurePg(tbName: string) {
     WHERE table_name = '${tbName}';
     ;`;
 
-  const dbRes = await invoker.querySql(testConnName, sql);
+  const dbRes = await invoker.querySql(connName, sql);
 
   // 主键信息
   const primaryKeysRes = await invoker.querySql(
-    testConnName,
+    connName,
     `
     SELECT column_name 
     FROM information_schema.key_column_usage
@@ -106,7 +125,7 @@ export async function getTableStructurePg(tbName: string) {
 
   // 外键信息
   const foreignKeysRes = await invoker.querySql(
-    testConnName,
+    connName,
     `
     SELECT 
       conname AS constraint_name,
@@ -122,7 +141,7 @@ export async function getTableStructurePg(tbName: string) {
 
   // 唯一约束
   const UniqueKeysRes = await invoker.querySql(
-    testConnName,
+    connName,
     `
     SELECT 
       kcu.column_name,
@@ -139,7 +158,7 @@ export async function getTableStructurePg(tbName: string) {
 
   //  检查约束
   const constraintsRes = await invoker.querySql(
-    testConnName,
+    connName,
     `
     SELECT 
       conname AS constraint_name,
@@ -154,7 +173,7 @@ export async function getTableStructurePg(tbName: string) {
 
   // 备注
   const commentRes = await invoker.querySql(
-    testConnName,
+    connName,
     `
     SELECT 
       cols.column_name,
@@ -200,9 +219,9 @@ export async function getTableStructurePg(tbName: string) {
 
 // 获取表格的 DDL
 // FIXME: 实现比较复杂, 推迟
-export async function getTableDdlPg(tbName: string) {
+export async function getTableDdlPg(connName: string, tbName: string) {
   const sql = `SELECT pg_get_tabledef('${tbName}');`;
-  const dbRes = await invoker.querySql(testConnName, sql);
+  const dbRes = await invoker.querySql(connName, sql);
 
   console.log(" getTableDdlPg::::dbRes  ", dbRes);
 
@@ -213,8 +232,8 @@ export async function getTableDdlPg(tbName: string) {
 }
 
 // 获取表格数据
-export async function getTableDataPg(p: GetTableDataParam) {
-  const dbResTotal = await invoker.querySql(testConnName, `SELECT COUNT(*) AS total FROM "${p.tableName}";`);
+export async function getTableDataPg(connName: string, p: GetTableDataParam) {
+  const dbResTotal = await invoker.querySql(connName, `SELECT COUNT(*) AS total FROM "${p.tableName}";`);
   console.log("getTableDataPg dbResTotal>>>>   ", dbResTotal);
 
   let itemsTotal = 0; // 总条数
@@ -254,7 +273,7 @@ export async function getTableDataPg(p: GetTableDataParam) {
       ${p.pageSize}
     ;`;
 
-  const dbRes = await invoker.querySql(testConnName, sqlHasPkey);
+  const dbRes = await invoker.querySql(connName, sqlHasPkey);
 
   return {
     itemsTotal,
@@ -322,8 +341,24 @@ export function getDefultOrderField(tsa: TableStructurePostgresql[]) {
 }
 
 // 执行语句
-export async function execPg(sql: string) {
-  return await invoker.execSql(testConnName, sql);
+export async function execPg(connName: string, sql: string) {
+  return await invoker.execSql(connName, sql);
+}
+
+// 执行事务语句
+export async function execTransactionPg(connName: string, sqls: string[]) {
+  const transactionSQL = `
+    BEGIN;
+      ${sqls.join(";\n")};
+    COMMIT;
+  `;
+
+  try {
+    return await invoker.execSql(connName, transactionSQL);
+  } catch (err) {
+    await invoker.execSql(connName, "ROLLBACK;").catch(() => {});
+    throw err;
+  }
 }
 
 // 生成重命名表格的语句
@@ -360,6 +395,9 @@ export function genCreateTableCmdPg(tbName: string) {
         id SERIAL PRIMARY KEY,          -- PostgreSQL 自增主键
         id INT AUTO_INCREMENT PRIMARY KEY,  -- MySQL 自增主键
         id INTEGER PRIMARY KEY AUTOINCREMENT,  -- SQLite 自增主键
+
+        name VARCHAR(100) NOT NULL DEFAULT '',
+        price NUMERIC(10,2) NOT NULL DEFAULT 0.00,
 
         code VARCHAR(50) UNIQUE,      -- 唯一约束
         

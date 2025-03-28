@@ -24,6 +24,10 @@ export interface CoreStoreState {
   currentDbType: DbType;
   setCurrentDbType: (val: DbType) => void;
 
+  // 当前连接名
+  currentConnName: string;
+  setCurrentConnName: (val: string) => void;
+
   // 当前数据库名
   currentDbNme: string;
   setCurrentDbName: (val: string) => void;
@@ -93,6 +97,9 @@ export const useCoreStore = create<CoreStoreState>()(
       currentDbType: DB_TYPE_POSTGRESQL,
       setCurrentDbType: (val: DbType) => set({ currentDbType: val }),
 
+      currentConnName: "",
+      setCurrentConnName: (val: string) => set({ currentConnName: val }),
+
       currentDbNme: "",
       setCurrentDbName: (val: string) => set({ currentDbNme: val }),
 
@@ -122,6 +129,7 @@ export const useCoreStore = create<CoreStoreState>()(
           config: emptyConfigFile,
           mainPasswordSha: defaultMainPasswordSha,
           currentDbType: DB_TYPE_POSTGRESQL,
+          currentConnName: "",
           currentDbNme: "",
           currentTableName: "",
           currentTableStructure: [],
@@ -136,3 +144,6 @@ export const useCoreStore = create<CoreStoreState>()(
     },
   ),
 );
+
+// 直接导出store的纯函数版本（无hook）, 便于在工具函数里调用
+export const coreStore = useCoreStore;

@@ -117,14 +117,14 @@ export function TableEditorStructure(props: MainContentStructure) {
     if (fieldName !== "") {
       setOperateFieldName(fieldName);
       setShowDialogDelete(true);
-      setWillExecCmd(genDeleteFieldCmd(currentDbType, currentTableName, fieldName) || "");
+      setWillExecCmd(genDeleteFieldCmd( currentTableName, fieldName) || "");
     } else {
       // TODO: 报错
     }
   }
   // 执行删除字段
   function handleDelete() {
-    exec(currentDbType, willExecCmd);
+    exec( willExecCmd);
   }
 
   // 提交变更
