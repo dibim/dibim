@@ -2,6 +2,7 @@
  * 点击表格显示数据
  */
 import { useEffect, useState } from "react";
+import { STR_EMPTY } from "@/constants";
 import { getTableStructure } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
 import { Card, CardContent } from "../ui/card";
@@ -18,12 +19,21 @@ const TAB_DATA = "TAB_DATA";
 const TAB_PARTITION = "TAB_PARTITION";
 const TAB_FOREIGN_KEY = "TAB_FOREIGN_KEY";
 
+type MainContentTab =
+  | typeof STR_EMPTY
+  | typeof TAB_DATA
+  | typeof TAB_STRUCTURE
+  | typeof TAB_DDL
+  | typeof TAB_CONSTRAINT
+  | typeof TAB_FOREIGN_KEY
+  | typeof TAB_PARTITION;
+
 export function TableEditor() {
   const { currentTableName, setCurrentTableStructure } = useCoreStore();
 
   // tabName 先使用空的, 避免表结构没获取到就查询表数据出问题
   // 注意: 使用 value 控制 Tabs 组件的显示, TabsTrigger 要添加 onClick 修改 tabName
-  const [tabName, setTabName] = useState<string>("");
+  const [tabName, setTabName] = useState<MainContentTab>("");
 
   // 获取表结构, 会在多个地方用, 在这里记录到 store
   const getStructure = async () => {
@@ -35,7 +45,7 @@ export function TableEditor() {
 
     if (res && res.data) {
       setCurrentTableStructure(res.data);
-      setTabName(TAB_DATA);
+      if (tabName === STR_EMPTY) setTabName(TAB_DATA);
     }
   };
 
