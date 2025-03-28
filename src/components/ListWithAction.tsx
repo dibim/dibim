@@ -70,7 +70,7 @@ export function ListWithAction({
             <DropdownMenuContent align={menuAlign}>
               {item.menuItems.map((menuItem, index) => {
                 return menuItem.isLine ? (
-                  <hr className="my-2" />
+                  <hr className="my-2" key={index} />
                 ) : (
                   <DropdownMenuItem
                     key={index}
@@ -106,7 +106,7 @@ export function ListWithAction({
             <ContextMenuContent>
               {item.menuItems.map((menuItem, index) => {
                 return menuItem.isLine ? (
-                  <hr className="my-2" />
+                  <hr className="my-2" key={index} />
                 ) : (
                   <ContextMenuItem
                     className={menuItem.className || ""}

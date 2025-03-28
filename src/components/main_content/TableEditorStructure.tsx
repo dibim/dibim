@@ -10,7 +10,7 @@ import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "@/databases/constants";
 import { ColumnAlterAction, TableStructure } from "@/databases/types";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
-import { MainContentStructure } from "@/types/types";
+import { MainContentStructure, UniqueConstraint } from "@/types/types";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { LabeledDiv } from "../LabeledDiv";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
@@ -22,15 +22,12 @@ import { Input } from "../ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
-type IndexType = typeof STR_EMPTY | typeof INDEX_PRIMARY_KEY | typeof INDEX_UNIQUE;
 type DialogAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
 
 export function TableEditorStructure(props: MainContentStructure) {
-  const { currentDbType, currentTableStructure, currentTableName } = useCoreStore();
+  const { currentTableStructure, currentTableName } = useCoreStore();
 
   const [alterData, setAlterData] = useState<ColumnAlterAction[]>([]); // 表结构的修改数据
-  // TODO: 实现 src/databases/PostgreSQL/alter.ts 里的功能
-
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set()); // 选中的行
   const [operateRowIndex, setOperateRowIndex] = useState<number>(0); // 现在操作的行的索引
   const [operateFieldName, setOperateFieldName] = useState<string>(""); // 现在操作的行的索引
@@ -49,11 +46,24 @@ export function TableEditorStructure(props: MainContentStructure) {
   const [fieldSize, setFieldSize] = useState<string>(""); // 字段大小
   const [fieldDefalut, setFieldDefault] = useState<string>(""); // 字段默认值
   const [fieldNotNull, setFieldNotNull] = useState<boolean>(false); // 字段非空
-  const [fieldIndexType, setFieldIndexType] = useState<IndexType>(""); // 字段索引类型
+  const [fieldIndexType, setFieldIndexType] = useState<UniqueConstraint>(""); // 字段索引类型
   const [fieldIndexPkAutoIncrement, setFieldIndexPkAutoIncrement] = useState<boolean>(false); // 字段主键自增
   const [fieldIndexName, setFieldIndexName] = useState<string>(""); // 字段索引名
   const [fieldComment, setFieldComment] = useState<string>(""); // 字段备注
   const [tableComment, setTableComment] = useState<string>(""); // 表备注
+
+  function resetDialogData(caa: ColumnAlterAction | null) {
+    setFieldName(caa ? caa.fieldName : "");
+    setFieldType(caa ? caa.fieldType : "");
+    setFieldSize(caa ? caa.fieldSize : "");
+    setFieldDefault(caa && caa.fieldDefalut ? caa.fieldDefalut : "");
+    setFieldNotNull(caa ? caa.fieldNotNull : false);
+    setFieldIndexType(caa ? caa.fieldIndexType : "");
+    setFieldIndexPkAutoIncrement(caa ? caa.fieldIndexPkAutoIncrement : false);
+    setFieldIndexName(caa ? caa.fieldIndexName : "");
+    setFieldComment(caa ? caa.fieldComment : "");
+    setTableComment(caa ? caa.tableComment : "");
+  }
 
   // 选中行, 删除的时候使用
   const handleSelectRow = (id: number) => {
@@ -68,6 +78,7 @@ export function TableEditorStructure(props: MainContentStructure) {
 
   // 添加列
   function handleAddField() {
+    resetDialogData(null);
     setShowDialogEdit(true);
     setDialogAction(STR_ADD);
   }
@@ -89,17 +100,43 @@ export function TableEditorStructure(props: MainContentStructure) {
 
   // 弹出确认编辑列
   function handleEditColPopup(index: number) {
-    const ad = alterData[index];
-    setFieldNameEditing(ad.fieldName);
+    const field = currentTableStructure[index];
+
+    let fieldIndexType: UniqueConstraint = "";
+    let fieldIndexName = "";
+    if (field.indexes) {
+      for (const idx of field.indexes) {
+        if (idx.isPrimary) {
+          fieldIndexType = INDEX_PRIMARY_KEY;
+          fieldIndexName = idx.name;
+        }
+
+        if (idx.isUnique) {
+          fieldIndexType = INDEX_UNIQUE;
+          fieldIndexName = idx.name;
+        }
+      }
+    }
+
+    resetDialogData({
+      action: STR_EDIT,
+      tableName: currentTableName,
+      tableComment: "", // TODO:
+      fieldName: field.column_name,
+      fieldNameExt: "",
+      fieldType: field.data_type,
+      fieldSize: `${field.size}`,
+      fieldDefalut: field.column_default,
+      fieldNotNull: field.is_not_null,
+      fieldIndexType: fieldIndexType,
+      fieldIndexPkAutoIncrement: false,
+      fieldIndexName: fieldIndexName,
+      fieldComment: field.comment,
+    });
+    setFieldNameEditing(field.column_name);
     setOperateRowIndex(index);
     setShowDialogEdit(true);
     setDialogAction(STR_EDIT);
-  }
-  function handleEditCol(index: number) {
-    console.log("editCol");
-
-    setOperateRowIndex(index);
-    setDialogAction(STR_EMPTY);
   }
 
   // 复制字段名
@@ -139,7 +176,7 @@ export function TableEditorStructure(props: MainContentStructure) {
   function handleConfirm() {
     console.log(`执行语句:  ${willExecCmd}`);
 
-    // FIXME: 接触注释
+    // FIXME: 解除注释
     // exec(willExecCmd);
     // props.getData();
   }
@@ -158,11 +195,12 @@ export function TableEditorStructure(props: MainContentStructure) {
       }
     }
 
-    console.log("dialogAction:: ", dialogAction);
-
     const actionData: ColumnAlterAction = {
-      tableName: currentTableName,
       action: dialogAction,
+
+      tableName: currentTableName,
+      tableComment,
+
       // 如果是编辑, 要记录编辑之前的列名, 重命名的时候会用到
       // 如果是添加, 直接使用输入框里的字段名
       fieldName: dialogAction === STR_EDIT ? fieldNameEditing : fieldName,
@@ -175,7 +213,6 @@ export function TableEditorStructure(props: MainContentStructure) {
       fieldIndexPkAutoIncrement,
       fieldIndexName,
       fieldComment,
-      tableComment,
     };
 
     if (actionDataFindedIndex > -1) {
@@ -186,7 +223,7 @@ export function TableEditorStructure(props: MainContentStructure) {
 
     setAlterData(alterData);
 
-    // TODO: 生成语句, 弹窗确认
+    // TODO: 生成语句, 弹窗确认.  应该在点击应用的时候才进行下面的
     setWillExecCmd(genAlterCmd(alterData));
     setShowDialogAlter(true);
   }

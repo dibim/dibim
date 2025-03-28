@@ -1,21 +1,42 @@
 import { invoker } from "@/invoke";
-import { CommonSQLValue, DbConnectionParam, DbCountRes, GetTableDataParam, TableStructure } from "../types";
+import {
+  ColumnIndex,
+  CommonSQLValue,
+  DbConnectionParam,
+  DbCountRes,
+  GetTableDataParam,
+  IndexQueryResult,
+  TableStructure,
+} from "../types";
 import { formatToSqlValueCommon } from "../utils";
 import "./types";
+import { PGValue } from "./types";
 
-// PostgreSQL 特有类型
-export type PGValue =
-  | CommonSQLValue // 继承通用类型
-  | Uint8Array // PostgreSQL 的 bytea 类型
-  | Record<string, any> // JSON/JSONB 类型
-  | any[] // 数组类型（PostgreSQL 有更丰富的数组支持）
-  | RegExp // 可以转换为 TEXT 或 JSON
-  | Map<any, any> // 可以转换为 JSON
-  | Set<any>; // 可以转换为 JSON 数组
+/**
+ * 判断是否是PostgreSQL函数调用的形式
+ * 函数名：PostgreSQL 必须 带括号（如 now() 合法，但 now 不合法）
+ * 字符串引号：PostgreSQL 支持单引号 'str'（字符串值）和双引号 "str"（标识符引用）
+ * 特殊函数：PostgreSQL 包含特有函数（如 jsonb_set()、regexp_match()）
+ * @param str
+ * @returns
+ */
+export function isPostgresFunctionCall(str: string): boolean {
+  return /^[a-z_][a-z0-9_]*\(.*\)$/i.test(str);
+}
 
-// 格式化 PostgreSQL 的数据类型
-export function formatToSqlValuePg(value: PGValue): string {
-  // 首先尝试通用格式化
+/**
+ * 格式化 PostgreSQL 的数据类型
+ * @param value
+ * @param allowFuncAcll 是否允许函数调用的形式
+ * @returns
+ */
+export function formatToSqlValuePg(value: PGValue, allowFuncAcll?: boolean): string {
+  // 首先检查是否是调用 PostgreSQL 函数
+  if (allowFuncAcll && typeof value === "string" && isPostgresFunctionCall(value)) {
+    return value;
+  }
+
+  // 尝试通用格式化
   try {
     return formatToSqlValueCommon(value as CommonSQLValue);
   } catch (e) {
@@ -133,14 +154,19 @@ export async function getAllTableSizePg(connName: string) {
   };
 }
 
-
 // 获取表结构
 export async function getTableStructurePg(connName: string, tbName: string) {
   // 基础列信息
-  const sql = `
+  const columnSql = `
     SELECT
         a.attname AS column_name,
         t.typname AS data_type,
+        CASE 
+            WHEN t.typname = 'varchar' THEN a.atttypmod - 4
+            WHEN t.typname = 'char' THEN a.atttypmod - 4
+            WHEN t.typname = 'numeric' THEN ((a.atttypmod - 4) >> 16) & 65535
+            ELSE NULL
+        END AS size,
         EXISTS(
             SELECT 1 FROM pg_constraint 
             WHERE conrelid = a.attrelid 
@@ -165,7 +191,7 @@ export async function getTableStructurePg(connName: string, tbName: string) {
     FROM
         pg_attribute a
     JOIN
-        pg_type t ON a.atttypid = t.oid  -- 关联类型表获取基础类型名称
+        pg_type t ON a.atttypid = t.oid
     LEFT JOIN
         pg_attrdef ad ON (a.attrelid = ad.adrelid AND a.attnum = ad.adnum)
     LEFT JOIN
@@ -176,20 +202,75 @@ export async function getTableStructurePg(connName: string, tbName: string) {
         pg_namespace n ON c.relnamespace = n.oid
     WHERE
         c.relname = '${tbName}'
-        AND n.nspname = 'public'       -- 假设表在public模式
+        AND n.nspname = 'public' -- TODO: 假设表在 public模式
         AND a.attnum > 0
         AND NOT a.attisdropped
     ORDER BY
         a.attnum;
-    ;`;
+    `;
 
-  const dbRes = await invoker.querySql(connName, sql);
+  // 索引信息查询
+  const indexSql = `
+    SELECT
+        i.relname AS index_name,
+        a.attname AS column_name,
+        am.amname AS index_type,
+        idx.indisunique AS is_unique,
+        idx.indisprimary AS is_primary
+    FROM
+        pg_index idx
+    JOIN
+        pg_class i ON i.oid = idx.indexrelid
+    JOIN
+        pg_class t ON t.oid = idx.indrelid
+    JOIN
+        pg_namespace n ON n.oid = t.relnamespace
+    JOIN
+        pg_am am ON i.relam = am.oid
+    JOIN
+        pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY(idx.indkey)
+    WHERE
+        t.relname = '${tbName}'
+        AND n.nspname = 'public'
+    ORDER BY
+        i.relname, array_position(idx.indkey, a.attnum);
+    `;
 
-  const colArr = dbRes.data ? (JSON.parse(dbRes.data) as TableStructure[]) : [];
+  // 执行查询
+  const [columnRes, indexRes] = await Promise.all([
+    invoker.querySql(connName, columnSql),
+    invoker.querySql(connName, indexSql),
+  ]);
+
+  // 处理列信息
+  const columns = columnRes.data ? (JSON.parse(columnRes.data) as TableStructure[]) : [];
+  // 处理索引信息
+  const indexes = indexRes.data ? (JSON.parse(indexRes.data) as IndexQueryResult[]) : [];
+
+  // 将索引信息合并到列信息中
+  const columnIndexMap: Record<string, ColumnIndex[]> = {};
+  indexes.forEach((index) => {
+    if (!columnIndexMap[index.column_name]) {
+      columnIndexMap[index.column_name] = [];
+    }
+    columnIndexMap[index.column_name].push({
+      name: index.index_name,
+      type: index.index_type,
+      isUnique: index.is_unique,
+      isPrimary: index.is_primary,
+    });
+  });
+
+  // 合并结果
+  const result = columns.map((column) => ({
+    ...column,
+    size: column.size ? column.size : 0,
+    indexes: columnIndexMap[column.column_name] || [],
+  }));
 
   return {
-    columnName: dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : [],
-    data: colArr,
+    columnName: columnRes.columnName ? (JSON.parse(columnRes.columnName) as string[]) : [],
+    data: result,
   };
 }
 
