@@ -6,7 +6,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "./ui/alert-dialog";
+} from "./ui/x_alert-dialog";
 
 export type ConfirmDialogProp = {
   open: boolean;

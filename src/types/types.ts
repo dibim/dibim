@@ -36,7 +36,7 @@ export type ExecResult = {
 
 // 表结构
 export type MainContentStructure = {
-  getStructure: () => void;
+  getData: () => void;
 };
 
 // 数据库类型
