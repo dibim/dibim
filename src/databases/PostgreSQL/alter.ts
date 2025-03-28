@@ -8,7 +8,7 @@ import { formatToSqlValuePg } from "./utils";
 
 // 编辑字段
 export const genAlterFieldEdit = (ca: ColumnAlterAction) => {
-  let res: string[] = [];
+  let res: string[] = [`\n-- 将要对字段${ca.fieldName}执行以下语句:\n`];
 
   // 修改数据类型
   if (ca.fieldType !== "") {
@@ -141,28 +141,30 @@ export const genAlterFieldEdit = (ca: ColumnAlterAction) => {
 
   // 设置字段默认值
   if (ca.fieldDefalut !== null) {
-    res.push(`ALTER TABLE "${ca.tableName}" ALTER COLUMN "${ca.fieldNameExt}" SET DEFAULT '${ca.fieldDefalut}';`);
+    const fv = formatToSqlValuePg(ca.fieldDefalut, true);
+    res.push(`ALTER TABLE "${ca.tableName}" ALTER COLUMN "${ca.fieldNameExt}" SET DEFAULT ${fv};`);
   } else {
     res.push(`ALTER TABLE "${ca.tableName}" ALTER COLUMN "${ca.fieldNameExt}" DROP DEFAULT;`);
   }
 
   // 修改列备注
   if (ca.fieldDefalut) {
-    res.push(`COMMENT ON COLUMN "${ca.tableName}"."${ca.fieldNameExt}" IS '${ca.fieldComment}';`);
+    const fv = formatToSqlValuePg(ca.fieldComment, true);
+    res.push(`COMMENT ON COLUMN "${ca.tableName}"."${ca.fieldNameExt}" IS ${fv};`);
   } else {
     res.push(`COMMENT ON COLUMN "${ca.tableName}"."${ca.fieldNameExt}" IS NULL;`);
   }
 
   // 修改表备注
   if (ca.fieldDefalut) {
-    res.push(`COMMENT ON TABLE "${ca.tableName}" IS '${ca.tableComment}';`);
+    const fv = formatToSqlValuePg(ca.fieldComment, true);
+    res.push(`COMMENT ON TABLE "${ca.tableName}" IS ${fv};`);
   } else {
     res.push(`COMMENT ON TABLE "${ca.tableName}" IS NULL`);
   }
 
   // 修改列名要放在最后处理, 避免其它修改找不到表名
-
-  if (ca.fieldNameExt) {
+  if (ca.fieldName !== ca.fieldNameExt) {
     res.push(`ALTER TABLE "${ca.tableName}" RENAME COLUMN "${ca.fieldName}" TO "${ca.fieldNameExt}";`);
   }
 
@@ -180,7 +182,7 @@ export const genAlterFieldAdd = (ca: ColumnAlterAction) => {
   // 多维数组: 使用 ARRAY[[1,2],[3,4]]
   // 几何类型 / 网络地址类型: 需用类型构造函数
   // 复合类型: 使用 ROW() 构造函数
-  const defaultValue = ca.fieldDefalut ? "DEFAULT " + formatToSqlValuePg(ca.fieldDefalut) + " " : "";
+  const defaultValue = ca.fieldDefalut ? "DEFAULT " + formatToSqlValuePg(ca.fieldDefalut, true) + " " : "";
   const genIndx = () => {
     if (ca.fieldIndexType === INDEX_PRIMARY_KEY) {
       return `,\n  ADD CONSTRAINT "${ca.fieldIndexName}" PRIMARY KEY  ("${ca.fieldName}")`;

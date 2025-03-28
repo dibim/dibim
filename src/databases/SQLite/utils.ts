@@ -4,6 +4,18 @@ import { invoker } from "./invoke";
 
 const testConnName = "testPg";
 
+/**
+ * 判断是否是函数调用的形式
+ * 函数名：SQLite 必须 带括号（如 date() 合法，但 date 不合法）
+ * 字符串引号：SQLite 支持单引号 'str' 和双引号 "str"（双引号通常用于列名）
+ * 特殊函数：SQLite 有一些独特函数（如 json_extract()、regexp()）
+ * @param str
+ * @returns
+ */
+export function isSQLiteFunctionCall(str: string): boolean {
+  return /^[a-z_][a-z0-9_]*\s*\(.*\)$/i.test(str);
+}
+
 // SQLite 特有类型处理
 export function formatSQLiteValue(value: unknown): string {
   try {

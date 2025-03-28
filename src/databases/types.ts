@@ -1,4 +1,5 @@
 import { STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY } from "@/constants";
+import { UniqueConstraint } from "@/types/types";
 import {
   FIELD,
   FIELD_COMMENT,
@@ -71,17 +72,36 @@ export type CommonSQLValue =
   | Array<CommonSQLValue>; // 数组类型（部分数据库支持）
 
 // 表结构列表的数据
+// 这是从数据库查询的结果, 注意命名方式
 export type TableStructure = {
   has_check_conditions: any;
   column_name: string;
   data_type: string;
   column_default: string;
   comment: string;
+  size: number;
   is_primary_key: boolean;
   is_unique_key: boolean;
   is_foreign_key: boolean;
   is_not_null: boolean;
+  indexes?: ColumnIndex[];
 };
+
+// 字段的索引信息
+export interface ColumnIndex {
+  name: string; // 索引名称
+  type: string; // 索引类型 (如 btree, hash 等)
+  isUnique: boolean; // 是否唯一索引
+  isPrimary: boolean; // 是否主键索引
+}
+
+export interface IndexQueryResult {
+  index_name: string;
+  column_name: string;
+  index_type: string;
+  is_unique: boolean;
+  is_primary: boolean;
+}
 
 // 变更表更表结构的动作类性
 export type AlterAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
@@ -98,19 +118,19 @@ export type AlterActionTarget =
 
 // 列的修改数据
 export type ColumnAlterAction = {
-  tableName: string;
   action: AlterAction;
+
+  tableName: string;
+  tableComment: string; // 表备注
 
   fieldName: string;
   fieldNameExt: string; // 改名时作为新字段名, 设置索引时作为作音的列名 TODO: 后续要支持复合索引
   fieldType: string; // 字段类型
   fieldSize: string; // 字段大小
-  fieldDefalut: string | number | null; // 字段默认值
+  fieldDefalut: string | null; // 字段默认值
   fieldNotNull: boolean; // 字段非空
-  fieldIndexType: string; // 字段索引类型
+  fieldIndexType: UniqueConstraint; // 字段索引类型
   fieldIndexPkAutoIncrement: boolean; // 字段主键自增
   fieldIndexName: string; // 字段索引名
   fieldComment: string; // 字段备注
-
-  tableComment: string; // 表备注
 };
