@@ -1,9 +1,30 @@
+import { CommonSQLValue } from "../types";
+import { formatSQLValueCommon } from "../utils";
 import { invoker } from "./invoke";
 
 const testConnName = "testPg";
 
+// MySQL 特有类型处理
+export function formatMySQLValue(value: unknown): string {
+  try {
+    return formatSQLValueCommon(value as CommonSQLValue);
+  } catch {
+    // 处理MySQL特有类型
+    if (value instanceof Uint8Array) {
+      return `0x${Buffer.from(value).toString("hex")}`;
+    }
+
+    if (typeof value === "object" && value !== null) {
+      // JSON类型
+      return `CAST('${JSON.stringify(value)}' AS JSON)`;
+    }
+
+    throw new Error(`Unsupported MySQL type: ${typeof value}`);
+  }
+}
+
 // 获取表结构
-export async function getTableStructurePg(tbName: string) {
+export async function getTableStructureMysql(tbName: string) {
   const sql = `
     SELECT *
     FROM information_schema.columns

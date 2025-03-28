@@ -8,12 +8,12 @@ import { getTableDdl } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
 
 export function TableEditorDdl() {
-  const { currentDbType, currentTableName } = useCoreStore();
+  const { currentTableName } = useCoreStore();
 
   const [tableData, setTableData] = useState<any[]>([]); // 表结构
 
   const getData = async () => {
-    const res = await getTableDdl(currentDbType, currentTableName);
+    const res = await getTableDdl(currentTableName);
     if (res && res.data) {
       setTableData(res.data);
     }

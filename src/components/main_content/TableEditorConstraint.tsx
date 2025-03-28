@@ -6,10 +6,10 @@ import { getTableStructure } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
 
 export function TableEditorConstraint() {
-  const { currentDbType, currentTableName } = useCoreStore();
+  const { currentTableName } = useCoreStore();
 
   const getData = async () => {
-    await getTableStructure(currentDbType, currentTableName);
+    await getTableStructure(currentTableName);
   };
 
   useEffect(() => {
