@@ -1,5 +1,4 @@
 import { STR_ADD, STR_DELETE, STR_EDIT } from "@/constants";
-import { TableStructurePostgresql } from "./PostgreSQL/types";
 import {
   FIELD,
   FIELD_COMMENT,
@@ -71,8 +70,18 @@ export type CommonSQLValue =
   | ArrayBuffer // 二进制数据通用表示
   | Array<CommonSQLValue>; // 数组类型（部分数据库支持）
 
-// 表结构
-export type TableStructure = TableStructurePostgresql;
+// 表结构列表的数据
+export type TableStructure = {
+  has_check_conditions: any;
+  column_name: string;
+  data_type: string;
+  column_default: string;
+  comment: string;
+  is_primary_key: boolean;
+  is_unique_key: boolean;
+  is_foreign_key: boolean;
+  is_not_null: boolean;
+};
 
 // 变更表更表结构的动作类性
 export type AlterAction = typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
