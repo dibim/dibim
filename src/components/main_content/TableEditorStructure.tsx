@@ -3,17 +3,8 @@
  */
 import { useState } from "react";
 import { AlertCircle, CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
-import {
-  DB_TYPE_MYSQL,
-  DB_TYPE_POSTGRESQL,
-  DB_TYPE_SQLITE,
-  DIR_H,
-  HEDAER_H,
-  STR_ADD,
-  STR_DELETE,
-  STR_EDIT,
-  STR_EMPTY,
-} from "@/constants";
+import { toast } from "sonner";
+import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY } from "@/constants";
 import { exec, genDeleteFieldCmd } from "@/databases/adapter,";
 import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "@/databases/constants";
 import { ColumnAlterAction, TableStructure } from "@/databases/types";
@@ -174,6 +165,28 @@ export function TableEditorStructure(props: MainContentStructure) {
     setDialogAction(STR_EMPTY);
   }
 
+  // 复制字段名
+  async function handleCopyFieldName(index: number) {
+    const field = currentTableStructure[index];
+    try {
+      await navigator.clipboard.writeText(field.column_name);
+      toast("复制成功");
+    } catch (err) {
+      toast("复制失败");
+    }
+  }
+
+  // 复制字段类型
+  async function handleCopyFieldType(index: number) {
+    const field = currentTableStructure[index];
+    try {
+      await navigator.clipboard.writeText(field.data_type);
+      toast("复制成功");
+    } catch (err) {
+      toast("复制失败");
+    }
+  }
+
   // 弹出确认删除1列
   function handleDeleteColPopup(index: number) {
     const fieldName = findFieldName(index);
@@ -207,18 +220,9 @@ export function TableEditorStructure(props: MainContentStructure) {
    * @returns
    */
   const findFieldName = (index: number) => {
-    if (currentDbType === DB_TYPE_MYSQL) {
-      // TODO: 实现逻辑
-    }
-
-    if (currentDbType === DB_TYPE_POSTGRESQL) {
-      const tableDataPg = currentTableStructure as unknown as TableStructure[];
-
-      console.log("tableDataPg.length:: ", tableDataPg.length);
-
-      if (index <= tableDataPg.length) {
-        return tableDataPg[index].column_name;
-      }
+    const tableDataPg = currentTableStructure as unknown as TableStructure[];
+    if (index <= tableDataPg.length) {
+      return tableDataPg[index].column_name;
     }
 
     return "";
@@ -236,6 +240,9 @@ export function TableEditorStructure(props: MainContentStructure) {
         <ContextMenuTrigger asChild>{node}</ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuItem onClick={() => handleEditColPopup(index)}>编辑</ContextMenuItem>
+          <ContextMenuItem onClick={() => handleCopyFieldName(index)}>复制字段名</ContextMenuItem>
+          <ContextMenuItem onClick={() => handleCopyFieldType(index)}>复制类型</ContextMenuItem>
+          <hr className="my-2" />
           <ContextMenuItem onClick={() => handleDeleteColPopup(index)} className={`text-[var(--fvm-danger-clr)]`}>
             删除
           </ContextMenuItem>
@@ -245,61 +252,49 @@ export function TableEditorStructure(props: MainContentStructure) {
   };
 
   const renderBody = () => {
-    if (currentDbType === DB_TYPE_MYSQL) {
-      // TODO: 实现逻辑
-    }
-
-    if (currentDbType === DB_TYPE_POSTGRESQL) {
-      const tableDataPg = currentTableStructure as unknown as TableStructure[];
-      return tableDataPg.map((row, index) =>
-        renderContextMenu(
-          index,
-          <TableRow className={`${selectedRows.has(index) ? "text-[var(--fvm-primary-clr)] font-bold" : ""}`}>
-            <TableCell
-              className="cursor-grab"
-              onClick={() => {
-                handleSelectRow(index);
-              }}
-            >
-              <div>{index + 1}</div>
-            </TableCell>
-            <TableCell>
-              <div>{row.column_name}</div>
-            </TableCell>
-            <TableCell>
-              <div>{row.data_type}</div>
-            </TableCell>
-            <TableCell>
-              <div>{row.is_primary_key ? "✅" : ""}</div>
-            </TableCell>
-            <TableCell>
-              <div>{row.is_foreign_key ? "✅" : ""}</div>
-            </TableCell>
-            <TableCell>
-              <div>{row.is_unique_key ? "✅" : ""}</div>
-            </TableCell>
-            <TableCell>
-              <div>{row.has_check_conditions ? "✅" : ""}</div>
-            </TableCell>
-            <TableCell>
-              <div>{row.is_not_null ? "✅" : ""}</div>
-            </TableCell>
-            <TableCell>
-              <div>{row.column_default}</div>
-            </TableCell>
-            <TableCell>
-              <div className="w-full">{row.comment}</div>
-            </TableCell>
-          </TableRow>,
-        ),
-      );
-    }
-
-    if (currentDbType === DB_TYPE_SQLITE) {
-      // TODO: 实现逻辑
-    }
-
-    return <></>;
+    const tableDataPg = currentTableStructure as unknown as TableStructure[];
+    return tableDataPg.map((row, index) =>
+      renderContextMenu(
+        index,
+        <TableRow className={`${selectedRows.has(index) ? "text-[var(--fvm-primary-clr)] font-bold" : ""}`}>
+          <TableCell
+            className="cursor-grab"
+            onClick={() => {
+              handleSelectRow(index);
+            }}
+          >
+            <div>{index + 1}</div>
+          </TableCell>
+          <TableCell>
+            <div>{row.column_name}</div>
+          </TableCell>
+          <TableCell>
+            <div>{row.data_type}</div>
+          </TableCell>
+          <TableCell>
+            <div>{row.is_primary_key ? "✅" : ""}</div>
+          </TableCell>
+          <TableCell>
+            <div>{row.is_foreign_key ? "✅" : ""}</div>
+          </TableCell>
+          <TableCell>
+            <div>{row.is_unique_key ? "✅" : ""}</div>
+          </TableCell>
+          <TableCell>
+            <div>{row.has_check_conditions ? "✅" : ""}</div>
+          </TableCell>
+          <TableCell>
+            <div>{row.is_not_null ? "✅" : ""}</div>
+          </TableCell>
+          <TableCell>
+            <div>{row.column_default}</div>
+          </TableCell>
+          <TableCell>
+            <div className="w-full">{row.comment}</div>
+          </TableCell>
+        </TableRow>,
+      ),
+    );
   };
 
   return (

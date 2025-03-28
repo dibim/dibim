@@ -15,6 +15,7 @@ export interface ListItemItem {
   onClick: (item: ListItem) => void;
   icon?: React.ReactNode;
   disabled?: boolean;
+  isLine?: boolean; // 是分割线
 }
 
 export interface ListItem {
@@ -67,19 +68,23 @@ export function ListWithAction({
             </div>
 
             <DropdownMenuContent align={menuAlign}>
-              {item.menuItems.map((menuItem, index) => (
-                <DropdownMenuItem
-                  key={index}
-                  onClick={() => {
-                    menuItem.onClick(item);
-                  }}
-                  disabled={menuItem.disabled}
-                  className={`flex items-center gap-2 ${menuItemClassName} ${menuItem.className || ""}`}
-                >
-                  {menuItem.icon && <span>{menuItem.icon}</span>}
-                  {menuItem.label}
-                </DropdownMenuItem>
-              ))}
+              {item.menuItems.map((menuItem, index) => {
+                return menuItem.isLine ? (
+                  <hr className="my-2" />
+                ) : (
+                  <DropdownMenuItem
+                    key={index}
+                    onClick={() => {
+                      menuItem.onClick(item);
+                    }}
+                    disabled={menuItem.disabled}
+                    className={`flex items-center gap-2 ${menuItemClassName} ${menuItem.className || ""}`}
+                  >
+                    {menuItem.icon && <span>{menuItem.icon}</span>}
+                    {menuItem.label}
+                  </DropdownMenuItem>
+                );
+              })}
             </DropdownMenuContent>
           </DropdownMenu>
         ))}
@@ -99,18 +104,22 @@ export function ListWithAction({
               </div>
             </ContextMenuTrigger>
             <ContextMenuContent>
-              {item.menuItems.map((menuItem, index) => (
-                <ContextMenuItem
-                  className={menuItem.className || ""}
-                  key={index}
-                  onClick={() => {
-                    menuItem.onClick(item);
-                  }}
-                >
-                  {menuItem.icon && <span>{menuItem.icon}</span>}
-                  {menuItem.label}
-                </ContextMenuItem>
-              ))}
+              {item.menuItems.map((menuItem, index) => {
+                return menuItem.isLine ? (
+                  <hr className="my-2" />
+                ) : (
+                  <ContextMenuItem
+                    className={menuItem.className || ""}
+                    key={index}
+                    onClick={() => {
+                      menuItem.onClick(item);
+                    }}
+                  >
+                    {menuItem.icon && <span>{menuItem.icon}</span>}
+                    {menuItem.label}
+                  </ContextMenuItem>
+                );
+              })}
             </ContextMenuContent>
           </ContextMenu>
         ))}
