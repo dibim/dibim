@@ -200,6 +200,11 @@ export function TableList() {
             },
           },
           {
+            label: "分割线",
+            onClick: () => {},
+            isLine: true,
+          },
+          {
             label: "导入",
             onClick: () => {
               handleImport(item.tableName);
@@ -211,6 +216,11 @@ export function TableList() {
             onClick: () => {
               handleExport(item.tableName);
             },
+          },
+          {
+            label: "分割线",
+            onClick: () => {},
+            isLine: true,
           },
           {
             label: "截断",
