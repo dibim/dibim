@@ -10,13 +10,13 @@ import {
   DIR_H,
   HEDAER_H,
   STR_ADD,
+  STR_DELETE,
   STR_EDIT,
   STR_EMPTY,
 } from "@/constants";
-import { TableStructurePostgresql } from "@/databases/PostgreSQL/types";
 import { exec, genDeleteFieldCmd } from "@/databases/adapter,";
 import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "@/databases/constants";
-import { ColumnAlterAction } from "@/databases/types";
+import { ColumnAlterAction, TableStructure } from "@/databases/types";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
 import { MainContentStructure } from "@/types/types";
@@ -32,7 +32,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 type IndexType = typeof STR_EMPTY | typeof INDEX_PRIMARY_KEY | typeof INDEX_UNIQUE;
-type DialogAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT;
+type DialogAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
 
 export function TableEditorStructure(props: MainContentStructure) {
   const { currentDbType, currentTableStructure, currentTableName } = useCoreStore();
@@ -60,6 +60,72 @@ export function TableEditorStructure(props: MainContentStructure) {
   const [fieldIndexPkAutoIncrement, setFieldIndexPkAutoIncrement] = useState<boolean>(false); // 字段主键自增
   const [fieldIndexName, setFieldIndexName] = useState<string>(""); // 字段索引名
   const [fieldComment, setFieldComment] = useState<string>(""); // 字段备注
+
+  const [tableComment, setTableComment] = useState<string>(""); // 表备注
+
+  // 记录动作
+  function logAction() {
+    // TODO: 先找到 alterData 里对应的字段的数据
+
+    if (dialogAction === STR_ADD) {
+      //
+    } else if (dialogAction === STR_EDIT) {
+      //
+    } else if (dialogAction === STR_DELETE) {
+      //
+    }
+
+    setAlterData(alterData);
+  }
+
+  function changeFieldName(val: string) {
+    // TODO: 记录动作
+
+    setFieldName(val);
+  }
+  function changeFieldType(val: string) {
+    //TODO: 记录动作
+    setFieldType(val);
+  }
+
+  function changeFieldSize(val: string) {
+    //TODO: 记录动作
+    setFieldSize(val);
+  }
+
+  function changeFieldDefault(val: string) {
+    //TODO: 记录动作
+    setFieldDefault(val);
+  }
+
+  function changeFieldNotNull(val: boolean) {
+    //TODO: 记录动作
+    setFieldNotNull(val);
+  }
+
+  function changeFieldIndexType(val: IndexType) {
+    //TODO: 记录动作
+    setFieldIndexType(val);
+  }
+
+  function changeFieldIndexPkAutoIncrement(val: boolean) {
+    //TODO: 记录动作
+    setFieldIndexPkAutoIncrement(val);
+  }
+
+  function changeFieldIndexName(val: string) {
+    //TODO: 记录动作
+    setFieldIndexName(val);
+  }
+
+  function changeFieldComment(val: string) {
+    //TODO: 记录动作
+    setFieldComment(val);
+  }
+  function changeTableComment(val: string) {
+    //TODO: 记录动作
+    setTableComment(val);
+  }
 
   // 选中行, 删除的时候使用
   const handleSelectRow = (id: number) => {
@@ -146,7 +212,7 @@ export function TableEditorStructure(props: MainContentStructure) {
     }
 
     if (currentDbType === DB_TYPE_POSTGRESQL) {
-      const tableDataPg = currentTableStructure as unknown as TableStructurePostgresql[];
+      const tableDataPg = currentTableStructure as unknown as TableStructure[];
 
       console.log("tableDataPg.length:: ", tableDataPg.length);
 
@@ -184,7 +250,7 @@ export function TableEditorStructure(props: MainContentStructure) {
     }
 
     if (currentDbType === DB_TYPE_POSTGRESQL) {
-      const tableDataPg = currentTableStructure as unknown as TableStructurePostgresql[];
+      const tableDataPg = currentTableStructure as unknown as TableStructure[];
       return tableDataPg.map((row, index) =>
         renderContextMenu(
           index,
@@ -207,16 +273,16 @@ export function TableEditorStructure(props: MainContentStructure) {
               <div>{row.is_primary_key ? "✅" : ""}</div>
             </TableCell>
             <TableCell>
-              <div>{row.has_foreign_key ? "✅" : ""}</div>
+              <div>{row.is_foreign_key ? "✅" : ""}</div>
             </TableCell>
             <TableCell>
-              <div>{row.is_unique ? "✅" : ""}</div>
+              <div>{row.is_unique_key ? "✅" : ""}</div>
             </TableCell>
             <TableCell>
               <div>{row.has_check_conditions ? "✅" : ""}</div>
             </TableCell>
             <TableCell>
-              <div>{row.is_nullable === "YES" ? "✅" : ""}</div>
+              <div>{row.is_not_null ? "✅" : ""}</div>
             </TableCell>
             <TableCell>
               <div>{row.column_default}</div>
@@ -312,23 +378,23 @@ export function TableEditorStructure(props: MainContentStructure) {
           </DialogHeader>
 
           <LabeledDiv direction={DIR_H} label={"字段名"}>
-            <Input value={fieldName} onInput={(e) => setFieldName(e.currentTarget.value)} />
+            <Input value={fieldName} onInput={(e) => changeFieldName(e.currentTarget.value)} />
           </LabeledDiv>
 
           <LabeledDiv direction={DIR_H} label={"类型"}>
-            <Input value={fieldType} onInput={(e) => setFieldType(e.currentTarget.value)} />
+            <Input value={fieldType} onInput={(e) => changeFieldType(e.currentTarget.value)} />
           </LabeledDiv>
 
           <LabeledDiv direction={DIR_H} label={"大小"}>
-            <Input value={fieldSize} onInput={(e) => setFieldSize(e.currentTarget.value)} />
+            <Input value={fieldSize} onInput={(e) => changeFieldSize(e.currentTarget.value)} />
           </LabeledDiv>
 
           <LabeledDiv direction={DIR_H} label={"默认值"}>
-            <Input value={fieldDefalut} onInput={(e) => setFieldDefault(e.currentTarget.value)} />
+            <Input value={fieldDefalut} onInput={(e) => changeFieldDefault(e.currentTarget.value)} />
             <div className="flex items-center pt-2">
               <Checkbox
                 checked={fieldNotNull}
-                onClick={() => setFieldNotNull(!fieldNotNull)}
+                onClick={() => changeFieldNotNull(!fieldNotNull)}
                 className="me-4"
                 id="fieldNotNull"
               />
@@ -344,7 +410,7 @@ export function TableEditorStructure(props: MainContentStructure) {
                 <Checkbox
                   checked={fieldIndexType === INDEX_PRIMARY_KEY}
                   onClick={() =>
-                    setFieldIndexType(fieldIndexType === INDEX_PRIMARY_KEY ? STR_EMPTY : INDEX_PRIMARY_KEY)
+                    changeFieldIndexType(fieldIndexType === INDEX_PRIMARY_KEY ? STR_EMPTY : INDEX_PRIMARY_KEY)
                   }
                   className="me-4"
                   id="INDEX_PRIMARY_KEY"
@@ -357,7 +423,7 @@ export function TableEditorStructure(props: MainContentStructure) {
               <div className="flex items-center">
                 <Checkbox
                   checked={fieldIndexPkAutoIncrement}
-                  onClick={() => setFieldIndexPkAutoIncrement(!fieldIndexPkAutoIncrement)}
+                  onClick={() => changeFieldIndexPkAutoIncrement(!fieldIndexPkAutoIncrement)}
                   className="me-4"
                   id="fieldIndexAutoIncrement"
                   disabled={fieldIndexType === STR_EMPTY}
@@ -370,7 +436,7 @@ export function TableEditorStructure(props: MainContentStructure) {
               <div className="flex items-center">
                 <Checkbox
                   checked={fieldIndexType === INDEX_UNIQUE}
-                  onClick={() => setFieldIndexType(fieldIndexType === INDEX_UNIQUE ? STR_EMPTY : INDEX_UNIQUE)}
+                  onClick={() => changeFieldIndexType(fieldIndexType === INDEX_UNIQUE ? STR_EMPTY : INDEX_UNIQUE)}
                   className="me-4"
                   id="INDEX_UNIQUE"
                 />
@@ -382,14 +448,14 @@ export function TableEditorStructure(props: MainContentStructure) {
             <div className="pt-2">
               <Input
                 value={fieldIndexName}
-                onInput={(e) => setFieldIndexName(e.currentTarget.value)}
+                onInput={(e) => changeFieldIndexName(e.currentTarget.value)}
                 placeholder="索引名"
                 disabled={fieldIndexType === STR_EMPTY}
               />
             </div>
           </LabeledDiv>
           <LabeledDiv direction={DIR_H} label={"备注"}>
-            <Input value={fieldComment} onInput={(e) => setFieldComment(e.currentTarget.value)} />
+            <Input value={fieldComment} onInput={(e) => changeFieldComment(e.currentTarget.value)} />
           </LabeledDiv>
 
           {errorMessage && (
