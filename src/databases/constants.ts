@@ -20,6 +20,8 @@ export const SSL_MODE_VERIFY_FULL = "verify-full";
  *
  * 这里是名词, 具体的动作使用 STR_ADD STR_EDIT STR_DELETE
  */
+export const INDEX_PRIMARY_KEY = "PRIMARY KEY"; // 主键
+export const INDEX_UNIQUE = "UNIQUE"; // 唯一索引
 export const TABLE_COMMENT = "TBL_COMMENT"; // 表备注
 export const FIELD = "FIELD"; // 字段
 export const FIELD_NAME = "FIELD_NAME"; // 字段名
@@ -27,8 +29,7 @@ export const FIELD_TYPE = "FIELD_TYPE"; // 字段类型
 export const FIELD_SIZE = "FIELD_SIZE"; // 字段大小
 export const FIELD_DEFAULT = "FIELD_DEFAULT"; // 字段默认值
 export const FIELD_NOT_NULL = "FIELD_NOT_NULL"; // 字段非空
-export const FIELD_IS_PRIMARY_KEY = "FIELD_IS_PRIMARY_KEY"; // 字段索引类型,主键
-export const FIELD_IS_UNIQUE_KEY = "FIELD_IS_UNIQUE_KEY"; // 字段索引类型,列唯一索引
+export const FIELD_INDEX_TYPE = "FIELD_INDEX_TYPE"; // 字段索引类型
 export const FIELD_INDEX_AUTO_INCREMENT = "FIELD_INDEX_AUTO_INCREMENT"; // 字段主键自增
 export const FIELD_INDEX_NAME = "FIELD_INDEX_NAME"; // 字段索引名
 export const FIELD_COMMENT = "FIELD_COMMENT"; // 字段备注

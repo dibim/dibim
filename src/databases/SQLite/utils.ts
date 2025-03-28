@@ -1,5 +1,5 @@
 import { CommonSQLValue } from "../types";
-import { formatSQLValueCommon } from "../utils";
+import { formatToSqlValueCommon } from "../utils";
 import { invoker } from "./invoke";
 
 const testConnName = "testPg";
@@ -7,7 +7,7 @@ const testConnName = "testPg";
 // SQLite 特有类型处理
 export function formatSQLiteValue(value: unknown): string {
   try {
-    return formatSQLValueCommon(value as CommonSQLValue);
+    return formatToSqlValueCommon(value as CommonSQLValue);
   } catch {
     // SQLite的特殊处理较少，主要处理BLOB
     if (value instanceof Uint8Array) {

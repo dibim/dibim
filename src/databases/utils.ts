@@ -25,7 +25,7 @@ export function isCommonSQLValue(value: unknown): value is CommonSQLValue {
  * 格式化所有SQL数据库通用的数据类型
  * 类型和 isCommonSQLValue 一致
  */
-export function formatSQLValueCommon(value: CommonSQLValue): string {
+export function formatToSqlValueCommon(value: CommonSQLValue): string {
   // 处理空值
   if (value == null) return "NULL";
 
@@ -52,7 +52,7 @@ export function formatSQLValueCommon(value: CommonSQLValue): string {
   }
 
   if (Array.isArray(value)) {
-    return `(${value.map(formatSQLValueCommon).join(", ")})`;
+    return `(${value.map(formatToSqlValueCommon).join(", ")})`;
   }
 
   // 默认处理（不应执行到这里）

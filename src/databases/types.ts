@@ -4,8 +4,7 @@ import {
   FIELD,
   FIELD_COMMENT,
   FIELD_DEFAULT,
-  FIELD_IS_PRIMARY_KEY,
-  FIELD_IS_UNIQUE_KEY,
+  FIELD_INDEX_TYPE,
   FIELD_NAME,
   FIELD_NOT_NULL,
   FIELD_TYPE,
@@ -82,8 +81,7 @@ export type AlterActionTarget =
   | typeof TABLE_COMMENT
   | typeof FIELD_NAME
   | typeof FIELD_TYPE
-  | typeof FIELD_IS_PRIMARY_KEY
-  | typeof FIELD_IS_UNIQUE_KEY
+  | typeof FIELD_INDEX_TYPE
   | typeof FIELD_NOT_NULL
   | typeof FIELD_DEFAULT
   | typeof FIELD_COMMENT
@@ -97,10 +95,10 @@ export type AlterActionValue = {
   fieldName: string; // 字段名
   fieldType: string; // 字段类型
   fieldSize: string; // 字段大小
-  fieldDefalut: string; // 字段默认值
+  fieldDefalut: string | number | null; // 字段默认值
   fieldNotNull: boolean; // 字段非空
   fieldIndexType: string; // 字段索引类型
-  fieldIndexAutoIncrement: boolean; // 字段主键自增
+  fieldIndexPkAutoIncrement: boolean; // 字段主键自增
   fieldIndexName: string; // 字段索引名
   fieldComment: string; // 字段备注
 
