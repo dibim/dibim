@@ -1,4 +1,4 @@
-import { STR_ADD, STR_DELETE, STR_EDIT } from "@/constants";
+import { STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY } from "@/constants";
 import {
   FIELD,
   FIELD_COMMENT,
@@ -84,7 +84,7 @@ export type TableStructure = {
 };
 
 // 变更表更表结构的动作类性
-export type AlterAction = typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
+export type AlterAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
 // 变更表更表结构的动作目标
 export type AlterActionTarget =
   | typeof TABLE_COMMENT
@@ -96,12 +96,13 @@ export type AlterActionTarget =
   | typeof FIELD_COMMENT
   | typeof FIELD;
 
-export type AlterActionValue = {
-  target: AlterActionTarget;
+// 列的修改数据
+export type ColumnAlterAction = {
+  tableName: string;
+  action: AlterAction;
 
-  // fieldName 是改名时作为新字段名, 设置索引时作为作音的列名
-  // TODO: 后续要支持复合索引
-  fieldName: string; // 字段名
+  fieldName: string;
+  fieldNameExt: string; // 改名时作为新字段名, 设置索引时作为作音的列名 TODO: 后续要支持复合索引
   fieldType: string; // 字段类型
   fieldSize: string; // 字段大小
   fieldDefalut: string | number | null; // 字段默认值
@@ -112,12 +113,4 @@ export type AlterActionValue = {
   fieldComment: string; // 字段备注
 
   tableComment: string; // 表备注
-};
-
-// 列的修改数据
-export type ColumnAlterAction = {
-  tableName: string;
-  fieldName: string;
-  action: AlterAction;
-  actionValues: AlterActionValue[];
 };
