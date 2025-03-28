@@ -1,5 +1,6 @@
 import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE } from "@/constants";
 import {
+  connectPg,
   execPg,
   genCreateTableCmdPg,
   genDeleteFieldCmdPg,
@@ -13,8 +14,8 @@ import {
   getTableDdlPg,
   getTableStructurePg,
 } from "@/databases/PostgreSQL/utils";
-import { DbType } from "@/types/types";
-import { GetTableDataParam } from "./types";
+import { coreStore } from "@/store";
+import { DbConnectionParam, GetTableDataParam } from "./types";
 
 // 连接数据库的参数不同, 直接调用各自目录里的
 
@@ -24,6 +25,16 @@ import { GetTableDataParam } from "./types";
  * sqlite:///path/to/database.db      # SQLite
  */
 
+// 获取所有表名
+export async function connect(p: DbConnectionParam) {
+  const dbType = coreStore.getState().currentDbType;
+  const connName = coreStore.getState().currentConnName;
+
+  if (dbType === DB_TYPE_MYSQL) return; // TODO:
+  if (dbType === DB_TYPE_POSTGRESQL) return connectPg(connName, p);
+  if (dbType === DB_TYPE_SQLITE) return; // TODO:
+}
+
 /**
  *
  * @param dbType
@@ -31,111 +42,117 @@ import { GetTableDataParam } from "./types";
  */
 
 // 获取所有表名
-export async function getAllTableName(dbType: DbType) {
+export async function getAllTableName() {
+  const dbType = coreStore.getState().currentDbType;
+  const connName = coreStore.getState().currentConnName;
+
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
-
-  if (dbType === DB_TYPE_POSTGRESQL) return getAllTableNamePg();
-
+  if (dbType === DB_TYPE_POSTGRESQL) return getAllTableNamePg(connName);
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
 }
 
 // 获取所有表格的大小
-export async function getAllTableSize(dbType: DbType) {
+export async function getAllTableSize() {
+  const dbType = coreStore.getState().currentDbType;
+  const connName = coreStore.getState().currentConnName;
+
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
-
-  if (dbType === DB_TYPE_POSTGRESQL) return getAllTableSizePg();
-
+  if (dbType === DB_TYPE_POSTGRESQL) return getAllTableSizePg(connName);
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
 }
 
 // 获取表格数据
-export async function getTableStructure(dbType: DbType, tbName: string) {
+export async function getTableStructure(tbName: string) {
+  const dbType = coreStore.getState().currentDbType;
+  const connName = coreStore.getState().currentConnName;
+
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
-
-  if (dbType === DB_TYPE_POSTGRESQL) return getTableStructurePg(tbName);
-
+  if (dbType === DB_TYPE_POSTGRESQL) return getTableStructurePg(connName, tbName);
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
 }
 
 // 获取表格的 DDL
-export async function getTableDdl(dbType: DbType, tbName: string) {
+export async function getTableDdl(tbName: string) {
+  const dbType = coreStore.getState().currentDbType;
+  const connName = coreStore.getState().currentConnName;
+
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
-
-  if (dbType === DB_TYPE_POSTGRESQL) return getTableDdlPg(tbName);
-
+  if (dbType === DB_TYPE_POSTGRESQL) return getTableDdlPg(connName, tbName);
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
 }
 
 // 获取表格数据
-export async function getTableData(dbType: DbType, params: GetTableDataParam) {
+export async function getTableData(params: GetTableDataParam) {
+  const dbType = coreStore.getState().currentDbType;
+  const connName = coreStore.getState().currentConnName;
+
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
-
-  if (dbType === DB_TYPE_POSTGRESQL) return getTableDataPg(params);
-
+  if (dbType === DB_TYPE_POSTGRESQL) return getTableDataPg(connName, params);
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
 }
 
 // 生成重命名表格的语句
-export function exec(dbType: DbType, sql: string) {
+export function exec(sql: string) {
+  const dbType = coreStore.getState().currentDbType;
+  const connName = coreStore.getState().currentConnName;
+
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
-
-  if (dbType === DB_TYPE_POSTGRESQL) return execPg(sql);
-
+  if (dbType === DB_TYPE_POSTGRESQL) return execPg(connName, sql);
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
 
   return "";
 }
 
 // 生成重命名表格的语句
-export function genRenameTableCmd(dbType: DbType, oldName: string, newName: string) {
+export function genRenameTableCmd(oldName: string, newName: string) {
+  const dbType = coreStore.getState().currentDbType;
+
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
-  if (dbType === DB_TYPE_POSTGRESQL) {
-    return genRenameTableCmdPg(oldName, newName);
-  }
+  if (dbType === DB_TYPE_POSTGRESQL) return genRenameTableCmdPg(oldName, newName);
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
 
   return "";
 }
 
 // 生成截断表格的语句
-export function genTruncateTableCmd(dbType: DbType, tbName: string) {
-  if (dbType === DB_TYPE_MYSQL) return; // TODO:
+export function genTruncateTableCmd(tbName: string) {
+  const dbType = coreStore.getState().currentDbType;
 
+  if (dbType === DB_TYPE_MYSQL) return; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genTruncateTableCmdPg(tbName);
-
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
 
   return "";
 }
 
 // 生成删除表格的语句
-export function genDeleteTableCmd(dbType: DbType, tbName: string) {
-  if (dbType === DB_TYPE_MYSQL) return; // TODO:
+export function genDeleteTableCmd(tbName: string) {
+  const dbType = coreStore.getState().currentDbType;
 
+  if (dbType === DB_TYPE_MYSQL) return; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genDeleteTableCmdPg(tbName);
-
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
 
   return "";
 }
 
 // 生成删除表格的语句
-export function genRenameFieldCmd(dbType: DbType, tbName: string, oldName: string, newName: string) {
-  if (dbType === DB_TYPE_MYSQL) return; // TODO:
+export function genRenameFieldCmd(tbName: string, oldName: string, newName: string) {
+  const dbType = coreStore.getState().currentDbType;
 
+  if (dbType === DB_TYPE_MYSQL) return; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genRenameFieldCmdPg(tbName, oldName, newName);
-
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
 
   return "";
 }
 
 // 生成删除表格的语句
-export function genDeleteFieldCmd(dbType: DbType, tbName: string, fieldName: string) {
+export function genDeleteFieldCmd(tbName: string, fieldName: string) {
+  const dbType = coreStore.getState().currentDbType;
+
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
-
   if (dbType === DB_TYPE_POSTGRESQL) return genDeleteFieldCmdPg(tbName, fieldName);
-
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
 
   return "";
@@ -143,11 +160,11 @@ export function genDeleteFieldCmd(dbType: DbType, tbName: string, fieldName: str
 
 // 生成建表语句
 // FIXME: 实现功能
-export function genCreateTableCmd(dbType: DbType, tbName: string) {
+export function genCreateTableCmd(tbName: string) {
+  const dbType = coreStore.getState().currentDbType;
+
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
-
   if (dbType === DB_TYPE_POSTGRESQL) return genCreateTableCmdPg(tbName);
-
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
 
   return "";

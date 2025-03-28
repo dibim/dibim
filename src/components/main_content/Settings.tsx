@@ -15,7 +15,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "../ui/input";
 
 export function Settings() {
-  const { currentDbType, currentTableName, setMainPasswordSha, config, setConfig } = useCoreStore();
+  const { currentTableName, setMainPasswordSha, config, setConfig } = useCoreStore();
 
   const [mainPassword, setMainPassword] = useState<string>("");
   const [theme, setTheme] = useState<string>("");
@@ -52,7 +52,7 @@ export function Settings() {
   }
 
   const getData = async () => {
-    const res = await getTableDdl(currentDbType, currentTableName);
+    const res = await getTableDdl(currentTableName);
     if (res && res.data) {
       // setTableData(res.data);
     }

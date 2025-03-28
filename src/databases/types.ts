@@ -1,20 +1,21 @@
+import { STR_ADD, STR_DELETE, STR_EDIT } from "@/constants";
 import { TableStructurePostgresql } from "./PostgreSQL/types";
 import {
-  ACTION_C_COLNAME,
-  ACTION_C_COL_COMMENT,
-  ACTION_C_DATATYPE,
-  ACTION_C_DEFAULT,
-  ACTION_C_IS_PRIMARY_KEY,
-  ACTION_C_IS_UNIQUE,
-  ACTION_C_NULLABLE,
-  ACTION_C_TBL_COMMENT,
-  ACTION_D_COL,
+  FIELD,
+  FIELD_COMMENT,
+  FIELD_DEFAULT,
+  FIELD_IS_PRIMARY_KEY,
+  FIELD_IS_UNIQUE_KEY,
+  FIELD_NAME,
+  FIELD_NOT_NULL,
+  FIELD_TYPE,
   SSL_MODE_ALLOW,
   SSL_MODE_DISABLE,
   SSL_MODE_PREFER,
   SSL_MODE_REQUIRE,
   SSL_MODE_VERIFY_CA,
   SSL_MODE_VERIFY_FULL,
+  TABLE_COMMENT,
 } from "./constants";
 
 // rust 的 sqlx 在连接字符串中添加 sslmode 参数控制 TLS 行为
@@ -57,24 +58,59 @@ export type DbCountRes = {
   total: number;
 };
 
+/**
+ * SQL通用数据类型（所有主流数据库支持的基础类型）
+ */
+export type CommonSQLValue =
+  | string
+  | number
+  | boolean
+  | Date
+  | null
+  | undefined
+  | bigint
+  | ArrayBuffer // 二进制数据通用表示
+  | Array<CommonSQLValue>; // 数组类型（部分数据库支持）
+
 // 表结构
 export type TableStructure = TableStructurePostgresql;
 
 // 变更表更表结构的动作类性
-export type AlterAction =
-  | typeof ACTION_C_COLNAME
-  | typeof ACTION_C_DATATYPE
-  | typeof ACTION_C_IS_PRIMARY_KEY
-  | typeof ACTION_C_IS_UNIQUE
-  | typeof ACTION_C_NULLABLE
-  | typeof ACTION_C_DEFAULT
-  | typeof ACTION_C_COL_COMMENT
-  | typeof ACTION_C_TBL_COMMENT
-  | typeof ACTION_D_COL;
+export type AlterAction = typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
+// 变更表更表结构的动作目标
+export type AlterActionTarget =
+  | typeof TABLE_COMMENT
+  | typeof FIELD_NAME
+  | typeof FIELD_TYPE
+  | typeof FIELD_IS_PRIMARY_KEY
+  | typeof FIELD_IS_UNIQUE_KEY
+  | typeof FIELD_NOT_NULL
+  | typeof FIELD_DEFAULT
+  | typeof FIELD_COMMENT
+  | typeof FIELD;
+
+export type AlterActionValue = {
+  target: AlterActionTarget;
+
+  // fieldName 是改名时作为新字段名, 设置索引时作为作音的列名
+  // TODO: 后续要支持复合索引
+  fieldName: string; // 字段名
+  fieldType: string; // 字段类型
+  fieldSize: string; // 字段大小
+  fieldDefalut: string; // 字段默认值
+  fieldNotNull: boolean; // 字段非空
+  fieldIndexType: string; // 字段索引类型
+  fieldIndexAutoIncrement: boolean; // 字段主键自增
+  fieldIndexName: string; // 字段索引名
+  fieldComment: string; // 字段备注
+
+  tableComment: string; // 表备注
+};
 
 // 列的修改数据
 export type ColumnAlterAction = {
-  column_name: string;
+  tableName: string;
+  fieldName: string;
   action: AlterAction;
-  actionValue: any; // 类型根据 action 变化
+  actionValues: AlterActionValue[];
 };

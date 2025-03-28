@@ -5,7 +5,7 @@ import {
   MAIN_CONTEN_TYPE_TABLE_EDITOR,
   SUB_SIDEBAR_TYPE_TABLE_LIST,
 } from "@/constants";
-import { connectPg } from "@/databases/PostgreSQL/utils";
+import { connect } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
 import { DbConnections } from "@/types/conf_file";
 import { ConfirmDialog } from "../ConfirmDialog";
@@ -28,7 +28,7 @@ export function DatabaseList() {
 
   // 点击连接
   const clickConn = async (conn: DbConnections) => {
-    const res = await connectPg({
+    const res = await connect({
       dbName: conn.dbName,
       host: conn.host,
       password: conn.password,
@@ -36,12 +36,12 @@ export function DatabaseList() {
       user: conn.user,
     });
 
-    if (res.errorMessage === "") {
+    if (res && res.errorMessage === "") {
       setSubSidebarType(SUB_SIDEBAR_TYPE_TABLE_LIST);
       setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
     } else {
       // TODO: 优化一下报错
-      console.log("打开数据库连接出错: ", res.errorMessage);
+      console.log("打开数据库连接出错: ", res && res.errorMessage);
     }
   };
 
