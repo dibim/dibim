@@ -36,13 +36,12 @@ export function TableEditor() {
   const [tabName, setTabName] = useState<MainContentTab>("");
 
   // 获取表结构, 会在多个地方用, 在这里记录到 store
-  const getStructure = async () => {
+  const getData = async () => {
     if (currentTableName === "") {
       return;
     }
 
     const res = await getTableStructure(currentTableName);
-
     if (res && res.data) {
       setCurrentTableStructure(res.data);
       if (tabName === STR_EMPTY) setTabName(TAB_DATA);
@@ -50,11 +49,11 @@ export function TableEditor() {
   };
 
   useEffect(() => {
-    getStructure();
+    getData();
   }, [currentTableName]);
 
   useEffect(() => {
-    getStructure();
+    getData();
   }, []);
 
   return (
@@ -122,7 +121,7 @@ export function TableEditor() {
       <TabsContent value={TAB_STRUCTURE}>
         <Card className="p-4">
           <CardContent className="p-0">
-            <TableEditorStructure getStructure={getStructure} />
+            <TableEditorStructure getData={getData} />
           </CardContent>
         </Card>
       </TabsContent>

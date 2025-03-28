@@ -114,11 +114,6 @@ export function TableList() {
     setWillExecCmd(genTruncateTableCmd(tableName) || "");
     setShowDialogTruncate(true);
   };
-  // 执行截断表
-  const handleTruncate = async () => {
-    exec(willExecCmd);
-    getData();
-  };
 
   // 弹出确认删除表
   const handleDeletePopup = async (tableName: string) => {
@@ -126,11 +121,13 @@ export function TableList() {
     setWillExecCmd(genDeleteTableCmd(tableName) || "");
     setShowDialogDelete(true);
   };
-  // 执行删除表
-  const handleDelete = async () => {
+
+  // 确定执行语句
+  const handleConfirm = async () => {
     exec(willExecCmd);
     getData();
   };
+
   // ========== 上下文按钮功能 结束 ==========
 
   // 列表数据
@@ -300,7 +297,7 @@ export function TableList() {
           <>
             <div className="pt-4">
               <div className="pb-4">将要执行的语句:</div>
-              <div>{willExecCmd}</div>
+              <pre>{willExecCmd}</pre>
             </div>
           </>
         }
@@ -309,7 +306,7 @@ export function TableList() {
           setShowDialogTruncate(false);
         }}
         okText={"确定"}
-        okCb={handleTruncate}
+        okCb={handleConfirm}
       />
       <ConfirmDialog
         open={showDialogDelete}
@@ -318,7 +315,7 @@ export function TableList() {
           <>
             <div className="pt-4">
               <div className="pb-4">将要执行的语句:</div>
-              <div>{willExecCmd}</div>
+              <pre>{willExecCmd}</pre>
             </div>
           </>
         }
@@ -327,7 +324,7 @@ export function TableList() {
           setShowDialogDelete(false);
         }}
         okText={"确定"}
-        okCb={handleDelete}
+        okCb={handleConfirm}
       />
     </div>
   );

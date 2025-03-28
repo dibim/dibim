@@ -5,7 +5,7 @@ import { useState } from "react";
 import { AlertCircle, CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY } from "@/constants";
-import { exec, genDeleteFieldCmd } from "@/databases/adapter,";
+import { exec, genAlterCmd, genDeleteFieldCmd } from "@/databases/adapter,";
 import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "@/databases/constants";
 import { ColumnAlterAction, TableStructure } from "@/databases/types";
 import { cn } from "@/lib/utils";
@@ -38,11 +38,13 @@ export function TableEditorStructure(props: MainContentStructure) {
   const [dialogAction, setDialogAction] = useState<DialogAction>("");
   const [showDialogEdit, setShowDialogEdit] = useState<boolean>(false);
   const [showDialogDelete, setShowDialogDelete] = useState<boolean>(false);
+  const [showDialogAlter, setShowDialogAlter] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>(""); // 错误消息
   const [okMessage, setOkMessage] = useState<string>(""); // 成功消息
 
+  const [fieldNameEditing, setFieldNameEditing] = useState<string>(""); // 字段名, 编辑之前记录的原先的字段名
   // 对话框里的数据
-  const [fieldName, setFieldName] = useState<string>(""); // 字段名
+  const [fieldName, setFieldName] = useState<string>(""); // 字段名, 输入框里的
   const [fieldType, setFieldType] = useState<string>(""); // 字段类型
   const [fieldSize, setFieldSize] = useState<string>(""); // 字段大小
   const [fieldDefalut, setFieldDefault] = useState<string>(""); // 字段默认值
@@ -51,72 +53,7 @@ export function TableEditorStructure(props: MainContentStructure) {
   const [fieldIndexPkAutoIncrement, setFieldIndexPkAutoIncrement] = useState<boolean>(false); // 字段主键自增
   const [fieldIndexName, setFieldIndexName] = useState<string>(""); // 字段索引名
   const [fieldComment, setFieldComment] = useState<string>(""); // 字段备注
-
   const [tableComment, setTableComment] = useState<string>(""); // 表备注
-
-  // 记录动作
-  function logAction() {
-    // TODO: 先找到 alterData 里对应的字段的数据
-
-    if (dialogAction === STR_ADD) {
-      //
-    } else if (dialogAction === STR_EDIT) {
-      //
-    } else if (dialogAction === STR_DELETE) {
-      //
-    }
-
-    setAlterData(alterData);
-  }
-
-  function changeFieldName(val: string) {
-    // TODO: 记录动作
-
-    setFieldName(val);
-  }
-  function changeFieldType(val: string) {
-    //TODO: 记录动作
-    setFieldType(val);
-  }
-
-  function changeFieldSize(val: string) {
-    //TODO: 记录动作
-    setFieldSize(val);
-  }
-
-  function changeFieldDefault(val: string) {
-    //TODO: 记录动作
-    setFieldDefault(val);
-  }
-
-  function changeFieldNotNull(val: boolean) {
-    //TODO: 记录动作
-    setFieldNotNull(val);
-  }
-
-  function changeFieldIndexType(val: IndexType) {
-    //TODO: 记录动作
-    setFieldIndexType(val);
-  }
-
-  function changeFieldIndexPkAutoIncrement(val: boolean) {
-    //TODO: 记录动作
-    setFieldIndexPkAutoIncrement(val);
-  }
-
-  function changeFieldIndexName(val: string) {
-    //TODO: 记录动作
-    setFieldIndexName(val);
-  }
-
-  function changeFieldComment(val: string) {
-    //TODO: 记录动作
-    setFieldComment(val);
-  }
-  function changeTableComment(val: string) {
-    //TODO: 记录动作
-    setTableComment(val);
-  }
 
   // 选中行, 删除的时候使用
   const handleSelectRow = (id: number) => {
@@ -130,15 +67,13 @@ export function TableEditorStructure(props: MainContentStructure) {
   };
 
   // 添加列
-  function handleAddCol() {
-    console.log("添加列");
-
+  function handleAddField() {
     setShowDialogEdit(true);
     setDialogAction(STR_ADD);
   }
 
   // 删除选中的列
-  function handleDelSelectedCol() {
+  function handleDelSelectedField() {
     console.log("删除列");
   }
 
@@ -154,6 +89,8 @@ export function TableEditorStructure(props: MainContentStructure) {
 
   // 弹出确认编辑列
   function handleEditColPopup(index: number) {
+    const ad = alterData[index];
+    setFieldNameEditing(ad.fieldName);
     setOperateRowIndex(index);
     setShowDialogEdit(true);
     setDialogAction(STR_EDIT);
@@ -198,20 +135,60 @@ export function TableEditorStructure(props: MainContentStructure) {
       // TODO: 报错
     }
   }
-  // 执行删除字段
-  function handleDelete() {
-    exec(willExecCmd);
+  // 确定执行语句
+  function handleConfirm() {
+    console.log(`执行语句:  ${willExecCmd}`);
+
+    // FIXME: 接触注释
+    // exec(willExecCmd);
+    // props.getData();
   }
 
   // 提交变更
   async function onSubmit() {
-    if (dialogAction === STR_ADD) {
-      // TODO: 添加记录, 等电影应用按钮的时候再执行修改
+    // 找到 alterData 里对应的字段的数据
+    let actionDataFinded: ColumnAlterAction | null = null;
+    let actionDataFindedIndex = -1;
+
+    for (let index = 0; index < alterData.length; index++) {
+      const ad = alterData[index];
+      if (ad.fieldName === fieldName) {
+        actionDataFinded = ad;
+        actionDataFindedIndex = index;
+      }
     }
 
-    if (dialogAction === STR_EDIT) {
-      // TODO: 执行修改
+    console.log("dialogAction:: ", dialogAction);
+
+    const actionData: ColumnAlterAction = {
+      tableName: currentTableName,
+      action: dialogAction,
+      // 如果是编辑, 要记录编辑之前的列名, 重命名的时候会用到
+      // 如果是添加, 直接使用输入框里的字段名
+      fieldName: dialogAction === STR_EDIT ? fieldNameEditing : fieldName,
+      fieldNameExt: fieldName, // 输入框里的列名
+      fieldType,
+      fieldSize,
+      fieldDefalut,
+      fieldNotNull,
+      fieldIndexType,
+      fieldIndexPkAutoIncrement,
+      fieldIndexName,
+      fieldComment,
+      tableComment,
+    };
+
+    if (actionDataFindedIndex > -1) {
+      alterData[actionDataFindedIndex] = { ...actionDataFinded, ...actionData };
+    } else {
+      alterData.push(actionData);
     }
+
+    setAlterData(alterData);
+
+    // TODO: 生成语句, 弹窗确认
+    setWillExecCmd(genAlterCmd(alterData));
+    setShowDialogAlter(true);
   }
 
   /**
@@ -304,7 +281,7 @@ export function TableEditorStructure(props: MainContentStructure) {
         <div className={cn("gap-4 px-2 pb-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <RotateCw color="var(--fvm-info-clr)" onClick={() => props.getStructure()} />
+              <RotateCw color="var(--fvm-info-clr)" onClick={() => props.getData()} />
             </TooltipTrigger>
             <TooltipContent>
               <p>刷新</p>
@@ -312,18 +289,18 @@ export function TableEditorStructure(props: MainContentStructure) {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <CirclePlus color="var(--fvm-primary-clr)" onClick={handleAddCol} />
+              <CirclePlus color="var(--fvm-primary-clr)" onClick={handleAddField} />
             </TooltipTrigger>
             <TooltipContent>
-              <p>添加列</p>
+              <p>添加字段</p>
             </TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <CircleMinus color="var(--fvm-danger-clr)" onClick={handleDelSelectedCol} />
+              <CircleMinus color="var(--fvm-danger-clr)" onClick={handleDelSelectedField} />
             </TooltipTrigger>
             <TooltipContent>
-              <p>删除列</p>
+              <p>删除字段</p>
             </TooltipContent>
           </Tooltip>
           <Tooltip>
@@ -372,24 +349,24 @@ export function TableEditorStructure(props: MainContentStructure) {
             <DialogTitle>{dialogAction === STR_ADD ? "添加" : "编辑"}字段</DialogTitle>
           </DialogHeader>
 
-          <LabeledDiv direction={DIR_H} label={"字段名"}>
-            <Input value={fieldName} onInput={(e) => changeFieldName(e.currentTarget.value)} />
+          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"字段名"}>
+            <Input value={fieldName} onInput={(e) => setFieldName(e.currentTarget.value)} />
           </LabeledDiv>
 
-          <LabeledDiv direction={DIR_H} label={"类型"}>
-            <Input value={fieldType} onInput={(e) => changeFieldType(e.currentTarget.value)} />
+          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"类型"}>
+            <Input value={fieldType} onInput={(e) => setFieldType(e.currentTarget.value)} />
           </LabeledDiv>
 
-          <LabeledDiv direction={DIR_H} label={"大小"}>
-            <Input value={fieldSize} onInput={(e) => changeFieldSize(e.currentTarget.value)} />
+          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"大小"}>
+            <Input value={fieldSize} onInput={(e) => setFieldSize(e.currentTarget.value)} />
           </LabeledDiv>
 
-          <LabeledDiv direction={DIR_H} label={"默认值"}>
-            <Input value={fieldDefalut} onInput={(e) => changeFieldDefault(e.currentTarget.value)} />
+          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"默认值"}>
+            <Input value={fieldDefalut} onInput={(e) => setFieldDefault(e.currentTarget.value)} />
             <div className="flex items-center pt-2">
               <Checkbox
                 checked={fieldNotNull}
-                onClick={() => changeFieldNotNull(!fieldNotNull)}
+                onClick={() => setFieldNotNull(!fieldNotNull)}
                 className="me-4"
                 id="fieldNotNull"
               />
@@ -399,13 +376,13 @@ export function TableEditorStructure(props: MainContentStructure) {
             </div>
           </LabeledDiv>
 
-          <LabeledDiv direction={DIR_H} label={"索引"}>
+          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"索引"}>
             <div className="flex gap-4">
               <div className="flex items-center">
                 <Checkbox
                   checked={fieldIndexType === INDEX_PRIMARY_KEY}
                   onClick={() =>
-                    changeFieldIndexType(fieldIndexType === INDEX_PRIMARY_KEY ? STR_EMPTY : INDEX_PRIMARY_KEY)
+                    setFieldIndexType(fieldIndexType === INDEX_PRIMARY_KEY ? STR_EMPTY : INDEX_PRIMARY_KEY)
                   }
                   className="me-4"
                   id="INDEX_PRIMARY_KEY"
@@ -418,10 +395,10 @@ export function TableEditorStructure(props: MainContentStructure) {
               <div className="flex items-center">
                 <Checkbox
                   checked={fieldIndexPkAutoIncrement}
-                  onClick={() => changeFieldIndexPkAutoIncrement(!fieldIndexPkAutoIncrement)}
+                  onClick={() => setFieldIndexPkAutoIncrement(!fieldIndexPkAutoIncrement)}
                   className="me-4"
                   id="fieldIndexAutoIncrement"
-                  disabled={fieldIndexType === STR_EMPTY}
+                  disabled={!(fieldIndexType === INDEX_PRIMARY_KEY)}
                 />
                 <label htmlFor="fieldIndexAutoIncrement" className="text-sm font-medium">
                   主键自增
@@ -431,7 +408,7 @@ export function TableEditorStructure(props: MainContentStructure) {
               <div className="flex items-center">
                 <Checkbox
                   checked={fieldIndexType === INDEX_UNIQUE}
-                  onClick={() => changeFieldIndexType(fieldIndexType === INDEX_UNIQUE ? STR_EMPTY : INDEX_UNIQUE)}
+                  onClick={() => setFieldIndexType(fieldIndexType === INDEX_UNIQUE ? STR_EMPTY : INDEX_UNIQUE)}
                   className="me-4"
                   id="INDEX_UNIQUE"
                 />
@@ -443,14 +420,14 @@ export function TableEditorStructure(props: MainContentStructure) {
             <div className="pt-2">
               <Input
                 value={fieldIndexName}
-                onInput={(e) => changeFieldIndexName(e.currentTarget.value)}
+                onInput={(e) => setFieldIndexName(e.currentTarget.value)}
                 placeholder="索引名"
                 disabled={fieldIndexType === STR_EMPTY}
               />
             </div>
           </LabeledDiv>
-          <LabeledDiv direction={DIR_H} label={"备注"}>
-            <Input value={fieldComment} onInput={(e) => changeFieldComment(e.currentTarget.value)} />
+          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"备注"}>
+            <Input value={fieldComment} onInput={(e) => setFieldComment(e.currentTarget.value)} />
           </LabeledDiv>
 
           {errorMessage && (
@@ -470,11 +447,14 @@ export function TableEditorStructure(props: MainContentStructure) {
           )}
 
           <DialogFooter>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit" onClick={onSubmit}>
+              保存
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
+      {/* 确认要执行的删除语句 */}
       <ConfirmDialog
         open={showDialogDelete}
         title={`确认要删除字段${operateFieldName}吗?`}
@@ -482,7 +462,7 @@ export function TableEditorStructure(props: MainContentStructure) {
           <>
             <div className="pt-4">
               <div className="pb-4">将要执行的语句:</div>
-              <div>{willExecCmd}</div>
+              <pre>{willExecCmd}</pre>
             </div>
           </>
         }
@@ -491,7 +471,27 @@ export function TableEditorStructure(props: MainContentStructure) {
           setShowDialogDelete(false);
         }}
         okText={"确定"}
-        okCb={handleDelete}
+        okCb={handleConfirm}
+      />
+
+      {/* 确认要执行的变更语句 */}
+      <ConfirmDialog
+        open={showDialogAlter}
+        title={`确认要保存变更吗?`}
+        content={
+          <>
+            <div className="pt-4">
+              <div className="pb-4">将要执行的语句:</div>
+              <pre>{willExecCmd}</pre>
+            </div>
+          </>
+        }
+        cancelText={"取消"}
+        cancelCb={() => {
+          setShowDialogAlter(false);
+        }}
+        okText={"确定"}
+        okCb={handleConfirm}
       />
     </div>
   );

@@ -15,7 +15,8 @@ import {
   getTableStructurePg,
 } from "@/databases/PostgreSQL/utils";
 import { coreStore } from "@/store";
-import { DbConnectionParam, GetTableDataParam } from "./types";
+import { genAlterCmdPg } from "./PostgreSQL/alter";
+import { ColumnAlterAction, DbConnectionParam, GetTableDataParam } from "./types";
 
 // 连接数据库的参数不同, 直接调用各自目录里的
 
@@ -107,9 +108,9 @@ export function exec(sql: string) {
 export function genRenameTableCmd(oldName: string, newName: string) {
   const dbType = coreStore.getState().currentDbType;
 
-  if (dbType === DB_TYPE_MYSQL) return; // TODO:
+  if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genRenameTableCmdPg(oldName, newName);
-  if (dbType === DB_TYPE_SQLITE) return; // TODO:
+  if (dbType === DB_TYPE_SQLITE) return ""; // TODO:
 
   return "";
 }
@@ -118,9 +119,9 @@ export function genRenameTableCmd(oldName: string, newName: string) {
 export function genTruncateTableCmd(tbName: string) {
   const dbType = coreStore.getState().currentDbType;
 
-  if (dbType === DB_TYPE_MYSQL) return; // TODO:
+  if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genTruncateTableCmdPg(tbName);
-  if (dbType === DB_TYPE_SQLITE) return; // TODO:
+  if (dbType === DB_TYPE_SQLITE) return ""; // TODO:
 
   return "";
 }
@@ -129,9 +130,9 @@ export function genTruncateTableCmd(tbName: string) {
 export function genDeleteTableCmd(tbName: string) {
   const dbType = coreStore.getState().currentDbType;
 
-  if (dbType === DB_TYPE_MYSQL) return; // TODO:
+  if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genDeleteTableCmdPg(tbName);
-  if (dbType === DB_TYPE_SQLITE) return; // TODO:
+  if (dbType === DB_TYPE_SQLITE) return ""; // TODO:
 
   return "";
 }
@@ -140,9 +141,9 @@ export function genDeleteTableCmd(tbName: string) {
 export function genRenameFieldCmd(tbName: string, oldName: string, newName: string) {
   const dbType = coreStore.getState().currentDbType;
 
-  if (dbType === DB_TYPE_MYSQL) return; // TODO:
+  if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genRenameFieldCmdPg(tbName, oldName, newName);
-  if (dbType === DB_TYPE_SQLITE) return; // TODO:
+  if (dbType === DB_TYPE_SQLITE) return ""; // TODO:
 
   return "";
 }
@@ -151,9 +152,9 @@ export function genRenameFieldCmd(tbName: string, oldName: string, newName: stri
 export function genDeleteFieldCmd(tbName: string, fieldName: string) {
   const dbType = coreStore.getState().currentDbType;
 
-  if (dbType === DB_TYPE_MYSQL) return; // TODO:
+  if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genDeleteFieldCmdPg(tbName, fieldName);
-  if (dbType === DB_TYPE_SQLITE) return; // TODO:
+  if (dbType === DB_TYPE_SQLITE) return ""; // TODO:
 
   return "";
 }
@@ -166,6 +167,17 @@ export function genCreateTableCmd(tbName: string) {
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genCreateTableCmdPg(tbName);
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
+
+  return "";
+}
+
+// 生成修改语句
+export function genAlterCmd(val: ColumnAlterAction[]) {
+  const dbType = coreStore.getState().currentDbType;
+
+  if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
+  if (dbType === DB_TYPE_POSTGRESQL) return genAlterCmdPg(val);
+  if (dbType === DB_TYPE_SQLITE) return ""; // TODO:
 
   return "";
 }
