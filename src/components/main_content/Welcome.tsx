@@ -26,7 +26,7 @@ export function Welcome() {
   }, []);
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4">
+    <div className="flex items-center justify-center p-4">
       <Card className="w-150">
         <CardContent>
           <div className="flex items-center pb-4">

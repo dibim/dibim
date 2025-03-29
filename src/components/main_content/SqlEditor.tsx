@@ -2,10 +2,13 @@
  * SQL 编辑器及其查询结果
  */
 import { useMemo } from "react";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { Grid3x3, NotebookText, Play, ShieldAlert } from "lucide-react";
 import * as Monaco from "monaco-editor";
 import sqlWorker from "monaco-editor/esm/vs/basic-languages/sql/sql?worker";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import Editor from "@monaco-editor/react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 // 初始化 Monaco 环境, 避免从 CDN 加载
 self.MonacoEnvironment = {
@@ -72,32 +75,87 @@ export function SqlEditor() {
     [],
   );
 
-  return (
-    <div>
-      <div>操作按钮: 执行 / 格式化等</div>
-      <div>
-        <Editor
-          height="500px"
-          language="sql"
-          theme="vs-dark"
-          beforeMount={beforeMount}
-          options={{
-            suggestOnTriggerCharacters: true, // 必须开启
-            quickSuggestions: {
-              other: true, // 非注释/字符串区域也显示建议
-              comments: false,
-              strings: true,
-            },
-            autoClosingBrackets: "always",
-            autoIndent: "full",
-            formatOnType: true,
-            wordBasedSuggestions: "off", // 禁用默认单词补全（关键！）
-            acceptSuggestionOnEnter: "on", // 回车直接选中
-          }}
-        />
+  function renderEditor() {
+    return (
+      <div className="flex">
+        <div className="pe-2 ">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Play className="mb-2" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>执行</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <NotebookText className="mb-2" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>格式化</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Grid3x3 className="mb-2" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>显示结果集</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ShieldAlert className="mb-2" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>显示状态栏</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+        <div className="flex-1">
+          <Editor
+            height="500px"
+            language="sql"
+            theme="vs-dark"
+            beforeMount={beforeMount}
+            options={{
+              suggestOnTriggerCharacters: true, // 必须开启
+              quickSuggestions: {
+                other: true, // 非注释/字符串区域也显示建议
+                comments: false,
+                strings: true,
+              },
+              autoClosingBrackets: "always",
+              autoIndent: "full",
+              formatOnType: true,
+              wordBasedSuggestions: "off", // 禁用默认单词补全（关键！）
+              acceptSuggestionOnEnter: "on", // 回车直接选中
+            }}
+          />
+        </div>
       </div>
-      <div>查询的据</div>
-      <div>错误提示</div>
+    );
+  }
+
+  return (
+    <div className="h-full">
+      <PanelGroup direction="vertical">
+        <Panel defaultSize={50} minSize={20}>
+          <div className="w-full">{renderEditor()}</div>
+        </Panel>
+        <PanelResizeHandle className="h-1 bg-secondary hover:bg-blue-500" />
+        <Panel defaultSize={25}>
+          <div className="w-full">
+            <div>错误提示</div>
+          </div>
+        </Panel>
+        <PanelResizeHandle className="h-1 bg-secondary hover:bg-blue-500" />
+        <Panel defaultSize={25}>
+          <div className="w-full">
+            <div>查询的据</div>
+          </div>
+        </Panel>
+      </PanelGroup>
     </div>
   );
 }

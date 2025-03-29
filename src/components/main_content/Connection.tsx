@@ -11,6 +11,7 @@ import { DbType, SvgComponentType } from "@/types/types";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 type ConnectionProp = {
   action: typeof STR_ADD | typeof STR_EDIT;
@@ -119,12 +120,19 @@ export function Connection(props: ConnectionProp) {
 
   function renderDbType(type: DbType, LogoComponent: SvgComponentType) {
     return (
-      <div
-        className={`p-1 rounded-md transition-all ${dbType === type ? "ring-2 ring-[var(--fvm-primary-clr)]" : ""}`}
-        onClick={() => handleClickDbLogo(type)}
-      >
-        <LogoComponent className="h-full w-auto cursor-pointer" />
-      </div>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className={`p-1 rounded-md transition-all ${dbType === type ? "ring-2 ring-[var(--fvm-primary-clr)]" : ""}`}
+            onClick={() => handleClickDbLogo(type)}
+          >
+            <LogoComponent className="h-full w-auto cursor-pointer" />
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{type}</p>
+        </TooltipContent>
+      </Tooltip>
     );
   }
 
@@ -148,7 +156,7 @@ export function Connection(props: ConnectionProp) {
     <div className="flex items-center justify-center min-h-screen p-4">
       <Card className="w-150">
         <CardHeader>
-          <CardTitle>{props.action}数据库</CardTitle>
+          <CardTitle>{props.action === STR_ADD ? "添加" : "编辑"}数据库</CardTitle>
           <CardDescription></CardDescription>
         </CardHeader>
         <CardContent>
