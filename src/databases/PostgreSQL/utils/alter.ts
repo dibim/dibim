@@ -2,9 +2,9 @@
  * 修改字段的功能
  */
 import { STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY } from "@/constants";
-import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "../constants";
-import { ColumnAlterAction } from "../types";
-import { formatToSqlValuePg } from "./utils";
+import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "../../constants";
+import { ColumnAlterAction } from "../../types";
+import { formatToSqlValuePg } from "./format";
 
 // 编辑字段
 export const genAlterFieldEdit = (ca: ColumnAlterAction) => {

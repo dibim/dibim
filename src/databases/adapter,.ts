@@ -13,20 +13,13 @@ import {
   getTableDataPg,
   getTableDdlPg,
   getTableStructurePg,
-} from "@/databases/PostgreSQL/utils";
+} from "@/databases/PostgreSQL/utils/sql";
 import { coreStore } from "@/store";
-import { genAlterCmdPg } from "./PostgreSQL/alter";
+import { genAlterCmdPg } from "./PostgreSQL/utils/alter";
+import { getDataTypeCategoryPg } from "./PostgreSQL/utils/icon";
 import { ColumnAlterAction, DbConnectionParam, GetTableDataParam } from "./types";
 
-// 连接数据库的参数不同, 直接调用各自目录里的
-
-/**
- * postgres://user:pass@host:port/db  # PostgreSQL
- * mysql://user:pass@host:port/db     # MySQL
- * sqlite:///path/to/database.db      # SQLite
- */
-
-// 获取所有表名
+// 连接数据库
 export async function connect(p: DbConnectionParam) {
   const dbType = coreStore.getState().currentDbType;
   const connName = coreStore.getState().currentConnName;
@@ -35,12 +28,6 @@ export async function connect(p: DbConnectionParam) {
   if (dbType === DB_TYPE_POSTGRESQL) return connectPg(connName, p);
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
 }
-
-/**
- *
- * @param dbType
- * @returns
- */
 
 // 获取所有表名
 export async function getAllTableName() {
@@ -177,6 +164,17 @@ export function genAlterCmd(val: ColumnAlterAction[]) {
 
   if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genAlterCmdPg(val);
+  if (dbType === DB_TYPE_SQLITE) return ""; // TODO:
+
+  return "";
+}
+
+// 根据数据类型名称返回对应的分类常量
+export function getDataTypeCategory(val: string) {
+  const dbType = coreStore.getState().currentDbType;
+
+  if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
+  if (dbType === DB_TYPE_POSTGRESQL) return getDataTypeCategoryPg(val);
   if (dbType === DB_TYPE_SQLITE) return ""; // TODO:
 
   return "";
