@@ -299,14 +299,8 @@ export function TableList() {
       <ConfirmDialog
         open={showDialogTruncate}
         title={`确认要截断${operateTableName}吗?`}
-        content={
-          <>
-            <div className="pt-4">
-              <div className="pb-4">将要执行的语句:</div>
-              <pre>{willExecCmd}</pre>
-            </div>
-          </>
-        }
+        description={`请确认将要执行的语句:`}
+        content={<pre>{willExecCmd}</pre>}
         cancelText={"取消"}
         cancelCb={() => {
           setShowDialogTruncate(false);
@@ -317,14 +311,8 @@ export function TableList() {
       <ConfirmDialog
         open={showDialogDelete}
         title={`确认要删除表格${operateTableName}吗?`}
-        content={
-          <>
-            <div className="pt-4">
-              <div className="pb-4">将要执行的语句:</div>
-              <pre>{willExecCmd}</pre>
-            </div>
-          </>
-        }
+        description={`请确认将要执行的语句:`}
+        content={<pre>{willExecCmd}</pre>}
         cancelText={"取消"}
         cancelCb={() => {
           setShowDialogDelete(false);

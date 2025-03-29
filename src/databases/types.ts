@@ -1,4 +1,4 @@
-import { STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY } from "@/constants";
+import { STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD, STR_TABLE } from "@/constants";
 import { UniqueConstraint } from "@/types/types";
 import {
   FIELD,
@@ -116,9 +116,11 @@ export type AlterActionTarget =
   | typeof FIELD_COMMENT
   | typeof FIELD;
 
-// 字段的修改数据
+export type ActionTarget = typeof STR_FIELD | typeof STR_TABLE;
+
+// 对字段的修改数据
 export type FieldAlterAction = {
-  target: "field";
+  target: ActionTarget;
   action: AlterAction;
   tableName: string;
 
@@ -134,11 +136,14 @@ export type FieldAlterAction = {
   fieldComment: string; // 字段备注
 };
 
-// 表
+// 对表的修改数据
 export type TableAlterAction = {
-  target: "table";
+  target: ActionTarget;
   action: AlterAction;
   tableName: string;
   tableNameOld: string; // 原先的表名, 重命名的时候用
   comment: string; // 表注释
 };
+
+
+export type AllAlterAction = FieldAlterAction | TableAlterAction;

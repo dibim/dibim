@@ -6,6 +6,9 @@ export const STR_ADD = "add";
 export const STR_EDIT = "edit";
 export const STR_DELETE = "delete";
 
+export const STR_FIELD = "field";
+export const STR_TABLE = "table";
+
 // 样式
 export const HEDAER_H = 12; // header 的 h- 属性值, 对应 tailwindcss 的
 

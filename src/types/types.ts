@@ -42,11 +42,6 @@ export type ExecResult = {
   lastInsertId: number;
 };
 
-// 表结构
-export type MainContentStructure = {
-  getData: () => void;
-};
-
 // 数据库类型
 export type DbType = typeof DB_TYPE_MYSQL | typeof DB_TYPE_POSTGRESQL | typeof DB_TYPE_SQLITE;
 
