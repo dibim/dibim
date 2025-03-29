@@ -2,7 +2,6 @@ import * as React from "react";
 import { Database, DatabaseBackup, FilePenLine, Link, Settings, SquareFunction, Table, View } from "lucide-react";
 import Logo from "@/assets/logo.svg?react";
 import {
-  Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
@@ -10,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  Sidebar as SidebarSc,
 } from "@/components/ui/sidebar";
 import {
   APP_NAME,
@@ -23,11 +23,11 @@ import {
 } from "@/constants";
 import { useCoreStore } from "@/store";
 
-export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
   const { sidebarOpen, setMainContenType, listBarType, setListBarType, setListBarOpen } = useCoreStore();
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <SidebarSc collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -178,6 +178,6 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
-    </Sidebar>
+    </SidebarSc>
   );
 }
