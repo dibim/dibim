@@ -1,0 +1,22 @@
+<svg
+   width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"  
+  xmlns="http://www.w3.org/2000/svg">
+
+ <g fill="currentColor" transform="matrix(0.99614176,0,0,1.4460578,0.99999996,-6.8571496)">
+    <path
+       d="M 4.2150722,20.647272 V 6.9043806 H 3.4332275e-8 V 5.4334961 H 10.142517 V 6.9043806 H 5.9274452 V 20.647272 Z"
+       style="stroke:none"
+       id="path5782" />
+    <path
+       d="M 13.655066,20.647272 V 5.4334961 h 8.430144 v 1.4708845 h -6.695817 v 5.0712584 h 5.905491 v 1.470885 h -5.905491 v 7.200748 z"
+       style="stroke:none"
+       id="path5784" />
+  </g>
+</svg>
