@@ -9,7 +9,7 @@ export const STR_DELETE = "delete";
 // 样式
 export const HEDAER_H = 12; // header 的 h- 属性值, 对应 tailwindcss 的
 
-// 次级侧边栏
+// 次级侧边栏的样式
 export const SUB_SIDEBAR_DEFAULT_WIDTH = 280; // 默认宽度
 export const SUB_SIDEBAR_MIN_WIDTH = 150; // 最小宽度
 
@@ -44,6 +44,9 @@ export const FIELD_TYPE_BIT_STRING = "BIT_STRING";
 export const FIELD_TYPE_MONETARY = "MONETARY";
 export const FIELD_TYPE_PSEUDO = "PSEUDO";
 
+// 空的新表名, 添加表格时模式临时使用
+export const EMPTY_NEW_TABLE_NAE = "/*NEW_TABLE*/";
+
 // 次级侧边栏的类型
 export const SUB_SIDEBAR_TYPE_DB_LIST = "dbList";
 export const SUB_SIDEBAR_TYPE_TABLE_LIST = "tableList";
@@ -57,6 +60,14 @@ export const MAIN_CONTEN_TYPE_EDIT_CONNECTION = "editConnection";
 export const MAIN_CONTEN_TYPE_TABLE_EDITOR = "tableEditor";
 export const MAIN_CONTEN_TYPE_SETTINGS = "settings";
 export const MAIN_CONTEN_TYPE_SQL_EDITOR = "sqlEditor";
+
+// 主要区域的标签页
+export const TAB_STRUCTURE = "TAB_STRUCTURE";
+export const TAB_DDL = "TAB_DDL";
+export const TAB_CONSTRAINT = "TAB_CONSTRAINT";
+export const TAB_DATA = "TAB_DATA";
+export const TAB_PARTITION = "TAB_PARTITION";
+export const TAB_FOREIGN_KEY = "TAB_FOREIGN_KEY";
 
 // 方向
 export const DIR_H = "horizontal";

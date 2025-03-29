@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import bytes from "bytes";
-import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, LucideIcon } from "lucide-react";
+import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, CirclePlus, LucideIcon } from "lucide-react";
 import { toast } from "sonner";
-import { MAIN_CONTEN_TYPE_TABLE_EDITOR } from "@/constants";
+import { EMPTY_NEW_TABLE_NAE, MAIN_CONTEN_TYPE_TABLE_EDITOR, TAB_STRUCTURE } from "@/constants";
 import {
   exec,
   genDeleteTableCmd,
@@ -25,13 +25,19 @@ type TableData = {
 };
 
 export function TableList() {
-  const { setCurrentTableName, setMainContenType } = useCoreStore();
+  const { setCurrentTableName, setMainContenType, setMainContenTab, setIsAddingTable } = useCoreStore();
 
   const [tablData, setTableData] = useState<TableData[]>([]);
 
   const clickItem = (item: ListItem) => {
     setCurrentTableName(item.id);
     setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
+  };
+
+  const addTable = () => {
+    setIsAddingTable(true);
+    setCurrentTableName(EMPTY_NEW_TABLE_NAE);
+    setMainContenTab(TAB_STRUCTURE);
   };
 
   // ========== 排序 ==========
@@ -140,7 +146,6 @@ export function TableList() {
     if (res && res.data) {
       // 获取表格大小
       const sizeRes = await getAllTableSize();
-
       if (sizeRes && sizeRes.data) {
         const arrTb: TableData[] = [];
 
@@ -260,6 +265,7 @@ export function TableList() {
         {renderSortBtn(sortByNameDesc, ArrowDownZA, "按表名倒序排序")}
         {renderSortBtn(sortByBytesAsc, ArrowDown01, "按表格大小正序排序")}
         {renderSortBtn(sortByBytesDesc, ArrowUp01, "按表格大小倒序排序")}
+        {renderSortBtn(addTable, CirclePlus, "添加表格")}
       </div>
       {!tablData || (tablData.length === 0 && <EmptyList />)}
 
