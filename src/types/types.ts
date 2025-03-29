@@ -10,10 +10,10 @@ import {
   MAIN_CONTEN_TYPE_TABLE_EDITOR,
   MAIN_CONTEN_TYPE_WELCOME,
   STR_EMPTY,
-  SUB_SIDEBAR_TYPE_DB_LIST,
-  SUB_SIDEBAR_TYPE_FUNC_LIST,
-  SUB_SIDEBAR_TYPE_TABLE_LIST,
-  SUB_SIDEBAR_TYPE_VIEW_LIST,
+  LIST_BAR_TYPE_DB_LIST,
+  LIST_BAR_TYPE_FUNC_LIST,
+  LIST_BAR_TYPE_TABLE_LIST,
+  LIST_SUB_SIDEBAR_TYPE_VIEW_LIST,
   TAB_CONSTRAINT,
   TAB_DATA,
   TAB_DDL,
@@ -48,12 +48,12 @@ export type DbType = typeof DB_TYPE_MYSQL | typeof DB_TYPE_POSTGRESQL | typeof D
 // 唯一约束, 主键或唯一索引
 export type UniqueConstraint = typeof STR_EMPTY | typeof INDEX_PRIMARY_KEY | typeof INDEX_UNIQUE;
 
-// 次级侧边栏的类型
-export type SubSidebarType =
-  | typeof SUB_SIDEBAR_TYPE_DB_LIST
-  | typeof SUB_SIDEBAR_TYPE_TABLE_LIST
-  | typeof SUB_SIDEBAR_TYPE_VIEW_LIST
-  | typeof SUB_SIDEBAR_TYPE_FUNC_LIST;
+// 列表栏的类型
+export type ListBarType =
+  | typeof LIST_BAR_TYPE_DB_LIST
+  | typeof LIST_BAR_TYPE_TABLE_LIST
+  | typeof LIST_SUB_SIDEBAR_TYPE_VIEW_LIST
+  | typeof LIST_BAR_TYPE_FUNC_LIST;
 
 // 主要区域的类型
 export type MainContenType =

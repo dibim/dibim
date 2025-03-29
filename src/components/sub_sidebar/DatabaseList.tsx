@@ -7,9 +7,9 @@ import {
   DB_TYPE_MYSQL,
   DB_TYPE_POSTGRESQL,
   DB_TYPE_SQLITE,
+  LIST_BAR_TYPE_TABLE_LIST,
   MAIN_CONTEN_TYPE_EDIT_CONNECTION,
   MAIN_CONTEN_TYPE_TABLE_EDITOR,
-  SUB_SIDEBAR_TYPE_TABLE_LIST,
 } from "@/constants";
 import { connect } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
@@ -19,7 +19,7 @@ import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
 
 export function DatabaseList() {
-  const { config, setConfig, setMainContenType, setSubSidebarType } = useCoreStore();
+  const { config, setConfig, setMainContenType, setListBarType } = useCoreStore();
 
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [itemIndex, setItemIndex] = useState<number>(-1);
@@ -43,7 +43,7 @@ export function DatabaseList() {
     });
 
     if (res && res.errorMessage === "") {
-      setSubSidebarType(SUB_SIDEBAR_TYPE_TABLE_LIST);
+      setListBarType(LIST_BAR_TYPE_TABLE_LIST);
       setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
     } else {
       // TODO: 优化一下报错
@@ -108,7 +108,7 @@ export function DatabaseList() {
     getData();
 
     // 监听 store 的变化
-    useCoreStore.subscribe(() => {
+    useCoreStore.subscribe((_state, _prevState) => {
       getData();
     });
   }, []);

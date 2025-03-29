@@ -2,14 +2,14 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import {
   DB_TYPE_POSTGRESQL,
+  LIST_BAR_TYPE_DB_LIST,
   MAIN_CONTEN_TYPE_WELCOME,
   MAIN_PASSWORD_DEFAULT,
-  SUB_SIDEBAR_TYPE_DB_LIST,
 } from "@/constants";
 import { TableStructure } from "@/databases/types";
 import { invoker } from "@/invoke";
 import { ConfigFile } from "@/types/conf_file";
-import { DbType, MainContenType, MainContentTab, SubSidebarType } from "@/types/types";
+import { DbType, MainContenType, MainContentTab, ListBarType } from "@/types/types";
 import { saveConfigFile } from "@/utils/config_file";
 
 // 定义 store 的类型
@@ -44,11 +44,11 @@ export interface CoreStoreState {
   sidebarOpen: boolean;
   setSidebarOpen: (val: boolean) => void;
 
-  // 次级侧边栏的类型
-  subSidebarOpen: boolean;
-  setSubSidebarOpen: (val: boolean) => void;
-  subSidebarType: SubSidebarType;
-  setSubSidebarType: (val: SubSidebarType) => void;
+  // 列表栏的类型
+  listBarOpen: boolean;
+  setListBarOpen: (val: boolean) => void;
+  listBarType: ListBarType;
+  setListBarType: (val: ListBarType) => void;
 
   // 主要区域的类型
   mainContenType: MainContenType;
@@ -116,10 +116,10 @@ export const useCoreStore = create<CoreStoreState>()(
       sidebarOpen: true,
       setSidebarOpen: (val: boolean) => set({ sidebarOpen: val }),
 
-      subSidebarOpen: true,
-      setSubSidebarOpen: (val: boolean) => set({ subSidebarOpen: val }),
-      subSidebarType: SUB_SIDEBAR_TYPE_DB_LIST,
-      setSubSidebarType: (val: SubSidebarType) => set({ subSidebarType: val }),
+      listBarOpen: true,
+      setListBarOpen: (val: boolean) => set({ listBarOpen: val }),
+      listBarType: LIST_BAR_TYPE_DB_LIST,
+      setListBarType: (val: ListBarType) => set({ listBarType: val }),
 
       mainContenType: MAIN_CONTEN_TYPE_WELCOME,
       setMainContenType: (val: MainContenType) => set({ mainContenType: val }),
@@ -142,7 +142,7 @@ export const useCoreStore = create<CoreStoreState>()(
           currentTableName: "",
           currentTableStructure: [],
           sidebarOpen: true,
-          subSidebarType: SUB_SIDEBAR_TYPE_DB_LIST,
+          listBarType: LIST_BAR_TYPE_DB_LIST,
           mainContenType: MAIN_CONTEN_TYPE_WELCOME,
           isAddingTable: false,
           mainContenTab: "",
