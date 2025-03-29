@@ -253,7 +253,7 @@ export function TableList() {
     getData();
 
     // 监听 store 的变化
-    useCoreStore.subscribe(() => {
+    useCoreStore.subscribe((_state, _prevState) => {
       getData();
     });
   }, []);

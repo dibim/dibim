@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { useEffect, useRef, useState } from "react";
+import { ImperativePanelHandle, Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { AlertCircle, PanelLeftDashed, PanelLeftIcon } from "lucide-react";
-import { Separator } from "@radix-ui/react-separator";
 import { MainContent } from "@/components/main_content/MainContent";
 import { TableList } from "@/components/sub_sidebar/TableList";
 import { Button } from "@/components/ui/button";
@@ -10,11 +9,11 @@ import {
   APP_NAME,
   CONFIG_FILE_MAIN,
   HEDAER_H,
+  LIST_BAR_DEFAULT_WIDTH,
+  LIST_BAR_MIN_WIDTH,
+  LIST_BAR_TYPE_DB_LIST,
+  LIST_BAR_TYPE_TABLE_LIST,
   MAIN_PASSWORD_DEFAULT,
-  SUB_SIDEBAR_DEFAULT_WIDTH,
-  SUB_SIDEBAR_MIN_WIDTH,
-  SUB_SIDEBAR_TYPE_DB_LIST,
-  SUB_SIDEBAR_TYPE_TABLE_LIST,
 } from "@/constants";
 import { invoker } from "@/invoke";
 import { clearCoreStore, useCoreStore } from "@/store";
@@ -25,33 +24,28 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card"
 import { Input } from "./ui/input";
 
 export function Main() {
-  const {
-    setConfig,
-    subSidebarType,
-    sidebarOpen,
-    setSidebarOpen,
-    subSidebarOpen,
-    setSubSidebarOpen,
-    setMainPasswordSha,
-  } = useCoreStore();
+  const { setConfig, listBarType, sidebarOpen, setSidebarOpen, listBarOpen, setListBarOpen, setMainPasswordSha } =
+    useCoreStore();
 
   const { toggleSidebar, setOpenMobile, setOpen } = useSidebar();
 
-  // ========== 控制次级侧边栏 ==========
+  // ========== 控制列表栏 ==========
   const [defaultSizePercent, setDefaultSizePercent] = useState(20);
   const [minSizePercent, setMinSizePercent] = useState(10);
+  const panelRef = useRef<ImperativePanelHandle>(null);
+
   useEffect(() => {
     const updateSize = () => {
       const screenAvailWidth = window.screen.availWidth;
-      setDefaultSizePercent((SUB_SIDEBAR_DEFAULT_WIDTH / screenAvailWidth) * 100);
-      setMinSizePercent((SUB_SIDEBAR_MIN_WIDTH / screenAvailWidth) * 100);
+      setDefaultSizePercent((LIST_BAR_DEFAULT_WIDTH / screenAvailWidth) * 100);
+      setMinSizePercent((LIST_BAR_MIN_WIDTH / screenAvailWidth) * 100);
     };
 
     updateSize();
     window.addEventListener("resize", updateSize);
     return () => window.removeEventListener("resize", updateSize);
   }, []);
-  // ========== 控制次级侧边栏 结束 ==========
+  // ========== 控制列表栏 结束 ==========
 
   // ========== 配置初始化  ==========
   clearCoreStore(); // 清空旧的 store 数据
@@ -110,6 +104,15 @@ export function Main() {
     checkConfigFile();
     setOpenMobile(sidebarOpen);
     setOpen(sidebarOpen);
+
+    // 监听 store 的变化
+    useCoreStore.subscribe((state, _prevState) => {
+      if (state.listBarOpen) {
+        if (panelRef.current) panelRef.current.expand();
+      } else {
+        if (panelRef.current) panelRef.current?.collapse();
+      }
+    });
   }, []);
 
   return (
@@ -154,33 +157,36 @@ export function Main() {
               onClick={() => {
                 setOpenMobile(!sidebarOpen);
                 setOpen(!sidebarOpen);
-                toggleSidebar();
                 setSidebarOpen(!sidebarOpen);
+                toggleSidebar();
               }}
             >
               <PanelLeftIcon />
-              <span className="sr-only">Toggle Sidebar</span>
+              <span className="sr-only">切换侧边栏</span>
             </Button>
 
             <Button
-              data-sidebar="trigger"
               variant="ghost"
               onClick={() => {
-                setSubSidebarOpen(!subSidebarOpen);
+                setListBarOpen(!listBarOpen);
               }}
             >
               <PanelLeftDashed />
-              <span className="sr-only">Toggle SubSidebar</span>
+              <span className="sr-only">切换列表栏</span>
             </Button>
-
-            <Separator orientation="vertical" className="mr-2 h-4" />
           </header>
 
           <PanelGroup direction="horizontal">
-            <Panel defaultSize={defaultSizePercent} minSize={minSizePercent}>
+            <Panel
+              ref={panelRef}
+              defaultSize={defaultSizePercent}
+              minSize={minSizePercent}
+              collapsible
+              collapsedSize={0}
+            >
               <div className="p-2" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}>
-                {subSidebarType === SUB_SIDEBAR_TYPE_DB_LIST && <DatabaseList />}
-                {subSidebarType === SUB_SIDEBAR_TYPE_TABLE_LIST && <TableList />}
+                {listBarType === LIST_BAR_TYPE_DB_LIST && <DatabaseList />}
+                {listBarType === LIST_BAR_TYPE_TABLE_LIST && <TableList />}
               </div>
             </Panel>
             <PanelResizeHandle className="w-1 bg-secondary hover:bg-blue-500" />

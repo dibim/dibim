@@ -1,15 +1,5 @@
 import * as React from "react";
-import {
-  Database,
-  DatabaseBackup,
-  FilePenLine,
-  Link,
-  ScanSearch,
-  Settings,
-  SquareFunction,
-  Table,
-  View,
-} from "lucide-react";
+import { Database, DatabaseBackup, FilePenLine, Link, Settings, SquareFunction, Table, View } from "lucide-react";
 import Logo from "@/assets/logo.svg?react";
 import {
   Sidebar,
@@ -23,18 +13,18 @@ import {
 } from "@/components/ui/sidebar";
 import {
   APP_NAME,
+  LIST_BAR_TYPE_DB_LIST,
+  LIST_BAR_TYPE_FUNC_LIST,
+  LIST_BAR_TYPE_TABLE_LIST,
+  LIST_SUB_SIDEBAR_TYPE_VIEW_LIST,
   MAIN_CONTEN_TYPE_ADD_CONNECTION,
   MAIN_CONTEN_TYPE_SETTINGS,
   MAIN_CONTEN_TYPE_SQL_EDITOR,
-  SUB_SIDEBAR_TYPE_DB_LIST,
-  SUB_SIDEBAR_TYPE_FUNC_LIST,
-  SUB_SIDEBAR_TYPE_TABLE_LIST,
-  SUB_SIDEBAR_TYPE_VIEW_LIST,
 } from "@/constants";
 import { useCoreStore } from "@/store";
 
 export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { sidebarOpen, setMainContenType, subSidebarType, setSubSidebarType, setSubSidebarOpen } = useCoreStore();
+  const { sidebarOpen, setMainContenType, listBarType, setListBarType, setListBarOpen } = useCoreStore();
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -55,13 +45,13 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
             <SidebarMenuButton
               tooltip={"数据库"}
               onClick={() => {
-                setSubSidebarType(SUB_SIDEBAR_TYPE_DB_LIST);
-                setSubSidebarOpen(true);
+                setListBarType(LIST_BAR_TYPE_DB_LIST);
+                setListBarOpen(true);
               }}
             >
               <Database />
               <span
-                className={`${subSidebarType === SUB_SIDEBAR_TYPE_DB_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
+                className={`${listBarType === LIST_BAR_TYPE_DB_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
               >
                 数据库
               </span>
@@ -74,13 +64,13 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
             <SidebarMenuButton
               tooltip={"表格"}
               onClick={() => {
-                setSubSidebarType(SUB_SIDEBAR_TYPE_TABLE_LIST);
-                setSubSidebarOpen(true);
+                setListBarType(LIST_BAR_TYPE_TABLE_LIST);
+                setListBarOpen(true);
               }}
             >
               <Table />
               <span
-                className={`${subSidebarType === SUB_SIDEBAR_TYPE_TABLE_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
+                className={`${listBarType === LIST_BAR_TYPE_TABLE_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
               >
                 表格
               </span>
@@ -93,13 +83,13 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
             <SidebarMenuButton
               tooltip={"函数"}
               onClick={() => {
-                setSubSidebarType(SUB_SIDEBAR_TYPE_FUNC_LIST);
-                setSubSidebarOpen(true);
+                setListBarType(LIST_BAR_TYPE_FUNC_LIST);
+                setListBarOpen(true);
               }}
             >
               <SquareFunction />
               <span
-                className={`${subSidebarType === SUB_SIDEBAR_TYPE_FUNC_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
+                className={`${listBarType === LIST_BAR_TYPE_FUNC_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
               >
                 函数
               </span>
@@ -112,13 +102,13 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
             <SidebarMenuButton
               tooltip={"视图"}
               onClick={() => {
-                setSubSidebarType(SUB_SIDEBAR_TYPE_VIEW_LIST);
-                setSubSidebarOpen(true);
+                setListBarType(LIST_SUB_SIDEBAR_TYPE_VIEW_LIST);
+                setListBarOpen(true);
               }}
             >
               <View />
               <span
-                className={`${subSidebarType === SUB_SIDEBAR_TYPE_VIEW_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
+                className={`${listBarType === LIST_SUB_SIDEBAR_TYPE_VIEW_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
               >
                 视图
               </span>
@@ -133,7 +123,7 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               tooltip={"添加数据库"}
               onClick={() => {
                 setMainContenType(MAIN_CONTEN_TYPE_ADD_CONNECTION);
-                setSubSidebarOpen(true);
+                setListBarOpen(true);
               }}
             >
               <Link color="var(--fvm-info-clr)" />
@@ -148,7 +138,7 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               tooltip={"SQL编辑器"}
               onClick={() => {
                 setMainContenType(MAIN_CONTEN_TYPE_SQL_EDITOR);
-                setSubSidebarOpen(true);
+                setListBarOpen(true);
               }}
             >
               <FilePenLine color="var(--fvm-info-clr)" />
@@ -163,7 +153,7 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               tooltip={"备份"}
               onClick={() => {
                 // setMainContenType(MAIN_CONTEN_TYPE_SETTINGS);
-                setSubSidebarOpen(true);
+                setListBarOpen(true);
               }}
             >
               <DatabaseBackup color="var(--fvm-info-clr)" />
@@ -178,7 +168,7 @@ export function MainSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               tooltip={"设置"}
               onClick={() => {
                 setMainContenType(MAIN_CONTEN_TYPE_SETTINGS);
-                setSubSidebarOpen(true);
+                setListBarOpen(true);
               }}
             >
               <Settings color="var(--fvm-info-clr)" />
