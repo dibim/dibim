@@ -9,7 +9,7 @@ import {
 import { TableStructure } from "@/databases/types";
 import { invoker } from "@/invoke";
 import { ConfigFile } from "@/types/conf_file";
-import { DbType, MainContenType, SubSidebarType } from "@/types/types";
+import { DbType, MainContenType, MainContentTab, SubSidebarType } from "@/types/types";
 import { saveConfigFile } from "@/utils/config_file";
 
 // 定义 store 的类型
@@ -39,6 +39,8 @@ export interface CoreStoreState {
   // 当前表结构
   currentTableStructure: TableStructure[];
   setCurrentTableStructure: (val: TableStructure[]) => void;
+  currentTableComment: string;
+  setCurrentTableComment: (val: string) => void;
 
   // 侧边栏
   sidebarOpen: boolean;
@@ -53,6 +55,10 @@ export interface CoreStoreState {
   // 主要区域的类型
   mainContenType: MainContenType;
   setMainContenType: (val: MainContenType) => void;
+  mainContenTab: MainContentTab;
+  setMainContenTab: (val: MainContentTab) => void;
+  isAddingTable: boolean;
+  setIsAddingTable: (val: boolean) => void;
 
   // 要编辑的数据库连接
   editDbConnIndex: number;
@@ -108,6 +114,8 @@ export const useCoreStore = create<CoreStoreState>()(
 
       currentTableStructure: [],
       setCurrentTableStructure: (val: TableStructure[]) => set({ currentTableStructure: val }),
+      currentTableComment: "",
+      setCurrentTableComment: (val: string) => set({ currentTableComment: val }),
 
       sidebarOpen: true,
       setSidebarOpen: (val: boolean) => set({ sidebarOpen: val }),
@@ -119,6 +127,10 @@ export const useCoreStore = create<CoreStoreState>()(
 
       mainContenType: MAIN_CONTEN_TYPE_WELCOME,
       setMainContenType: (val: MainContenType) => set({ mainContenType: val }),
+      mainContenTab: "",
+      setMainContenTab: (val: MainContentTab) => set({ mainContenTab: val }),
+      isAddingTable: false,
+      setIsAddingTable: (val: boolean) => set({ isAddingTable: val }),
 
       editDbConnIndex: 0,
       setEditDbConnndex: (val: number) => set({ editDbConnIndex: val }),
@@ -133,9 +145,12 @@ export const useCoreStore = create<CoreStoreState>()(
           currentDbNme: "",
           currentTableName: "",
           currentTableStructure: [],
+          currentTableComment: "",
           sidebarOpen: true,
           subSidebarType: SUB_SIDEBAR_TYPE_DB_LIST,
           mainContenType: MAIN_CONTEN_TYPE_WELCOME,
+          isAddingTable: false,
+          mainContenTab: "",
           editDbConnIndex: 0,
         }),
     }),

@@ -1,39 +1,35 @@
 /**
  * 点击表格显示数据
  */
-import { useEffect, useState } from "react";
-import { STR_EMPTY } from "@/constants";
+import { useEffect } from "react";
+import {
+  STR_EMPTY,
+  TAB_CONSTRAINT,
+  TAB_DATA,
+  TAB_DDL,
+  TAB_FOREIGN_KEY,
+  TAB_PARTITION,
+  TAB_STRUCTURE,
+} from "@/constants";
 import { getTableStructure } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
 import { Card, CardContent } from "../ui/card";
+import { Input } from "../ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { TableEditorConstraint } from "./TableEditorConstraint";
 import { TableEditorData } from "./TableEditorData";
 import { TableEditorDdl } from "./TableEditorDdl";
 import { TableEditorStructure } from "./TableEditorStructure";
 
-const TAB_STRUCTURE = "TAB_STRUCTURE";
-const TAB_DDL = "TAB_DDL";
-const TAB_CONSTRAINT = "TAB_CONSTRAINT";
-const TAB_DATA = "TAB_DATA";
-const TAB_PARTITION = "TAB_PARTITION";
-const TAB_FOREIGN_KEY = "TAB_FOREIGN_KEY";
-
-type MainContentTab =
-  | typeof STR_EMPTY
-  | typeof TAB_DATA
-  | typeof TAB_STRUCTURE
-  | typeof TAB_DDL
-  | typeof TAB_CONSTRAINT
-  | typeof TAB_FOREIGN_KEY
-  | typeof TAB_PARTITION;
-
 export function TableEditor() {
-  const { currentTableName, setCurrentTableStructure } = useCoreStore();
-
-  // tabName 先使用空的, 避免表结构没获取到就查询表数据出问题
-  // 注意: 使用 value 控制 Tabs 组件的显示, TabsTrigger 要添加 onClick 修改 tabName
-  const [tabName, setTabName] = useState<MainContentTab>("");
+  const {
+    currentTableName,
+    setCurrentTableName,
+    setCurrentTableStructure,
+    mainContenTab,
+    setMainContenTab,
+    isAddingTable,
+  } = useCoreStore();
 
   // 获取表结构, 会在多个地方用, 在这里记录到 store
   const getData = async () => {
@@ -44,7 +40,7 @@ export function TableEditor() {
     const res = await getTableStructure(currentTableName);
     if (res && res.data) {
       setCurrentTableStructure(res.data);
-      if (tabName === STR_EMPTY) setTabName(TAB_DATA);
+      if (mainContenTab === STR_EMPTY) setMainContenTab(TAB_DATA);
     }
   };
 
@@ -57,16 +53,26 @@ export function TableEditor() {
   }, []);
 
   return (
-    <Tabs value={tabName} className="w-full">
+    // 注意: 使用 value 控制 Tabs 组件的显示, TabsTrigger 要添加 onClick 修改 mainContenTab
+    <Tabs value={mainContenTab} className="w-full">
       <div className="flex">
         <div className="flex items-center pe-4">
-          <strong>{currentTableName}</strong>{" "}
+          {isAddingTable ? (
+            <Input
+              placeholder={"请输入表名"}
+              onInput={(e) => {
+                setCurrentTableName(e.currentTarget.value);
+              }}
+            />
+          ) : (
+            <strong>{currentTableName}</strong>
+          )}
         </div>
         <TabsList className="grid grid-cols-6">
           <TabsTrigger
             value={TAB_STRUCTURE}
             onClick={() => {
-              setTabName(TAB_STRUCTURE);
+              setMainContenTab(TAB_STRUCTURE);
             }}
           >
             表结构
@@ -75,7 +81,7 @@ export function TableEditor() {
           <TabsTrigger
             value={TAB_DDL}
             onClick={() => {
-              setTabName(TAB_DDL);
+              setMainContenTab(TAB_DDL);
             }}
           >
             DDL
@@ -84,7 +90,7 @@ export function TableEditor() {
           <TabsTrigger
             value={TAB_CONSTRAINT}
             onClick={() => {
-              setTabName(TAB_CONSTRAINT);
+              setMainContenTab(TAB_CONSTRAINT);
             }}
           >
             约束
@@ -93,7 +99,7 @@ export function TableEditor() {
           <TabsTrigger
             value={TAB_FOREIGN_KEY}
             onClick={() => {
-              setTabName(TAB_FOREIGN_KEY);
+              setMainContenTab(TAB_FOREIGN_KEY);
             }}
           >
             外键
@@ -102,7 +108,7 @@ export function TableEditor() {
           <TabsTrigger
             value={TAB_PARTITION}
             onClick={() => {
-              setTabName(TAB_PARTITION);
+              setMainContenTab(TAB_PARTITION);
             }}
           >
             分区
@@ -111,7 +117,7 @@ export function TableEditor() {
           <TabsTrigger
             value={TAB_DATA}
             onClick={() => {
-              setTabName(TAB_DATA);
+              setMainContenTab(TAB_DATA);
             }}
           >
             数据

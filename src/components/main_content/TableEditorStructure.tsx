@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY } from "@/constants";
 import { exec, genAlterCmd, genDeleteFieldCmd } from "@/databases/adapter,";
 import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "@/databases/constants";
-import { ColumnAlterAction, TableStructure } from "@/databases/types";
+import { FieldAlterAction, TableStructure } from "@/databases/types";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
 import { MainContentStructure, UniqueConstraint } from "@/types/types";
@@ -26,9 +26,15 @@ import { renderDataTypeIcon } from "./TableEditorStructureIcon";
 type DialogAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
 
 export function TableEditorStructure(props: MainContentStructure) {
-  const { currentTableStructure, currentTableName } = useCoreStore();
+  const {
+    currentTableStructure,
+    setCurrentTableStructure,
+    currentTableName,
+    currentTableComment,
+    setCurrentTableComment,
+  } = useCoreStore();
 
-  const [alterData, setAlterData] = useState<ColumnAlterAction[]>([]); // 表结构的修改数据
+  const [alterData, setAlterData] = useState<FieldAlterAction[]>([]); // 表结构的修改数据
   const [deletedFieldIndex, setDeletedFieldIndex] = useState<Set<number>>(new Set()); // 删除的字段的索引
   const [selectedFieldIndex, setSelectedFieldIndex] = useState<Set<number>>(new Set()); // 选中的字段的索引
   const [operateFieldName, setOperateFieldName] = useState<string>(""); // 现在操作的行的索引
@@ -51,9 +57,8 @@ export function TableEditorStructure(props: MainContentStructure) {
   const [fieldIndexPkAutoIncrement, setFieldIndexPkAutoIncrement] = useState<boolean>(false); // 字段主键自增
   const [fieldIndexName, setFieldIndexName] = useState<string>(""); // 字段索引名
   const [fieldComment, setFieldComment] = useState<string>(""); // 字段备注
-  const [tableComment, setTableComment] = useState<string>(""); // 表备注
 
-  function resetDialogData(caa: ColumnAlterAction | null) {
+  function resetDialogData(caa: FieldAlterAction | null) {
     setFieldName(caa ? caa.fieldName : "");
     setFieldType(caa ? caa.fieldType : "");
     setFieldSize(caa ? caa.fieldSize : "");
@@ -63,7 +68,7 @@ export function TableEditorStructure(props: MainContentStructure) {
     setFieldIndexPkAutoIncrement(caa ? caa.fieldIndexPkAutoIncrement : false);
     setFieldIndexName(caa ? caa.fieldIndexName : "");
     setFieldComment(caa ? caa.fieldComment : "");
-    setTableComment(caa ? caa.tableComment : "");
+    setCurrentTableComment("");
   }
 
   // 选中行, 删除的时候使用
@@ -77,23 +82,22 @@ export function TableEditorStructure(props: MainContentStructure) {
     setSelectedFieldIndex(newSelectedRows);
   };
 
-  // 添加列
+  // 点击添加字段
   function handleAddField() {
     resetDialogData(null);
     setShowDialogEdit(true);
     setDialogAction(STR_ADD);
   }
 
-  // 删除选中的列
+  // 删除选中的字段
   function handleDelSelectedField() {
     for (const index of selectedFieldIndex) {
       const field = currentTableStructure[index];
 
       alterData.push({
+        target: "field",
         action: STR_DELETE,
-
         tableName: currentTableName,
-        tableComment: "",
 
         fieldName: field.column_name,
         fieldNameExt: "",
@@ -112,7 +116,7 @@ export function TableEditorStructure(props: MainContentStructure) {
     setAlterData(alterData);
   }
 
-  // 应用, 弹出确认框, 确认之后才执行
+  // 点击应用按钮, 弹出确认框, 确认之后才执行
   function handleApply() {
     if (alterData.length === 0) {
       toast("请先选中要操作的字段");
@@ -123,14 +127,14 @@ export function TableEditorStructure(props: MainContentStructure) {
     setShowDialogAlter(true);
   }
 
-  // 取消
+  // 点击取消按钮
   function handleCancel() {
     setAlterData([]);
     setDeletedFieldIndex(new Set());
     setSelectedFieldIndex(new Set());
   }
 
-  // 弹出确认编辑列
+  // 点击编辑按钮, 弹出编辑对话框
   function handleEditColPopup(index: number) {
     const field = currentTableStructure[index];
 
@@ -151,9 +155,9 @@ export function TableEditorStructure(props: MainContentStructure) {
     }
 
     resetDialogData({
+      target: "field",
       action: STR_EDIT,
       tableName: currentTableName,
-      tableComment: "", // TODO: 添加表注释
       fieldName: field.column_name,
       fieldNameExt: "",
       fieldType: field.data_type,
@@ -212,7 +216,7 @@ export function TableEditorStructure(props: MainContentStructure) {
   // 提交变更
   async function onSubmit() {
     // 找到 alterData 里对应的字段的数据
-    let actionDataFinded: ColumnAlterAction | null = null;
+    let actionDataFinded: FieldAlterAction | null = null;
     let actionDataFindedIndex = -1;
 
     for (let index = 0; index < alterData.length; index++) {
@@ -223,34 +227,55 @@ export function TableEditorStructure(props: MainContentStructure) {
       }
     }
 
-    const actionData: ColumnAlterAction = {
+    const actionData: FieldAlterAction = {
+      target: "field",
       action: dialogAction,
-
       tableName: currentTableName,
-      tableComment,
 
+      fieldComment,
+      fieldDefalut,
+      fieldIndexName,
+      fieldIndexPkAutoIncrement,
+      fieldIndexType,
       // 如果是编辑, 要记录编辑之前的列名, 重命名的时候会用到
       // 如果是添加, 直接使用输入框里的字段名
       fieldName: dialogAction === STR_EDIT ? fieldNameEditing : fieldName,
       fieldNameExt: fieldName, // 输入框里的列名
-      fieldType,
-      fieldSize,
-      fieldDefalut,
       fieldNotNull,
-      fieldIndexType,
-      fieldIndexPkAutoIncrement,
-      fieldIndexName,
-      fieldComment,
+      fieldSize,
+      fieldType,
     };
 
     if (actionDataFindedIndex > -1) {
       alterData[actionDataFindedIndex] = { ...actionDataFinded, ...actionData };
     } else {
       alterData.push(actionData);
+
+      // 添加字段的还得在前端添加表结构数据
+      currentTableStructure.push({
+        has_check_conditions: undefined,
+        column_name: fieldName,
+        data_type: fieldType,
+        column_default: fieldDefalut,
+        comment: fieldComment,
+        size: parseInt(fieldSize) || 0,
+        is_primary_key: false,
+        is_unique_key: false,
+        is_foreign_key: false,
+        is_not_null: false,
+      });
+      setCurrentTableStructure(currentTableStructure);
     }
 
+    // FIXME: 检查新建表格的逻辑对不对
+    console.log("actionDataFindedIndex::", actionDataFindedIndex);
+    console.log("actionData::", actionData);
+
+    // FIXME: 添加对表的操作, 重命名 / 注释 / 分区 / 约束 / 表字符集和排序规则, 不应该在这里编辑字段的时候执行!!
+    // 类型为 TableAlterAction
+
     setAlterData(alterData);
-    setShowDialogEdit(false);
+    // setShowDialogEdit(false); // TODO: 临时注释
   }
 
   /**
@@ -395,6 +420,15 @@ export function TableEditorStructure(props: MainContentStructure) {
               <p>取消</p>
             </TooltipContent>
           </Tooltip>
+        </div>
+        <div className="flex-1">
+          <Input
+            defaultValue={currentTableComment}
+            placeholder={"请输入表注释"}
+            onInput={(e) => {
+              setCurrentTableComment(e.currentTarget.value);
+            }}
+          />
         </div>
       </div>
 

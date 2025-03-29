@@ -116,12 +116,11 @@ export type AlterActionTarget =
   | typeof FIELD_COMMENT
   | typeof FIELD;
 
-// 列的修改数据
-export type ColumnAlterAction = {
+// 字段的修改数据
+export type FieldAlterAction = {
+  target: "field";
   action: AlterAction;
-
   tableName: string;
-  tableComment: string; // 表备注
 
   fieldName: string;
   fieldNameExt: string; // 改名时作为新字段名, 设置索引时作为作音的列名 TODO: 后续要支持复合索引
@@ -133,4 +132,13 @@ export type ColumnAlterAction = {
   fieldIndexPkAutoIncrement: boolean; // 字段主键自增
   fieldIndexName: string; // 字段索引名
   fieldComment: string; // 字段备注
+};
+
+// 表
+export type TableAlterAction = {
+  target: "table";
+  action: AlterAction;
+  tableName: string;
+  tableNameOld: string; // 原先的表名, 重命名的时候用
+  comment: string; // 表注释
 };
