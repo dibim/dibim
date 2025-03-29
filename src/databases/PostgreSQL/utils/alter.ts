@@ -3,18 +3,19 @@
  */
 import { STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY } from "@/constants";
 import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "../../constants";
-import { FieldAlterAction, TableAlterAction } from "../../types";
+import { AllAlterAction, FieldAlterAction, TableAlterAction } from "../../types";
 import { formatToSqlValuePg } from "./format";
 
 // 编辑字段
 export const genAlterFieldEdit = (ca: FieldAlterAction) => {
-  let res: string[] = [`\n-- 将要对字段${ca.fieldName}执行以下语句:\n`];
+  let res: string[] = [`-- 将要对字段${ca.fieldName}执行以下语句:`];
 
   // 修改数据类型
   if (ca.fieldType !== "") {
-    const size = ca.fieldSize ? `(${ca.fieldSize})` : "";
+    const size = parseInt(ca.fieldSize) | 0;
+    const sizeStr = size && size > 0 ? `(${size})` : "";
     res.push(
-      `ALTER TABLE "${ca.tableName}" ALTER COLUMN "${ca.fieldNameExt}" TYPE ${ca.fieldType}${size} USING "${ca.fieldNameExt}"::${ca.fieldType}${size};`,
+      `ALTER TABLE "${ca.tableName}" ALTER COLUMN "${ca.fieldNameExt}" TYPE ${ca.fieldType}${size} USING "${ca.fieldNameExt}"::${ca.fieldType}${sizeStr};`,
     );
   }
 
@@ -24,26 +25,26 @@ export const genAlterFieldEdit = (ca: FieldAlterAction) => {
     res.push(`
       DO $$
       DECLARE
-          constraint_name text;
+        constraint_name text;
       BEGIN
-          -- 查找关联到指定字段的主键约束名称
-          SELECT pg_constraint.conname INTO constraint_name
-          FROM pg_constraint
-          JOIN pg_class ON pg_constraint.conrelid = pg_class.oid
-          JOIN pg_attribute ON pg_attribute.attrelid = pg_class.oid AND pg_attribute.attnum = ANY(pg_constraint.conkey)
-          JOIN pg_namespace ON pg_class.relnamespace = pg_namespace.oid
-          WHERE pg_namespace.nspname = current_schema()
-          AND pg_class.relname = '${ca.tableName}'
-          AND pg_attribute.attname = '${ca.fieldName}'
-          AND pg_constraint.contype = 'p';
-          
-          -- 如果找到主键约束，则删除它
-          IF constraint_name IS NOT NULL THEN
-              EXECUTE 'ALTER TABLE "${ca.tableName}" DROP CONSTRAINT "' || constraint_name || '"';
-              RAISE NOTICE '主键约束 % 已从表"${ca.tableName}"的字段"${ca.fieldName}"上删除', constraint_name;
-          ELSE
-              RAISE NOTICE '字段"${ca.fieldName}"不是表"${ca.tableName}"的主键';
-          END IF;
+        -- 查找关联到${ca.fieldName}字段的主键约束名称
+        SELECT pg_constraint.conname INTO constraint_name
+        FROM pg_constraint
+        JOIN pg_class ON pg_constraint.conrelid = pg_class.oid
+        JOIN pg_attribute ON pg_attribute.attrelid = pg_class.oid AND pg_attribute.attnum = ANY(pg_constraint.conkey)
+        JOIN pg_namespace ON pg_class.relnamespace = pg_namespace.oid
+        WHERE pg_namespace.nspname = current_schema()
+        AND pg_class.relname = '${ca.tableName}'
+        AND pg_attribute.attname = '${ca.fieldName}'
+        AND pg_constraint.contype = 'p';
+        
+        -- 如果找到${ca.fieldName}的主键约束，则删除它
+        IF constraint_name IS NOT NULL THEN
+            EXECUTE 'ALTER TABLE "${ca.tableName}" DROP CONSTRAINT "' || constraint_name || '"';
+            RAISE NOTICE '主键约束 % 已从表"${ca.tableName}"的字段"${ca.fieldName}"上删除', constraint_name;
+        ELSE
+            RAISE NOTICE '字段"${ca.fieldName}"不是表"${ca.tableName}"的主键';
+        END IF;
       END $$; 
     `);
 
@@ -67,28 +68,28 @@ export const genAlterFieldEdit = (ca: FieldAlterAction) => {
     res.push(`
       DO $$
       DECLARE
-          index_name text;
+        index_name text;
       BEGIN
-          -- 查找关联到指定字段的唯一索引（不包括主键）
-          SELECT pgc.relname INTO index_name
-          FROM pg_class pgc
-          JOIN pg_index pgi ON pgi.indexrelid = pgc.oid
-          JOIN pg_class pgct ON pgi.indrelid = pgct.oid
-          JOIN pg_attribute pga ON pga.attrelid = pgct.oid AND pga.attnum = ANY(pgi.indkey)
-          JOIN pg_namespace pgn ON pgc.relnamespace = pgn.oid
-          WHERE pgn.nspname = current_schema()
-          AND pgct.relname = '${ca.tableName}'
-          AND pga.attname = '${ca.fieldName}'
-          AND pgi.indisunique = true
-          AND pgi.indisprimary = false;  -- 明确排除主键
-          
-          -- 如果找到唯一索引，则删除它
-          IF index_name IS NOT NULL THEN
-              EXECUTE 'DROP INDEX "' || index_name || '"';
-              RAISE NOTICE '唯一索引 % 已从表"${ca.tableName}"的字段"${ca.fieldName}"上删除', index_name;
-          ELSE
-              RAISE NOTICE '字段"${ca.fieldName}"在表"${ca.tableName}"上没有唯一索引（非主键）';
-          END IF;
+        -- 查找关联到${ca.fieldName}字段的唯一索引（不包括主键）
+        SELECT pgc.relname INTO index_name
+        FROM pg_class pgc
+        JOIN pg_index pgi ON pgi.indexrelid = pgc.oid
+        JOIN pg_class pgct ON pgi.indrelid = pgct.oid
+        JOIN pg_attribute pga ON pga.attrelid = pgct.oid AND pga.attnum = ANY(pgi.indkey)
+        JOIN pg_namespace pgn ON pgc.relnamespace = pgn.oid
+        WHERE pgn.nspname = current_schema()
+        AND pgct.relname = '${ca.tableName}'
+        AND pga.attname = '${ca.fieldName}'
+        AND pgi.indisunique = true
+        AND pgi.indisprimary = false;  -- 明确排除主键
+        
+        -- 如果找到唯一索引，则删除它
+        IF index_name IS NOT NULL THEN
+            EXECUTE 'DROP INDEX "' || index_name || '"';
+            RAISE NOTICE '唯一索引 % 已从表"${ca.tableName}"的字段"${ca.fieldName}"上删除', index_name;
+        ELSE
+            RAISE NOTICE '字段"${ca.fieldName}"在表"${ca.tableName}"上没有唯一索引（非主键）';
+        END IF;
       END $$;
     `);
 
@@ -102,32 +103,32 @@ export const genAlterFieldEdit = (ca: FieldAlterAction) => {
       DECLARE
           constraint_rec record;
       BEGIN
-          -- 查找关联到指定字段的唯一约束（包括主键）
-          FOR constraint_rec IN 
-              SELECT pg_constraint.conname as constraint_name, pg_constraint.contype as constraint_type
-              FROM pg_constraint
-              JOIN pg_class ON pg_constraint.conrelid = pg_class.oid
-              JOIN pg_attribute ON pg_attribute.attrelid = pg_class.oid AND pg_attribute.attnum = ANY(pg_constraint.conkey)
-              JOIN pg_namespace ON pg_class.relnamespace = pg_namespace.oid
-              WHERE pg_namespace.nspname = current_schema()
-              AND pg_class.relname = '${ca.tableName}'
-              AND pg_attribute.attname = '${ca.fieldName}'
-              AND pg_constraint.contype IN ('p', 'u')  -- 'p'是主键，'u'是唯一约束
-          LOOP
-              -- 删除找到的约束
-              EXECUTE 'ALTER TABLE "${ca.tableName}" DROP CONSTRAINT "' || constraint_rec.constraint_name || '"';
-              
-              IF constraint_rec.constraint_type = 'p' THEN
-                  RAISE NOTICE '已删除主键约束 % 从表"${ca.tableName}"的字段"${ca.fieldName}"', constraint_rec.constraint_name;
-              ELSE
-                  RAISE NOTICE '已删除唯一约束 % 从表"${ca.tableName}"的字段"${ca.fieldName}"', constraint_rec.constraint_name;
-              END IF;
-          END LOOP;
+        -- 查找关联到指定字段的唯一约束（包括主键）
+        FOR constraint_rec IN 
+          SELECT pg_constraint.conname as constraint_name, pg_constraint.contype as constraint_type
+          FROM pg_constraint
+          JOIN pg_class ON pg_constraint.conrelid = pg_class.oid
+          JOIN pg_attribute ON pg_attribute.attrelid = pg_class.oid AND pg_attribute.attnum = ANY(pg_constraint.conkey)
+          JOIN pg_namespace ON pg_class.relnamespace = pg_namespace.oid
+          WHERE pg_namespace.nspname = current_schema()
+          AND pg_class.relname = '${ca.tableName}'
+          AND pg_attribute.attname = '${ca.fieldName}'
+          AND pg_constraint.contype IN ('p', 'u')  -- 'p'是主键，'u'是唯一约束
+        LOOP
+          -- 删除找到的约束
+          EXECUTE 'ALTER TABLE "${ca.tableName}" DROP CONSTRAINT "' || constraint_rec.constraint_name || '"';
           
-          -- 检查是否处理了任何约束
-          IF NOT FOUND THEN
-              RAISE NOTICE '字段"${ca.fieldName}"在表"${ca.tableName}"上没有唯一索引或主键约束';
+          IF constraint_rec.constraint_type = 'p' THEN
+              RAISE NOTICE '已删除主键约束 % 从表"${ca.tableName}"的字段"${ca.fieldName}"', constraint_rec.constraint_name;
+          ELSE
+              RAISE NOTICE '已删除唯一约束 % 从表"${ca.tableName}"的字段"${ca.fieldName}"', constraint_rec.constraint_name;
           END IF;
+        END LOOP;
+        
+        -- 检查是否处理了任何约束
+        IF NOT FOUND THEN
+            RAISE NOTICE '字段"${ca.fieldName}"在表"${ca.tableName}"上没有唯一索引或主键约束';
+        END IF;
       END $$;
     `);
   }
@@ -183,13 +184,15 @@ export const genAlterFieldAdd = (ca: FieldAlterAction) => {
     } else return "";
   };
 
-  res.push(`BEGIN; 
-  ALTER TABLE "${ca.tableName}" ADD COLUMN "${ca.fieldName}" ${ca.fieldType}${size} ${ca.fieldNotNull ? "NOT NULL" : ""} ${defaultValue}${genIndx()};
+  res.push(`
+    BEGIN; 
+      ALTER TABLE "${ca.tableName}" ADD COLUMN "${ca.fieldName}" ${ca.fieldType}${size} ${ca.fieldNotNull ? "NOT NULL" : ""} ${defaultValue}${genIndx()};
 
-EXCEPTION WHEN OTHERS THEN
-  ROLLBACK;
-  RAISE EXCEPTION '修改表结构失败: %', SQLERRM;
-COMMIT;`);
+      EXCEPTION WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE EXCEPTION '修改表结构失败: %', SQLERRM;
+    COMMIT;
+  `);
 
   return res;
 };
@@ -203,17 +206,21 @@ export const genAlterFieldDel = (ca: FieldAlterAction) => {
 
 // 编辑表
 export const genAlterTableEdit = (ca: TableAlterAction) => {
-  let res: string[] = [`\n-- 将要对字段${ca.tableName}执行以下语句:\n`];
+  let res: string[] = [`-- 将要对表格${ca.tableName}执行以下语句:`];
   if (ca.comment) {
-    res.push(`COMMENT ON TABLE "${ca.tableName}" IS ${ca.comment};`);
+    res.push(`COMMENT ON TABLE "${ca.tableName}" IS '${ca.comment}';`);
   } else {
     res.push(`COMMENT ON TABLE "${ca.tableName}" IS NULL`);
+  }
+
+  if (ca.tableName !== ca.tableNameOld) {
+    res.push(`ALTER TABLE "${ca.tableNameOld}" RENAME TO "${ca.tableName}";`);
   }
 
   return res;
 };
 // 生成修改语句
-export const genAlterCmdPg = (val: FieldAlterAction[] | TableAlterAction[]) => {
+export const genAlterCmdPg = (val: AllAlterAction[]) => {
   let res: string[] = [];
 
   for (const item of val) {

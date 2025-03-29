@@ -4,13 +4,13 @@
 import { useState } from "react";
 import { AlertCircle, CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { toast } from "sonner";
-import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY } from "@/constants";
+import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
 import { exec, genAlterCmd, genDeleteFieldCmd } from "@/databases/adapter,";
 import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "@/databases/constants";
-import { FieldAlterAction, TableStructure } from "@/databases/types";
+import { AllAlterAction, FieldAlterAction, TableStructure } from "@/databases/types";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
-import { MainContentStructure, UniqueConstraint } from "@/types/types";
+import { UniqueConstraint } from "@/types/types";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { LabeledDiv } from "../LabeledDiv";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
@@ -25,16 +25,25 @@ import { renderDataTypeIcon } from "./TableEditorStructureIcon";
 
 type DialogAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
 
-export function TableEditorStructure(props: MainContentStructure) {
-  const {
-    currentTableStructure,
-    setCurrentTableStructure,
-    currentTableName,
-    currentTableComment,
-    setCurrentTableComment,
-  } = useCoreStore();
+export type MainContentStructureProp = {
+  getData: () => void;
+  alterData: AllAlterAction[];
+  setAlterData: (val: AllAlterAction[]) => void;
+  changeTable: () => void;
+  editingTableComment: string;
+  setEditingTableComment: (val: string) => void;
+};
 
-  const [alterData, setAlterData] = useState<FieldAlterAction[]>([]); // 表结构的修改数据
+export function TableEditorStructure({
+  getData,
+  alterData,
+  setAlterData,
+  changeTable,
+  editingTableComment,
+  setEditingTableComment,
+}: MainContentStructureProp) {
+  const { currentTableStructure, setCurrentTableStructure, currentTableName } = useCoreStore();
+
   const [deletedFieldIndex, setDeletedFieldIndex] = useState<Set<number>>(new Set()); // 删除的字段的索引
   const [selectedFieldIndex, setSelectedFieldIndex] = useState<Set<number>>(new Set()); // 选中的字段的索引
   const [operateFieldName, setOperateFieldName] = useState<string>(""); // 现在操作的行的索引
@@ -68,7 +77,6 @@ export function TableEditorStructure(props: MainContentStructure) {
     setFieldIndexPkAutoIncrement(caa ? caa.fieldIndexPkAutoIncrement : false);
     setFieldIndexName(caa ? caa.fieldIndexName : "");
     setFieldComment(caa ? caa.fieldComment : "");
-    setCurrentTableComment("");
   }
 
   // 选中行, 删除的时候使用
@@ -94,8 +102,8 @@ export function TableEditorStructure(props: MainContentStructure) {
     for (const index of selectedFieldIndex) {
       const field = currentTableStructure[index];
 
-      alterData.push({
-        target: "field",
+      const action = {
+        target: STR_FIELD,
         action: STR_DELETE,
         tableName: currentTableName,
 
@@ -109,7 +117,8 @@ export function TableEditorStructure(props: MainContentStructure) {
         fieldIndexPkAutoIncrement: false,
         fieldIndexName: "",
         fieldComment: "",
-      });
+      } as FieldAlterAction;
+      alterData.push(action);
     }
 
     setDeletedFieldIndex(selectedFieldIndex);
@@ -198,7 +207,7 @@ export function TableEditorStructure(props: MainContentStructure) {
 
   // 弹出确认删除1列
   function handleDeleteColPopup(index: number) {
-    const fieldName = findFieldName(index);
+    const fieldName = findFieldNameByIndex(index);
     if (fieldName !== "") {
       setOperateFieldName(fieldName);
       setShowDialogDelete(true);
@@ -210,25 +219,26 @@ export function TableEditorStructure(props: MainContentStructure) {
   // 确定执行语句
   function handleConfirm() {
     exec(willExecCmd);
-    props.getData();
+    getData();
   }
 
-  // 提交变更
+  // 对话框提交变更
   async function onSubmit() {
     // 找到 alterData 里对应的字段的数据
-    let actionDataFinded: FieldAlterAction | null = null;
     let actionDataFindedIndex = -1;
 
     for (let index = 0; index < alterData.length; index++) {
-      const ad = alterData[index];
-      if (ad.fieldName === fieldName) {
-        actionDataFinded = ad;
-        actionDataFindedIndex = index;
+      const item = alterData[index];
+      if (item.target === STR_FIELD) {
+        const ad = item as FieldAlterAction;
+        if (ad.fieldName === fieldName) {
+          actionDataFindedIndex = index;
+        }
       }
     }
 
     const actionData: FieldAlterAction = {
-      target: "field",
+      target: STR_FIELD,
       action: dialogAction,
       tableName: currentTableName,
 
@@ -247,9 +257,11 @@ export function TableEditorStructure(props: MainContentStructure) {
     };
 
     if (actionDataFindedIndex > -1) {
-      alterData[actionDataFindedIndex] = { ...actionDataFinded, ...actionData };
+      setAlterData(
+        alterData.map((item, index) => (index === actionDataFindedIndex ? { ...item, ...actionData } : item)),
+      );
     } else {
-      alterData.push(actionData);
+      setAlterData([...alterData, actionData]);
 
       // 添加字段的还得在前端添加表结构数据
       currentTableStructure.push({
@@ -267,15 +279,7 @@ export function TableEditorStructure(props: MainContentStructure) {
       setCurrentTableStructure(currentTableStructure);
     }
 
-    // FIXME: 检查新建表格的逻辑对不对
-    console.log("actionDataFindedIndex::", actionDataFindedIndex);
-    console.log("actionData::", actionData);
-
-    // FIXME: 添加对表的操作, 重命名 / 注释 / 分区 / 约束 / 表字符集和排序规则, 不应该在这里编辑字段的时候执行!!
-    // 类型为 TableAlterAction
-
-    setAlterData(alterData);
-    // setShowDialogEdit(false); // TODO: 临时注释
+    setShowDialogEdit(false);
   }
 
   /**
@@ -283,7 +287,7 @@ export function TableEditorStructure(props: MainContentStructure) {
    * @param index
    * @returns
    */
-  const findFieldName = (index: number) => {
+  const findFieldNameByIndex = (index: number) => {
     const tableDataPg = currentTableStructure as unknown as TableStructure[];
     if (index <= tableDataPg.length) {
       return tableDataPg[index].column_name;
@@ -382,7 +386,7 @@ export function TableEditorStructure(props: MainContentStructure) {
         <div className={cn("gap-4 px-2 pb-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <RotateCw color="var(--fvm-info-clr)" onClick={() => props.getData()} />
+              <RotateCw color="var(--fvm-info-clr)" onClick={() => getData()} />
             </TooltipTrigger>
             <TooltipContent>
               <p>刷新</p>
@@ -423,10 +427,11 @@ export function TableEditorStructure(props: MainContentStructure) {
         </div>
         <div className="flex-1">
           <Input
-            defaultValue={currentTableComment}
+            defaultValue={editingTableComment}
             placeholder={"请输入表注释"}
+            onChange={changeTable}
             onInput={(e) => {
-              setCurrentTableComment(e.currentTarget.value);
+              setEditingTableComment(e.currentTarget.value);
             }}
           />
         </div>
@@ -588,14 +593,8 @@ export function TableEditorStructure(props: MainContentStructure) {
       <ConfirmDialog
         open={showDialogAlter}
         title={`确认要保存变更吗?`}
-        content={
-          <>
-            <div className="pt-4">
-              <div className="pb-4">将要执行的语句:</div>
-              <pre>{willExecCmd}</pre>
-            </div>
-          </>
-        }
+        description={`请确认将要执行的语句:`}
+        content={<pre>{willExecCmd}</pre>}
         cancelText={"取消"}
         cancelCb={() => {
           setShowDialogAlter(false);
