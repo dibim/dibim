@@ -48,7 +48,8 @@ export function Welcome() {
               <div>
                 <p className="pb-4 font-bold ">设置主密码</p>
                 <CardDescription className="pb-2">
-                  为了您的数据安全, <strong className="text-[var(--fvm-warning-clr)]">强烈建议您设置一个健壮的主密码</strong>.
+                  为了您的数据安全, <strong className="text-[var(--fvm-danger-clr)]">强烈建议</strong>
+                  <strong className="text-[var(--fvm-warning-clr)]">您设置一个健壮的主密码</strong>.
                 </CardDescription>
                 <CardDescription>主密码将会用于使用 AES_GCM 算法加密您的所有配置文件.</CardDescription>
               </div>
