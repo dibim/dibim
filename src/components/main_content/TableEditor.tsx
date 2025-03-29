@@ -1,9 +1,11 @@
 /**
  * 点击表格显示数据
  */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
+  STR_EDIT,
   STR_EMPTY,
+  STR_TABLE,
   TAB_CONSTRAINT,
   TAB_DATA,
   TAB_DDL,
@@ -12,6 +14,7 @@ import {
   TAB_STRUCTURE,
 } from "@/constants";
 import { getTableStructure } from "@/databases/adapter,";
+import { AllAlterAction, TableAlterAction } from "@/databases/types";
 import { useCoreStore } from "@/store";
 import { Card, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
@@ -22,14 +25,11 @@ import { TableEditorDdl } from "./TableEditorDdl";
 import { TableEditorStructure } from "./TableEditorStructure";
 
 export function TableEditor() {
-  const {
-    currentTableName,
-    setCurrentTableName,
-    setCurrentTableStructure,
-    mainContenTab,
-    setMainContenTab,
-    isAddingTable,
-  } = useCoreStore();
+  const { currentTableName, setCurrentTableStructure, mainContenTab, setMainContenTab } = useCoreStore();
+
+  const [alterData, setAlterData] = useState<AllAlterAction[]>([]); // 对表格和字段的修改数据
+  const [editingTableName, setEditingTableName] = useState<string>(""); // 输入框中的表名
+  const [editingTableComment, setEditingTableComment] = useState<string>(""); // 输入框中的表注释
 
   // 获取表结构, 会在多个地方用, 在这里记录到 store
   const getData = async () => {
@@ -44,8 +44,48 @@ export function TableEditor() {
     }
   };
 
+  // 修改表格数据
+  // 对表的操作包括: 重命名 / 注释 / 分区 / 约束 / 表字符集和排序规则 等
+  function changeTable() {
+    if (editingTableName === "") return;
+
+    let actionDataFindedIndex = -1;
+
+    // 找到已存在的记录
+    for (let index = 0; index < alterData.length; index++) {
+      const item = alterData[index];
+      if (item.target === STR_TABLE) {
+        // 对表的操作只有一个不由再判断
+        actionDataFindedIndex = index;
+      }
+    }
+
+    const actionData: TableAlterAction = {
+      target: STR_TABLE,
+      action: STR_EDIT, // 对表格的只有编辑一种动作
+      tableName: editingTableName, // 输入框里的表名
+      tableNameOld: currentTableName,
+      comment: editingTableComment,
+    };
+
+    if (actionDataFindedIndex > -1) {
+      setAlterData(
+        alterData.map((item, index) => (index === actionDataFindedIndex ? { ...item, ...actionData } : item)),
+      );
+    } else {
+      console.log("添加 ad::: ", actionData);
+      setAlterData([...alterData, actionData]);
+    }
+  }
+
+  // 对表格的修改, 要执行 changeTable
+  useEffect(() => {
+    changeTable();
+  }, [editingTableName, editingTableComment]);
+
   useEffect(() => {
     getData();
+    setEditingTableName(currentTableName);
   }, [currentTableName]);
 
   useEffect(() => {
@@ -57,16 +97,15 @@ export function TableEditor() {
     <Tabs value={mainContenTab} className="w-full">
       <div className="flex">
         <div className="flex items-center pe-4">
-          {isAddingTable ? (
-            <Input
-              placeholder={"请输入表名"}
-              onInput={(e) => {
-                setCurrentTableName(e.currentTarget.value);
-              }}
-            />
-          ) : (
-            <strong>{currentTableName}</strong>
-          )}
+          <Input
+            placeholder={"请输入表名"}
+            defaultValue={editingTableName}
+            onInput={(e) => {
+              console.log("输入:  ", e.currentTarget.value);
+
+              setEditingTableName(e.currentTarget.value);
+            }}
+          />
         </div>
         <TabsList className="grid grid-cols-6">
           <TabsTrigger
@@ -127,7 +166,14 @@ export function TableEditor() {
       <TabsContent value={TAB_STRUCTURE}>
         <Card className="p-4">
           <CardContent className="p-0">
-            <TableEditorStructure getData={getData} />
+            <TableEditorStructure
+              getData={getData}
+              changeTable={changeTable}
+              alterData={alterData}
+              setAlterData={setAlterData}
+              editingTableComment={editingTableComment}
+              setEditingTableComment={setEditingTableComment}
+            />
           </CardContent>
         </Card>
       </TabsContent>

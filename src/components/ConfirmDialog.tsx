@@ -3,6 +3,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
+  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -11,6 +12,7 @@ import {
 export type ConfirmDialogProp = {
   open: boolean;
   title: string;
+  description?: string;
   content: React.ReactNode;
   cancelText: string; // 取消按钮的文字
   cancelCb: () => void; // 点击编辑按钮的回调函数
@@ -18,31 +20,42 @@ export type ConfirmDialogProp = {
   okCb: () => void; // 点击确认按钮的回调函数
 };
 
-export function ConfirmDialog(props: ConfirmDialogProp) {
+export function ConfirmDialog({
+  open,
+  title,
+  description,
+  content,
+  cancelText,
+  cancelCb,
+  okText,
+  okCb,
+}: ConfirmDialogProp) {
   return (
-    <AlertDialog open={props.open}>
+    <AlertDialog open={open}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          {props.title && <AlertDialogTitle>{props.title}</AlertDialogTitle>}
-          {props.content && <div className="text-muted-foreground">{props.content}</div>}
+          {title && <AlertDialogTitle>{title}</AlertDialogTitle>}
+          {description && <AlertDialogDescription>{description}</AlertDialogDescription>}
+
+          {content && <div className="text-muted-foreground">{content}</div>}
         </AlertDialogHeader>
         <AlertDialogFooter>
-          {props.cancelText && (
+          {cancelText && (
             <AlertDialogCancel
               onClick={() => {
-                props.cancelCb ? props.cancelCb() : null;
+                cancelCb ? cancelCb() : null;
               }}
             >
-              {props.cancelText}
+              {cancelText}
             </AlertDialogCancel>
           )}
-          {props.okText && (
+          {okText && (
             <AlertDialogAction
               onClick={() => {
-                props.okCb ? props.okCb() : null;
+                okCb ? okCb() : null;
               }}
             >
-              {props.okText}
+              {okText}
             </AlertDialogAction>
           )}
         </AlertDialogFooter>

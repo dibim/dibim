@@ -39,8 +39,6 @@ export interface CoreStoreState {
   // 当前表结构
   currentTableStructure: TableStructure[];
   setCurrentTableStructure: (val: TableStructure[]) => void;
-  currentTableComment: string;
-  setCurrentTableComment: (val: string) => void;
 
   // 侧边栏
   sidebarOpen: boolean;
@@ -114,8 +112,6 @@ export const useCoreStore = create<CoreStoreState>()(
 
       currentTableStructure: [],
       setCurrentTableStructure: (val: TableStructure[]) => set({ currentTableStructure: val }),
-      currentTableComment: "",
-      setCurrentTableComment: (val: string) => set({ currentTableComment: val }),
 
       sidebarOpen: true,
       setSidebarOpen: (val: boolean) => set({ sidebarOpen: val }),
@@ -145,7 +141,6 @@ export const useCoreStore = create<CoreStoreState>()(
           currentDbNme: "",
           currentTableName: "",
           currentTableStructure: [],
-          currentTableComment: "",
           sidebarOpen: true,
           subSidebarType: SUB_SIDEBAR_TYPE_DB_LIST,
           mainContenType: MAIN_CONTEN_TYPE_WELCOME,

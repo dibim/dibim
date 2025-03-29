@@ -12,9 +12,8 @@
 
 ## TODO
 
-## v0.1 pg
+### v0.1 pg
 
-- 在 TableEditorStructure 里实现新建表格的功能 ---
 - 页面表格超出尺寸的控制待优化
 - sql 编辑器
   - 执行语句
@@ -22,18 +21,18 @@
 
 - 表格数据分页查询, 没有主键的待实现
 
-## v0.2 sqlite
+### v0.2 sqlite
 
 - 支持 sqlite
 - 密码在内存中的存储方式要改一下, 使用类似 libsodium 的方式保存  
 - 大字符串查看器
 
-## v0.3 mysql
+### v0.3 mysql
 
 - 支持 mysql
 - 分区
 
-## v0.4 优化 sql 语句功能
+### v0.4 优化 sql 语句功能
 
 - sql 编辑器
   - 记录到历史
@@ -42,13 +41,13 @@
 
 - 确认框里的语句要高亮  
 
-## v0.5
+### v0.5
 
 - 字段类型改为下拉框, 提高效率
 - 表结构的对话框保存是添加检查
 - 优化表名列表的磁盘占用大小的样式
 
-## v1.0
+### v1.0
 
 - 实现多标签页
 - 添加快捷键:
@@ -56,5 +55,27 @@
   - alt + 1 切换侧边栏
   - alt + 2 切换次级侧边栏
   - alt + 3 切换sql编辑器下方的提示栏栏
-  - alt + e 执行 sql 编辑器里的代码
   - alt + l 锁屏
+  - alt + d 数据库连接列表
+  - alt + t 表格列表
+  - alt + f 函数列表
+  - alt + v 视图列表
+  - alt + c 添加数据库连接
+  - alt + b 备份
+  - f1 关于
+  - f5 刷新数据(表结构/ddl等)
+  - f9 执行 sql 编辑器里的代码
+
+## 其它
+
+### oracle 和 mssql 的测试环境
+
+```sh
+# Oracle XE (社区维护的镜像)
+docker pull gvenzl/oracle-xe:21
+docker run -d -p 1521:1521 -e ORACLE_PASSWORD=yourpw gvenzl/oracle-xe:21
+
+# SQL Server
+docker pull mcr.microsoft.com/mssql/server:2022-latest
+docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=yourStrong(!)Password" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
+```
