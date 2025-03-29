@@ -30,6 +30,7 @@ const STR_RC = "rightClick";
 
 interface ReusableDropdownListProps {
   items: ListItem[];
+  className?: string;
   menuAlign?: "start" | "center" | "end";
   itemClassName?: string;
   menuItemClassName?: string;
@@ -38,6 +39,7 @@ interface ReusableDropdownListProps {
 
 export function ListWithAction({
   items,
+  className = "",
   menuAlign = "end",
   itemClassName = "",
   menuItemClassName = "",
@@ -47,7 +49,7 @@ export function ListWithAction({
     triggerMethod = isPcScreen() ? STR_RC : STR_BTN;
   }
   return (
-    <div className="space-y-2">
+    <div className={`${className}`}>
       {/* 按钮触发 */}
       {triggerMethod === STR_BTN &&
         items.map((item) => (
@@ -93,7 +95,7 @@ export function ListWithAction({
       {triggerMethod === STR_RC &&
         items.map((item) => (
           <ContextMenu key={item.id}>
-            <ContextMenuTrigger>
+            <ContextMenuTrigger asChild>
               <div
                 className={`${itemClassName}`}
                 onClick={() => {

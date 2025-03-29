@@ -267,9 +267,12 @@ export function TableList() {
         {renderSortBtn(sortByBytesDesc, ArrowUp01, "按表格大小倒序排序")}
         {renderSortBtn(addTable, CirclePlus, "添加表格")}
       </div>
-      {!tablData || (tablData.length === 0 && <EmptyList />)}
 
-      {tablData.length > 0 && <ListWithAction items={listData} itemClassName="cursor-pointer" />}
+      {!tablData || tablData.length === 0 ? (
+        <EmptyList />
+      ) : (
+        <ListWithAction items={listData} itemClassName="cursor-pointer" />
+      )}
 
       <ConfirmDialog
         open={showDialogRename}

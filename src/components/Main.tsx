@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { AlertCircle, PanelLeftDashed, PanelLeftIcon } from "lucide-react";
 import { Separator } from "@radix-ui/react-separator";
 import { MainContent } from "@/components/main_content/MainContent";
@@ -37,40 +38,19 @@ export function Main() {
   const { toggleSidebar, setOpenMobile, setOpen } = useSidebar();
 
   // ========== 控制次级侧边栏 ==========
-  const [subSidebarWidth, setSubSidebarWidth] = useState(SUB_SIDEBAR_DEFAULT_WIDTH);
-  const [isDragging, setIsDragging] = useState(false);
-  const mouseInitialPosX = useRef(0); // 起始坐标
-  const handleMouseDown = useCallback(() => {
-    setIsDragging(true);
-  }, []);
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (!isDragging) return;
-      if (mouseInitialPosX.current === 0) {
-        mouseInitialPosX.current = e.clientX; // 记录起始坐标
-      }
-
-      // 计算新宽度
-      let newWidth = subSidebarWidth + e.clientX - mouseInitialPosX.current;
-      if (newWidth < SUB_SIDEBAR_MIN_WIDTH) newWidth = SUB_SIDEBAR_MIN_WIDTH;
-
-      setSubSidebarWidth(newWidth);
-    },
-    [isDragging],
-  );
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-    mouseInitialPosX.current = 0; // 重置起始坐标
-  }, []);
+  const [defaultSizePercent, setDefaultSizePercent] = useState(20);
+  const [minSizePercent, setMinSizePercent] = useState(10);
   useEffect(() => {
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+    const updateSize = () => {
+      const screenAvailWidth = window.screen.availWidth;
+      setDefaultSizePercent((SUB_SIDEBAR_DEFAULT_WIDTH / screenAvailWidth) * 100);
+      setMinSizePercent((SUB_SIDEBAR_MIN_WIDTH / screenAvailWidth) * 100);
     };
-  }, [handleMouseMove, handleMouseUp]);
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
   // ========== 控制次级侧边栏 结束 ==========
 
   // ========== 配置初始化  ==========
@@ -104,8 +84,8 @@ export function Main() {
     } catch (error) {
       console.log(
         `
-        使用${isDefultPwd ? "默认" : "用户"} 的主密码解析配置文件出错, 
-        文件路径为: ${CONFIG_FILE_MAIN}, 
+        使用${isDefultPwd ? "默认" : "用户"} 的主密码解析配置文件出错,
+        文件路径为: ${CONFIG_FILE_MAIN},
         文件内容为: ${conf}`,
       );
       return false;
@@ -196,36 +176,23 @@ export function Main() {
             <Separator orientation="vertical" className="mr-2 h-4" />
           </header>
 
-          <div className="flex">
-            {/* 次级侧边栏 */}
-            {subSidebarOpen && (
-              <div className="flex border-r relative" style={{ width: subSidebarWidth }}>
-                {/* 次级侧边栏内容 */}
-                {/* 这里的 height 是屏幕高度减去 header 的高度 */}
-                <div
-                  className="flex-1 overflow-y-scroll py-2 ps-2 pe-4"
-                  style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}
-                >
-                  {subSidebarType === SUB_SIDEBAR_TYPE_DB_LIST && <DatabaseList />}
-                  {subSidebarType === SUB_SIDEBAR_TYPE_TABLE_LIST && <TableList />}
-                </div>
-
-                {/* 拖拽手柄 */}
-                <div
-                  className="absolute -right-1 top-0 w-2 h-full cursor-col-resize hover:bg-primary/50"
-                  onMouseDown={handleMouseDown}
-                />
+          <PanelGroup direction="horizontal">
+            <Panel defaultSize={defaultSizePercent} minSize={minSizePercent}>
+              <div className="p-2" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}>
+                {subSidebarType === SUB_SIDEBAR_TYPE_DB_LIST && <DatabaseList />}
+                {subSidebarType === SUB_SIDEBAR_TYPE_TABLE_LIST && <TableList />}
               </div>
-            )}
-
-            {/* 主内容区域 */}
-            <div
-              className="flex-1 p-4 overflow-y-scroll"
-              style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}
-            >
-              <MainContent />
-            </div>
-          </div>
+            </Panel>
+            <PanelResizeHandle className="w-1 bg-secondary hover:bg-blue-500" />
+            <Panel defaultSize={100 - defaultSizePercent}>
+              <div
+                className="flex-1 p-4 overflow-y-scroll"
+                style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}
+              >
+                <MainContent />
+              </div>
+            </Panel>
+          </PanelGroup>
         </>
       )}
     </>

@@ -61,12 +61,12 @@ export function DatabaseList() {
         content: (
           <div className="flex cursor-pointer">
             <div className="pe-2">
-              {item.dbType === DB_TYPE_MYSQL && <MysqlLogo className="w-6" />}
-              {item.dbType === DB_TYPE_POSTGRESQL && <PostgresqlLogo className="w-6" />}
-              {item.dbType === DB_TYPE_SQLITE && <SqliteLogo className="w-6" />}
+              {item.dbType === DB_TYPE_MYSQL && <MysqlLogo className="w-6 h-6" />}
+              {item.dbType === DB_TYPE_POSTGRESQL && <PostgresqlLogo className="w-6 h-6" />}
+              {item.dbType === DB_TYPE_SQLITE && <SqliteLogo className="w-6 h-6" />}
             </div>
 
-            {item.name}
+            <div className={`border-b-2 border-b-[${item.color}]`}>{item.name}</div>
           </div>
         ),
         contentOnClick: async () => {
@@ -115,11 +115,7 @@ export function DatabaseList() {
 
   return (
     <>
-      <div>
-        {!config.dbConnections && <EmptyList />}
-
-        {config.dbConnections && <ListWithAction items={listData} itemClassName="py-2 cursor-pointer" />}
-      </div>
+      {!config.dbConnections ? <EmptyList /> : <ListWithAction items={listData} itemClassName="py-2 cursor-pointer" />}
 
       <ConfirmDialog
         open={showDialog}
