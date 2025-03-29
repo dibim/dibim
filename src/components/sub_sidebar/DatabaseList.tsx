@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { Edit, Trash, Unlink } from "lucide-react";
+import MysqlLogo from "@/assets/db_logo/mysql.svg?react";
+import PostgresqlLogo from "@/assets/db_logo/postgresql.svg?react";
+import SqliteLogo from "@/assets/db_logo/sqlite.svg?react";
 import {
+  DB_TYPE_MYSQL,
+  DB_TYPE_POSTGRESQL,
+  DB_TYPE_SQLITE,
   MAIN_CONTEN_TYPE_EDIT_CONNECTION,
   MAIN_CONTEN_TYPE_TABLE_EDITOR,
   SUB_SIDEBAR_TYPE_TABLE_LIST,
@@ -52,7 +58,17 @@ export function DatabaseList() {
     config.dbConnections.map((item, index) => {
       arr.push({
         id: item.name,
-        content: <div className="cursor-pointer">{item.name}</div>,
+        content: (
+          <div className="flex cursor-pointer">
+            <div className="pe-2">
+              {item.dbType === DB_TYPE_MYSQL && <MysqlLogo className="w-6" />}
+              {item.dbType === DB_TYPE_POSTGRESQL && <PostgresqlLogo className="w-6" />}
+              {item.dbType === DB_TYPE_SQLITE && <SqliteLogo className="w-6" />}
+            </div>
+
+            {item.name}
+          </div>
+        ),
         contentOnClick: async () => {
           clickConn(item);
         },
