@@ -394,6 +394,11 @@ export function getDefultOrderField(tsa: TableStructure[]) {
   return "";
 }
 
+// 查询语句
+export async function queryPg(connName: string, sql: string) {
+  return await invoker.querySql(connName, sql);
+}
+
 // 执行语句
 export async function execPg(connName: string, sql: string) {
   return await invoker.execSql(connName, sql);
