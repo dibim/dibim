@@ -13,11 +13,12 @@ import {
   getTableDataPg,
   getTableDdlPg,
   getTableStructurePg,
+  queryPg,
 } from "@/databases/PostgreSQL/utils/sql";
 import { coreStore } from "@/store";
 import { genAlterCmdPg } from "./PostgreSQL/utils/alter";
 import { getDataTypeCategoryPg } from "./PostgreSQL/utils/icon";
-import { AllAlterAction, DbConnectionParam, FieldAlterAction, GetTableDataParam, TableAlterAction } from "./types";
+import { AllAlterAction, DbConnectionParam, GetTableDataParam } from "./types";
 
 // 连接数据库
 export async function connect(p: DbConnectionParam) {
@@ -79,7 +80,19 @@ export async function getTableData(params: GetTableDataParam) {
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
 }
 
-// 生成重命名表格的语句
+// 查询语句
+export function query(sql: string) {
+  const dbType = coreStore.getState().currentDbType;
+  const connName = coreStore.getState().currentConnName;
+
+  if (dbType === DB_TYPE_MYSQL) return; // TODO:
+  if (dbType === DB_TYPE_POSTGRESQL) return queryPg(connName, sql);
+  if (dbType === DB_TYPE_SQLITE) return; // TODO:
+
+  return "";
+}
+
+// 执行语句
 export function exec(sql: string) {
   const dbType = coreStore.getState().currentDbType;
   const connName = coreStore.getState().currentConnName;

@@ -1,13 +1,16 @@
 /**
  * SQL 编辑器及其查询结果
  */
-import { useMemo } from "react";
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import { Grid3x3, NotebookText, Play, ShieldAlert } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { ImperativePanelHandle, Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { NotebookText, Play } from "lucide-react";
 import * as Monaco from "monaco-editor";
 import sqlWorker from "monaco-editor/esm/vs/basic-languages/sql/sql?worker";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import Editor from "@monaco-editor/react";
+import { exec, query } from "@/databases/adapter,";
+import { DbResult } from "@/types/types";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 // 初始化 Monaco 环境, 避免从 CDN 加载
@@ -33,6 +36,77 @@ const SQL_KEYWORDS = [
 ];
 
 export function SqlEditor() {
+  // ========== 面板空值  ==========
+  const [showResultBar, setShowResultBar] = useState<boolean>(false);
+  const panelResultRef = useRef<ImperativePanelHandle>(null);
+  function toggleResultBar() {
+    if (panelResultRef.current) {
+      if (showResultBar) {
+        panelResultRef.current.expand();
+      } else {
+        panelResultRef.current.collapse();
+      }
+      setShowResultBar(!showResultBar);
+    }
+  }
+
+  const [showStatusBar, setShowStatusBar] = useState<boolean>(false);
+  const panelStatusBarRef = useRef<ImperativePanelHandle>(null);
+  function toggleStatusBar() {
+    if (panelStatusBarRef.current) {
+      if (showStatusBar) {
+        panelStatusBarRef.current.expand();
+      } else {
+        panelStatusBarRef.current.collapse();
+      }
+      setShowStatusBar(!showStatusBar);
+    }
+  }
+  // ========== 面板空值 结束 ==========
+
+  // ========== 结果集和状态栏 ==========
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [columnName, setColumnName] = useState<string[]>([]);
+  const [dataArr, setDataArr] = useState<any[]>([]);
+
+  // ========== 结果集和状态栏 结束 ==========
+
+  // ========== 编辑器 ==========
+  const [code, setCode] = useState<string>("");
+  const handleEditorChange = (value: string | undefined, _ev: Monaco.editor.IModelContentChangedEvent) => {
+    setCode(value || "");
+  };
+  async function execCode() {
+    // FIXME: 不能都用 exec, 查询的会不返回结果
+
+    let res = null;
+    let isQuery = false;
+    // 获取前10个字符（如果字符串不足10个字符则取全部）
+    const first10Chars = code.trim().substring(0, 10).toLowerCase();
+
+    // 检查是否包含"select"
+    if (first10Chars.includes("select")) {
+      res = await query(code);
+      isQuery = true;
+    } else {
+      res = await exec(code);
+    }
+
+    console.log("res:   ", res);
+
+    if (res) {
+      const resData = res as unknown as DbResult;
+      if (resData.errorMessage !== "") {
+        setErrorMessage(resData.errorMessage.replace("error returned from database: ", " "));
+      } else {
+        if (isQuery) {
+          setColumnName(JSON.parse(resData.columnName) as string[]);
+          setDataArr(JSON.parse(resData.data) as { [key: string]: any }[]);
+        }
+      }
+    }
+  }
+
   const beforeMount = useMemo(
     () => (monacoInstance: typeof Monaco) => {
       monacoInstance.languages.register({ id: "sql" });
@@ -74,6 +148,7 @@ export function SqlEditor() {
     },
     [],
   );
+  // ========== 编辑器 结束 ==========
 
   function renderEditor() {
     return (
@@ -81,7 +156,7 @@ export function SqlEditor() {
         <div className="pe-2 ">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Play className="mb-2" />
+              <Play className="mb-2" onClick={execCode} />
             </TooltipTrigger>
             <TooltipContent>
               <p>执行</p>
@@ -95,9 +170,11 @@ export function SqlEditor() {
               <p>格式化</p>
             </TooltipContent>
           </Tooltip>
+          {/*           
+          FIXME: 3个 panel 先后折叠 2 个会有问题, 这 2 个里始终会显示一个
           <Tooltip>
             <TooltipTrigger asChild>
-              <Grid3x3 className="mb-2" />
+              <Grid3x3 className="mb-2" onClick={toggleResultBar} />
             </TooltipTrigger>
             <TooltipContent>
               <p>显示结果集</p>
@@ -105,12 +182,12 @@ export function SqlEditor() {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <ShieldAlert className="mb-2" />
+              <ShieldAlert className="mb-2" onClick={toggleStatusBar} />
             </TooltipTrigger>
             <TooltipContent>
               <p>显示状态栏</p>
             </TooltipContent>
-          </Tooltip>
+          </Tooltip> */}
         </div>
         <div className="flex-1">
           <Editor
@@ -118,6 +195,7 @@ export function SqlEditor() {
             language="sql"
             theme="vs-dark"
             beforeMount={beforeMount}
+            onChange={handleEditorChange}
             options={{
               suggestOnTriggerCharacters: true, // 必须开启
               quickSuggestions: {
@@ -140,19 +218,36 @@ export function SqlEditor() {
   return (
     <div className="h-full">
       <PanelGroup direction="vertical">
-        <Panel defaultSize={50} minSize={20}>
+        <Panel defaultSize={60} minSize={20}>
           <div className="w-full">{renderEditor()}</div>
         </Panel>
         <PanelResizeHandle className="h-1 bg-secondary hover:bg-blue-500" />
-        <Panel defaultSize={25}>
+        <Panel defaultSize={30} collapsible collapsedSize={0} ref={panelResultRef}>
           <div className="w-full">
-            <div>错误提示</div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {columnName.map((item, index) => (
+                    <TableHead key={index}>{item}</TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {dataArr.map((rowData, index) => (
+                  <TableRow key={index}>
+                    {columnName.map((item, ii) => (
+                      <TableCell key={ii}>{rowData[item]}</TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </Panel>
         <PanelResizeHandle className="h-1 bg-secondary hover:bg-blue-500" />
-        <Panel defaultSize={25}>
+        <Panel defaultSize={10} collapsible collapsedSize={0} ref={panelStatusBarRef}>
           <div className="w-full">
-            <div>查询的据</div>
+            <div>{errorMessage}</div>
           </div>
         </Panel>
       </PanelGroup>

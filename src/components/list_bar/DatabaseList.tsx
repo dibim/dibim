@@ -19,7 +19,7 @@ import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
 
 export function DatabaseList() {
-  const { config, setConfig, setMainContenType, setListBarType } = useCoreStore();
+  const { config, setConfig, setMainContenType, setListBarType, setCurrentDbName } = useCoreStore();
 
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [itemIndex, setItemIndex] = useState<number>(-1);
@@ -43,6 +43,7 @@ export function DatabaseList() {
     });
 
     if (res && res.errorMessage === "") {
+      setCurrentDbName(conn.dbName);
       setListBarType(LIST_BAR_TYPE_TABLE_LIST);
       setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
     } else {
@@ -66,7 +67,7 @@ export function DatabaseList() {
               {item.dbType === DB_TYPE_SQLITE && <SqliteLogo className="w-6 h-6" />}
             </div>
 
-            <div className={`border-b-2 border-b-[${item.color}]`}>{item.name}</div>
+            <div style={{ borderBottom: `2px  solid ${item.color}` }}>{item.name}</div>
           </div>
         ),
         contentOnClick: async () => {

@@ -135,6 +135,8 @@ async fn process_pg_query(
 
     let rows = query.fetch_all(pool).await?;
     let mut json_rows = Vec::new();
+    let mut column_names: Vec<String> = Vec::new();
+    let mut index = 0;
 
     for row in rows {
         let mut json_row = json!({});
@@ -314,12 +316,17 @@ async fn process_pg_query(
                 }
             };
             json_row[col_name] = value;
+
+            if index == 0 {
+                column_names.push(col_name.to_owned())
+            }
         }
         json_rows.push(json_row);
+        index += 1;
     }
 
     Ok(QueryResult {
-        column_name: "".to_string(),
+        column_name: serde_json::to_string(&column_names)?,
         data: serde_json::to_string(&json_rows)?,
     })
 }
@@ -333,6 +340,8 @@ async fn process_mysql_query(
 
     let rows = query.fetch_all(pool).await?;
     let mut json_rows = Vec::new();
+    let mut column_names: Vec<String> = Vec::new();
+    let mut index = 0;
 
     for row in rows {
         let mut json_row = json!({});
@@ -359,12 +368,17 @@ async fn process_mysql_query(
                 _ => json!("unsupported_type"),
             };
             json_row[col_name] = value;
+
+            if index == 0 {
+                column_names.push(col_name.to_owned())
+            }
         }
         json_rows.push(json_row);
+        index += 1;
     }
 
     Ok(QueryResult {
-        column_name: "".to_string(),
+        column_name: serde_json::to_string(&column_names)?,
         data: serde_json::to_string(&json_rows)?,
     })
 }
@@ -378,6 +392,8 @@ async fn process_sqlite_query(
 
     let rows = query.fetch_all(pool).await?;
     let mut json_rows = Vec::new();
+    let mut column_names: Vec<String> = Vec::new();
+    let mut index = 0;
 
     for row in rows {
         let mut json_row = json!({});
@@ -396,12 +412,17 @@ async fn process_sqlite_query(
                 _ => json!("unsupported_type"),
             };
             json_row[col_name] = value;
+
+            if index == 0 {
+                column_names.push(col_name.to_owned())
+            }
         }
         json_rows.push(json_row);
+        index += 1;
     }
 
     Ok(QueryResult {
-        column_name: "".to_string(),
+        column_name: serde_json::to_string(&column_names)?,
         data: serde_json::to_string(&json_rows)?,
     })
 }

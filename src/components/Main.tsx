@@ -24,8 +24,16 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card"
 import { Input } from "./ui/input";
 
 export function Main() {
-  const { setConfig, listBarType, sidebarOpen, setSidebarOpen, listBarOpen, setListBarOpen, setMainPasswordSha } =
-    useCoreStore();
+  const {
+    setConfig,
+    listBarType,
+    sidebarOpen,
+    setSidebarOpen,
+    listBarOpen,
+    setListBarOpen,
+    setMainPasswordSha,
+    currentDbNme,
+  } = useCoreStore();
 
   const { toggleSidebar, setOpenMobile, setOpen } = useSidebar();
 
@@ -174,6 +182,8 @@ export function Main() {
               <PanelLeftDashed />
               <span className="sr-only">切换列表栏</span>
             </Button>
+
+            <span>{currentDbNme || "无数据库连接"}</span>
           </header>
 
           <PanelGroup direction="horizontal">
