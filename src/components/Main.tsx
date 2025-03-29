@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { ImperativePanelHandle, Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { AlertCircle, PanelLeftDashed, PanelLeftIcon } from "lucide-react";
+import { DatabaseList } from "@/components/list_bar/DatabaseList";
+import { TableList } from "@/components/list_bar/TableList";
 import { MainContent } from "@/components/main_content/MainContent";
-import { TableList } from "@/components/sub_sidebar/TableList";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import {
@@ -18,7 +19,6 @@ import {
 import { invoker } from "@/invoke";
 import { clearCoreStore, useCoreStore } from "@/store";
 import { readConfigFile } from "@/utils/config_file";
-import { DatabaseList } from "./sub_sidebar/DatabaseList";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
@@ -184,7 +184,7 @@ export function Main() {
               collapsible
               collapsedSize={0}
             >
-              <div className="p-2" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}>
+              <div className="p-2 overflow-y-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}>
                 {listBarType === LIST_BAR_TYPE_DB_LIST && <DatabaseList />}
                 {listBarType === LIST_BAR_TYPE_TABLE_LIST && <TableList />}
               </div>

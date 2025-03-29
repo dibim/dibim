@@ -1,5 +1,5 @@
 import { TooltipProvider } from "@radix-ui/react-tooltip";
-import { MainSidebar } from "@/components/MainSidebar";
+import { Sidebar } from "@/components/Sidebar";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import "@/styles/app.scss";
@@ -18,7 +18,7 @@ export function App() {
         }}
       >
         <TooltipProvider>
-          <MainSidebar />
+          <Sidebar />
           <SidebarInset>
             <Main />
           </SidebarInset>
