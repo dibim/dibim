@@ -14,6 +14,12 @@ import {
   SUB_SIDEBAR_TYPE_FUNC_LIST,
   SUB_SIDEBAR_TYPE_TABLE_LIST,
   SUB_SIDEBAR_TYPE_VIEW_LIST,
+  TAB_CONSTRAINT,
+  TAB_DATA,
+  TAB_DDL,
+  TAB_FOREIGN_KEY,
+  TAB_PARTITION,
+  TAB_STRUCTURE,
 } from "@/constants";
 import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "@/databases/constants";
 
@@ -62,6 +68,16 @@ export type MainContenType =
   | typeof MAIN_CONTEN_TYPE_EDIT_CONNECTION
   | typeof MAIN_CONTEN_TYPE_TABLE_EDITOR
   | typeof MAIN_CONTEN_TYPE_SQL_EDITOR;
+
+// 主要区域的标签页
+export type MainContentTab =
+  | typeof STR_EMPTY
+  | typeof TAB_DATA
+  | typeof TAB_STRUCTURE
+  | typeof TAB_DDL
+  | typeof TAB_CONSTRAINT
+  | typeof TAB_FOREIGN_KEY
+  | typeof TAB_PARTITION;
 
 // 导入的 svg 的属性
 export type SvgComponentProps = SVGProps<SVGSVGElement> & {

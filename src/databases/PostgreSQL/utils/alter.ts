@@ -3,11 +3,11 @@
  */
 import { STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY } from "@/constants";
 import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "../../constants";
-import { ColumnAlterAction } from "../../types";
+import { FieldAlterAction, TableAlterAction } from "../../types";
 import { formatToSqlValuePg } from "./format";
 
 // 编辑字段
-export const genAlterFieldEdit = (ca: ColumnAlterAction) => {
+export const genAlterFieldEdit = (ca: FieldAlterAction) => {
   let res: string[] = [`\n-- 将要对字段${ca.fieldName}执行以下语句:\n`];
 
   // 修改数据类型
@@ -148,19 +148,11 @@ export const genAlterFieldEdit = (ca: ColumnAlterAction) => {
   }
 
   // 修改列备注
-  if (ca.fieldDefalut) {
+  if (ca.fieldComment) {
     const fv = formatToSqlValuePg(ca.fieldComment, true);
     res.push(`COMMENT ON COLUMN "${ca.tableName}"."${ca.fieldNameExt}" IS ${fv};`);
   } else {
     res.push(`COMMENT ON COLUMN "${ca.tableName}"."${ca.fieldNameExt}" IS NULL;`);
-  }
-
-  // 修改表备注
-  if (ca.fieldDefalut) {
-    const fv = formatToSqlValuePg(ca.fieldComment, true);
-    res.push(`COMMENT ON TABLE "${ca.tableName}" IS ${fv};`);
-  } else {
-    res.push(`COMMENT ON TABLE "${ca.tableName}" IS NULL`);
   }
 
   // 修改列名要放在最后处理, 避免其它修改找不到表名
@@ -173,7 +165,7 @@ export const genAlterFieldEdit = (ca: ColumnAlterAction) => {
 
 // 添加字段
 // 为了最终的代码比较美观, 要注意这里的字符串格式.
-export const genAlterFieldAdd = (ca: ColumnAlterAction) => {
+export const genAlterFieldAdd = (ca: FieldAlterAction) => {
   let res: string[] = [];
 
   const size = ca.fieldSize ? `(${ca.fieldSize})` : "";
@@ -203,27 +195,46 @@ COMMIT;`);
 };
 
 // 删除字段
-export const genAlterFieldDel = (ca: ColumnAlterAction) => {
+export const genAlterFieldDel = (ca: FieldAlterAction) => {
   let res: string[] = [];
-
   res.push(`ALTER TABLE "${ca.tableName}" DROP COLUMN "${ca.fieldName}";`);
-
   return res;
 };
 
+// 编辑表
+export const genAlterTableEdit = (ca: TableAlterAction) => {
+  let res: string[] = [`\n-- 将要对字段${ca.tableName}执行以下语句:\n`];
+  if (ca.comment) {
+    res.push(`COMMENT ON TABLE "${ca.tableName}" IS ${ca.comment};`);
+  } else {
+    res.push(`COMMENT ON TABLE "${ca.tableName}" IS NULL`);
+  }
+
+  return res;
+};
 // 生成修改语句
-export const genAlterCmdPg = (val: ColumnAlterAction[]) => {
+export const genAlterCmdPg = (val: FieldAlterAction[] | TableAlterAction[]) => {
   let res: string[] = [];
 
-  for (const ca of val) {
-    if (ca.action === STR_EDIT) {
-      res = res.concat(genAlterFieldEdit(ca));
-    }
-    if (ca.action === STR_ADD) {
-      res = res.concat(genAlterFieldAdd(ca));
-    }
-    if (ca.action === STR_DELETE) {
-      res = res.concat(genAlterFieldDel(ca));
+  for (const item of val) {
+    if (item.target === "field") {
+      // 对列的修改
+      const faa = item as FieldAlterAction;
+      if (faa.action === STR_EDIT) {
+        res = res.concat(genAlterFieldEdit(faa));
+      }
+      if (faa.action === STR_ADD) {
+        res = res.concat(genAlterFieldAdd(faa));
+      }
+      if (faa.action === STR_DELETE) {
+        res = res.concat(genAlterFieldDel(faa));
+      }
+    } else if (item.target === "table") {
+      // 对表格的修改
+      const faa = item as TableAlterAction;
+      if (faa.action === STR_EDIT) {
+        res = res.concat(genAlterTableEdit(faa));
+      }
     }
   }
 

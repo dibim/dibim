@@ -17,7 +17,7 @@ import {
 import { coreStore } from "@/store";
 import { genAlterCmdPg } from "./PostgreSQL/utils/alter";
 import { getDataTypeCategoryPg } from "./PostgreSQL/utils/icon";
-import { ColumnAlterAction, DbConnectionParam, GetTableDataParam } from "./types";
+import { DbConnectionParam, FieldAlterAction, GetTableDataParam, TableAlterAction } from "./types";
 
 // 连接数据库
 export async function connect(p: DbConnectionParam) {
@@ -159,7 +159,7 @@ export function genCreateTableCmd(tbName: string) {
 }
 
 // 生成修改语句
-export function genAlterCmd(val: ColumnAlterAction[]) {
+export function genAlterCmd(val: FieldAlterAction[] | TableAlterAction[]) {
   const dbType = coreStore.getState().currentDbType;
 
   if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
