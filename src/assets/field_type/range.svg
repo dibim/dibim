@@ -1,0 +1,23 @@
+<svg
+   width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"  
+  xmlns="http://www.w3.org/2000/svg">
+
+ <g fill="currentColor" transform="matrix(1.0226055,0,0,1.267913,1.2110427,-4.8966052)">
+    <path
+       d="M 0.88485279,21.472514 V 5.6506508 H 2.0453407 V 21.472514 Z"
+       id="path6395" />
+    <path
+       d="M 8.746741,14.411517 V 13.21834 h 3.726637 v 1.193177 z"
+       id="path6397" />
+    <path
+       d="M 19.191123,21.472514 V 5.6506508 h 1.160488 V 21.472514 Z"
+       id="path6399" />
+  </g>
+</svg>
