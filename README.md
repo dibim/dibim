@@ -1,24 +1,31 @@
 # DIBIM
 
+## 简介
+
+**DIBIM** 是一个简单易用的数据库管理软件.
+
+依托于 [Tauri](https://tauri.app/), 操作数据库等基础功能均在rust中实现, 前端所需的数据在前端通过原生 SQL 语句传递给 rust 执行.
+
+前端使用 [TypeScript](https://www.typescriptlang.org) + [React](https://react.dev/) + [shadcn/ui](https://ui.shadcn.com/), 易于扩展.
+
+后端使用 [sqlx](https://github.com/launchbadge/sqlx) 操作 SQL 数据库, 支持  PostgreSQL, MySQL, MariaDB, SQLite.
+
 ## TODO
 
 ## v0.1 pg
 
-- 表结构的编辑
-  - 编辑 的对话框处理
-    - onSubmit 的最后几句该房到应用的时候才执行 ---
-    - 添加取消按钮的逻辑
 - 表格列表添加一个添加表格的按钮
 - 页面表格超出尺寸的控制待优化
 - sql 编辑器
   - 执行语句
+  - 显示查询结果
 
 - 表格数据分页查询, 没有主键的待实现
 
 ## v0.2 sqlite
 
 - 支持 sqlite
-- 密码的存储要改一下, 使用类似 libsodium 的方式保存  
+- 密码在内存中的存储方式要改一下, 使用类似 libsodium 的方式保存  
 - 大字符串查看器
 
 ## v0.3 mysql
@@ -26,7 +33,7 @@
 - 支持 mysql
 - 分区
 
-## v0.4
+## v0.4 优化 sql 语句功能
 
 - sql 编辑器
   - 记录到历史
@@ -39,6 +46,7 @@
 
 - 字段类型改为下拉框, 提高效率
 - 表结构的对话框保存是添加检查
+- 优化表名列表的磁盘占用大小的样式
 
 ## v1.0
 
