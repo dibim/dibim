@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, CornerDownLeft, RotateCw } from "lucide-react";
 import { HEDAER_H } from "@/constants";
-import { getDefultOrderField } from "@/databases/PostgreSQL/utils";
+import { getDefultOrderField } from "@/databases/PostgreSQL/utils/sql";
 import { getTableData } from "@/databases/adapter,";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";

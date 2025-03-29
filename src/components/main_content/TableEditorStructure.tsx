@@ -21,6 +21,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Input } from "../ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { renderDataTypeIcon } from "./TableEditorStructureIcon";
 
 type DialogAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
 
@@ -28,8 +29,8 @@ export function TableEditorStructure(props: MainContentStructure) {
   const { currentTableStructure, currentTableName } = useCoreStore();
 
   const [alterData, setAlterData] = useState<ColumnAlterAction[]>([]); // 表结构的修改数据
-  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set()); // 选中的行
-  const [operateRowIndex, setOperateRowIndex] = useState<number>(0); // 现在操作的行的索引
+  const [deletedFieldIndex, setDeletedFieldIndex] = useState<Set<number>>(new Set()); // 删除的字段的索引
+  const [selectedFieldIndex, setSelectedFieldIndex] = useState<Set<number>>(new Set()); // 选中的字段的索引
   const [operateFieldName, setOperateFieldName] = useState<string>(""); // 现在操作的行的索引
   const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
   const [dialogAction, setDialogAction] = useState<DialogAction>("");
@@ -67,13 +68,13 @@ export function TableEditorStructure(props: MainContentStructure) {
 
   // 选中行, 删除的时候使用
   const handleSelectRow = (id: number) => {
-    const newSelectedRows = new Set(selectedRows);
+    const newSelectedRows = new Set(selectedFieldIndex);
     if (newSelectedRows.has(id)) {
       newSelectedRows.delete(id);
     } else {
       newSelectedRows.add(id);
     }
-    setSelectedRows(newSelectedRows);
+    setSelectedFieldIndex(newSelectedRows);
   };
 
   // 添加列
@@ -85,17 +86,48 @@ export function TableEditorStructure(props: MainContentStructure) {
 
   // 删除选中的列
   function handleDelSelectedField() {
-    console.log("删除列");
+    for (const index of selectedFieldIndex) {
+      const field = currentTableStructure[index];
+
+      alterData.push({
+        action: STR_DELETE,
+
+        tableName: currentTableName,
+        tableComment: "",
+
+        fieldName: field.column_name,
+        fieldNameExt: "",
+        fieldType: "",
+        fieldSize: "",
+        fieldDefalut: "",
+        fieldNotNull: false,
+        fieldIndexType: "",
+        fieldIndexPkAutoIncrement: false,
+        fieldIndexName: "",
+        fieldComment: "",
+      });
+    }
+
+    setDeletedFieldIndex(selectedFieldIndex);
+    setAlterData(alterData);
   }
 
-  // 应用
+  // 应用, 弹出确认框, 确认之后才执行
   function handleApply() {
-    console.log("应用");
+    if (alterData.length === 0) {
+      toast("请先选中要操作的字段");
+      return;
+    }
+
+    setWillExecCmd(genAlterCmd(alterData));
+    setShowDialogAlter(true);
   }
 
   // 取消
   function handleCancel() {
-    console.log("取消");
+    setAlterData([]);
+    setDeletedFieldIndex(new Set());
+    setSelectedFieldIndex(new Set());
   }
 
   // 弹出确认编辑列
@@ -121,7 +153,7 @@ export function TableEditorStructure(props: MainContentStructure) {
     resetDialogData({
       action: STR_EDIT,
       tableName: currentTableName,
-      tableComment: "", // TODO:
+      tableComment: "", // TODO: 添加表注释
       fieldName: field.column_name,
       fieldNameExt: "",
       fieldType: field.data_type,
@@ -134,7 +166,6 @@ export function TableEditorStructure(props: MainContentStructure) {
       fieldComment: field.comment,
     });
     setFieldNameEditing(field.column_name);
-    setOperateRowIndex(index);
     setShowDialogEdit(true);
     setDialogAction(STR_EDIT);
   }
@@ -174,11 +205,8 @@ export function TableEditorStructure(props: MainContentStructure) {
   }
   // 确定执行语句
   function handleConfirm() {
-    console.log(`执行语句:  ${willExecCmd}`);
-
-    // FIXME: 解除注释
-    // exec(willExecCmd);
-    // props.getData();
+    exec(willExecCmd);
+    props.getData();
   }
 
   // 提交变更
@@ -222,10 +250,7 @@ export function TableEditorStructure(props: MainContentStructure) {
     }
 
     setAlterData(alterData);
-
-    // TODO: 生成语句, 弹窗确认.  应该在点击应用的时候才进行下面的
-    setWillExecCmd(genAlterCmd(alterData));
-    setShowDialogAlter(true);
+    setShowDialogEdit(false);
   }
 
   /**
@@ -267,23 +292,37 @@ export function TableEditorStructure(props: MainContentStructure) {
 
   const renderBody = () => {
     const tableDataPg = currentTableStructure as unknown as TableStructure[];
+
+    function genClassName(index: number) {
+      // 删除的样式
+      if (deletedFieldIndex.has(index)) return " bg-[var(--fvm-danger-clr)]";
+
+      // 选中的样式
+      if (selectedFieldIndex.has(index)) return "text-[var(--fvm-primary-clr)] font-bold";
+
+      return "";
+    }
+
     return tableDataPg.map((row, index) =>
       renderContextMenu(
         index,
-        <TableRow className={`${selectedRows.has(index) ? "text-[var(--fvm-primary-clr)] font-bold" : ""}`}>
+        <TableRow className={genClassName(index)}>
           <TableCell
-            className="cursor-grab"
+            className="text-[var(--fvm-info-clr)] cursor-grab"
             onClick={() => {
               handleSelectRow(index);
             }}
           >
-            <div>{index + 1}</div>
+            <strong>{index + 1}</strong>
           </TableCell>
           <TableCell>
             <div>{row.column_name}</div>
           </TableCell>
           <TableCell>
-            <div>{row.data_type}</div>
+            <div className="flex">
+              <span className="pe-2">{renderDataTypeIcon(row.data_type)}</span>
+              <span>{row.data_type}</span>
+            </div>
           </TableCell>
           <TableCell>
             <div>{row.is_primary_key ? "✅" : ""}</div>
@@ -364,7 +403,7 @@ export function TableEditorStructure(props: MainContentStructure) {
         <Table className="border-y">
           <TableHeader>
             <TableRow>
-              <TableHead>#</TableHead>
+              <TableHead>☑️</TableHead>
               <TableHead>列名</TableHead>
               <TableHead>数据类型</TableHead>
               <TableHead>主键</TableHead>
