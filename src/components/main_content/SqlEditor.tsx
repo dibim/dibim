@@ -9,7 +9,9 @@ import sqlWorker from "monaco-editor/esm/vs/basic-languages/sql/sql?worker";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import Editor from "@monaco-editor/react";
 import { exec, query } from "@/databases/adapter,";
+import { useCoreStore } from "@/store";
 import { DbResult } from "@/types/types";
+import { formatSql } from "@/utils/format_sql";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
@@ -36,7 +38,9 @@ const SQL_KEYWORDS = [
 ];
 
 export function SqlEditor() {
-  // ========== 面板空值  ==========
+  const { currentDbType } = useCoreStore();
+
+  // ========== 面板控制  ==========
   const [showResultBar, setShowResultBar] = useState<boolean>(false);
   const panelResultRef = useRef<ImperativePanelHandle>(null);
   function toggleResultBar() {
@@ -73,11 +77,44 @@ export function SqlEditor() {
 
   // ========== 编辑器 ==========
   const [code, setCode] = useState<string>("");
+  const editorRef = useRef<any>(null);
+
   const handleEditorChange = (value: string | undefined, _ev: Monaco.editor.IModelContentChangedEvent) => {
     setCode(value || "");
   };
+
+  const handleEditorDidMount = (editor: any, monaco: any) => {
+    editorRef.current = editor;
+  };
+
+  // 获取编辑器里的代码
+  const getEditorCode = () => {
+    if (editorRef.current) {
+      const code = editorRef.current.getValue();
+      console.log("Current code:", code);
+      return code;
+    }
+    return "";
+  };
+
+  // 设置编辑器里的代码
+  const setEditorCode = (newCode: string) => {
+    if (editorRef.current) {
+      editorRef.current.setValue(newCode);
+    }
+  };
+
+  // 格式化代码
+  function formatCode() {
+    const code = getEditorCode();
+    console.log("code: ", code);
+
+    setEditorCode(formatSql(currentDbType, code));
+  }
+
+  // 执行代码
   async function execCode() {
-    // FIXME: 不能都用 exec, 查询的会不返回结果
+    // 不能都用 exec, 查询的会不返回结果
 
     let res = null;
     let isQuery = false;
@@ -86,7 +123,8 @@ export function SqlEditor() {
 
     // 检查是否包含"select"
     if (first10Chars.includes("select")) {
-      res = await query(code);
+      // TODO: 实现翻页
+      res = await query(code, true, 1, 100);
       isQuery = true;
     } else {
       res = await exec(code);
@@ -164,7 +202,7 @@ export function SqlEditor() {
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <NotebookText className="mb-2" />
+              <NotebookText className="mb-2" onClick={formatCode} />
             </TooltipTrigger>
             <TooltipContent>
               <p>格式化</p>
@@ -195,6 +233,7 @@ export function SqlEditor() {
             language="sql"
             theme="vs-dark"
             beforeMount={beforeMount}
+            onMount={handleEditorDidMount}
             onChange={handleEditorChange}
             options={{
               suggestOnTriggerCharacters: true, // 必须开启

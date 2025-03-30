@@ -15,6 +15,7 @@ import { useCoreStore } from "@/store";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
+import { SqlCodeViewer } from "../SqlCodeViewer";
 import { Input } from "../ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
@@ -335,7 +336,7 @@ export function TableList() {
         open={showDialogTruncate}
         title={`确认要截断${operateTableName}吗?`}
         description={`请确认将要执行的语句:`}
-        content={<pre>{willExecCmd}</pre>}
+        content={<SqlCodeViewer ddl={willExecCmd} />}
         cancelText={"取消"}
         cancelCb={() => {
           setShowDialogTruncate(false);
@@ -347,7 +348,7 @@ export function TableList() {
         open={showDialogDelete}
         title={`确认要删除表格${operateTableName}吗?`}
         description={`请确认将要执行的语句:`}
-        content={<pre>{willExecCmd}</pre>}
+        content={<SqlCodeViewer ddl={willExecCmd} />}
         cancelText={"取消"}
         cancelCb={() => {
           setShowDialogDelete(false);
