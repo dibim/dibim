@@ -444,26 +444,3 @@ export function genRenameFieldCmdPg(tbName: string, oldName: string, newName: st
 export function genDeleteFieldCmdPg(tbName: string, fieldName: string) {
   return `ALTER TABLE IF EXISTS "${tbName}" DROP COLUMN IF EXISTS "${fieldName}" CASCADE;`;
 }
-
-// 生成建表语句
-// FIXME: 实现功能
-export function genCreateTableCmdPg(tbName: string) {
-  return `
-    -- 尽可能兼容三者的语法
-    CREATE TABLE cross_db_example (
-        id SERIAL PRIMARY KEY,          -- PostgreSQL 自增主键
-        id INT AUTO_INCREMENT PRIMARY KEY,  -- MySQL 自增主键
-        id INTEGER PRIMARY KEY AUTOINCREMENT,  -- SQLite 自增主键
-
-        name VARCHAR(100) NOT NULL DEFAULT '',
-        price NUMERIC(10,2) NOT NULL DEFAULT 0.00,
-
-        code VARCHAR(50) UNIQUE,      -- 唯一约束
-        
-        PRIMARY KEY (order_id, product_id) -- 复合主键
-        UNIQUE (department_id, employee_code) -- 复合唯一约束
-
-  
-    );
-`;
-}

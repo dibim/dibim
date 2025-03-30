@@ -19,7 +19,8 @@ import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
 
 export function DatabaseList() {
-  const { config, setConfig, setMainContenType, setListBarType, setCurrentDbName } = useCoreStore();
+  const { config, setConfig, setMainContenType, setListBarType, setCurrentDbName, setCurrentConnColor } =
+    useCoreStore();
 
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [itemIndex, setItemIndex] = useState<number>(-1);
@@ -44,6 +45,7 @@ export function DatabaseList() {
 
     if (res && res.errorMessage === "") {
       setCurrentDbName(conn.dbName);
+      setCurrentConnColor(conn.color);
       setListBarType(LIST_BAR_TYPE_TABLE_LIST);
       setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
     } else {
@@ -60,14 +62,14 @@ export function DatabaseList() {
       arr.push({
         id: item.name,
         content: (
-          <div className="flex cursor-pointer">
+          <div className="flex cursor-pointer" style={{ borderBottom: `2px  solid ${item.color}` }}>
             <div className="pe-2">
               {item.dbType === DB_TYPE_MYSQL && <MysqlLogo className="w-6 h-6" />}
               {item.dbType === DB_TYPE_POSTGRESQL && <PostgresqlLogo className="w-6 h-6" />}
               {item.dbType === DB_TYPE_SQLITE && <SqliteLogo className="w-6 h-6" />}
             </div>
 
-            <div style={{ borderBottom: `2px  solid ${item.color}` }}>{item.name}</div>
+            <div>{item.name}</div>
           </div>
         ),
         contentOnClick: async () => {

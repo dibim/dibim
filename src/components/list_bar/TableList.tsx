@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import bytes from "bytes";
 import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, CirclePlus, LucideIcon } from "lucide-react";
 import { toast } from "sonner";
-import { EMPTY_NEW_TABLE_NAE, MAIN_CONTEN_TYPE_TABLE_EDITOR, TAB_STRUCTURE } from "@/constants";
+import { MAIN_CONTEN_TYPE_TABLE_EDITOR, TAB_STRUCTURE } from "@/constants";
 import {
   exec,
   genDeleteTableCmd,
@@ -36,7 +36,7 @@ export function TableList() {
 
   const addTable = () => {
     setIsAddingTable(true);
-    setCurrentTableName(EMPTY_NEW_TABLE_NAE);
+    setCurrentTableName("");
     setMainContenTab(TAB_STRUCTURE);
   };
 
@@ -260,7 +260,7 @@ export function TableList() {
 
   return (
     <div>
-      <div className="flex justify-between pb-2">
+      <div className="flex justify-between p-2">
         {renderSortBtn(sortByNameAsc, ArrowDownAZ, "按表名正序排序")}
         {renderSortBtn(sortByNameDesc, ArrowDownZA, "按表名倒序排序")}
         {renderSortBtn(sortByBytesAsc, ArrowDown01, "按表格大小正序排序")}
