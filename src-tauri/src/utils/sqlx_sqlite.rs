@@ -8,12 +8,20 @@ use sqlx::Row;
 use sqlx::SqlitePool;
 use sqlx::TypeInfo;
 
+/// 处理 SQLite 的查询 | Handling SQLite queries
+///
+/// # 参数
+/// - `sql`: 要执行的 sql | The SQL to be executed"
+/// - `streaming`: 是否启用流式分页 | Whether to enable streaming pagination
+/// - `page`: 当前页码（从1开始） | Current page number (starting from 1)
+/// - `page_size`: 每页的条目数 | Number of entries per page
+///
 pub async fn process_sqlite_query(
     pool: &SqlitePool,
     sql: &str,
-    streaming: bool,          // 是否启用流式分页
-    page: Option<usize>,      // 当前页码（从1开始）
-    page_size: Option<usize>, // 每页条数
+    streaming: bool,
+    page: Option<usize>,
+    page_size: Option<usize>,
 ) -> Result<QueryResult, Box<dyn std::error::Error>> {
     let query = sqlx::query(sql);
     println!("Executing SQL: {}", query.sql());

@@ -1,46 +1,49 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct DbResult {
+    // 列表数组的 json, 仅查询的时候有数据
+    // JSON for list arrays, with data available only during queries
     #[serde(rename = "columnName")]
-    pub column_name: String, // 列表数组 json, 仅查询的时候有数据
+    pub column_name: String,
 
+    // 查询结果, 实际是 json 字符串
+    // The query result is actually a JSON string
     #[serde(rename = "data")]
-    pub data: String, // 查询结果, 实际是 json 字符串
+    pub data: String,
 
+    // 错误消息
+    // error message
     #[serde(rename = "errorMessage")]
-    pub error_message: String, // 错误消息
+    pub error_message: String,
 }
 
 impl DbResult {
     pub fn new() -> Self {
-        Self {
-            column_name: "".to_string(),
-            data: "".to_string(),
-            error_message: "".to_string(),
-        }
+        Self::default()
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct QueryResult {
+    // 列表数组的 json, 仅查询的时候有数据
+    // JSON for list arrays, with data available only during queries
     #[serde(rename = "columnName")]
-    pub column_name: String, // 列表数组 json
+    pub column_name: String,
 
+    // 查询结果, 实际是 json 字符串
+    // The query result is actually a JSON string
     #[serde(rename = "data")]
-    pub data: String, // 查询结果, 实际是 json 字符串
+    pub data: String,
 }
 
 impl QueryResult {
     pub fn new() -> Self {
-        Self {
-            column_name: "".to_string(),
-            data: "".to_string(),
-        }
+        Self::default()
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct ExecResult {
     #[serde(rename = "affectedRows")]
     pub affected_rows: u64,
@@ -51,10 +54,7 @@ pub struct ExecResult {
 
 impl ExecResult {
     pub fn new() -> Self {
-        Self {
-            affected_rows: 0,
-            last_insert_id: 0,
-        }
+        Self::default()
     }
 }
 

@@ -1,100 +1,90 @@
 use super::{
-    sqlx_common::{DatabaseConnection, DbPool, DB_MANAGER},
+    sqlx_common::{DbConnection, DbPool},
     sqlx_mysql::process_mysql_query,
     sqlx_pg::process_pg_query,
     sqlx_sqlite::process_sqlite_query,
 };
 use crate::{
     types::{ExecResult, QueryResult},
-    utils::sqlx_common::DatabaseType,
+    utils::sqlx_common::DbType,
 };
 use sqlx::Error;
 
-pub async fn connect(conn_name: &str, url: &str) -> Result<(), sqlx::Error> {
-    let db_type = if url.starts_with("postgres://") {
-        DatabaseType::Postgres
-    } else if url.starts_with("mysql://") {
-        DatabaseType::MySql
-    } else if url.starts_with("sqlite:") {
-        DatabaseType::Sqlite
+pub fn get_db_type(url: &str) -> Result<DbType, Error> {
+    let url_lower = url.to_lowercase();
+
+    if url_lower.starts_with("postgres://") {
+        Ok(DbType::Postgres)
+    } else if url_lower.starts_with("mysql://") {
+        Ok(DbType::MySql)
+    } else if url_lower.starts_with("sqlite::") {
+        Ok(DbType::Sqlite)
     } else {
-        return Err(sqlx::Error::Configuration(
-            "Unsupported database scheme".into(),
-        ));
-    };
-
-    let pool = DbPool::connect(db_type, url).await?;
-    let db_conn = DatabaseConnection { db_type, pool };
-
-    DB_MANAGER
-        .lock()
-        .map_err(|e| {
-            sqlx::Error::Io(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                e.to_string(),
-            ))
-        })?
-        .insert(conn_name.to_string(), db_conn);
-
-    Ok(())
-}
-
-fn get_db_connection(conn_name: &str) -> Result<DatabaseConnection, Error> {
-    DB_MANAGER
-        .lock()
-        .map_err(|e| {
-            Error::Io(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                e.to_string(),
-            ))
-        })?
-        .get(conn_name)
-        .cloned()
-        .ok_or_else(|| {
-            Error::Io(std::io::Error::new(
-                std::io::ErrorKind::NotFound,
-                "Connection not found",
-            ))
-        })
-}
-
-// 执行查询并返回 JSON 数组
-pub async fn query(
-    conn_name: &str,
-    sql: &str,
-    streaming: bool,          // 是否启用流式分页
-    page: Option<usize>,      // 当前页码（从1开始）
-    page_size: Option<usize>, // 每页条数
-) -> Result<QueryResult, Box<dyn std::error::Error>> {
-    let db_conn = get_db_connection(conn_name)?;
-
-    match db_conn.pool {
-        DbPool::Postgres(pool) => process_pg_query(&pool, sql, streaming, page, page_size).await,
-        DbPool::MySql(pool) => process_mysql_query(&pool, sql, streaming, page, page_size).await,
-        DbPool::Sqlite(pool) => process_sqlite_query(&pool, sql, streaming, page, page_size).await,
+        Err(Error::Configuration(
+            format!("Unsupported database scheme in URL: {}", url).into(),
+        ))
     }
 }
 
-// 执行更新/删除操作
-pub async fn exec(conn_name: &str, sql: &str) -> Result<ExecResult, Error> {
-    let db_conn = get_db_connection(conn_name)?;
+pub async fn connect(conn_name: &str, url: &str) -> Result<(), sqlx::Error> {
+    let db_type = get_db_type(url)?;
+    DbPool::global().connect(db_type, conn_name, url).await?;
+    Ok(())
+}
 
-    match db_conn.pool {
-        DbPool::Postgres(pool) => {
+pub async fn disconnect(conn_name: &str) -> Result<bool, sqlx::Error> {
+    Ok(DbPool::global().disconnect(conn_name).await)
+}
+
+// 执行查询语句并返回 JSON 数组
+// Execute query statement and return JSON array
+pub async fn query(
+    conn_name: &str,
+    sql: &str,
+    streaming: bool,
+    page: Option<usize>,
+    page_size: Option<usize>,
+) -> Result<QueryResult, Box<dyn std::error::Error>> {
+    let db_conn = DbPool::global()
+        .get(conn_name)
+        .await.ok_or_else(|| format!("Connection '{}' not found", conn_name))?;
+
+    match db_conn {
+        DbConnection::Postgres(pool) => {
+            process_pg_query(&pool, sql, streaming, page, page_size).await
+        }
+        DbConnection::MySql(pool) => {
+            process_mysql_query(&pool, sql, streaming, page, page_size).await
+        }
+        DbConnection::Sqlite(pool) => {
+            process_sqlite_query(&pool, sql, streaming, page, page_size).await
+        }
+    }
+}
+
+// 执行非查询语句
+// Execute non query statements
+pub async fn exec(conn_name: &str, sql: &str) -> Result<ExecResult, Box<dyn std::error::Error>> {
+    let db_conn = DbPool::global()
+        .get(conn_name)
+        .await.ok_or_else(|| format!("Connection '{}' not found", conn_name))?;
+
+    match db_conn {
+        DbConnection::Postgres(pool) => {
             let result = sqlx::query(sql).execute(&pool).await?;
             Ok(ExecResult {
                 affected_rows: result.rows_affected(),
                 last_insert_id: 0, // PostgreSQL 需要 RETURNING 子句
             })
         }
-        DbPool::MySql(pool) => {
+        DbConnection::MySql(pool) => {
             let result = sqlx::query(sql).execute(&pool).await?;
             Ok(ExecResult {
                 affected_rows: result.rows_affected(),
                 last_insert_id: result.last_insert_id(),
             })
         }
-        DbPool::Sqlite(pool) => {
+        DbConnection::Sqlite(pool) => {
             let result = sqlx::query(sql).execute(&pool).await?;
             Ok(ExecResult {
                 affected_rows: result.rows_affected(),
