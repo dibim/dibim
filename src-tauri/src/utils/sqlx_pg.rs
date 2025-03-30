@@ -1,13 +1,32 @@
+use crate::types::QueryResult;
+use base64::engine::general_purpose::STANDARD;
+use base64::Engine;
 use bigdecimal::BigDecimal;
 use futures_util::StreamExt;
+use lazy_static::lazy_static;
 use serde_json::json;
 use sqlx::postgres::{PgPool, PgRow};
 use sqlx::types::chrono;
 use sqlx::Column;
+use sqlx::Error as SqlxError;
 use sqlx::Row;
 use sqlx::TypeInfo;
+use std::collections::HashMap;
+use std::pin::Pin;
+use std::sync::Arc;
+use tokio::sync::Mutex as TokioMutex;
 
-use crate::types::QueryResult;
+lazy_static! {
+    static ref CURSOR_CACHE: TokioMutex<HashMap<Arc<str>, CursorState>> =
+        TokioMutex::new(HashMap::new());
+}
+
+struct CursorState {
+    offset: usize,
+    stream: TokioMutex<
+        Option<Pin<Box<dyn futures_util::Stream<Item = Result<PgRow, SqlxError>> + Send>>>,
+    >,
+}
 
 pub async fn process_pg_query(
     pool: &PgPool,
@@ -32,27 +51,76 @@ async fn stream_pagination(
     page: usize,
     page_size: usize,
 ) -> Result<QueryResult, Box<dyn std::error::Error>> {
-    let mut stream = sqlx::query(sql).persistent(true).fetch(pool);
+    let sql_key = Arc::from(sql);
+    let pool = Arc::new(pool.clone());
 
-    // 跳过前序页
-    let skip = (page - 1) * page_size;
+    // 异步获取缓存锁
+    let mut cache = CURSOR_CACHE.lock().await;
+
+    // 清空缓存，如果当前 sql 参数与缓存中的不同
+    if !cache.is_empty() && (!cache.contains_key(&sql_key)) {
+        cache.clear();
+    }
+
+    // 获取或创建游标状态
+    let state = cache
+        .entry(Arc::clone(&sql_key))
+        .or_insert_with(|| CursorState {
+            offset: 0,
+            stream: TokioMutex::new(None),
+        });
+
+    let target_offset = (page - 1) * page_size;
+
+    // 获取流锁
+    let mut stream_guard = state.stream.lock().await;
+
+    // 判断是否需要重置流
+    let needs_reset = target_offset < state.offset || stream_guard.is_none();
+
+    if needs_reset {
+        // 创建新流（包含所有权的安全传递）
+        let sql_clone = Arc::clone(&sql_key);
+        let pool_clone = Arc::clone(&pool);
+
+        *stream_guard = Some(Box::pin(async_stream::stream! {
+            let mut stream = sqlx::query(&*sql_clone)
+                .persistent(true)
+                .fetch(&*pool_clone);
+
+            while let Some(row) = stream.next().await {
+                yield row;
+            }
+        }));
+
+        state.offset = 0;
+    }
+
+    // 调整偏移量
+    let stream = stream_guard.as_mut().unwrap();
+    let skip = target_offset.saturating_sub(state.offset);
     for _ in 0..skip {
-        if stream.next().await.is_none() {
+        if let Some(row) = stream.next().await {
+            row.map_err(|e| format!("Stream error: {}", e))?;
+            state.offset += 1;
+        } else {
             break;
         }
     }
 
-    // 收集当前页行数据
+    // 收集当前页数据
     let mut page_rows = Vec::with_capacity(page_size);
     for _ in 0..page_size {
         match stream.next().await {
-            Some(Ok(row)) => page_rows.push(row),
+            Some(Ok(row)) => {
+                page_rows.push(row);
+                state.offset += 1;
+            }
             Some(Err(e)) => return Err(Box::new(e)),
             None => break,
         }
     }
 
-    // 复用统一处理逻辑
     let (column_names, json_rows) = process_rows(page_rows)?;
 
     Ok(QueryResult {
@@ -210,7 +278,7 @@ fn convert_value_pg(row: &PgRow, idx: usize) -> Result<serde_json::Value, sqlx::
         "BYTEA" => {
             let val: Option<Vec<u8>> = row.get(col_name);
             match val {
-                Some(s) => Ok(json!(base64::encode(&s))),
+                Some(s) => Ok(json!(STANDARD.encode(&s))),
                 None => Ok(json!(null)),
             }
         }

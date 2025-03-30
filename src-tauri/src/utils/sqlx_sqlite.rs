@@ -1,4 +1,6 @@
 use crate::types::QueryResult;
+use base64::engine::general_purpose::STANDARD;
+use base64::Engine;
 use serde_json::json;
 use sqlx::Column;
 use sqlx::Execute;
@@ -30,7 +32,7 @@ pub async fn process_sqlite_query(
                 "INTEGER" => json!(row.get::<i64, _>(col_name)),
                 "REAL" => json!(row.get::<f64, _>(col_name)),
                 "TEXT" => json!(row.get::<String, _>(col_name)),
-                "BLOB" => json!(base64::encode(row.get::<Vec<u8>, _>(col_name))),
+                "BLOB" => json!(STANDARD.encode(row.get::<Vec<u8>, _>(col_name))),
                 "DATETIME" => {
                     let s: String = row.get(col_name);
                     json!(s)
