@@ -28,23 +28,34 @@ struct CursorState {
     >,
 }
 
+/// 处理 PostgreSQL 的查询 | Handling PostgreSQL queries
+///
+/// # 参数
+/// - `sql`: 要执行的 sql | The SQL to be executed"
+/// - `streaming`: 是否启用流式分页 | Whether to enable streaming pagination
+/// - `page`: 当前页码（从1开始） | Current page number (starting from 1)
+/// - `page_size`: 每页的条目数 | Number of entries per page
+///
 pub async fn process_pg_query(
     pool: &PgPool,
     sql: &str,
-    streaming: bool,          // 是否启用流式分页
-    page: Option<usize>,      // 当前页码（从1开始）
-    page_size: Option<usize>, // 每页条数
+    streaming: bool,
+    page: Option<usize>,
+    page_size: Option<usize>,
 ) -> Result<QueryResult, Box<dyn std::error::Error>> {
     if streaming {
-        // 流式分页
+        // 流式查询
+        // Streaming pagination
         stream_pagination(pool, sql, page.unwrap_or(1), page_size.unwrap_or(200)).await
     } else {
         // 一次性返回所有数据
+        // Return all data at once
         fetch_all_data(pool, sql).await
     }
 }
 
-// 流式分页
+// 流式查询
+// Streaming pagination
 async fn stream_pagination(
     pool: &PgPool,
     sql: &str,
@@ -55,14 +66,17 @@ async fn stream_pagination(
     let pool = Arc::new(pool.clone());
 
     // 异步获取缓存锁
+    // Asynchronous retrieval of cache lock
     let mut cache = CURSOR_CACHE.lock().await;
 
     // 清空缓存，如果当前 sql 参数与缓存中的不同
+    // Clear cache, if the current SQL parameters are different from those in the cache
     if !cache.is_empty() && (!cache.contains_key(&sql_key)) {
         cache.clear();
     }
 
     // 获取或创建游标状态
+    // Retrieve or create cursor state
     let state = cache
         .entry(Arc::clone(&sql_key))
         .or_insert_with(|| CursorState {
@@ -73,13 +87,16 @@ async fn stream_pagination(
     let target_offset = (page - 1) * page_size;
 
     // 获取流锁
+    // Get stream lock
     let mut stream_guard = state.stream.lock().await;
 
     // 判断是否需要重置流
+    // Determine whether to reset the stream
     let needs_reset = target_offset < state.offset || stream_guard.is_none();
 
     if needs_reset {
         // 创建新流（包含所有权的安全传递）
+        // Create a new stream (including secure transfer of ownership)
         let sql_clone = Arc::clone(&sql_key);
         let pool_clone = Arc::clone(&pool);
 
@@ -97,6 +114,7 @@ async fn stream_pagination(
     }
 
     // 调整偏移量
+    // Adjust offset
     let stream = stream_guard.as_mut().unwrap();
     let skip = target_offset.saturating_sub(state.offset);
     for _ in 0..skip {
@@ -109,6 +127,7 @@ async fn stream_pagination(
     }
 
     // 收集当前页数据
+    // Collect current page data
     let mut page_rows = Vec::with_capacity(page_size);
     for _ in 0..page_size {
         match stream.next().await {
@@ -130,6 +149,7 @@ async fn stream_pagination(
 }
 
 // 一次性返回所有数据
+// Return all data at once
 async fn fetch_all_data(
     pool: &PgPool,
     sql: &str,
@@ -168,6 +188,7 @@ fn process_rows(
 }
 
 // 把数据库类型转为 json 类型
+// Convert database type to JSON type
 fn convert_value_pg(row: &PgRow, idx: usize) -> Result<serde_json::Value, sqlx::Error> {
     let column = row.columns().get(idx).unwrap();
     let col_name = column.name();
