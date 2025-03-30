@@ -12,6 +12,7 @@ import {
   MAIN_CONTEN_TYPE_TABLE_EDITOR,
 } from "@/constants";
 import { connect } from "@/databases/adapter,";
+import { invoker } from "@/invoker";
 import { useCoreStore } from "@/store";
 import { DbConnections } from "@/types/conf_file";
 import { ConfirmDialog } from "../ConfirmDialog";
@@ -19,8 +20,15 @@ import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
 
 export function DatabaseList() {
-  const { config, setConfig, setMainContenType, setListBarType, setCurrentDbName, setCurrentConnColor } =
-    useCoreStore();
+  const {
+    config,
+    setConfig,
+    setMainContenType,
+    setListBarType,
+    setCurrentDbName,
+    currentConnName,
+    setCurrentConnColor,
+  } = useCoreStore();
 
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [itemIndex, setItemIndex] = useState<number>(-1);
@@ -87,7 +95,7 @@ export function DatabaseList() {
           {
             label: "断开链接",
             onClick: () => {
-              //  TODO:
+              invoker.disconnectSql(currentConnName);
             },
             icon: <Unlink className="h-4 w-4" color="var(--fvm-warning-clr)" />,
           },

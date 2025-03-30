@@ -1,9 +1,6 @@
 use crate::types::DbResult;
 use crate::utils::sqlx_public;
 
-/**
- * 使用 sqlx 连接数据库
- */
 #[tauri::command]
 pub async fn sqlx_connect(conn_name: String, url: String) -> DbResult {
     let mut res = DbResult::new();
@@ -19,9 +16,21 @@ pub async fn sqlx_connect(conn_name: String, url: String) -> DbResult {
     res
 }
 
-/**
- * 使用 sqlx 查询数据
- */
+#[tauri::command]
+pub async fn sqlx_disconnect(conn_name: String) -> DbResult {
+    let mut res = DbResult::new();
+
+    match sqlx_public::disconnect(&conn_name).await {
+        Ok(o) => res.data = o.to_string(),
+        Err(e) => {
+            eprintln!("Error occurred in sqlx_disconnect: {:?}", e);
+            res.error_message = e.to_string()
+        }
+    }
+
+    res
+}
+
 #[tauri::command]
 pub async fn sqlx_query(
     conn_name: String,
@@ -46,9 +55,6 @@ pub async fn sqlx_query(
     res
 }
 
-/**
- * 使用 sqlx 执行非查询语句
- */
 #[tauri::command]
 pub async fn sqlx_exec(conn_name: String, sql: String) -> DbResult {
     let mut res = DbResult::new();

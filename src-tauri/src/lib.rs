@@ -20,6 +20,7 @@ pub fn run() {
             // commands::password::verify_password,
             commands::sha::sha256,
             commands::sql::sqlx_connect,
+            commands::sql::sqlx_disconnect,
             commands::sql::sqlx_exec,
             commands::sql::sqlx_query,
         ])

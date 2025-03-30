@@ -16,7 +16,7 @@ import {
   LIST_BAR_TYPE_TABLE_LIST,
   MAIN_PASSWORD_DEFAULT,
 } from "@/constants";
-import { invoker } from "@/invoke";
+import { invoker } from "@/invoker";
 import { clearCoreStore, useCoreStore } from "@/store";
 import { readConfigFile } from "@/utils/config_file";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";

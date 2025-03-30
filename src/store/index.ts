@@ -7,7 +7,7 @@ import {
   MAIN_PASSWORD_DEFAULT,
 } from "@/constants";
 import { TableStructure } from "@/databases/types";
-import { invoker } from "@/invoke";
+import { invoker } from "@/invoker";
 import { ConfigFile } from "@/types/conf_file";
 import { DbType, ListBarType, MainContenType, MainContentTab } from "@/types/types";
 import { saveConfigFile } from "@/utils/config_file";

@@ -1,7 +1,6 @@
 import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE } from "@/constants";
 import {
   connectPg,
-  execPg,
   genDeleteFieldCmdPg,
   genDeleteTableCmdPg,
   genRenameFieldCmdPg,
@@ -12,8 +11,8 @@ import {
   getTableDataPg,
   getTableDdlPg,
   getTableStructurePg,
-  queryPg,
 } from "@/databases/PostgreSQL/utils/sql";
+import { invoker } from "@/invoker";
 import { coreStore } from "@/store";
 import { genAlterCmdPg } from "./PostgreSQL/utils/alter";
 import { getDataTypeCategoryPg } from "./PostgreSQL/utils/icon";
@@ -27,6 +26,23 @@ export async function connect(p: DbConnectionParam) {
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return connectPg(connName, p);
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
+}
+
+// 断开数据库
+export async function disconnect(connName: string) {
+  return await invoker.disconnectSql(connName);
+}
+
+// 查询语句
+export async function query(sql: string, streaming?: boolean, page?: number, pageSize?: number) {
+  const connName = coreStore.getState().currentConnName;
+  return await invoker.querySql(connName, sql, streaming, page, pageSize);
+}
+
+// 执行语句
+export async function exec(sql: string) {
+  const connName = coreStore.getState().currentConnName;
+  return await invoker.execSql(connName, sql);
 }
 
 // 获取所有表名
@@ -77,30 +93,6 @@ export async function getTableData(params: GetTableDataParam) {
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return getTableDataPg(connName, params);
   if (dbType === DB_TYPE_SQLITE) return; // TODO:
-}
-
-// 查询语句
-export function query(sql: string) {
-  const dbType = coreStore.getState().currentDbType;
-  const connName = coreStore.getState().currentConnName;
-
-  if (dbType === DB_TYPE_MYSQL) return; // TODO:
-  if (dbType === DB_TYPE_POSTGRESQL) return queryPg(connName, sql);
-  if (dbType === DB_TYPE_SQLITE) return; // TODO:
-
-  return "";
-}
-
-// 执行语句
-export function exec(sql: string) {
-  const dbType = coreStore.getState().currentDbType;
-  const connName = coreStore.getState().currentConnName;
-
-  if (dbType === DB_TYPE_MYSQL) return; // TODO:
-  if (dbType === DB_TYPE_POSTGRESQL) return execPg(connName, sql);
-  if (dbType === DB_TYPE_SQLITE) return; // TODO:
-
-  return "";
 }
 
 // 生成重命名表格的语句

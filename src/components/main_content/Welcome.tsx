@@ -6,7 +6,7 @@ import {
   MAIN_CONTEN_TYPE_SETTINGS,
   MAIN_PASSWORD_DEFAULT,
 } from "@/constants";
-import { invoker } from "@/invoke";
+import { invoker } from "@/invoker";
 import { useCoreStore } from "@/store";
 import { Card, CardContent, CardDescription, CardFooter } from "../ui/card";
 

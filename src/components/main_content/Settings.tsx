@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { DIR_H, MAIN_PASSWORD_MIN_LEN } from "@/constants";
 import { getTableDdl } from "@/databases/adapter,";
-import { invoker } from "@/invoke";
+import { invoker } from "@/invoker";
 import { useCoreStore } from "@/store";
 import { LabeledDiv } from "../LabeledDiv";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";

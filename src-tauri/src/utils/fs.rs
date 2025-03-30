@@ -7,6 +7,7 @@ pub fn path_exists(path: String) -> bool {
 }
 
 /// 读取文件的文本
+/// Read the text of the file
 pub fn read_file_text(input_path: String) -> Result<String> {
     let input_path = Path::new(&input_path);
     let plaintext = fs::read(input_path)
@@ -16,6 +17,7 @@ pub fn read_file_text(input_path: String) -> Result<String> {
 }
 
 /// 读取文件的二进制内容
+/// Read the binary content of the file
 pub fn read_file_base64(input_path: String) -> Result<String> {
     let input_path = Path::new(&input_path);
     let bytes = fs::read(input_path)
@@ -25,6 +27,7 @@ pub fn read_file_base64(input_path: String) -> Result<String> {
 }
 
 /// 写入文本内容到文件
+/// Write text content to a file
 pub fn write_file_text(output_path: String, content: String) -> Result<()> {
     let output_path = Path::new(&output_path);
     fs::write(output_path, content)
@@ -33,6 +36,7 @@ pub fn write_file_text(output_path: String, content: String) -> Result<()> {
     Ok(())
 }
 /// 写入二进制内容到文件
+/// Write binary content to a file
 pub fn write_file_base64(output_path: String, content_base64: String) -> Result<()> {
     let content = general_purpose::STANDARD
         .decode(&content_base64)

@@ -1,4 +1,4 @@
-import { invoker } from "@/invoke";
+import { invoker } from "@/invoker";
 import {
   ColumnIndex,
   DbConnectionParam,
@@ -14,14 +14,9 @@ import "../types";
  *
  * "postgres://user:password@localhost:5432/mydb?sslmode=require";
  *
- *
  */
 export async function connectPg(connName: string, p: DbConnectionParam) {
-  return await invoker.connectSql(
-    connName,
-    // `host=${p.host} port=${p.port} user=${p.user} password=${p.password} dbname=${p.dbname}`,
-    `postgres://${p.user}:${p.password}@${p.host}:${p.port}/${p.dbName}`,
-  );
+  return await invoker.connectSql(connName, `postgres://${p.user}:${p.password}@${p.host}:${p.port}/${p.dbName}`);
 }
 
 // 获取所有表格名
@@ -392,16 +387,6 @@ export function getDefultOrderField(tsa: TableStructure[]) {
   }
 
   return "";
-}
-
-// 查询语句
-export async function queryPg(connName: string, sql: string) {
-  return await invoker.querySql(connName, sql);
-}
-
-// 执行语句
-export async function execPg(connName: string, sql: string) {
-  return await invoker.execSql(connName, sql);
 }
 
 // 执行事务语句
