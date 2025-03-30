@@ -7,9 +7,7 @@ import { AllAlterAction, FieldAlterAction, TableAlterAction } from "../../types"
 import { formatToSqlValuePg } from "./format";
 
 function genSizeStr(sizeStr: string) {
-  if (sizeStr === "") {
-    return "";
-  }
+  if (sizeStr === "") return "";
 
   if (reNumStr.test(sizeStr)) {
     const size = parseInt(sizeStr) | 0;
@@ -22,7 +20,9 @@ function genSizeStr(sizeStr: string) {
 function genFieldDefault(fieldDefalut: string | null) {
   if (fieldDefalut === null) return "";
 
-  let defalutValue = reNumStr.test(fieldDefalut) ? `${fieldDefalut}` : formatToSqlValuePg(fieldDefalut);
+  // TODO: 支持以下类型:
+  // 多维数组: 使用 ARRAY[[1,2],[3,4]]
+  let defalutValue = reNumStr.test(fieldDefalut) ? `${fieldDefalut}` : formatToSqlValuePg(fieldDefalut, true);
   return fieldDefalut ? "DEFAULT " + defalutValue : "";
 }
 
@@ -43,11 +43,6 @@ function genIndxConstraint(faa: FieldAlterAction) {
 // 用于 CREATE TABLE 和ALTER TABLE 语句里每个字段名及其后面的属性
 function genFieldSql(faa: FieldAlterAction) {
   const sizeStr = genSizeStr(faa.fieldSize);
-  // TODO: 支持以下类型:
-  // bytea: 使用  decode('DEADBEEF', 'hex')
-  // 多维数组: 使用 ARRAY[[1,2],[3,4]]
-  // 几何类型 / 网络地址类型: 需用类型构造函数
-  // 复合类型: 使用 ROW() 构造函数
   const defaultValue = genFieldDefault(faa.fieldDefalut);
   const notNull = genNotNull(faa.fieldNotNull);
 
