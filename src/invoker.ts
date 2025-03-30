@@ -50,8 +50,12 @@ export const invoker = {
    * @param pageSize 流式查询的页大小
    * @returns
    */
-  querySql: (connName: string, sql: string, streaming?: boolean, page?: number, pageSize?: number) =>
-    invoke<QueryResult>("sqlx_query", { connName, sql, streaming, page, pageSize }),
+  querySql: (connName: string, sql: string, streaming?: boolean, page?: number, pageSize?: number) => {
+    streaming ??= false;
+    page ??= 1;
+    pageSize ??= 100;
+    return invoke<QueryResult>("sqlx_query", { connName, sql, streaming, page, pageSize });
+  },
   /**
    * 执行非查询语句 | Execute non query statements
    * @param connName 数据库连接的名字 | Name of database connection

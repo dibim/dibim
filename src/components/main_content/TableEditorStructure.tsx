@@ -13,6 +13,7 @@ import { useCoreStore } from "@/store";
 import { UniqueConstraint } from "@/types/types";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { LabeledDiv } from "../LabeledDiv";
+import { SqlCodeViewer } from "../SqlCodeViewer";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
@@ -578,14 +579,7 @@ export function TableEditorStructure({
       <ConfirmDialog
         open={showDialogDelete}
         title={`确认要删除字段${operateFieldName}吗?`}
-        content={
-          <>
-            <div className="pt-4">
-              <div className="pb-4">将要执行的语句:</div>
-              <pre>{willExecCmd}</pre>
-            </div>
-          </>
-        }
+        content={<SqlCodeViewer ddl={willExecCmd} />}
         cancelText={"取消"}
         cancelCb={() => {
           setShowDialogDelete(false);
@@ -599,7 +593,7 @@ export function TableEditorStructure({
         open={showDialogAlter}
         title={`确认要保存变更吗?`}
         description={`请确认将要执行的语句:`}
-        content={<pre>{willExecCmd}</pre>}
+        content={<SqlCodeViewer ddl={willExecCmd} />}
         cancelText={"取消"}
         cancelCb={() => {
           setShowDialogAlter(false);
