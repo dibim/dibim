@@ -1,5 +1,5 @@
 use crate::types::DbResult;
-use crate::utils::sqlx;
+use crate::utils::sqlx_public;
 
 /**
  * 使用 sqlx 连接数据库
@@ -8,7 +8,7 @@ use crate::utils::sqlx;
 pub async fn sqlx_connect(conn_name: String, url: String) -> DbResult {
     let mut res = DbResult::new();
 
-    match sqlx::connect(&conn_name, &url).await {
+    match sqlx_public::connect(&conn_name, &url).await {
         Ok(()) => res.data = "ok".to_string(),
         Err(e) => {
             eprintln!("Error occurred in sqlx_connect: {:?}", e);
@@ -23,10 +23,16 @@ pub async fn sqlx_connect(conn_name: String, url: String) -> DbResult {
  * 使用 sqlx 查询数据
  */
 #[tauri::command]
-pub async fn sqlx_query(conn_name: String, sql: String) -> DbResult {
+pub async fn sqlx_query(
+    conn_name: String,
+    sql: String,
+    streaming: bool,
+    page: Option<usize>,
+    page_size: Option<usize>,
+) -> DbResult {
     let mut res = DbResult::new();
 
-    match sqlx::query(&conn_name, &sql).await {
+    match sqlx_public::query(&conn_name, &sql, streaming, page, page_size).await {
         Ok(o) => {
             res.column_name = o.column_name;
             res.data = o.data;
@@ -47,7 +53,7 @@ pub async fn sqlx_query(conn_name: String, sql: String) -> DbResult {
 pub async fn sqlx_exec(conn_name: String, sql: String) -> DbResult {
     let mut res = DbResult::new();
 
-    match sqlx::exec(&conn_name, &sql).await {
+    match sqlx_public::exec(&conn_name, &sql).await {
         Ok(o) => {
             res.data = match serde_json::to_string(&o) {
                 Ok(oo) => oo,
