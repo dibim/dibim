@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import bytes from "bytes";
 import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, CirclePlus, LucideIcon } from "lucide-react";
 import { toast } from "sonner";
-import { MAIN_CONTEN_TYPE_TABLE_EDITOR, TAB_STRUCTURE } from "@/constants";
+import { MAIN_CONTEN_TYPE_TABLE_EDITOR, STR_EMPTY, TAB_STRUCTURE } from "@/constants";
 import {
   exec,
   genDeleteTableCmd,
@@ -18,6 +18,18 @@ import { ListItem, ListWithAction } from "../ListWithAction";
 import { Input } from "../ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
+const SORT_BY_NAME_ASC = "SORT_BY_NAME_ASC";
+const SORT_BY_NAME_DESC = "SORT_BY_NAME_DESC";
+const SORT_BY_BYTES_ASC = "SORT_BY_BYTES_ASC";
+const SORT_BY_BYTES_DESC = "SORT_BY_BYTES_DESC";
+
+type SortBy =
+  | typeof STR_EMPTY
+  | typeof SORT_BY_NAME_ASC
+  | typeof SORT_BY_NAME_DESC
+  | typeof SORT_BY_BYTES_ASC
+  | typeof SORT_BY_BYTES_DESC;
+
 type TableData = {
   tableName: string;
   size: string;
@@ -25,8 +37,16 @@ type TableData = {
 };
 
 export function TableList() {
-  const { setCurrentTableName, setMainContenType, setMainContenTab, setIsAddingTable } = useCoreStore();
+  const {
+    setCurrentTableName,
+    setMainContenType,
+    setMainContenTab,
+    setIsAddingTable,
+    currentConnColor,
+    setCurrentTableStructure,
+  } = useCoreStore();
 
+  const [sortBy, setSortBy] = useState<SortBy>(SORT_BY_NAME_ASC);
   const [tablData, setTableData] = useState<TableData[]>([]);
 
   const clickItem = (item: ListItem) => {
@@ -38,29 +58,40 @@ export function TableList() {
     setIsAddingTable(true);
     setCurrentTableName("");
     setMainContenTab(TAB_STRUCTURE);
+    setCurrentTableStructure([]);
   };
 
   // ========== 排序 ==========
   // 按表名正序排序 (A-Z)
-  const sortByNameAsc = () => setTableData([...tablData].sort((a, b) => a.tableName.localeCompare(b.tableName)));
+  const sortByNameAsc = () => {
+    setTableData([...tablData].sort((a, b) => a.tableName.localeCompare(b.tableName)));
+    setSortBy(SORT_BY_NAME_ASC);
+  };
 
   // 按表名倒序排序 (Z-A)
-  const sortByNameDesc = () => setTableData([...tablData].sort((a, b) => b.tableName.localeCompare(a.tableName)));
+  const sortByNameDesc = () => {
+    setTableData([...tablData].sort((a, b) => b.tableName.localeCompare(a.tableName)));
+    setSortBy(SORT_BY_NAME_DESC);
+  };
 
   // 按大小正序排序 (小到大)
-  const sortByBytesAsc = () => setTableData([...tablData].sort((a, b) => a.bytes - b.bytes));
+  const sortByBytesAsc = () => {
+    setTableData([...tablData].sort((a, b) => a.bytes - b.bytes));
+    setSortBy(SORT_BY_BYTES_ASC);
+  };
 
   // 按大小倒序排序 (大到小)
-  const sortByBytesDesc = () => setTableData([...tablData].sort((a, b) => b.bytes - a.bytes));
+  const sortByBytesDesc = () => {
+    setTableData([...tablData].sort((a, b) => b.bytes - a.bytes));
+    setSortBy(SORT_BY_BYTES_DESC);
+  };
 
-  const renderSortBtn = (sortByNameAsc: () => void, Icon: LucideIcon, text: string) => {
+  const renderSortBtn = (sortMethod: SortBy, sortByNameAsc: () => void, Icon: LucideIcon, text: string) => {
     return (
       <div onClick={sortByNameAsc}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div>
-              <Icon />
-            </div>
+            {sortBy === sortMethod ? <Icon color={currentConnColor} /> : <Icon />}
           </TooltipTrigger>
           <TooltipContent>
             <p>{text}</p>
@@ -261,12 +292,13 @@ export function TableList() {
   return (
     <div>
       <div className="flex justify-between p-2">
-        {renderSortBtn(sortByNameAsc, ArrowDownAZ, "按表名正序排序")}
-        {renderSortBtn(sortByNameDesc, ArrowDownZA, "按表名倒序排序")}
-        {renderSortBtn(sortByBytesAsc, ArrowDown01, "按表格大小正序排序")}
-        {renderSortBtn(sortByBytesDesc, ArrowUp01, "按表格大小倒序排序")}
-        {renderSortBtn(addTable, CirclePlus, "添加表格")}
+        {renderSortBtn(SORT_BY_NAME_ASC, sortByNameAsc, ArrowDownAZ, "按表名正序排序")}
+        {renderSortBtn(SORT_BY_NAME_DESC, sortByNameDesc, ArrowDownZA, "按表名倒序排序")}
+        {renderSortBtn(SORT_BY_BYTES_ASC, sortByBytesAsc, ArrowDown01, "按表格大小正序排序")}
+        {renderSortBtn(SORT_BY_BYTES_DESC, sortByBytesDesc, ArrowUp01, "按表格大小倒序排序")}
+        {renderSortBtn(STR_EMPTY, addTable, CirclePlus, "添加表格")}
       </div>
+      <hr />
 
       {!tablData || tablData.length === 0 ? (
         <EmptyList />
