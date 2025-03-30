@@ -3,6 +3,7 @@
  */
 import { useEffect, useState } from "react";
 import {
+  STR_ADD,
   STR_EDIT,
   STR_EMPTY,
   STR_TABLE,
@@ -25,7 +26,7 @@ import { TableEditorDdl } from "./TableEditorDdl";
 import { TableEditorStructure } from "./TableEditorStructure";
 
 export function TableEditor() {
-  const { currentTableName, setCurrentTableStructure, mainContenTab, setMainContenTab } = useCoreStore();
+  const { currentTableName, setCurrentTableStructure, mainContenTab, setMainContenTab, isAddingTable } = useCoreStore();
 
   const [alterData, setAlterData] = useState<AllAlterAction[]>([]); // 对表格和字段的修改数据
   const [editingTableName, setEditingTableName] = useState<string>(""); // 输入框中的表名
@@ -55,14 +56,14 @@ export function TableEditor() {
     for (let index = 0; index < alterData.length; index++) {
       const item = alterData[index];
       if (item.target === STR_TABLE) {
-        // 对表的操作只有一个不由再判断
+        // 对表的操作只有一个不用再判断
         actionDataFindedIndex = index;
       }
     }
 
     const actionData: TableAlterAction = {
       target: STR_TABLE,
-      action: STR_EDIT, // 对表格的只有编辑一种动作
+      action: isAddingTable ? STR_ADD : STR_EDIT,
       tableName: editingTableName, // 输入框里的表名
       tableNameOld: currentTableName,
       comment: editingTableComment,
@@ -73,7 +74,6 @@ export function TableEditor() {
         alterData.map((item, index) => (index === actionDataFindedIndex ? { ...item, ...actionData } : item)),
       );
     } else {
-      console.log("添加 ad::: ", actionData);
       setAlterData([...alterData, actionData]);
     }
   }
@@ -101,8 +101,6 @@ export function TableEditor() {
             placeholder={"请输入表名"}
             defaultValue={editingTableName}
             onInput={(e) => {
-              console.log("输入:  ", e.currentTarget.value);
-
               setEditingTableName(e.currentTarget.value);
             }}
           />
