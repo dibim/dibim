@@ -9,7 +9,7 @@ import {
 import { TableStructure } from "@/databases/types";
 import { invoker } from "@/invoke";
 import { ConfigFile } from "@/types/conf_file";
-import { DbType, MainContenType, MainContentTab, ListBarType } from "@/types/types";
+import { DbType, ListBarType, MainContenType, MainContentTab } from "@/types/types";
 import { saveConfigFile } from "@/utils/config_file";
 
 // 定义 store 的类型
@@ -27,6 +27,9 @@ export interface CoreStoreState {
   // 当前连接名
   currentConnName: string;
   setCurrentConnName: (val: string) => void;
+  // 当前连接颜色
+  currentConnColor: string;
+  setCurrentConnColor: (val: string) => void;
 
   // 当前数据库名
   currentDbNme: string;
@@ -103,6 +106,8 @@ export const useCoreStore = create<CoreStoreState>()(
 
       currentConnName: "",
       setCurrentConnName: (val: string) => set({ currentConnName: val }),
+      currentConnColor: "",
+      setCurrentConnColor: (val: string) => set({ currentConnColor: val }),
 
       currentDbNme: "",
       setCurrentDbName: (val: string) => set({ currentDbNme: val }),
@@ -138,6 +143,7 @@ export const useCoreStore = create<CoreStoreState>()(
           mainPasswordSha: defaultMainPasswordSha,
           currentDbType: DB_TYPE_POSTGRESQL,
           currentConnName: "",
+          currentConnColor: "",
           currentDbNme: "",
           currentTableName: "",
           currentTableStructure: [],

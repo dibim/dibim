@@ -47,9 +47,6 @@ export const FIELD_TYPE_BIT_STRING = "BIT_STRING";
 export const FIELD_TYPE_MONETARY = "MONETARY";
 export const FIELD_TYPE_PSEUDO = "PSEUDO";
 
-// 空的新表名, 添加表格时模式临时使用
-export const EMPTY_NEW_TABLE_NAE = "/*NEW_TABLE*/";
-
 // 列表栏的类型
 export const LIST_BAR_TYPE_DB_LIST = "dbList";
 export const LIST_BAR_TYPE_TABLE_LIST = "tableList";
@@ -75,3 +72,6 @@ export const TAB_FOREIGN_KEY = "TAB_FOREIGN_KEY";
 // 方向
 export const DIR_H = "horizontal";
 export const DIR_V = "vertical";
+
+// 正则
+export const reNumStr = /^\d+$/;

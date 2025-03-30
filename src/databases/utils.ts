@@ -58,4 +58,3 @@ export function formatToSqlValueCommon(value: CommonSQLValue): string {
   // 默认处理（不应执行到这里）
   throw new Error(`Unsupported common SQL type: ${typeof value}`);
 }
-

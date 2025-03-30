@@ -22,6 +22,7 @@ import { readConfigFile } from "@/utils/config_file";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function Main() {
   const {
@@ -33,6 +34,7 @@ export function Main() {
     setListBarOpen,
     setMainPasswordSha,
     currentDbNme,
+    currentConnColor,
   } = useCoreStore();
 
   const { toggleSidebar, setOpenMobile, setOpen } = useSidebar();
@@ -183,7 +185,19 @@ export function Main() {
               <span className="sr-only">切换列表栏</span>
             </Button>
 
-            <span>{currentDbNme || "无数据库连接"}</span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span
+                  className="cursor-pointer"
+                  style={{ borderBottom: `0.25rem solid ${currentConnColor || "rgba(0,0,0,0)"}` }}
+                >
+                  {currentDbNme || "无数据库连接"}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>当前数据库连接</p>
+              </TooltipContent>
+            </Tooltip>
           </header>
 
           <PanelGroup direction="horizontal">

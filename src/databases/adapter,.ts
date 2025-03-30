@@ -2,7 +2,6 @@ import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE } from "@/constants";
 import {
   connectPg,
   execPg,
-  genCreateTableCmdPg,
   genDeleteFieldCmdPg,
   genDeleteTableCmdPg,
   genRenameFieldCmdPg,
@@ -155,18 +154,6 @@ export function genDeleteFieldCmd(tbName: string, fieldName: string) {
   if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genDeleteFieldCmdPg(tbName, fieldName);
   if (dbType === DB_TYPE_SQLITE) return ""; // TODO:
-
-  return "";
-}
-
-// 生成建表语句
-// FIXME: 实现功能
-export function genCreateTableCmd(tbName: string) {
-  const dbType = coreStore.getState().currentDbType;
-
-  if (dbType === DB_TYPE_MYSQL) return; // TODO:
-  if (dbType === DB_TYPE_POSTGRESQL) return genCreateTableCmdPg(tbName);
-  if (dbType === DB_TYPE_SQLITE) return; // TODO:
 
   return "";
 }

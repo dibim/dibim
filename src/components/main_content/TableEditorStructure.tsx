@@ -42,7 +42,7 @@ export function TableEditorStructure({
   editingTableComment,
   setEditingTableComment,
 }: MainContentStructureProp) {
-  const { currentTableStructure, setCurrentTableStructure, currentTableName } = useCoreStore();
+  const { currentTableStructure, setCurrentTableStructure, currentTableName, isAddingTable } = useCoreStore();
 
   const [deletedFieldIndex, setDeletedFieldIndex] = useState<Set<number>>(new Set()); // 删除的字段的索引
   const [selectedFieldIndex, setSelectedFieldIndex] = useState<Set<number>>(new Set()); // 选中的字段的索引
@@ -102,23 +102,26 @@ export function TableEditorStructure({
     for (const index of selectedFieldIndex) {
       const field = currentTableStructure[index];
 
-      const action = {
-        target: STR_FIELD,
-        action: STR_DELETE,
-        tableName: currentTableName,
+      // 创建表格时不需要记录字段的删除动作
+      if (!isAddingTable) {
+        const action = {
+          target: STR_FIELD,
+          action: STR_DELETE,
+          tableName: currentTableName,
 
-        fieldName: field.column_name,
-        fieldNameExt: "",
-        fieldType: "",
-        fieldSize: "",
-        fieldDefalut: "",
-        fieldNotNull: false,
-        fieldIndexType: "",
-        fieldIndexPkAutoIncrement: false,
-        fieldIndexName: "",
-        fieldComment: "",
-      } as FieldAlterAction;
-      alterData.push(action);
+          fieldName: field.column_name,
+          fieldNameExt: "",
+          fieldType: "",
+          fieldSize: "",
+          fieldDefalut: "",
+          fieldNotNull: false,
+          fieldIndexType: "",
+          fieldIndexPkAutoIncrement: false,
+          fieldIndexName: "",
+          fieldComment: "",
+        } as FieldAlterAction;
+        alterData.push(action);
+      }
     }
 
     setDeletedFieldIndex(selectedFieldIndex);
@@ -164,7 +167,7 @@ export function TableEditorStructure({
     }
 
     resetDialogData({
-      target: "field",
+      target: STR_FIELD,
       action: STR_EDIT,
       tableName: currentTableName,
       fieldName: field.column_name,
@@ -271,10 +274,12 @@ export function TableEditorStructure({
         column_default: fieldDefalut,
         comment: fieldComment,
         size: parseInt(fieldSize) || 0,
-        is_primary_key: false,
-        is_unique_key: false,
+        is_primary_key: fieldIndexType === INDEX_PRIMARY_KEY,
+        is_unique_key: fieldIndexType === INDEX_UNIQUE,
         is_foreign_key: false,
-        is_not_null: false,
+        is_not_null: fieldNotNull,
+
+        // FIXME: 没记录上 索引名 / 主键/ 主键自增/ 唯一索引, 在点击编辑的时候美术据
       });
       setCurrentTableStructure(currentTableStructure);
     }
