@@ -12,7 +12,6 @@ import { ConfigFile } from "@/types/conf_file";
 import { DbType, ListBarType, MainContenType, MainContentTab } from "@/types/types";
 import { saveConfigFile } from "@/utils/config_file";
 
-// 定义 store 的类型
 export interface CoreStoreState {
   // 配置文件相关
   config: ConfigFile;
@@ -47,17 +46,21 @@ export interface CoreStoreState {
   sidebarOpen: boolean;
   setSidebarOpen: (val: boolean) => void;
 
-  // 列表栏的类型
+  // 列表栏是否显示
   listBarOpen: boolean;
   setListBarOpen: (val: boolean) => void;
+  // 列表栏的类型
   listBarType: ListBarType;
   setListBarType: (val: ListBarType) => void;
 
   // 主要区域的类型
   mainContenType: MainContenType;
   setMainContenType: (val: MainContenType) => void;
+  // 主要区域的标签页
   mainContenTab: MainContentTab;
   setMainContenTab: (val: MainContentTab) => void;
+
+  // 是建表
   isAddingTable: boolean;
   setIsAddingTable: (val: boolean) => void;
 
