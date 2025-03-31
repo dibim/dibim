@@ -4,7 +4,7 @@ import { NotebookText, Play } from "lucide-react";
 import * as Monaco from "monaco-editor";
 import sqlWorker from "monaco-editor/esm/vs/basic-languages/sql/sql?worker";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
-import Editor from "@monaco-editor/react";
+import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
 import { DEFAULT_PAGE_SIZE } from "@/constants";
 import { exec, query } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
@@ -58,6 +58,38 @@ export function SqlEditor() {
     }
   }
 
+  // 格式化代码
+  function formatCode() {
+    const code = getEditorCode();
+    setEditorCode(formatSql(currentDbType, code));
+  }
+
+  // 执行代码
+  async function execCode() {
+    // 获取前10个字符（如果字符串不足10个字符则取全部）
+    const first10Chars = getEditorCode().trim().substring(0, 10).toLowerCase();
+    // TODO: 只需支持单表查询
+
+    // 检查是否包含"select"
+    if (first10Chars.includes("select")) {
+      await queryPage(currentPage);
+    } else {
+      const res = await exec(code);
+
+      // TODO:
+      console.log("res:   ", res);
+
+      if (res) {
+        const resData = res as unknown as DbResult;
+        if (resData.errorMessage !== "") {
+          setErrorMessage(resData.errorMessage.replace("error returned from database: ", " "));
+        } else {
+          //  TODO: 显示影响的行数
+        }
+      }
+    }
+  }
+
   // ========== 面板控制  ==========
   const [showResultBar, setShowResultBar] = useState<boolean>(false);
   const panelResultRef = useRef<ImperativePanelHandle>(null);
@@ -97,71 +129,23 @@ export function SqlEditor() {
   const [code, setCode] = useState<string>("");
   const editorRef = useRef<any>(null);
 
-  const handleEditorChange = (value: string | undefined, _ev: Monaco.editor.IModelContentChangedEvent) => {
+  const handleEditorChange: OnChange = (value: string | undefined, _ev: Monaco.editor.IModelContentChangedEvent) => {
     setCode(value || "");
   };
 
-  const handleEditorDidMount = (editor: any, monaco: any) => {
+  const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
 
     // 添加快捷键
+    // 运行代码
     editor.addCommand(monaco.KeyCode.F9, async () => {
       await execCode();
     });
+    // 格式化代码
+    editor.addCommand(monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KeyF, () => formatCode());
   };
 
-  // 获取编辑器里的代码
-  const getEditorCode = () => {
-    if (editorRef.current) {
-      const code = editorRef.current.getValue();
-      console.log("Current code:", code);
-      return code;
-    }
-    return "";
-  };
-
-  // 设置编辑器里的代码
-  const setEditorCode = (newCode: string) => {
-    if (editorRef.current) {
-      editorRef.current.setValue(newCode);
-    }
-  };
-
-  // 格式化代码
-  function formatCode() {
-    const code = getEditorCode();
-    console.log("code: ", code);
-
-    setEditorCode(formatSql(currentDbType, code));
-  }
-
-  // 执行代码
-  async function execCode() {
-    // 获取前10个字符（如果字符串不足10个字符则取全部）
-    const first10Chars = getEditorCode().trim().substring(0, 10).toLowerCase();
-    // TODO: 只需支持单表查询
-
-    // 检查是否包含"select"
-    if (first10Chars.includes("select")) {
-      await queryPage(currentPage);
-    } else {
-      const res = await exec(code);
-
-      // TODO:
-      console.log("res:   ", res);
-
-      if (res) {
-        const resData = res as unknown as DbResult;
-        if (resData.errorMessage !== "") {
-          setErrorMessage(resData.errorMessage.replace("error returned from database: ", " "));
-        } else {
-          //  TODO: 显示影响的行数
-        }
-      }
-    }
-  }
-
-  const beforeMount = useMemo(
+  const beforeMount: BeforeMount = useMemo(
     () => (monacoInstance: typeof Monaco) => {
       monacoInstance.languages.register({ id: "sql" });
 
@@ -202,6 +186,21 @@ export function SqlEditor() {
     },
     [],
   );
+
+  // 获取编辑器里的代码
+  const getEditorCode = () => {
+    if (editorRef.current) {
+      return editorRef.current.getValue();
+    }
+    return "";
+  };
+
+  // 设置编辑器里的代码
+  const setEditorCode = (newCode: string) => {
+    if (editorRef.current) {
+      editorRef.current.setValue(newCode);
+    }
+  };
   // ========== 编辑器 结束 ==========
 
   // ========== 分页 结束 ==========
