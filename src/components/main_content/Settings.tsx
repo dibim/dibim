@@ -1,7 +1,3 @@
-/**
- * 设置
- *
- */
 import { useEffect, useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { DIR_H, MAIN_PASSWORD_MIN_LEN } from "@/constants";

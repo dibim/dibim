@@ -133,6 +133,7 @@ export const useCoreStore = create<CoreStoreState>()(
       setMainContenType: (val: MainContenType) => set({ mainContenType: val }),
       mainContenTab: "",
       setMainContenTab: (val: MainContentTab) => set({ mainContenTab: val }),
+
       isAddingTable: false,
       setIsAddingTable: (val: boolean) => set({ isAddingTable: val }),
 
