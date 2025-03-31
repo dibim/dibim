@@ -3,13 +3,13 @@
  */
 import { useEffect, useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, CornerDownLeft, RotateCw } from "lucide-react";
-import { HEDAER_H } from "@/constants";
+import { DEFAULT_PAGE_SIZE, HEDAER_H } from "@/constants";
 import { getDefultOrderField } from "@/databases/PostgreSQL/utils/sql";
 import { getTableData } from "@/databases/adapter,";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
+import { EditableTable, TableDataChange } from "../EditableTable";
 import { Input } from "../ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import {
   Pagination,
@@ -23,14 +23,8 @@ import {
 
 export function TableEditorData() {
   const { currentTableName, currentTableStructure } = useCoreStore();
-  const [tableData, setTableData] = useState<any[]>([]); // 表格数据
-  const [colNames, setColNames] = useState<string[]>([]); // 列名
-
-  const [currentPage, setCurrentPage] = useState<number>(1); // 当前页码
-  const [pageSize, setPageSize] = useState<number>(100); // 页面大小
-  const [pageTotal, setPageTotal] = useState<number>(0); // 页数
-  const [itemsTotal, setItemsTotal] = useState<number>(0); // 数据总条数
-  const [inputedPage, setInputedPage] = useState<number>(1); // 输入的页码
+  const [tableData, setTableData] = useState<object[]>([]); // 表格数据
+  const [fieldNames, setFieldNames] = useState<string[]>([]); // 字段名
 
   // 获取表格数据
   const getData = async (page: number) => {
@@ -38,13 +32,10 @@ export function TableEditorData() {
       return;
     }
 
-    // 整理字段名
-    setColNames(currentTableStructure.map((f) => f.column_name));
-
     // 整理参数
     const orderBy = getDefultOrderField(currentTableStructure);
     const lastRow = tableData[tableData.length - 1];
-    const lastOrderByValue = lastRow ? lastRow[orderBy] : null;
+    const lastOrderByValue = lastRow ? (lastRow as any)[orderBy] : null;
 
     if (orderBy === "") {
       console.log("orderBy 为空字符串");
@@ -61,25 +52,32 @@ export function TableEditorData() {
     });
 
     if (res) {
+      setFieldNames(res.columnName);
       setTableData(res.data);
       setItemsTotal(res.itemsTotal);
       setPageTotal(res.pageTotal);
     }
   };
 
-  // 第一页
+  // ========== 分页 ==========
+  const [currentPage, setCurrentPage] = useState<number>(1); // 当前页码
+  const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE); // 页面大小
+  const [pageTotal, setPageTotal] = useState<number>(0); // 页数
+  const [itemsTotal, setItemsTotal] = useState<number>(0); // 数据总条数
+  const [inputedPage, setInputedPage] = useState<number>(1); // 输入的页码
+
   const firstPage = () => {
     let page = 1;
     getData(page);
     setCurrentPage(page);
   };
-  // 最后一页
+
   const lastPage = () => {
     let page = pageTotal;
     getData(page);
     setCurrentPage(page);
   };
-  // 上一页
+
   const prevPage = () => {
     let page = currentPage - 1;
     if (page > 0) {
@@ -87,7 +85,7 @@ export function TableEditorData() {
       setCurrentPage(page);
     }
   };
-  // 下一页
+
   const nextPage = () => {
     let page = currentPage + 1;
     if (page <= pageTotal) {
@@ -95,7 +93,7 @@ export function TableEditorData() {
       setCurrentPage(page);
     }
   };
-  // 跳转到指定的页码
+
   const goToPage = () => {
     let page = inputedPage;
     if (page <= 0) page = 1;
@@ -120,14 +118,15 @@ export function TableEditorData() {
     // TODO: 为了编译不报错
     setPageSize(100);
   }, []);
+  // ========== 分页 结束 ==========
 
-  const renderRow = (row: { [key: string]: any }, indexRow: number) => {
-    return colNames.map((colName, indexCell) => (
-      <TableCell className="font-medium" key={`r${indexRow}|c${indexCell}`}>
-        {row[colName]}
-      </TableCell>
-    ));
-  };
+  // ========== 表格的变化 ==========
+  const [changes, setChanges] = useState<TableDataChange[]>([]); // 记录所有修改的变量
+  function onChange(val: TableDataChange[]) {
+    setChanges(val);
+    // TODO: 保存时生成语句
+  }
+  // ========== 表格的变化 结束 ==========
 
   return (
     <div>
@@ -252,20 +251,7 @@ export function TableEditorData() {
 
       {/* 主体表格 */}
       <div className="flex-1 overflow-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})` }}>
-        <Table className="border-y">
-          <TableHeader>
-            <TableRow>
-              {colNames.map((colName, index) => (
-                <TableHead key={`h${index}`}>{colName}</TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tableData.map((item, index) => (
-              <TableRow key={`r${index}`}>{renderRow(item, index)}</TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <EditableTable fieldNames={fieldNames} fieldNamesUnique={["id"]} dataArr={tableData} onChange={onChange} />
       </div>
     </div>
   );
