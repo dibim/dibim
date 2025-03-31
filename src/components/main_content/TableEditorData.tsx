@@ -2,24 +2,15 @@
  * 点击表格显示数据
  */
 import { useEffect, useState } from "react";
-import { CircleCheck, CircleMinus, CirclePlus, CircleX, CornerDownLeft, RotateCw } from "lucide-react";
+import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { DEFAULT_PAGE_SIZE, HEDAER_H } from "@/constants";
 import { getDefultOrderField } from "@/databases/PostgreSQL/utils/sql";
 import { getTableData } from "@/databases/adapter,";
 import { cn } from "@/lib/utils";
 import { useCoreStore } from "@/store";
 import { EditableTable, TableDataChange } from "../EditableTable";
-import { Input } from "../ui/input";
+import { PaginationSection } from "../PaginationSection";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationFirst,
-  PaginationItem,
-  PaginationLast,
-  PaginationNext,
-  PaginationPrevious,
-} from "../ui/x_pagination";
 
 export function TableEditorData() {
   const { currentTableName, currentTableStructure } = useCoreStore();
@@ -47,7 +38,7 @@ export function TableEditorData() {
       sortField: orderBy,
       sortOrder: "ASC",
       currentPage: page,
-      pageSize: pageSize,
+      pageSize: DEFAULT_PAGE_SIZE,
       lastOrderByValue,
     });
 
@@ -59,74 +50,23 @@ export function TableEditorData() {
     }
   };
 
-  // ========== 分页 ==========
-  const [currentPage, setCurrentPage] = useState<number>(1); // 当前页码
-  const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE); // 页面大小
-  const [pageTotal, setPageTotal] = useState<number>(0); // 页数
-  const [itemsTotal, setItemsTotal] = useState<number>(0); // 数据总条数
-  const [inputedPage, setInputedPage] = useState<number>(1); // 输入的页码
-
-  const firstPage = () => {
-    let page = 1;
-    getData(page);
-    setCurrentPage(page);
-  };
-
-  const lastPage = () => {
-    let page = pageTotal;
-    getData(page);
-    setCurrentPage(page);
-  };
-
-  const prevPage = () => {
-    let page = currentPage - 1;
-    if (page > 0) {
-      getData(page);
-      setCurrentPage(page);
-    }
-  };
-
-  const nextPage = () => {
-    let page = currentPage + 1;
-    if (page <= pageTotal) {
-      getData(page);
-      setCurrentPage(page);
-    }
-  };
-
-  const goToPage = () => {
-    let page = inputedPage;
-    if (page <= 0) page = 1;
-    if (page > pageTotal) page = pageTotal;
-
-    getData(page);
-    setCurrentPage(page);
-  };
-
-  // 输入框里的页面跟随当前页码变化
   useEffect(() => {
-    setInputedPage(currentPage);
-  }, [currentPage]);
-
-  useEffect(() => {
-    getData(currentPage);
+    setCurrentPage(1);
+    getData(1);
   }, [currentTableName]);
 
-  useEffect(() => {
-    getData(currentPage);
+  // ========== 分页 ==========
+  const [currentPage, setCurrentPage] = useState<number>(1); // 当前页码
+  const [pageTotal, setPageTotal] = useState<number>(0); // 页数
+  const [itemsTotal, setItemsTotal] = useState<number>(0); // 数据总条数
 
-    // TODO: 为了编译不报错
-    setPageSize(100);
-  }, []);
-  // ========== 分页 结束 ==========
-
-  // ========== 表格的变化 ==========
+  //  表格的变化
   const [changes, setChanges] = useState<TableDataChange[]>([]); // 记录所有修改的变量
   function onChange(val: TableDataChange[]) {
     setChanges(val);
     // TODO: 保存时生成语句
   }
-  // ========== 表格的变化 结束 ==========
+  // ========== 分页 结束 ==========
 
   return (
     <div>
@@ -175,82 +115,19 @@ export function TableEditorData() {
           </Tooltip>
         </div>
         <div className="flex flex-1 justify-between">
-          <Pagination className="flex-1 justify-start px-8">
-            <PaginationContent>
-              <PaginationItem>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <PaginationFirst className="!px-1" href="#" text={""} onClick={() => firstPage()} />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>第一页</p>
-                  </TooltipContent>
-                </Tooltip>
-              </PaginationItem>
-              <PaginationItem>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <PaginationPrevious className="!px-1" href="#" text={""} onClick={() => prevPage()} />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>上一页</p>
-                  </TooltipContent>
-                </Tooltip>
-              </PaginationItem>
-              <PaginationItem className="flex">
-                <div className="pe-2 w-20">
-                  <Input
-                    value={inputedPage}
-                    onChange={(e) => {
-                      try {
-                        setInputedPage(parseInt(e.target.value));
-                      } catch (error) {
-                        console.log("解析要跳转额页码出错: ", error);
-                      }
-                    }}
-                  />
-                </div>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center pe-4">
-                      <CornerDownLeft onClick={goToPage} />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>跳转到第{inputedPage}页</p>
-                  </TooltipContent>
-                </Tooltip>
-              </PaginationItem>
-              <PaginationItem>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <PaginationNext className="!px-1" href="#" text={""} onClick={() => nextPage()} />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>下一页</p>
-                  </TooltipContent>
-                </Tooltip>
-              </PaginationItem>
-              <PaginationItem>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <PaginationLast className="!px-1" href="#" text={""} onClick={() => lastPage()} />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>最后一页</p>
-                  </TooltipContent>
-                </Tooltip>
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-          <div className="text-muted-foreground">
-            {currentPage} / {pageTotal} <strong>页</strong> 共 {itemsTotal} 行
-          </div>
+          <PaginationSection
+            currentPage={currentPage}
+            setCurrentPage={(val) => setCurrentPage(val)}
+            pageTotal={pageTotal}
+            itemsTotal={itemsTotal}
+            getData={getData}
+          />
         </div>
       </div>
 
       {/* 主体表格 */}
       <div className="flex-1 overflow-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})` }}>
+        {/* TODO: 找到主键和唯一索引, 不能写死 id */}
         <EditableTable fieldNames={fieldNames} fieldNamesUnique={["id"]} dataArr={tableData} onChange={onChange} />
       </div>
     </div>
