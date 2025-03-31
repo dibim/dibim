@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import bytes from "bytes";
 import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, CirclePlus, LucideIcon } from "lucide-react";
 import { toast } from "sonner";
+import { subscribeKey } from "valtio/utils";
 import { MAIN_CONTEN_TYPE_TABLE_EDITOR, STR_EMPTY, TAB_STRUCTURE } from "@/constants";
 import {
   exec,
@@ -11,7 +12,7 @@ import {
   getAllTableName,
   getAllTableSize,
 } from "@/databases/adapter,";
-import { useCoreStore } from "@/store";
+import { appState } from "@/store/valtio";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
@@ -38,28 +39,21 @@ type TableData = {
 };
 
 export function TableList() {
-  const {
-    setCurrentTableName,
-    setMainContenType,
-    setMainContenTab,
-    setIsAddingTable,
-    currentConnColor,
-    setCurrentTableStructure,
-  } = useCoreStore();
-
   const [sortBy, setSortBy] = useState<SortBy>(SORT_BY_NAME_ASC);
   const [tablData, setTableData] = useState<TableData[]>([]);
 
-  function clickItem(item: ListItem) {
-    setCurrentTableName(item.id);
-    setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
+  function clickTableName(item: ListItem) {
+    console.log("点击了:: ", item.id);
+
+    appState.setCurrentTableName(item.id);
+    appState.setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
   }
 
   function addTable() {
-    setIsAddingTable(true);
-    setCurrentTableName("");
-    setMainContenTab(TAB_STRUCTURE);
-    setCurrentTableStructure([]);
+    appState.setIsAddingTable(true);
+    appState.setCurrentTableName("");
+    appState.setMainContenTab(TAB_STRUCTURE);
+    appState.setCurrentTableStructure([]);
   }
 
   // ========== 排序 ==========
@@ -92,7 +86,7 @@ export function TableList() {
       <div onClick={sortByNameAsc}>
         <Tooltip>
           <TooltipTrigger asChild>
-            {sortBy === sortMethod ? <Icon color={currentConnColor} /> : <Icon />}
+            {sortBy === sortMethod ? <Icon color={appState.currentConnColor} /> : <Icon />}
           </TooltipTrigger>
           <TooltipContent>
             <p>{text}</p>
@@ -208,17 +202,17 @@ export function TableList() {
         id: item.tableName,
         content: (
           <div className="py-1 cursor-pointer flex justify-between items-center" key={index}>
-            {/* 表名部分 - 占用剩余空间，不换行，超出显示省略号 */}
+            {/* 表名部分 */}
             <div className="flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" title={item.tableName}>
               {item.tableName}
             </div>
 
-            {/* 大小部分 - 不收缩，优先显示 */}
+            {/* 占用磁盘大小部分 */}
             <div className="flex-shrink-0 bg-muted">{item.size}</div>
           </div>
         ),
         contentOnClick: async (item) => {
-          clickItem(item);
+          clickTableName(item);
         },
         menuItems: [
           {
@@ -285,9 +279,10 @@ export function TableList() {
     getData();
 
     // 监听 store 的变化
-    useCoreStore.subscribe((_state, _prevState) => {
+    const unsubscribe = subscribeKey(appState, "currentDbNme", (_value: any) => {
       getData();
     });
+    return () => unsubscribe();
   }, []);
 
   return (

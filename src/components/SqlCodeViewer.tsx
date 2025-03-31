@@ -4,18 +4,17 @@ import pgsql from "highlight.js/lib/languages/pgsql";
 import sql from "highlight.js/lib/languages/sql";
 import "highlight.js/styles/tokyo-night-dark.css";
 import { DB_TYPE_POSTGRESQL } from "@/constants";
-import { useCoreStore } from "@/store";
+import { appState } from "@/store/valtio";
 
 hljs.registerLanguage("sql", sql);
 hljs.registerLanguage("postgresql", pgsql);
 
 export function SqlCodeViewer(props: { ddl: string }) {
-  const { currentDbType } = useCoreStore();
   const codeRef = useRef<HTMLElement>(null);
 
   // TODO: add support for SQLite, MySQ, Oracle
   function getLang() {
-    if (currentDbType === DB_TYPE_POSTGRESQL) return "postgresql";
+    if (appState.currentDbType === DB_TYPE_POSTGRESQL) return "postgresql";
 
     return "sql";
   }

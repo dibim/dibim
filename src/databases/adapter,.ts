@@ -1,3 +1,4 @@
+import { useSnapshot } from "valtio";
 import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE } from "@/constants";
 import {
   connectPg,
@@ -13,15 +14,15 @@ import {
   getTableStructurePg,
 } from "@/databases/PostgreSQL/utils/sql";
 import { invoker } from "@/invoker";
-import { coreStore } from "@/store";
+import { appState } from "@/store/valtio";
 import { genAlterCmdPg } from "./PostgreSQL/utils/alter";
 import { getDataTypeCategoryPg } from "./PostgreSQL/utils/icon";
 import { AllAlterAction, DbConnectionParam, GetTableDataParam } from "./types";
 
 // 连接数据库
 export async function connect(p: DbConnectionParam) {
-  const dbType = coreStore.getState().currentDbType;
-  const connName = coreStore.getState().currentConnName;
+  const dbType = appState.currentDbType;
+  const connName = appState.currentConnName;
 
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return connectPg(connName, p);
@@ -35,20 +36,20 @@ export async function disconnect(connName: string) {
 
 // 查询语句
 export async function query(sql: string, streaming?: boolean, page?: number, pageSize?: number) {
-  const connName = coreStore.getState().currentConnName;
+  const connName = appState.currentConnName;
   return await invoker.querySql(connName, sql, streaming, page, pageSize);
 }
 
 // 执行语句
 export async function exec(sql: string) {
-  const connName = coreStore.getState().currentConnName;
+  const connName = appState.currentConnName;
   return await invoker.execSql(connName, sql);
 }
 
 // 获取所有表名
 export async function getAllTableName() {
-  const dbType = coreStore.getState().currentDbType;
-  const connName = coreStore.getState().currentConnName;
+  const dbType = appState.currentDbType;
+  const connName = appState.currentConnName;
 
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return getAllTableNamePg(connName);
@@ -57,8 +58,8 @@ export async function getAllTableName() {
 
 // 获取所有表格的大小
 export async function getAllTableSize() {
-  const dbType = coreStore.getState().currentDbType;
-  const connName = coreStore.getState().currentConnName;
+  const dbType = appState.currentDbType;
+  const connName = appState.currentConnName;
 
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return getAllTableSizePg(connName);
@@ -67,8 +68,8 @@ export async function getAllTableSize() {
 
 // 获取表格数据
 export async function getTableStructure(tbName: string) {
-  const dbType = coreStore.getState().currentDbType;
-  const connName = coreStore.getState().currentConnName;
+  const dbType = appState.currentDbType;
+  const connName = appState.currentConnName;
 
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return getTableStructurePg(connName, tbName);
@@ -77,8 +78,8 @@ export async function getTableStructure(tbName: string) {
 
 // 获取表格的 DDL
 export async function getTableDdl(tbName: string) {
-  const dbType = coreStore.getState().currentDbType;
-  const connName = coreStore.getState().currentConnName;
+  const dbType = appState.currentDbType;
+  const connName = appState.currentConnName;
 
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return getTableDdlPg(connName, tbName);
@@ -87,8 +88,8 @@ export async function getTableDdl(tbName: string) {
 
 // 获取表格数据
 export async function getTableData(params: GetTableDataParam) {
-  const dbType = coreStore.getState().currentDbType;
-  const connName = coreStore.getState().currentConnName;
+  const dbType = appState.currentDbType;
+  const connName = appState.currentConnName;
 
   if (dbType === DB_TYPE_MYSQL) return; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return getTableDataPg(connName, params);
@@ -97,7 +98,7 @@ export async function getTableData(params: GetTableDataParam) {
 
 // 生成重命名表格的语句
 export function genRenameTableCmd(oldName: string, newName: string) {
-  const dbType = coreStore.getState().currentDbType;
+  const dbType = appState.currentDbType;
 
   if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genRenameTableCmdPg(oldName, newName);
@@ -108,7 +109,7 @@ export function genRenameTableCmd(oldName: string, newName: string) {
 
 // 生成截断表格的语句
 export function genTruncateTableCmd(tbName: string) {
-  const dbType = coreStore.getState().currentDbType;
+  const dbType = appState.currentDbType;
 
   if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genTruncateTableCmdPg(tbName);
@@ -119,7 +120,7 @@ export function genTruncateTableCmd(tbName: string) {
 
 // 生成删除表格的语句
 export function genDeleteTableCmd(tbName: string) {
-  const dbType = coreStore.getState().currentDbType;
+  const dbType = appState.currentDbType;
 
   if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genDeleteTableCmdPg(tbName);
@@ -130,7 +131,7 @@ export function genDeleteTableCmd(tbName: string) {
 
 // 生成删除表格的语句
 export function genRenameFieldCmd(tbName: string, oldName: string, newName: string) {
-  const dbType = coreStore.getState().currentDbType;
+  const dbType = appState.currentDbType;
 
   if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genRenameFieldCmdPg(tbName, oldName, newName);
@@ -141,7 +142,7 @@ export function genRenameFieldCmd(tbName: string, oldName: string, newName: stri
 
 // 生成删除表格的语句
 export function genDeleteFieldCmd(tbName: string, fieldName: string) {
-  const dbType = coreStore.getState().currentDbType;
+  const dbType = appState.currentDbType;
 
   if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genDeleteFieldCmdPg(tbName, fieldName);
@@ -152,7 +153,7 @@ export function genDeleteFieldCmd(tbName: string, fieldName: string) {
 
 // 生成修改语句
 export function genAlterCmd(val: AllAlterAction[]) {
-  const dbType = coreStore.getState().currentDbType;
+  const dbType = appState.currentDbType;
 
   if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return genAlterCmdPg(val);
@@ -163,7 +164,7 @@ export function genAlterCmd(val: AllAlterAction[]) {
 
 // 根据数据类型名称返回对应的分类常量
 export function getDataTypeCategory(val: string) {
-  const dbType = coreStore.getState().currentDbType;
+  const dbType = appState.currentDbType;
 
   if (dbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (dbType === DB_TYPE_POSTGRESQL) return getDataTypeCategoryPg(val);

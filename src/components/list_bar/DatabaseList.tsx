@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Edit, Trash, Unlink } from "lucide-react";
+import { useSnapshot } from "valtio";
+import { subscribeKey } from "valtio/utils";
 import MysqlLogo from "@/assets/db_logo/mysql.svg?react";
 import PostgresqlLogo from "@/assets/db_logo/postgresql.svg?react";
 import SqliteLogo from "@/assets/db_logo/sqlite.svg?react";
@@ -13,30 +15,27 @@ import {
 } from "@/constants";
 import { connect } from "@/databases/adapter,";
 import { invoker } from "@/invoker";
-import { useCoreStore } from "@/store";
+import { appState } from "@/store/valtio";
 import { DbConnections } from "@/types/conf_file";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
 
 export function DatabaseList() {
-  const {
-    config,
-    setConfig,
-    setMainContenType,
-    setListBarType,
-    setCurrentDbName,
-    currentConnName,
-    setCurrentConnColor,
-  } = useCoreStore();
-
+  const snap = useSnapshot(appState);
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [itemIndex, setItemIndex] = useState<number>(-1);
 
   // 删除
   function delItem() {
-    config.dbConnections.splice(itemIndex, 1);
-    setConfig(config);
+    const newConfig = {
+      ...appState.config,
+      dbConnections: [
+        ...appState.config.dbConnections.slice(0, itemIndex),
+        ...appState.config.dbConnections.slice(itemIndex + 1),
+      ],
+    };
+    appState.setConfig(newConfig);
 
     setShowDialog(false);
   }
@@ -51,11 +50,13 @@ export function DatabaseList() {
       user: conn.user,
     });
 
+    console.log("链接数据库的 res :: ", res);
+
     if (res && res.errorMessage === "") {
-      setCurrentDbName(conn.dbName);
-      setCurrentConnColor(conn.color);
-      setListBarType(LIST_BAR_TYPE_TABLE_LIST);
-      setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
+      appState.setCurrentDbName(conn.dbName);
+      appState.setCurrentConnColor(conn.color);
+      appState.setListBarType(LIST_BAR_TYPE_TABLE_LIST);
+      appState.setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
     } else {
       // TODO: 优化一下报错
       console.log("打开数据库连接出错: ", res && res.errorMessage);
@@ -66,7 +67,7 @@ export function DatabaseList() {
   const [listData, setListData] = useState<ListItem[]>([]);
   function getData() {
     const arr: ListItem[] = [];
-    config.dbConnections.map((item, index) => {
+    appState.config.dbConnections.map((item, index) => {
       arr.push({
         id: item.name,
         content: (
@@ -87,7 +88,7 @@ export function DatabaseList() {
           {
             label: "编辑",
             onClick: () => {
-              setMainContenType(MAIN_CONTEN_TYPE_EDIT_CONNECTION);
+              appState.setMainContenType(MAIN_CONTEN_TYPE_EDIT_CONNECTION);
             },
             icon: <Edit className="h-4 w-4" />,
           },
@@ -95,7 +96,7 @@ export function DatabaseList() {
           {
             label: "断开链接",
             onClick: () => {
-              invoker.disconnectSql(currentConnName);
+              invoker.disconnectSql(appState.currentConnName);
             },
             icon: <Unlink className="h-4 w-4" color="var(--fvm-warning-clr)" />,
           },
@@ -119,14 +120,19 @@ export function DatabaseList() {
     getData();
 
     // 监听 store 的变化
-    useCoreStore.subscribe((_state, _prevState) => {
+    const unsubscribe = subscribeKey(appState, "currentTableName", (_value: any) => {
       getData();
     });
+    return () => unsubscribe();
   }, []);
 
   return (
     <>
-      {!config.dbConnections ? <EmptyList /> : <ListWithAction items={listData} itemClassName="py-2 cursor-pointer" />}
+      {!snap.config.dbConnections ? (
+        <EmptyList />
+      ) : (
+        <ListWithAction items={listData} itemClassName="py-2 cursor-pointer" />
+      )}
 
       <ConfirmDialog
         open={showDialog}

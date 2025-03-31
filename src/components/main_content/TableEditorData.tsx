@@ -1,37 +1,40 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
+import { subscribeKey } from "valtio/utils";
 import { DEFAULT_PAGE_SIZE, HEDAER_H } from "@/constants";
 import { getDefultOrderField } from "@/databases/PostgreSQL/utils/sql";
 import { getTableData } from "@/databases/adapter,";
+import { TableStructure } from "@/databases/types";
 import { cn } from "@/lib/utils";
-import { useCoreStore } from "@/store";
-import { EditableTable, TableDataChange } from "../EditableTable";
+import { appState } from "@/store/valtio";
+import { EditableTable, ListItem, TableDataChange } from "../EditableTable";
 import { PaginationSection } from "../PaginationSection";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export function TableEditorData() {
-  const { currentTableName, currentTableStructure } = useCoreStore();
   const [tableData, setTableData] = useState<object[]>([]); // 表格数据
   const [fieldNames, setFieldNames] = useState<string[]>([]); // 字段名
 
   // 获取表格数据
   const getData = async (page: number) => {
-    if (currentTableName === "") {
-      return;
+    console.log("TableEditorData  appState.currentTableName::: ", appState.currentTableName);
+
+    if (appState.currentTableName === "") {
+      return [];
     }
 
     // 整理参数
-    const orderBy = getDefultOrderField(currentTableStructure);
+    const orderBy = getDefultOrderField(appState.currentTableStructure as TableStructure[]);
     const lastRow = tableData[tableData.length - 1];
     const lastOrderByValue = lastRow ? (lastRow as any)[orderBy] : null;
 
     if (orderBy === "") {
       console.log("orderBy 为空字符串");
-      return;
+      return [];
     }
 
     const res = await getTableData({
-      tableName: currentTableName,
+      tableName: appState.currentTableName,
       sortField: orderBy,
       sortOrder: "ASC",
       currentPage: page,
@@ -39,18 +42,25 @@ export function TableEditorData() {
       lastOrderByValue,
     });
 
+    console.log(
+      "getData::: currentTableName 的 ",
+      appState.currentTableName,
+
+      " 结果 ::  ",
+      res,
+    );
+
     if (res) {
       setFieldNames(res.columnName);
       setTableData(res.data);
       setItemsTotal(res.itemsTotal);
       setPageTotal(res.pageTotal);
-    }
-  };
 
-  useEffect(() => {
-    setCurrentPage(1);
-    getData(1);
-  }, [currentTableName]);
+      return res.data;
+    }
+
+    return [];
+  };
 
   // ========== 分页 ==========
   const [currentPage, setCurrentPage] = useState<number>(1); // 当前页码
@@ -64,6 +74,38 @@ export function TableEditorData() {
     // TODO: 保存时生成语句
   }
   // ========== 分页 结束 ==========
+
+  const [dataArr, setDataArr] = useState<ListItem[]>([]);
+  function updateDataArr(data: object[]) {
+    const dataArrTemp: ListItem[] = [];
+    data.map((row) => {
+      const wrappedObj: { [key: string]: ReactNode } = {};
+      for (const key in row) {
+        if (row.hasOwnProperty(key)) {
+          wrappedObj[key] = <div>{(row as any)[key]}</div>;
+        }
+      }
+
+      dataArrTemp.push(wrappedObj);
+    });
+    setDataArr(dataArrTemp);
+  }
+
+  async function initData() {
+    const data = await getData(1);
+    setCurrentPage(1);
+    updateDataArr(data);
+  }
+
+  useEffect(() => {
+    initData();
+
+    // 监听 store 的变化
+    const unsubscribe = subscribeKey(appState, "currentTableName", (_value: any) => {
+      initData();
+    });
+    return () => unsubscribe();
+  }, []);
 
   return (
     <div>
@@ -125,7 +167,14 @@ export function TableEditorData() {
       {/* 主体表格 */}
       <div className="flex-1 overflow-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})` }}>
         {/* TODO: 找到主键和唯一索引, 不能写死 id */}
-        <EditableTable fieldNames={fieldNames} fieldNamesUnique={["id"]} dataArr={tableData} onChange={onChange} />
+        <EditableTable
+          fieldNames={fieldNames}
+          fieldNamesUnique={["id"]}
+          dataArr={dataArr}
+          onChange={onChange}
+          editable={true}
+          multiSelect={true}
+        />
       </div>
     </div>
   );
