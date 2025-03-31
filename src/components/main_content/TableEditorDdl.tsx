@@ -9,7 +9,7 @@ export function TableEditorDdl() {
 
   const [ddl, setDdl] = useState<string>("");
 
-  const getData = async () => {
+  async function getData() {
     const res = await getTableDdl(currentTableName);
     if (res && res.data) {
       let sql = res.data;
@@ -23,7 +23,7 @@ export function TableEditorDdl() {
 
       // setDdl(res.data);
     }
-  };
+  }
 
   useEffect(() => {
     getData();

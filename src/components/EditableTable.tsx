@@ -29,14 +29,14 @@ export function EditableTable({ fieldNames, fieldNamesUnique, dataArr, onChange,
   const [changes, setChanges] = useState<TableDataChange[]>([]); // 记录所有修改的变量
 
   // 开始编辑
-  const handleEditStart = (indrowIndex: number, fieldName: string, value: string) => {
+  function handleEditStart(indrowIndex: number, fieldName: string, value: string) {
     setEditingRowIndex(indrowIndex);
     setEditingFieldName(fieldName);
     setTempValue(value);
-  };
+  }
 
   // 保存编辑
-  const handleEditSave = (rowIndex: number, fieldName: string) => {
+  function handleEditSave(rowIndex: number, fieldName: string) {
     setData(data.map((item, index) => (index === rowIndex ? { ...item, [fieldName]: tempValue } : item)));
     setEditingRowIndex(-1);
     setEditingFieldName("");
@@ -49,12 +49,12 @@ export function EditableTable({ fieldNames, fieldNamesUnique, dataArr, onChange,
         { index: rowIndex, field: fieldName, old: oldValue, new: tempValue },
       ]);
     }
-  };
+  }
 
   // 处理输入变化
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setTempValue(e.target.value);
-  };
+  }
 
   useEffect(() => {
     onChange(changes);

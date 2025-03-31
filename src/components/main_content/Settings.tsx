@@ -47,12 +47,12 @@ export function Settings() {
     setOkMessage("保存成功");
   }
 
-  const getData = async () => {
+  async function getData() {
     const res = await getTableDdl(currentTableName);
     if (res && res.data) {
       // setTableData(res.data);
     }
-  };
+  }
 
   useEffect(() => {
     getData();

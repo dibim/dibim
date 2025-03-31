@@ -50,44 +50,44 @@ export function TableList() {
   const [sortBy, setSortBy] = useState<SortBy>(SORT_BY_NAME_ASC);
   const [tablData, setTableData] = useState<TableData[]>([]);
 
-  const clickItem = (item: ListItem) => {
+  function clickItem(item: ListItem) {
     setCurrentTableName(item.id);
     setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
-  };
+  }
 
-  const addTable = () => {
+  function addTable() {
     setIsAddingTable(true);
     setCurrentTableName("");
     setMainContenTab(TAB_STRUCTURE);
     setCurrentTableStructure([]);
-  };
+  }
 
   // ========== 排序 ==========
   // 按表名正序排序 (A-Z)
-  const sortByNameAsc = () => {
+  function sortByNameAsc() {
     setTableData([...tablData].sort((a, b) => a.tableName.localeCompare(b.tableName)));
     setSortBy(SORT_BY_NAME_ASC);
-  };
+  }
 
   // 按表名倒序排序 (Z-A)
-  const sortByNameDesc = () => {
+  function sortByNameDesc() {
     setTableData([...tablData].sort((a, b) => b.tableName.localeCompare(a.tableName)));
     setSortBy(SORT_BY_NAME_DESC);
-  };
+  }
 
   // 按大小正序排序 (小到大)
-  const sortByBytesAsc = () => {
+  function sortByBytesAsc() {
     setTableData([...tablData].sort((a, b) => a.bytes - b.bytes));
     setSortBy(SORT_BY_BYTES_ASC);
-  };
+  }
 
   // 按大小倒序排序 (大到小)
-  const sortByBytesDesc = () => {
+  function sortByBytesDesc() {
     setTableData([...tablData].sort((a, b) => b.bytes - a.bytes));
     setSortBy(SORT_BY_BYTES_DESC);
-  };
+  }
 
-  const renderSortBtn = (sortMethod: SortBy, sortByNameAsc: () => void, Icon: LucideIcon, text: string) => {
+  function renderSortBtn(sortMethod: SortBy, sortByNameAsc: () => void, Icon: LucideIcon, text: string) {
     return (
       <div onClick={sortByNameAsc}>
         <Tooltip>
@@ -100,7 +100,7 @@ export function TableList() {
         </Tooltip>
       </div>
     );
-  };
+  }
 
   // ========== 排序 结束 ==========
 
@@ -112,66 +112,66 @@ export function TableList() {
   const [showDialogDelete, setShowDialogDelete] = useState<boolean>(false);
 
   // 弹出确认重命名表
-  const handleRenamePopup = async (tableName: string) => {
+  async function handleRenamePopup(tableName: string) {
     setOperateTableName(tableName);
     setShowDialogRename(true);
-  };
+  }
   // 处理重命名表格的输入
-  const handleRenameInput = async (e: React.FormEvent<HTMLInputElement>) => {
+  async function handleRenameInput(e: React.FormEvent<HTMLInputElement>) {
     setWillExecCmd(genRenameTableCmd(operateTableName, e.currentTarget.value) || "");
-  };
+  }
   // 执行重命名表
-  const handleRename = async () => {
+  async function handleRename() {
     exec(willExecCmd);
     getData();
-  };
+  }
 
   // 复制表名
-  const handleCopy = async (tableName: string) => {
+  async function handleCopy(tableName: string) {
     try {
       await navigator.clipboard.writeText(tableName);
       toast("复制成功");
     } catch (err) {
       toast("复制失败");
     }
-  };
+  }
 
   // 导入数据
-  const handleImport = async (tableName: string) => {
+  function handleImport(tableName: string) {
     // TODO:
-  };
+  }
 
   // 导出数据
-  const handleExport = async (tableName: string) => {
+  function handleExport(tableName: string) {
     // TODO:
-  };
+  }
 
   // 弹出确认截断表
-  const handleTruncatePopup = async (tableName: string) => {
+  function handleTruncatePopup(tableName: string) {
     setOperateTableName(tableName);
     setWillExecCmd(genTruncateTableCmd(tableName) || "");
     setShowDialogTruncate(true);
-  };
+  }
 
   // 弹出确认删除表
-  const handleDeletePopup = async (tableName: string) => {
+  function handleDeletePopup(tableName: string) {
     setOperateTableName(tableName);
     setWillExecCmd(genDeleteTableCmd(tableName) || "");
     setShowDialogDelete(true);
-  };
+  }
 
   // 确定执行语句
-  const handleConfirm = async () => {
+  function handleConfirm() {
     exec(willExecCmd);
     getData();
-  };
+  }
 
   // ========== 上下文按钮功能 结束 ==========
 
   // 列表数据
   const [listData, setListData] = useState<ListItem[]>([]);
 
-  const getData = async () => {
+  async function getData() {
     // 获取表名
     const res = await getAllTableName();
 
@@ -198,7 +198,7 @@ export function TableList() {
         setTableData(arrTb);
       }
     }
-  };
+  }
 
   // 生成带按钮的列表数据
   function genListData() {
