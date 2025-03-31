@@ -1,6 +1,3 @@
-/**
- * 点击表格显示数据
- */
 import { useEffect, useState } from "react";
 import {
   STR_ADD,

@@ -1,6 +1,3 @@
-/**
- * 表格 DDL
- */
 import { useEffect, useState } from "react";
 import { getTableDdl } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";

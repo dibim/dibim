@@ -1,6 +1,3 @@
-/**
- * 表格约束
- */
 import { useEffect } from "react";
 import { getTableStructure } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";

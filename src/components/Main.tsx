@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { ImperativePanelHandle, Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { AlertCircle, PanelLeftDashed, PanelLeftIcon } from "lucide-react";
 import { DatabaseList } from "@/components/list_bar/DatabaseList";
@@ -38,6 +39,19 @@ export function Main() {
   } = useCoreStore();
 
   const { toggleSidebar, setOpenMobile, setOpen } = useSidebar();
+
+  function toggleSidebarOpen() {
+    setOpenMobile(!sidebarOpen);
+    setOpen(!sidebarOpen);
+    setSidebarOpen(!sidebarOpen);
+    toggleSidebar();
+  }
+
+  // ========== 快捷键 ==========
+  useHotkeys("f2", () => toggleSidebarOpen(), [sidebarOpen]);
+  useHotkeys("f3", () => setListBarOpen(!listBarOpen), [listBarOpen]);
+
+  // ========== 快捷键 结束 ==========
 
   // ========== 控制列表栏 ==========
   const [defaultSizePercent, setDefaultSizePercent] = useState(20);
@@ -161,16 +175,7 @@ export function Main() {
             {!sidebarOpen && <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>}
 
             {/* 复制 sidebar-trigger 过来, 这里添加了函数, 记录 sidebar 的状态*/}
-            <Button
-              data-sidebar="trigger"
-              variant="ghost"
-              onClick={() => {
-                setOpenMobile(!sidebarOpen);
-                setOpen(!sidebarOpen);
-                setSidebarOpen(!sidebarOpen);
-                toggleSidebar();
-              }}
-            >
+            <Button data-sidebar="trigger" variant="ghost" onClick={toggleSidebarOpen}>
               <PanelLeftIcon />
               <span className="sr-only">切换侧边栏</span>
             </Button>

@@ -1,6 +1,3 @@
-/**
- * 点击表格显示数据
- */
 import { useEffect, useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { DEFAULT_PAGE_SIZE, HEDAER_H } from "@/constants";

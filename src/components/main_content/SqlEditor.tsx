@@ -1,6 +1,3 @@
-/**
- * SQL 编辑器及其查询结果
- */
 import { useMemo, useRef, useState } from "react";
 import { ImperativePanelHandle, Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { NotebookText, Play } from "lucide-react";
@@ -43,10 +40,12 @@ export function SqlEditor() {
   const { currentDbType } = useCoreStore();
 
   async function queryPage(page: number) {
-    // TODO:
+    // FIXME: 查询页码1 媒介过, 第二页才有, 估计是rust的问题
     console.log("查询 页码 :  ", page);
 
     const res = await query(code, true, page, DEFAULT_PAGE_SIZE);
+
+    console.log("查询 res :  ", res);
 
     if (res) {
       const resData = res as unknown as DbResult;
@@ -104,6 +103,11 @@ export function SqlEditor() {
 
   const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor;
+
+    // 添加快捷键
+    editor.addCommand(monaco.KeyCode.F9, async () => {
+      await execCode();
+    });
   };
 
   // 获取编辑器里的代码
@@ -133,10 +137,9 @@ export function SqlEditor() {
 
   // 执行代码
   async function execCode() {
-    // 不能都用 exec, 查询的会不返回结果
-
     // 获取前10个字符（如果字符串不足10个字符则取全部）
-    const first10Chars = code.trim().substring(0, 10).toLowerCase();
+    const first10Chars = getEditorCode().trim().substring(0, 10).toLowerCase();
+    // TODO: 只需支持单表查询
 
     // 检查是否包含"select"
     if (first10Chars.includes("select")) {
@@ -214,7 +217,7 @@ export function SqlEditor() {
   }
 
   async function getData() {
-    setCurrentPage(currentPage + 1);
+    // setCurrentPage(currentPage + 1);
 
     // FIXME: 这里的分页有问题. 可能是 rust 的问题, 也可能是没有执行 setPageTotal 和 setItemsTotal, 计算出错
     await queryPage(currentPage + 1);

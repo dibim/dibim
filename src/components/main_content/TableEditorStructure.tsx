@@ -1,6 +1,3 @@
-/**
- * 表格结构
- */
 import { useState } from "react";
 import { AlertCircle, CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { toast } from "sonner";
