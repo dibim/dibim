@@ -17,6 +17,10 @@
 - f9: 执行 sql 编辑器里的代码
 - alt + shift + f: 执行 sql 编辑器里的代码
 
+## 使用 valtio
+
+在组件中使用 Valtio 时，通过 `const snap = useSnapshot(appState)` 获取的状态快照（snap）应当用于组件的渲染输出（return 语句）中读取值。在事件处理、副作用等逻辑操作中，应当直接操作原始状态对象 appState 而不是快照对象 snap。
+
 ## TODO
 
 ### v0.1 pg

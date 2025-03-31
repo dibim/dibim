@@ -19,7 +19,7 @@ export interface PaginationProps {
   setCurrentPage: (page: number) => void;
   pageTotal: number;
   itemsTotal: number;
-  getData: (page: number) => Promise<void>;
+  getData: (page: number) => Promise<any>;
 }
 export function PaginationSection({ currentPage, setCurrentPage, pageTotal, itemsTotal, getData }: PaginationProps) {
   const [inputedPage, setInputedPage] = useState<number>(1); // 输入的页码
