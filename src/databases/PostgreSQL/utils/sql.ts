@@ -328,7 +328,7 @@ export async function getTableDataPg(connName: string, p: GetTableDataParam) {
     itemsTotal,
     pageTotal,
     columnName: dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : [],
-    data: dbRes.data ? (JSON.parse(dbRes.data) as { tablename: string }[]) : [],
+    data: dbRes.data ? (JSON.parse(dbRes.data) as object[]) : [],
   };
 }
 

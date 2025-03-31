@@ -1,12 +1,10 @@
 import { useEffect } from "react";
 import { getTableStructure } from "@/databases/adapter,";
-import { useCoreStore } from "@/store";
+import { appState } from "@/store/valtio";
 
 export function TableEditorConstraint() {
-  const { currentTableName } = useCoreStore();
-
   async function getData() {
-    await getTableStructure(currentTableName);
+    await getTableStructure(appState.currentTableName);
   }
 
   useEffect(() => {

@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ImperativePanelHandle, Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { AlertCircle, PanelLeftDashed, PanelLeftIcon } from "lucide-react";
+import { useSnapshot } from "valtio";
+import { subscribeKey } from "valtio/vanilla/utils";
 import { DatabaseList } from "@/components/list_bar/DatabaseList";
 import { TableList } from "@/components/list_bar/TableList";
 import { MainContent } from "@/components/main_content/MainContent";
@@ -18,7 +20,7 @@ import {
   MAIN_PASSWORD_DEFAULT,
 } from "@/constants";
 import { invoker } from "@/invoker";
-import { clearCoreStore, useCoreStore } from "@/store";
+import { appState } from "@/store/valtio";
 import { readConfigFile } from "@/utils/config_file";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
@@ -26,30 +28,19 @@ import { Input } from "./ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function Main() {
-  const {
-    setConfig,
-    listBarType,
-    sidebarOpen,
-    setSidebarOpen,
-    listBarOpen,
-    setListBarOpen,
-    setMainPasswordSha,
-    currentDbNme,
-    currentConnColor,
-  } = useCoreStore();
-
+  const snap = useSnapshot(appState);
   const { toggleSidebar, setOpenMobile, setOpen } = useSidebar();
 
   function toggleSidebarOpen() {
-    setOpenMobile(!sidebarOpen);
-    setOpen(!sidebarOpen);
-    setSidebarOpen(!sidebarOpen);
+    setOpenMobile(!appState.sidebarOpen);
+    setOpen(!appState.sidebarOpen);
+    appState.setSidebarOpen(!appState.sidebarOpen);
     toggleSidebar();
   }
 
   // ========== 快捷键 ==========
-  useHotkeys("f2", () => toggleSidebarOpen(), [sidebarOpen]);
-  useHotkeys("f3", () => setListBarOpen(!listBarOpen), [listBarOpen]);
+  useHotkeys("f2", () => toggleSidebarOpen(), [appState.sidebarOpen]);
+  useHotkeys("f3", () => appState.setListBarOpen(!appState.listBarOpen), [appState.listBarOpen]);
 
   // ========== 快捷键 结束 ==========
 
@@ -72,7 +63,6 @@ export function Main() {
   // ========== 控制列表栏 结束 ==========
 
   // ========== 配置初始化  ==========
-  clearCoreStore(); // 清空旧的 store 数据
 
   const [showPwdInput, setShowPwdInput] = useState(true);
   const [mainPassword, setMainPassword] = useState("");
@@ -84,7 +74,7 @@ export function Main() {
 
   async function onSubmit() {
     const sha256 = await invoker.sha256(mainPassword);
-    setMainPasswordSha(sha256);
+    appState.setMainPasswordSha(sha256);
 
     if (await initConfFile(sha256, false)) {
       setShowPwdInput(false);
@@ -97,7 +87,7 @@ export function Main() {
   async function initConfFile(pwd: string, isDefultPwd: boolean) {
     const conf = await readConfigFile(pwd);
     try {
-      await setConfig(JSON.parse(conf), true);
+      await appState.setConfig(JSON.parse(conf), true);
       return true;
     } catch (error) {
       console.log(
@@ -126,17 +116,18 @@ export function Main() {
 
   useEffect(() => {
     checkConfigFile();
-    setOpenMobile(sidebarOpen);
-    setOpen(sidebarOpen);
+    setOpenMobile(appState.sidebarOpen);
+    setOpen(appState.sidebarOpen);
 
     // 监听 store 的变化
-    useCoreStore.subscribe((state, _prevState) => {
-      if (state.listBarOpen) {
+    const unsubscribe = subscribeKey(appState, "listBarOpen", (val: boolean) => {
+      if (appState.listBarOpen) {
         if (panelRef.current) panelRef.current.expand();
       } else {
         if (panelRef.current) panelRef.current?.collapse();
       }
     });
+    return () => unsubscribe();
   }, []);
 
   return (
@@ -172,7 +163,7 @@ export function Main() {
       ) : (
         <>
           <header className={`flex h-${HEDAER_H} shrink-0 items-center gap-2 border-b px-4`}>
-            {!sidebarOpen && <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>}
+            {!snap.sidebarOpen && <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>}
 
             {/* 复制 sidebar-trigger 过来, 这里添加了函数, 记录 sidebar 的状态*/}
             <Button data-sidebar="trigger" variant="ghost" onClick={toggleSidebarOpen}>
@@ -183,7 +174,7 @@ export function Main() {
             <Button
               variant="ghost"
               onClick={() => {
-                setListBarOpen(!listBarOpen);
+                snap.setListBarOpen(!snap.listBarOpen);
               }}
             >
               <PanelLeftDashed />
@@ -194,9 +185,9 @@ export function Main() {
               <TooltipTrigger asChild>
                 <span
                   className="cursor-pointer"
-                  style={{ borderBottom: `0.25rem solid ${currentConnColor || "rgba(0,0,0,0)"}` }}
+                  style={{ borderBottom: `0.25rem solid ${snap.currentConnColor || "rgba(0,0,0,0)"}` }}
                 >
-                  {currentDbNme || "无数据库连接"}
+                  {snap.currentDbNme || "无数据库连接"}
                 </span>
               </TooltipTrigger>
               <TooltipContent>
@@ -214,8 +205,8 @@ export function Main() {
               collapsedSize={0}
             >
               <div className="p-2 overflow-y-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}>
-                {listBarType === LIST_BAR_TYPE_DB_LIST && <DatabaseList />}
-                {listBarType === LIST_BAR_TYPE_TABLE_LIST && <TableList />}
+                {snap.listBarType === LIST_BAR_TYPE_DB_LIST && <DatabaseList />}
+                {snap.listBarType === LIST_BAR_TYPE_TABLE_LIST && <TableList />}
               </div>
             </Panel>
             <PanelResizeHandle className="w-1 bg-secondary hover:bg-blue-500" />

@@ -7,18 +7,16 @@ import {
   MAIN_PASSWORD_DEFAULT,
 } from "@/constants";
 import { invoker } from "@/invoker";
-import { useCoreStore } from "@/store";
+import { appState } from "@/store/valtio";
 import { Card, CardContent, CardDescription, CardFooter } from "../ui/card";
 
 export function Welcome() {
-  const { setMainContenType, mainPasswordSha } = useCoreStore();
-
   const [showMainPasswordDiv, setShowMainPasswordDiv] = useState<boolean>(false);
 
   async function checkMainPassword() {
     const sha256 = await invoker.sha256(MAIN_PASSWORD_DEFAULT);
 
-    setShowMainPasswordDiv(mainPasswordSha === sha256);
+    setShowMainPasswordDiv(appState.mainPasswordSha === sha256);
   }
 
   useEffect(() => {
@@ -39,7 +37,7 @@ export function Welcome() {
             <div
               className="flex py-4 cursor-pointer"
               onClick={() => {
-                setMainContenType(MAIN_CONTEN_TYPE_SETTINGS);
+                appState.setMainContenType(MAIN_CONTEN_TYPE_SETTINGS);
               }}
             >
               <div className="pe-4">
@@ -58,7 +56,7 @@ export function Welcome() {
           <div
             className="flex py-4 cursor-pointer"
             onClick={() => {
-              setMainContenType(MAIN_CONTEN_TYPE_ADD_CONNECTION);
+              appState.setMainContenType(MAIN_CONTEN_TYPE_ADD_CONNECTION);
             }}
           >
             <div className="pe-4">

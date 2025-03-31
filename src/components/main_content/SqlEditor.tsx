@@ -7,7 +7,7 @@ import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
 import { DEFAULT_PAGE_SIZE } from "@/constants";
 import { exec, query } from "@/databases/adapter,";
-import { useCoreStore } from "@/store";
+import { appState } from "@/store/valtio";
 import { DbResult } from "@/types/types";
 import { formatSql } from "@/utils/format_sql";
 import { EditableTable, TableDataChange } from "../EditableTable";
@@ -37,8 +37,6 @@ const SQL_KEYWORDS = [
 ];
 
 export function SqlEditor() {
-  const { currentDbType } = useCoreStore();
-
   async function queryPage(page: number) {
     // FIXME: 查询页码1 媒介过, 第二页才有, 估计是rust的问题
     console.log("查询 页码 :  ", page);
@@ -61,7 +59,7 @@ export function SqlEditor() {
   // 格式化代码
   function formatCode() {
     const code = getEditorCode();
-    setEditorCode(formatSql(currentDbType, code));
+    setEditorCode(formatSql(appState.currentDbType, code));
   }
 
   // 执行代码
@@ -313,6 +311,8 @@ export function SqlEditor() {
                 fieldNamesUnique={["id"]}
                 dataArr={tableData}
                 onChange={onChange}
+                editable={true}
+                multiSelect={true}
               />
             </div>
           </div>

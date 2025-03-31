@@ -3,7 +3,8 @@ import { AlertCircle } from "lucide-react";
 import { DIR_H, MAIN_PASSWORD_MIN_LEN } from "@/constants";
 import { getTableDdl } from "@/databases/adapter,";
 import { invoker } from "@/invoker";
-import { useCoreStore } from "@/store";
+import { appState } from "@/store/valtio";
+import { ConfigFile } from "@/types/conf_file";
 import { LabeledDiv } from "../LabeledDiv";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
@@ -11,8 +12,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "../ui/input";
 
 export function Settings() {
-  const { currentTableName, setMainPasswordSha, config, setConfig } = useCoreStore();
-
   const [mainPassword, setMainPassword] = useState<string>("");
   const [theme, setTheme] = useState<string>("");
   const [lang, setLang] = useState<string>("");
@@ -37,18 +36,24 @@ export function Settings() {
 
     // 把数据写入配置文件, 先设置 sha256, 后 执行 setConfig
     const sha256 = await invoker.sha256(mainPassword);
-    setMainPasswordSha(sha256);
+    appState.setMainPasswordSha(sha256);
 
-    config.settings.lang = lang;
-    config.settings.theme = theme;
-    config.settings.timeFormat = timeFormat;
-    await setConfig(config);
+    await appState.setConfig({
+      ...appState.config,
+      settings: {
+        ...appState.config.settings,
+        lang,
+        theme,
+        timeFormat,
+      },
+      dbConnections: [...appState.config.dbConnections],
+    } as ConfigFile);
 
     setOkMessage("保存成功");
   }
 
   async function getData() {
-    const res = await getTableDdl(currentTableName);
+    const res = await getTableDdl(appState.currentTableName);
     if (res && res.data) {
       // setTableData(res.data);
     }
@@ -56,7 +61,7 @@ export function Settings() {
 
   useEffect(() => {
     getData();
-  }, [currentTableName]);
+  }, [appState.currentTableName]);
 
   useEffect(() => {
     getData();

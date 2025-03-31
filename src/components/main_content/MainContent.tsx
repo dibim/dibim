@@ -1,3 +1,4 @@
+import { useSnapshot } from "valtio";
 import {
   MAIN_CONTEN_TYPE_ADD_CONNECTION,
   MAIN_CONTEN_TYPE_EDIT_CONNECTION,
@@ -6,7 +7,7 @@ import {
   MAIN_CONTEN_TYPE_TABLE_EDITOR,
   MAIN_CONTEN_TYPE_WELCOME,
 } from "@/constants";
-import { useCoreStore } from "@/store";
+import { appState } from "@/store/valtio";
 import { Connection } from "./Connection";
 import { Settings } from "./Settings";
 import { SqlEditor } from "./SqlEditor";
@@ -14,16 +15,16 @@ import { TableEditor } from "./TableEditor";
 import { Welcome } from "./Welcome";
 
 export function MainContent() {
-  const { mainContenType } = useCoreStore();
+  const snap = useSnapshot(appState);
 
   return (
     <div className="h-full">
-      {mainContenType === MAIN_CONTEN_TYPE_ADD_CONNECTION && <Connection action={"add"} />}
-      {mainContenType === MAIN_CONTEN_TYPE_EDIT_CONNECTION && <Connection action={"edit"} />}
-      {mainContenType === MAIN_CONTEN_TYPE_TABLE_EDITOR && <TableEditor />}
-      {mainContenType === MAIN_CONTEN_TYPE_SETTINGS && <Settings />}
-      {mainContenType === MAIN_CONTEN_TYPE_SQL_EDITOR && <SqlEditor />}
-      {mainContenType === MAIN_CONTEN_TYPE_WELCOME && <Welcome />}
+      {snap.mainContenType === MAIN_CONTEN_TYPE_ADD_CONNECTION && <Connection action={"add"} />}
+      {snap.mainContenType === MAIN_CONTEN_TYPE_EDIT_CONNECTION && <Connection action={"edit"} />}
+      {snap.mainContenType === MAIN_CONTEN_TYPE_TABLE_EDITOR && <TableEditor />}
+      {snap.mainContenType === MAIN_CONTEN_TYPE_SETTINGS && <Settings />}
+      {snap.mainContenType === MAIN_CONTEN_TYPE_SQL_EDITOR && <SqlEditor />}
+      {snap.mainContenType === MAIN_CONTEN_TYPE_WELCOME && <Welcome />}
     </div>
   );
 }

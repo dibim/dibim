@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AlertCircle, CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { toast } from "sonner";
+import { subscribeKey } from "valtio/utils";
 import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
 import { exec, genAlterCmd, genDeleteFieldCmd } from "@/databases/adapter,";
 import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "@/databases/constants";
 import { AllAlterAction, FieldAlterAction, TableStructure } from "@/databases/types";
 import { cn } from "@/lib/utils";
-import { useCoreStore } from "@/store";
+import { appState } from "@/store/valtio";
 import { UniqueConstraint } from "@/types/types";
 import { ConfirmDialog } from "../ConfirmDialog";
+import { EditableTable, EditableTableMethods, ListItem } from "../EditableTable";
 import { LabeledDiv } from "../LabeledDiv";
 import { SqlCodeViewer } from "../SqlCodeViewer";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
@@ -17,7 +19,6 @@ import { Checkbox } from "../ui/checkbox";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { renderDataTypeIcon } from "./TableEditorStructureIcon";
 
@@ -40,10 +41,8 @@ export function TableEditorStructure({
   editingTableComment,
   setEditingTableComment,
 }: MainContentStructureProp) {
-  const { currentTableStructure, setCurrentTableStructure, currentTableName, isAddingTable } = useCoreStore();
+  const tableRef = useRef<EditableTableMethods | null>(null);
 
-  const [deletedFieldIndex, setDeletedFieldIndex] = useState<Set<number>>(new Set()); // 删除的字段的索引
-  const [selectedFieldIndex, setSelectedFieldIndex] = useState<Set<number>>(new Set()); // 选中的字段的索引
   const [operateFieldName, setOperateFieldName] = useState<string>(""); // 现在操作的行的索引
   const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
   const [dialogAction, setDialogAction] = useState<DialogAction>("");
@@ -77,17 +76,6 @@ export function TableEditorStructure({
     setFieldComment(caa ? caa.fieldComment : "");
   }
 
-  // 选中行, 删除的时候使用
-  function handleSelectRow(id: number) {
-    const newSelectedRows = new Set(selectedFieldIndex);
-    if (newSelectedRows.has(id)) {
-      newSelectedRows.delete(id);
-    } else {
-      newSelectedRows.add(id);
-    }
-    setSelectedFieldIndex(newSelectedRows);
-  }
-
   // 点击添加字段
   function handleAddField() {
     resetDialogData(null);
@@ -97,15 +85,16 @@ export function TableEditorStructure({
 
   // 删除选中的字段
   function handleDelSelectedField() {
-    for (const index of selectedFieldIndex) {
-      const field = currentTableStructure[index];
+    const arr = tableRef.current?.getMultiSelectData() || [];
+    for (const index of arr) {
+      const field = appState.currentTableStructure[index];
 
       // 创建表格时不需要记录字段的删除动作
-      if (!isAddingTable) {
+      if (!appState.isAddingTable) {
         const action = {
           target: STR_FIELD,
           action: STR_DELETE,
-          tableName: currentTableName,
+          tableName: appState.currentTableName,
 
           fieldName: field.column_name,
           fieldNameExt: "",
@@ -122,7 +111,7 @@ export function TableEditorStructure({
       }
     }
 
-    setDeletedFieldIndex(selectedFieldIndex);
+    tableRef.current?.deleteMultiSelectedRow();
     setAlterData(alterData);
   }
 
@@ -140,13 +129,13 @@ export function TableEditorStructure({
   // 点击取消按钮
   function handleCancel() {
     setAlterData([]);
-    setDeletedFieldIndex(new Set());
-    setSelectedFieldIndex(new Set());
+    tableRef.current?.resetMultiSelectData();
+    console.log("tableRef.current::: ", tableRef.current);
   }
 
   // 点击编辑按钮, 弹出编辑对话框
-  function handleEditColPopup(index: number) {
-    const field = currentTableStructure[index];
+  function handleEditFieldPopup(index: number) {
+    const field = appState.currentTableStructure[index];
 
     let fieldIndexType: UniqueConstraint = "";
     let fieldIndexName = "";
@@ -167,7 +156,7 @@ export function TableEditorStructure({
     resetDialogData({
       target: STR_FIELD,
       action: STR_EDIT,
-      tableName: currentTableName,
+      tableName: appState.currentTableName,
       fieldName: field.column_name,
       fieldNameExt: "",
       fieldType: field.data_type,
@@ -186,7 +175,7 @@ export function TableEditorStructure({
 
   // 复制字段名
   async function handleCopyFieldName(index: number) {
-    const field = currentTableStructure[index];
+    const field = appState.currentTableStructure[index];
     try {
       await navigator.clipboard.writeText(field.column_name);
       toast("复制成功");
@@ -197,7 +186,7 @@ export function TableEditorStructure({
 
   // 复制字段类型
   async function handleCopyFieldType(index: number) {
-    const field = currentTableStructure[index];
+    const field = appState.currentTableStructure[index];
     try {
       await navigator.clipboard.writeText(field.data_type);
       toast("复制成功");
@@ -212,7 +201,7 @@ export function TableEditorStructure({
     if (fieldName !== "") {
       setOperateFieldName(fieldName);
       setShowDialogDelete(true);
-      setWillExecCmd(genDeleteFieldCmd(currentTableName, fieldName) || "");
+      setWillExecCmd(genDeleteFieldCmd(appState.currentTableName, fieldName) || "");
     } else {
       // TODO: 报错
     }
@@ -241,7 +230,7 @@ export function TableEditorStructure({
     const actionData: FieldAlterAction = {
       target: STR_FIELD,
       action: dialogAction,
-      tableName: currentTableName,
+      tableName: appState.currentTableName,
 
       fieldComment,
       fieldDefalut,
@@ -265,21 +254,22 @@ export function TableEditorStructure({
       setAlterData([...alterData, actionData]);
 
       // 添加字段的还得在前端添加表结构数据
-      currentTableStructure.push({
-        has_check_conditions: undefined,
-        column_name: fieldName,
-        data_type: fieldType,
-        column_default: fieldDefalut,
-        comment: fieldComment,
-        size: parseInt(fieldSize) || 0,
-        is_primary_key: fieldIndexType === INDEX_PRIMARY_KEY,
-        is_unique_key: fieldIndexType === INDEX_UNIQUE,
-        is_foreign_key: false,
-        is_not_null: fieldNotNull,
-
-        // FIXME: 没记录上 索引名 / 主键/ 主键自增/ 唯一索引, 在点击编辑的时候美术据
-      });
-      setCurrentTableStructure(currentTableStructure);
+      appState.setCurrentTableStructure([
+        ...(appState.currentTableStructure as unknown as TableStructure[]),
+        {
+          // ...新项...
+          indexes: fieldIndexType
+            ? [
+                {
+                  name: "",
+                  type: fieldIndexType,
+                  isUnique: fieldIndexType === INDEX_UNIQUE,
+                  isPrimary: fieldIndexType === INDEX_PRIMARY_KEY,
+                },
+              ]
+            : undefined,
+        },
+      ] as TableStructure[]);
     }
 
     setShowDialogEdit(false);
@@ -291,7 +281,7 @@ export function TableEditorStructure({
    * @returns
    */
   function findFieldNameByIndex(index: number) {
-    const tableDataPg = currentTableStructure as unknown as TableStructure[];
+    const tableDataPg = appState.currentTableStructure as unknown as TableStructure[];
     if (index <= tableDataPg.length) {
       return tableDataPg[index].column_name;
     }
@@ -305,12 +295,12 @@ export function TableEditorStructure({
    * @param node 行的节点
    * @returns
    */
-  function renderContextMenu(index: number, node: React.ReactNode) {
+  function renderRowContextMenu(index: number, node: React.ReactNode) {
     return (
       <ContextMenu key={index}>
         <ContextMenuTrigger asChild>{node}</ContextMenuTrigger>
         <ContextMenuContent>
-          <ContextMenuItem onClick={() => handleEditColPopup(index)}>编辑</ContextMenuItem>
+          <ContextMenuItem onClick={() => handleEditFieldPopup(index)}>编辑</ContextMenuItem>
           <ContextMenuItem onClick={() => handleCopyFieldName(index)}>复制字段名</ContextMenuItem>
           <ContextMenuItem onClick={() => handleCopyFieldType(index)}>复制类型</ContextMenuItem>
           <hr className="my-2" />
@@ -322,65 +312,53 @@ export function TableEditorStructure({
     );
   }
 
-  function renderBody() {
-    const tableDataPg = currentTableStructure as unknown as TableStructure[];
+  const fieldNames = [
+    "column_name",
+    "data_type",
+    "is_primary_key",
+    "is_foreign_key",
+    "is_unique_key",
+    "has_check_conditions",
+    "is_not_null",
+    "column_default",
+    "comment",
+  ];
+  const fieldNameTitle = ["列名", "数据类型", "主键", "外键", "唯一", "条件", "非空", "默认值", "备注"];
+  const [dataArr, setDataArr] = useState<ListItem[]>([]);
 
-    function genClassName(index: number) {
-      // 删除的样式
-      if (deletedFieldIndex.has(index)) return " bg-[var(--fvm-danger-clr)]";
-
-      // 选中的样式
-      if (selectedFieldIndex.has(index)) return "text-[var(--fvm-primary-clr)] font-bold";
-
-      return "";
-    }
-
-    return tableDataPg.map((row, index) =>
-      renderContextMenu(
-        index,
-        <TableRow className={genClassName(index)}>
-          <TableCell
-            className="text-[var(--fvm-info-clr)] cursor-grab"
-            onClick={() => {
-              handleSelectRow(index);
-            }}
-          >
-            <strong>{index + 1}</strong>
-          </TableCell>
-          <TableCell>
-            <div>{row.column_name}</div>
-          </TableCell>
-          <TableCell>
+  function updateDataArr() {
+    const dataArrTemp = appState.currentTableStructure.map(
+      (row) =>
+        ({
+          column_name: <div>{row.column_name}</div>,
+          data_type: (
             <div className="flex">
               <span className="pe-2">{renderDataTypeIcon(row.data_type)}</span>
               <span>{row.data_type}</span>
             </div>
-          </TableCell>
-          <TableCell>
-            <div>{row.is_primary_key ? "✅" : ""}</div>
-          </TableCell>
-          <TableCell>
-            <div>{row.is_foreign_key ? "✅" : ""}</div>
-          </TableCell>
-          <TableCell>
-            <div>{row.is_unique_key ? "✅" : ""}</div>
-          </TableCell>
-          <TableCell>
-            <div>{row.has_check_conditions ? "✅" : ""}</div>
-          </TableCell>
-          <TableCell>
-            <div>{row.is_not_null ? "✅" : ""}</div>
-          </TableCell>
-          <TableCell>
-            <div>{row.column_default}</div>
-          </TableCell>
-          <TableCell>
-            <div className="w-full">{row.comment}</div>
-          </TableCell>
-        </TableRow>,
-      ),
+          ),
+          is_primary_key: <div>{row.is_primary_key ? "✅" : ""}</div>,
+          is_foreign_key: <div>{row.is_foreign_key ? "✅" : ""}</div>,
+          is_unique_key: <div>{row.is_unique_key ? "✅" : ""}</div>,
+          has_check_conditions: <div>{row.has_check_conditions ? "✅" : ""}</div>,
+          is_not_null: <div>{row.is_not_null ? "✅" : ""}</div>,
+          column_default: <div>{row.column_default}</div>,
+          comment: <div className="w-full">{row.comment}</div>,
+        }) as ListItem,
     );
+
+    setDataArr(dataArrTemp);
   }
+
+  useEffect(() => {
+    updateDataArr();
+
+    // 监听 store 的变化
+    const unsubscribe = subscribeKey(appState, "currentTableName", (_value: any) => {
+      updateDataArr();
+    });
+    return () => unsubscribe();
+  }, []);
 
   return (
     <div>
@@ -441,24 +419,22 @@ export function TableEditorStructure({
       </div>
 
       {/* 主体表格 */}
+
       <div className="flex-1 overflow-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})` }}>
-        <Table className="border-y">
-          <TableHeader>
-            <TableRow>
-              <TableHead>☑️</TableHead>
-              <TableHead>列名</TableHead>
-              <TableHead>数据类型</TableHead>
-              <TableHead>主键</TableHead>
-              <TableHead>外键</TableHead>
-              <TableHead>唯一</TableHead>
-              <TableHead>条件</TableHead>
-              <TableHead>非空</TableHead>
-              <TableHead>默认值</TableHead>
-              <TableHead>备注</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>{renderBody()}</TableBody>
-        </Table>
+        {/* TODO: 找到主键和唯一索引, 不能写死 id */}
+        <EditableTable
+          ref={tableRef}
+          editable={false}
+          multiSelect={true}
+          fieldNames={fieldNames}
+          fieldNamesTitle={fieldNameTitle}
+          fieldNamesUnique={["id"]}
+          dataArr={dataArr}
+          onChange={() => {
+            // TODO: 快捷修改字段名等
+          }}
+          renderRowContextMenu={renderRowContextMenu}
+        />
       </div>
 
       <Dialog open={showDialogEdit} onOpenChange={setShowDialogEdit}>

@@ -6,7 +6,7 @@ import SqliteLogo from "@/assets/db_logo/sqlite.svg?react";
 import { LabeledDiv } from "@/components/LabeledDiv";
 import { Input } from "@/components/ui/input";
 import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE, DIR_H, STR_ADD, STR_EDIT } from "@/constants";
-import { useCoreStore } from "@/store";
+import { appState } from "@/store/valtio";
 import { DbType, SvgComponentType } from "@/types/types";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
@@ -18,8 +18,6 @@ type ConnectionProp = {
 };
 
 export function Connection(props: ConnectionProp) {
-  const { config, setConfig, editDbConnIndex } = useCoreStore();
-
   const [name, setName] = useState<string>(""); // 连接名称
   const [dbType, setDbType] = useState<DbType>(DB_TYPE_POSTGRESQL); // 默认类型是 PostgreSQL
   const [host, setHost] = useState<string>("");
@@ -95,16 +93,20 @@ export function Connection(props: ConnectionProp) {
     };
 
     if (props.action === STR_ADD) {
-      config.dbConnections.push(dbConf);
-      await setConfig(config);
-
+      await appState.setConfig({
+        ...appState.config,
+        dbConnections: [...appState.config.dbConnections, ...(Array.isArray(dbConf) ? dbConf : [dbConf])],
+      });
       setOkMessage("添加成功");
     }
 
     if (props.action === STR_EDIT) {
-      config.dbConnections[editDbConnIndex] = dbConf;
-      await setConfig(config);
-
+      await appState.setConfig({
+        ...appState.config,
+        dbConnections: appState.config.dbConnections.map((item, index) =>
+          index === appState.editDbConnIndex ? dbConf : item,
+        ),
+      });
       setOkMessage("编辑成功");
     }
   }
@@ -139,7 +141,7 @@ export function Connection(props: ConnectionProp) {
   useEffect(() => {
     // 编辑连接的要获取数据
     if (props.action === STR_EDIT) {
-      const conn = config.dbConnections[editDbConnIndex];
+      const conn = appState.config.dbConnections[appState.editDbConnIndex];
       setColor(conn.color);
       setDbName(conn.dbName);
       setDbType(conn.dbType);
