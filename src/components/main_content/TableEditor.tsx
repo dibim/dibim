@@ -30,7 +30,7 @@ export function TableEditor() {
   const [editingTableComment, setEditingTableComment] = useState<string>(""); // 输入框中的表注释
 
   // 获取表结构, 会在多个地方用, 在这里记录到 store
-  const getData = async () => {
+  async function getData() {
     if (currentTableName === "") {
       return;
     }
@@ -40,7 +40,7 @@ export function TableEditor() {
       setCurrentTableStructure(res.data);
       if (mainContenTab === STR_EMPTY) setMainContenTab(TAB_DATA);
     }
-  };
+  }
 
   // 修改表格数据
   // 对表的操作包括: 重命名 / 注释 / 分区 / 约束 / 表字符集和排序规则 等

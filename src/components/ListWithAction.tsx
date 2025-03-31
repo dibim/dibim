@@ -48,6 +48,7 @@ export function ListWithAction({
   if (!triggerMethod) {
     triggerMethod = isPcScreen() ? STR_RC : STR_BTN;
   }
+
   return (
     <div className={`${className}`}>
       {/* 按钮触发 */}

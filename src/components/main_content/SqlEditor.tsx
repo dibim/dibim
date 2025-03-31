@@ -188,19 +188,19 @@ export function SqlEditor() {
   );
 
   // 获取编辑器里的代码
-  const getEditorCode = () => {
+  function getEditorCode() {
     if (editorRef.current) {
       return editorRef.current.getValue();
     }
     return "";
-  };
+  }
 
   // 设置编辑器里的代码
-  const setEditorCode = (newCode: string) => {
+  function setEditorCode(newCode: string) {
     if (editorRef.current) {
       editorRef.current.setValue(newCode);
     }
-  };
+  }
   // ========== 编辑器 结束 ==========
 
   // ========== 分页 结束 ==========

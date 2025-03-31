@@ -109,12 +109,12 @@ export function Connection(props: ConnectionProp) {
     }
   }
 
-  const handleClickDbLogo = (dbType: DbType) => {
+  function handleClickDbLogo(dbType: DbType) {
     if (dbType === DB_TYPE_MYSQL) setPort(3306);
     if (dbType === DB_TYPE_POSTGRESQL) setPort(5432);
 
     setDbType(dbType);
-  };
+  }
 
   // TODO: sqlite 的文件拾取使用 rust 的 rfd, 先不管 hos
 

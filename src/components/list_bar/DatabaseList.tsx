@@ -34,15 +34,15 @@ export function DatabaseList() {
   const [itemIndex, setItemIndex] = useState<number>(-1);
 
   // 删除
-  const delItem = () => {
+  function delItem() {
     config.dbConnections.splice(itemIndex, 1);
     setConfig(config);
 
     setShowDialog(false);
-  };
+  }
 
   // 点击连接
-  const clickConn = async (conn: DbConnections) => {
+  async function clickConn(conn: DbConnections) {
     const res = await connect({
       dbName: conn.dbName,
       host: conn.host,
@@ -60,11 +60,11 @@ export function DatabaseList() {
       // TODO: 优化一下报错
       console.log("打开数据库连接出错: ", res && res.errorMessage);
     }
-  };
+  }
 
   // 列表数据
   const [listData, setListData] = useState<ListItem[]>([]);
-  const getData = () => {
+  function getData() {
     const arr: ListItem[] = [];
     config.dbConnections.map((item, index) => {
       arr.push({
@@ -113,7 +113,7 @@ export function DatabaseList() {
     });
 
     setListData(arr);
-  };
+  }
 
   useEffect(() => {
     getData();

@@ -110,7 +110,7 @@ export function Main() {
     }
   }
 
-  const checkConfigFile = async () => {
+  async function checkConfigFile() {
     const res = await invoker.pathExists(CONFIG_FILE_MAIN);
 
     if (res) {
@@ -121,7 +121,7 @@ export function Main() {
     } else {
       setShowPwdInput(false);
     }
-  };
+  }
   // ========== 配置初始化 结束 ==========
 
   useEffect(() => {

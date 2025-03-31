@@ -50,7 +50,7 @@ function genFieldSql(faa: FieldAlterAction) {
 }
 
 // 编辑字段
-export const genAlterFieldEdit = (faa: FieldAlterAction) => {
+export function genAlterFieldEdit(faa: FieldAlterAction) {
   let res: string[] = [`-- 将要对字段${faa.fieldName}执行以下语句:`];
 
   // 修改数据类型
@@ -204,11 +204,11 @@ export const genAlterFieldEdit = (faa: FieldAlterAction) => {
   }
 
   return res;
-};
+}
 
 // 添加字段
 // 为了最终的代码比较美观, 要注意这里的字符串格式.
-export const genAlterFieldAdd = (faa: FieldAlterAction) => {
+export function genAlterFieldAdd(faa: FieldAlterAction) {
   let res: string[] = [];
   const indxConstraint = genIndxConstraint(faa);
 
@@ -225,17 +225,17 @@ export const genAlterFieldAdd = (faa: FieldAlterAction) => {
   `);
 
   return res;
-};
+}
 
 // 删除字段
-export const genAlterFieldDel = (faa: FieldAlterAction) => {
+export function genAlterFieldDel(faa: FieldAlterAction) {
   let res: string[] = [];
   res.push(`ALTER TABLE "${faa.tableName}" DROP COLUMN "${faa.fieldName}";`);
   return res;
-};
+}
 
 // 编辑表
-export const genAlterTableEdit = (taa: TableAlterAction) => {
+export function genAlterTableEdit(taa: TableAlterAction) {
   let res: string[] = [`-- 将要对表格${taa.tableName}执行以下语句:`];
   if (taa.comment) {
     res.push(`COMMENT ON TABLE "${taa.tableName}" IS '${taa.comment}';`);
@@ -248,10 +248,10 @@ export const genAlterTableEdit = (taa: TableAlterAction) => {
   }
 
   return res;
-};
+}
 
 // 创建表
-export const genAlterTableAdd = (taa: TableAlterAction, faas: FieldAlterAction[]) => {
+export function genAlterTableAdd(taa: TableAlterAction, faas: FieldAlterAction[]) {
   let res: string[] = [`-- 将要对表格${taa.tableName}执行以下语句:`];
 
   const fields: string[] = [];
@@ -270,10 +270,10 @@ export const genAlterTableAdd = (taa: TableAlterAction, faas: FieldAlterAction[]
   `);
 
   return res;
-};
+}
 
 // 生成修改语句
-export const genAlterCmdPg = (val: AllAlterAction[]) => {
+export function genAlterCmdPg(val: AllAlterAction[]) {
   let res: string[] = [];
 
   // 注意: 如果是建表, 需要把字段的数据全部传过去, 并直接返回
@@ -321,4 +321,4 @@ export const genAlterCmdPg = (val: AllAlterAction[]) => {
   }
 
   return res.join("\n");
-};
+}

@@ -17,20 +17,33 @@ export const MutuallyExclusiveMediaQueryBreakpoints = {
   pointerFine: "(pointer: fine)",
 };
 
-export const osThemeIsDark = () =>
-  window.matchMedia("(prefers-color-scheme: dark)").matches ||
-  document.documentElement.classList.contains("dark") ||
-  document.documentElement.hasAttribute("force-dark-mode");
+export function osThemeIsDark() {
+  return (
+    window.matchMedia("(prefers-color-scheme: dark)").matches ||
+    document.documentElement.classList.contains("dark") ||
+    document.documentElement.hasAttribute("force-dark-mode")
+  );
+}
 
-export const isMobileScreen = () => window.matchMedia(MutuallyExclusiveMediaQueryBreakpoints.sm).matches;
+export function isMobileScreen() {
+  return window.matchMedia(MutuallyExclusiveMediaQueryBreakpoints.sm).matches;
+}
 
-export const isTabletScreen = () => window.matchMedia(MutuallyExclusiveMediaQueryBreakpoints.md).matches;
+export function isTabletScreen() {
+  return window.matchMedia(MutuallyExclusiveMediaQueryBreakpoints.md).matches;
+}
 
-export const isPcScreen = () =>
-  window.matchMedia(MutuallyExclusiveMediaQueryBreakpoints.lg).matches ||
-  window.matchMedia(MutuallyExclusiveMediaQueryBreakpoints.xl).matches ||
-  window.matchMedia(MutuallyExclusiveMediaQueryBreakpoints.xxl).matches;
+export function isPcScreen() {
+  return (
+    window.matchMedia(MutuallyExclusiveMediaQueryBreakpoints.lg).matches ||
+    window.matchMedia(MutuallyExclusiveMediaQueryBreakpoints.xl).matches ||
+    window.matchMedia(MutuallyExclusiveMediaQueryBreakpoints.xxl).matches
+  );
+}
 
-export const getPageWidth = () => document.documentElement.clientWidth || document.body.offsetWidth;
-
-export const getPageHeight = () => document.documentElement.clientHeight || document.body.offsetHeight;
+export function getPageWidth() {
+  return document.documentElement.clientWidth || document.body.offsetWidth;
+}
+export function getPageHeight() {
+  return document.documentElement.clientHeight || document.body.offsetHeight;
+}
