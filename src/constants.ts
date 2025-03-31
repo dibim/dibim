@@ -12,14 +12,14 @@ export const STR_TABLE = "table";
 
 // 样式
 // styles
-// 
+//
 // header 的 h- 属性值, 对应 tailwindcss 的
 // The h-attribute value of the header corresponds to the tailwindcss
 export const HEDAER_H = 12;
 
 // 列表栏的样式
 // Style of List Bar
-// 
+//
 // 默认宽度
 // Default width
 export const LIST_BAR_DEFAULT_WIDTH = 280;
@@ -29,7 +29,7 @@ export const LIST_BAR_MIN_WIDTH = 150;
 
 // 配置文件相关
 // Configuration file related
-// 
+//
 // 默认主密码
 // Default master password
 export const MAIN_PASSWORD_DEFAULT = "DIBIM@2025-03-22 08:41^c3dd4147ea11b63c2cd776a0602930692ba34c43$";
@@ -104,7 +104,6 @@ export const DIR_V = "vertical";
 // Regular Expression
 export const reNumStr = /^\d+$/;
 
-
-// 
-// 
+// 分页
+// pagination
 export const DEFAULT_PAGE_SIZE = 50;

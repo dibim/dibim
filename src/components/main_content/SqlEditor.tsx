@@ -8,11 +8,13 @@ import * as Monaco from "monaco-editor";
 import sqlWorker from "monaco-editor/esm/vs/basic-languages/sql/sql?worker";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import Editor from "@monaco-editor/react";
+import { DEFAULT_PAGE_SIZE } from "@/constants";
 import { exec, query } from "@/databases/adapter,";
 import { useCoreStore } from "@/store";
 import { DbResult } from "@/types/types";
 import { formatSql } from "@/utils/format_sql";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { EditableTable, TableDataChange } from "../EditableTable";
+import { PaginationSection } from "../PaginationSection";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 // 初始化 Monaco 环境, 避免从 CDN 加载
@@ -40,6 +42,23 @@ const SQL_KEYWORDS = [
 export function SqlEditor() {
   const { currentDbType } = useCoreStore();
 
+  async function queryPage(page: number) {
+    // TODO:
+    console.log("查询 页码 :  ", page);
+
+    const res = await query(code, true, page, DEFAULT_PAGE_SIZE);
+
+    if (res) {
+      const resData = res as unknown as DbResult;
+      if (resData.errorMessage !== "") {
+        setErrorMessage(resData.errorMessage.replace("error returned from database: ", " "));
+      } else {
+        setFieldNames(JSON.parse(resData.columnName) as string[]);
+        setTableData(JSON.parse(resData.data) as { [key: string]: any }[]);
+      }
+    }
+  }
+
   // ========== 面板控制  ==========
   const [showResultBar, setShowResultBar] = useState<boolean>(false);
   const panelResultRef = useRef<ImperativePanelHandle>(null);
@@ -66,12 +85,12 @@ export function SqlEditor() {
       setShowStatusBar(!showStatusBar);
     }
   }
-  // ========== 面板空值 结束 ==========
+  // ========== 面板控制 结束 ==========
 
   // ========== 结果集和状态栏 ==========
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [columnName, setColumnName] = useState<string[]>([]);
-  const [dataArr, setDataArr] = useState<any[]>([]);
+  const [fieldNames, setFieldNames] = useState<string[]>([]);
+  const [tableData, setTableData] = useState<any[]>([]);
 
   // ========== 结果集和状态栏 结束 ==========
 
@@ -116,30 +135,24 @@ export function SqlEditor() {
   async function execCode() {
     // 不能都用 exec, 查询的会不返回结果
 
-    let res = null;
-    let isQuery = false;
     // 获取前10个字符（如果字符串不足10个字符则取全部）
     const first10Chars = code.trim().substring(0, 10).toLowerCase();
 
     // 检查是否包含"select"
     if (first10Chars.includes("select")) {
-      // TODO: 实现翻页
-      res = await query(code, true, 1, 100);
-      isQuery = true;
+      await queryPage(currentPage);
     } else {
-      res = await exec(code);
-    }
+      const res = await exec(code);
 
-    console.log("res:   ", res);
+      // TODO:
+      console.log("res:   ", res);
 
-    if (res) {
-      const resData = res as unknown as DbResult;
-      if (resData.errorMessage !== "") {
-        setErrorMessage(resData.errorMessage.replace("error returned from database: ", " "));
-      } else {
-        if (isQuery) {
-          setColumnName(JSON.parse(resData.columnName) as string[]);
-          setDataArr(JSON.parse(resData.data) as { [key: string]: any }[]);
+      if (res) {
+        const resData = res as unknown as DbResult;
+        if (resData.errorMessage !== "") {
+          setErrorMessage(resData.errorMessage.replace("error returned from database: ", " "));
+        } else {
+          //  TODO: 显示影响的行数
         }
       }
     }
@@ -187,6 +200,27 @@ export function SqlEditor() {
     [],
   );
   // ========== 编辑器 结束 ==========
+
+  // ========== 分页 结束 ==========
+  const [currentPage, setCurrentPage] = useState<number>(1); // 当前页码
+  const [pageTotal, setPageTotal] = useState<number>(0); // 页数
+  const [itemsTotal, setItemsTotal] = useState<number>(0); // 数据总条数
+
+  //  表格的变化
+  const [changes, setChanges] = useState<TableDataChange[]>([]); // 记录所有修改的变量
+  function onChange(val: TableDataChange[]) {
+    setChanges(val);
+    // TODO: 保存时生成语句
+  }
+
+  async function getData() {
+    setCurrentPage(currentPage + 1);
+
+    // FIXME: 这里的分页有问题. 可能是 rust 的问题, 也可能是没有执行 setPageTotal 和 setItemsTotal, 计算出错
+    await queryPage(currentPage + 1);
+  }
+
+  // ========== 分页 结束 ==========
 
   function renderEditor() {
     return (
@@ -262,25 +296,23 @@ export function SqlEditor() {
         </Panel>
         <PanelResizeHandle className="h-1 bg-secondary hover:bg-blue-500" />
         <Panel defaultSize={30} collapsible collapsedSize={0} ref={panelResultRef}>
-          <div className="w-full">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  {columnName.map((item, index) => (
-                    <TableHead key={index}>{item}</TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {dataArr.map((rowData, index) => (
-                  <TableRow key={index}>
-                    {columnName.map((item, ii) => (
-                      <TableCell key={ii}>{rowData[item]}</TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <div className="flex flex-col">
+            <PaginationSection
+              currentPage={currentPage}
+              setCurrentPage={(val) => setCurrentPage(val)}
+              pageTotal={pageTotal}
+              itemsTotal={itemsTotal}
+              getData={getData}
+            />
+            <div className="flex-1 w-full h-full overflow-scroll">
+              {/* FIXME: 找到主键和唯一索引, 不能写死 id */}
+              <EditableTable
+                fieldNames={fieldNames}
+                fieldNamesUnique={["id"]}
+                dataArr={tableData}
+                onChange={onChange}
+              />
+            </div>
           </div>
         </Panel>
         <PanelResizeHandle className="h-1 bg-secondary hover:bg-blue-500" />
