@@ -1,6 +1,6 @@
+import { invoker } from "@/invoker";
 import { CommonSQLValue } from "../types";
 import { formatToSqlValueCommon } from "../utils";
-import { invoker } from "./invoke";
 
 const testConnName = "testPg";
 

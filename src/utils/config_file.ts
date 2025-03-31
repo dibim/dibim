@@ -3,7 +3,7 @@ import { invoker } from "@/invoker";
 
 // 读取配置文件
 // Read configuration file
-export const readConfigFile = async (key: string) => {
+export async function readConfigFile(key: string) {
   const res = await invoker.readFileBase64(CONFIG_FILE_MAIN);
 
   if (res.errorMessage === "") {
@@ -19,11 +19,11 @@ export const readConfigFile = async (key: string) => {
   }
 
   return "";
-};
+}
 
 // 保存配置文件
 // Save configuration file
-export const saveConfigFile = async (val: string, key: string) => {
+export async function saveConfigFile(val: string, key: string) {
   const enc = await invoker.aesGcmEncryptString(val, key);
 
   if (enc.errorMessage === "") {
@@ -39,4 +39,4 @@ export const saveConfigFile = async (val: string, key: string) => {
   }
 
   return false;
-};
+}

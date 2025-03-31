@@ -78,7 +78,7 @@ export function TableEditorStructure({
   }
 
   // 选中行, 删除的时候使用
-  const handleSelectRow = (id: number) => {
+  function handleSelectRow(id: number) {
     const newSelectedRows = new Set(selectedFieldIndex);
     if (newSelectedRows.has(id)) {
       newSelectedRows.delete(id);
@@ -86,7 +86,7 @@ export function TableEditorStructure({
       newSelectedRows.add(id);
     }
     setSelectedFieldIndex(newSelectedRows);
-  };
+  }
 
   // 点击添加字段
   function handleAddField() {
@@ -290,14 +290,14 @@ export function TableEditorStructure({
    * @param index
    * @returns
    */
-  const findFieldNameByIndex = (index: number) => {
+  function findFieldNameByIndex(index: number) {
     const tableDataPg = currentTableStructure as unknown as TableStructure[];
     if (index <= tableDataPg.length) {
       return tableDataPg[index].column_name;
     }
 
     return "";
-  };
+  }
 
   /**
    * 给每一行套上一个菜单
@@ -305,7 +305,7 @@ export function TableEditorStructure({
    * @param node 行的节点
    * @returns
    */
-  const renderContextMenu = (index: number, node: React.ReactNode) => {
+  function renderContextMenu(index: number, node: React.ReactNode) {
     return (
       <ContextMenu key={index}>
         <ContextMenuTrigger asChild>{node}</ContextMenuTrigger>
@@ -320,9 +320,9 @@ export function TableEditorStructure({
         </ContextMenuContent>
       </ContextMenu>
     );
-  };
+  }
 
-  const renderBody = () => {
+  function renderBody() {
     const tableDataPg = currentTableStructure as unknown as TableStructure[];
 
     function genClassName(index: number) {
@@ -380,7 +380,7 @@ export function TableEditorStructure({
         </TableRow>,
       ),
     );
-  };
+  }
 
   return (
     <div>

@@ -5,9 +5,9 @@ import { useCoreStore } from "@/store";
 export function TableEditorConstraint() {
   const { currentTableName } = useCoreStore();
 
-  const getData = async () => {
+  async function getData() {
     await getTableStructure(currentTableName);
-  };
+  }
 
   useEffect(() => {
     getData();
