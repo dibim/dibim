@@ -159,7 +159,7 @@ export function EditableTable({
                 handleSelectRow(rowIndex);
               }}
             >
-              {selectedFieldIndex.has(rowIndex) ? <span>✅</span> : <span>☑️</span>}
+              {selectedFieldIndex.has(rowIndex) ? <span>🔵</span> : <span>🔘</span>}
             </TableCell>
           )}
           {/* 正常数据 */}
