@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { subscribeKey } from "valtio/utils";
 import { DEFAULT_PAGE_SIZE, HEDAER_H } from "@/constants";
-import { genUpdateFieldCmdPg, getDefultOrderField } from "@/databases/PostgreSQL/utils/sql";
-import { exec, getTableData } from "@/databases/adapter,";
+import { getDefultOrderField } from "@/databases/PostgreSQL/utils/sql";
+import { exec, genDeleteRowsCmd, genUpdateFieldCmd, getTableData } from "@/databases/adapter,";
 import { FieldWithValue, TableStructure } from "@/databases/types";
 import { cn } from "@/lib/utils";
 import { appState } from "@/store/valtio";
@@ -85,38 +85,40 @@ export function TableEditorData() {
         rowDataMap.set(c.index, [c]);
       }
     }
-    // 按每一行的数据整理好之后, 生成语句
 
     const sqls: string[] = [];
     rowDataMap.forEach((changes, rowIndex) => {
       // TODO: 根据表结构去找
       const uniqueField: FieldWithValue = {
         field: "id",
-        vaue: rowIndex,
+        value: rowIndex,
       };
       const fieldArr: FieldWithValue[] = [];
       for (const c of changes) {
         fieldArr.push({
           field: c.field,
-          vaue: c.new,
+          value: c.new,
         });
       }
 
-      sqls.push(genUpdateFieldCmdPg(appState.currentTableName, uniqueField, fieldArr));
+      sqls.push(genUpdateFieldCmd(appState.currentTableName, uniqueField, fieldArr));
     });
 
-    // TODO: 最后执行删除行
+    // 最后执行删除行
+    // TODO: 根据表结构去找 id
+    sqls.push(genDeleteRowsCmd(appState.currentTableName, "id", Array.from(deletedSet)));
 
     setWillExecCmd(sqls.join(""));
     setShowDialogAlter(true);
   }
 
   function handleCancel() {
-    //TODO:;
+    setChanges([]);
+    tableRef.current?.resetMultiSelectData();
   }
 
   function handleAdd() {
-    //TODO:;
+    //TODO:; 为了简单, 直接在表格最开始的位置添加
   }
 
   function handleDelete() {

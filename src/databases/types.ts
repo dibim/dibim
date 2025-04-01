@@ -148,4 +148,4 @@ export type TableAlterAction = {
 export type AllAlterAction = FieldAlterAction | TableAlterAction;
 
 // 字段名及其值
-export type FieldWithValue = { field: string; vaue: any };
+export type FieldWithValue = { field: string; value: any };

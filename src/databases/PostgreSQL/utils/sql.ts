@@ -434,15 +434,18 @@ export function genDeleteFieldCmdPg(tbName: string, fieldName: string) {
 
 // 生成变更一行的字段
 export function genUpdateFieldCmdPg(tbName: string, uniqueField: FieldWithValue, fieldArr: FieldWithValue[]) {
-  const fda: string[] = [];
-  fieldArr.map((item) => {
-    fda.push(`"${item.field}" = ${formatToSqlValuePg(item.vaue)}`);
-  });
+  const fda = fieldArr.map((item) => `"${item.field}" = ${formatToSqlValuePg(item.value)}`);
 
   return `
     UPDATE "${tbName}"
     SET 
         ${fda.join(",\n")}
-    WHERE "${uniqueField.field}" = ${uniqueField.vaue};
+    WHERE "${uniqueField.field}" = ${uniqueField.value};
   `;
+}
+
+// 生成删除多行的字段
+export function genDeleteRowsCmdPg(tbName: string, fieldName: string, fieldValues: any[]) {
+  const values = fieldValues.map((item) => formatToSqlValuePg(item)).join(",");
+  return `DELETE FROM "${tbName}" WHERE "${fieldName}" IN (${values});`;
 }
