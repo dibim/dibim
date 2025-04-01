@@ -43,8 +43,6 @@ export function TableList() {
   const [tablData, setTableData] = useState<TableData[]>([]);
 
   function clickTableName(item: ListItem) {
-    console.log("点击了:: ", item.id);
-
     appState.setCurrentTableName(item.id);
     appState.setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
   }

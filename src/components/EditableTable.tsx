@@ -2,8 +2,12 @@
 
 import { JSX, useEffect, useImperativeHandle, useState } from "react";
 import { SquareCheckBig } from "lucide-react";
+import { useSnapshot } from "valtio";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
+import { HEDAER_H } from "@/constants";
+import { cn } from "@/lib/utils";
+import { appState } from "@/store/valtio";
 
 export interface ListCell {
   render: (val: any) => JSX.Element; // 渲染 value, 可以添加其它元素
@@ -54,6 +58,7 @@ export function EditableTable({
   showChanges,
   ref,
 }: EditableTableProps) {
+  const snap = useSnapshot(appState);
   const [data, setData] = useState<ListRow[]>(dataArr);
   const [editingRowIdndex, setEditingRowIndex] = useState<number>(-1); // 正在编辑的索引
   const [editingFieldName, setEditingFieldName] = useState<string>(""); // 正在编辑的字段名
@@ -139,9 +144,31 @@ export function EditableTable({
     setData(dataArr);
   }, []);
 
+  function XTable({ className, ...props }: React.ComponentProps<"table">) {
+    return (
+      <div
+        data-slot="table-container"
+        className="relative table-body-scroll overflow-x-scroll overflow-y-scroll"
+        style={{
+          height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})`,
+          width:
+            snap.mainContentWidth > 0
+              ? `calc(${snap.mainContentWidth}px - var(--spacing) * 10)`
+              : `${snap.mainContentWidth}px`,
+        }}
+      >
+        <table data-slot="table" className={cn("caption-bottom text-sm", className)} {...props} />
+      </div>
+    );
+  }
+
+  function XTableHeader({ className, ...props }: React.ComponentProps<"thead">) {
+    return <thead data-slot="table-header" className={cn("[&_tr]:border-b", "bg-accent", className)} {...props} />;
+  }
+
   function renderHeader() {
     return (
-      <TableHeader>
+      <XTableHeader>
         <TableRow>
           {/* 多选触发器 */}
           {multiSelect && (
@@ -154,7 +181,7 @@ export function EditableTable({
             ? fieldNamesTitle.map((item, index) => <TableHead key={index}>{item}</TableHead>)
             : fieldNames.map((item, index) => <TableHead key={index}>{item}</TableHead>)}
         </TableRow>
-      </TableHeader>
+      </XTableHeader>
     );
   }
 
@@ -226,13 +253,13 @@ export function EditableTable({
   }
 
   return (
-    <div className="p-4">
+    <>
       {fieldNamesUnique.length === 0 && <p>由于无主键或唯一索引, 为了确保数据不被错误地修改, 该表格不能编辑</p>}
       {dataArr.length > 0 && (
-        <Table>
+        <XTable>
           {renderHeader()}
           <TableBody>{renderBody()}</TableBody>
-        </Table>
+        </XTable>
       )}
 
       {/* 显示修改记录 */}
@@ -240,15 +267,15 @@ export function EditableTable({
         <div className="mt-8">
           <h2 className="text-xl font-bold mb-4">修改记录</h2>
           {Object.keys(changes).length > 0 ? (
-            <Table>
-              <TableHeader>
+            <XTable>
+              <XTableHeader>
                 <TableRow>
                   <TableCell>行索引</TableCell>
                   <TableCell>字段名</TableCell>
                   <TableCell>修改前</TableCell>
                   <TableCell>修改后</TableCell>
                 </TableRow>
-              </TableHeader>
+              </XTableHeader>
               <TableBody>
                 {Object.entries(changes).map(([key, change]) => {
                   return (
@@ -261,12 +288,12 @@ export function EditableTable({
                   );
                 })}
               </TableBody>
-            </Table>
+            </XTable>
           ) : (
             <p>暂无数据</p>
           )}
         </div>
       )}
-    </div>
+    </>
   );
 }

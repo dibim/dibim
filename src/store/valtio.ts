@@ -60,6 +60,9 @@ interface AppState {
   listBarType: ListBarType;
   setListBarType: (val: ListBarType) => void;
 
+  // 主要区域的宽度
+  mainContentWidth: number;
+  setMainContentWidth: (val: number) => void;
   // 主要区域的类型
   mainContenType: MainContenType;
   setMainContenType: (val: MainContenType) => void;
@@ -129,6 +132,8 @@ export const appState = proxy<AppState>({
   listBarType: LIST_BAR_TYPE_DB_LIST,
   setListBarType: (val: ListBarType) => (appState.listBarType = val),
 
+  mainContentWidth: 0,
+  setMainContentWidth: (val: number) => (appState.mainContentWidth = val),
   mainContenType: MAIN_CONTEN_TYPE_WELCOME,
   setMainContenType: (val: MainContenType) => (appState.mainContenType = val),
   mainContenTab: "",
