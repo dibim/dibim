@@ -10,9 +10,10 @@ import { cn } from "@/lib/utils";
 import { appState } from "@/store/valtio";
 import { UniqueConstraint } from "@/types/types";
 import { ConfirmDialog } from "../ConfirmDialog";
-import { EditableTable, EditableTableMethods, ListItem } from "../EditableTable";
+import { EditableTable, EditableTableMethods, ListRow } from "../EditableTable";
 import { LabeledDiv } from "../LabeledDiv";
 import { SqlCodeViewer } from "../SqlCodeViewer";
+import { TooltipGroup } from "../TooltipGroup";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
@@ -20,7 +21,6 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } 
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { renderDataTypeIcon } from "./TableEditorStructureIcon";
-import { TooltipGroup } from "../TooltipGroup";
 
 type DialogAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
 
@@ -336,27 +336,30 @@ export function TableEditorStructure({
     "comment",
   ];
   const fieldNameTitle = ["列名", "数据类型", "主键", "外键", "唯一", "条件", "非空", "默认值", "备注"];
-  const [dataArr, setDataArr] = useState<ListItem[]>([]);
+  const [dataArr, setDataArr] = useState<ListRow[]>([]);
 
   function updateDataArr() {
     const dataArrTemp = appState.currentTableStructure.map(
       (row) =>
         ({
-          column_name: <div>{row.column_name}</div>,
-          data_type: (
-            <div className="flex">
-              <span className="pe-2">{renderDataTypeIcon(row.data_type)}</span>
-              <span>{row.data_type}</span>
-            </div>
-          ),
-          is_primary_key: <div>{row.is_primary_key ? "✅" : ""}</div>,
-          is_foreign_key: <div>{row.is_foreign_key ? "✅" : ""}</div>,
-          is_unique_key: <div>{row.is_unique_key ? "✅" : ""}</div>,
-          has_check_conditions: <div>{row.has_check_conditions ? "✅" : ""}</div>,
-          is_not_null: <div>{row.is_not_null ? "✅" : ""}</div>,
-          column_default: <div>{row.column_default}</div>,
-          comment: <div className="w-full">{row.comment}</div>,
-        }) as ListItem,
+          column_name: { render: (val: any) => <div>{val}</div>, value: row.column_name },
+          data_type: {
+            render: (val: any) => (
+              <div className="flex">
+                <span className="pe-2">{renderDataTypeIcon(val)}</span>
+                <span>{val}</span>
+              </div>
+            ),
+            value: row.data_type,
+          },
+          is_primary_key: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: row.is_primary_key },
+          is_foreign_key: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: row.is_foreign_key },
+          is_unique_key: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: row.is_unique_key },
+          has_check_conditions: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: row.has_check_conditions },
+          is_not_null: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: row.is_not_null },
+          column_default: { render: (val: any) => <div>{val}</div>, value: row.column_default },
+          comment: { render: (val: any) => <div className="w-full">{val}</div>, value: row.comment },
+        }) as ListRow,
     );
 
     setDataArr(dataArrTemp);

@@ -1,12 +1,17 @@
 "use client";
 
-import { ReactNode, useEffect, useImperativeHandle, useState } from "react";
+import { JSX, useEffect, useImperativeHandle, useState } from "react";
 import { SquareCheckBig } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-export interface ListItem {
-  [key: string]: ReactNode;
+export interface ListCell {
+  render: (val: any) => JSX.Element; // 渲染 value, 可以添加其它元素
+  value: any;
+}
+
+export interface ListRow {
+  [key: string]: ListCell;
 }
 
 // 修改表格的数据
@@ -30,7 +35,7 @@ interface EditableTableProps {
   fieldNames: string[]; // 字段名
   fieldNamesTitle?: string[]; // 字段名的标题
   fieldNamesUnique: string[]; // 是唯一的字段名
-  dataArr: ListItem[]; // 每行的数据
+  dataArr: ListRow[]; // 每行的数据
   onChange: (val: TableDataChange[]) => void;
   renderRowContextMenu?: (index: number, node: React.ReactNode) => React.ReactElement;
   showChanges?: boolean;
@@ -49,7 +54,7 @@ export function EditableTable({
   showChanges,
   ref,
 }: EditableTableProps) {
-  const [data, setData] = useState<ListItem[]>(dataArr);
+  const [data, setData] = useState<ListRow[]>(dataArr);
   const [editingRowIdndex, setEditingRowIndex] = useState<number>(-1); // 正在编辑的索引
   const [editingFieldName, setEditingFieldName] = useState<string>(""); // 正在编辑的字段名
   const [tempValue, setTempValue] = useState<string>("");
@@ -64,12 +69,24 @@ export function EditableTable({
 
   // 保存编辑
   function handleEditSave(rowIndex: number, fieldName: string) {
-    setData(data.map((item, index) => (index === rowIndex ? { ...item, [fieldName]: tempValue } : item)));
+    setData(
+      data.map((item, index) =>
+        index === rowIndex
+          ? {
+              ...item,
+              [fieldName]: {
+                ...item[fieldName],
+                value: tempValue, // 只更新 value
+              },
+            }
+          : item,
+      ),
+    );
     setEditingRowIndex(-1);
     setEditingFieldName("");
 
     // 记录修改
-    const oldValue = (data[rowIndex] as any)[fieldName];
+    const oldValue = getCellValue(data[rowIndex], fieldName);
     if (oldValue !== tempValue) {
       setChanges((prev) => [
         ...prev.filter((item) => !(item.index === rowIndex && item.field === fieldName)), // 去重
@@ -141,6 +158,20 @@ export function EditableTable({
     );
   }
 
+  // 使用单元格的渲染函数渲染 value
+  function renderCell(rowData: ListRow, field: string) {
+    const cell = rowData[field as keyof ListRow];
+    if (cell) return cell.render(cell.value);
+    return <div></div>;
+  }
+
+  // 获取单元格的值
+  function getCellValue(rowData: ListRow, field: string) {
+    const cell = rowData[field as keyof ListRow];
+    if (cell) return cell.value;
+    return "";
+  }
+
   function renderBody() {
     function genClassName(index: number) {
       // 删除的样式
@@ -168,7 +199,9 @@ export function EditableTable({
           {fieldNames.map((field, index) => (
             <TableCell
               key={index}
-              onClick={() => handleEditStart(rowIndex, fieldNames[index], (rowData as any)[field])}
+              onClick={() => {
+                handleEditStart(rowIndex, fieldNames[index], getCellValue(rowData, field));
+              }}
             >
               {editable && editingRowIdndex === rowIndex && editingFieldName === fieldNames[index] ? (
                 <Input
@@ -179,7 +212,7 @@ export function EditableTable({
                   onKeyDown={(e) => e.key === "Enter" && handleEditSave(rowIndex, editingFieldName)}
                 />
               ) : (
-                (rowData as any)[field]
+                renderCell(rowData, field)
               )}
             </TableCell>
           ))}

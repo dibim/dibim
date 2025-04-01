@@ -3,11 +3,13 @@ import {
   ColumnIndex,
   DbConnectionParam,
   DbCountRes,
+  FieldWithValue,
   GetTableDataParam,
   IndexQueryResult,
   TableStructure,
 } from "../../types";
 import "../types";
+import { formatToSqlValuePg } from "./format";
 
 /**
  * 连接到 postgre_sql
@@ -428,4 +430,19 @@ export function genRenameFieldCmdPg(tbName: string, oldName: string, newName: st
 // 生成删除字段的语句
 export function genDeleteFieldCmdPg(tbName: string, fieldName: string) {
   return `ALTER TABLE IF EXISTS "${tbName}" DROP COLUMN IF EXISTS "${fieldName}" CASCADE;`;
+}
+
+// 生成变更一行的字段
+export function genUpdateFieldCmdPg(tbName: string, uniqueField: FieldWithValue, fieldArr: FieldWithValue[]) {
+  const fda: string[] = [];
+  fieldArr.map((item) => {
+    fda.push(`"${item.field}" = ${formatToSqlValuePg(item.vaue)}`);
+  });
+
+  return `
+    UPDATE "${tbName}"
+    SET 
+        ${fda.join(",\n")}
+    WHERE "${uniqueField.field}" = ${uniqueField.vaue};
+  `;
 }
