@@ -2,21 +2,22 @@ import { useEffect, useRef, useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { subscribeKey } from "valtio/utils";
 import { DEFAULT_PAGE_SIZE, HEDAER_H } from "@/constants";
-import { getDefultOrderField } from "@/databases/PostgreSQL/utils/sql";
 import { exec, genDeleteRowsCmd, genUpdateFieldCmd, getTableData } from "@/databases/adapter,";
-import { FieldWithValue, TableStructure } from "@/databases/types";
+import { FieldWithValue } from "@/databases/types";
+import { getDefultOrderField } from "@/databases/utils";
 import { cn } from "@/lib/utils";
 import { appState } from "@/store/valtio";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EditableTable, EditableTableMethods, ListRow, TableDataChange } from "../EditableTable";
 import { PaginationSection } from "../PaginationSection";
 import { SqlCodeViewer } from "../SqlCodeViewer";
+import { TextWarning } from "../TextWarning";
 import { TooltipGroup } from "../TooltipGroup";
 
 export function TableEditorData() {
   const tableRef = useRef<EditableTableMethods | null>(null);
 
-  const [tableData, setTableData] = useState<object[]>([]); // 表格数据
+  const [tableData, setTableData] = useState<Record<string, any>[]>([]); // 表格数据
   const [fieldNames, setFieldNames] = useState<string[]>([]); // 字段名
   const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
   const [showDialogAlter, setShowDialogAlter] = useState<boolean>(false);
@@ -28,7 +29,7 @@ export function TableEditorData() {
     }
 
     // 整理参数
-    const orderBy = getDefultOrderField(appState.currentTableStructure as TableStructure[]);
+    const orderBy = getDefultOrderField(appState.currentTableStructure);
     const lastRow = tableData[tableData.length - 1];
     const lastOrderByValue = lastRow ? (lastRow as any)[orderBy] : null;
 
@@ -71,6 +72,8 @@ export function TableEditorData() {
   // ========== 分页 结束 ==========
 
   function handleApply() {
+    if (appState.uniqueFieldName === "") return;
+
     const deletedSet = tableRef.current?.getMultiDeleteData() || new Set();
 
     // 处理变更数据的航
@@ -90,7 +93,7 @@ export function TableEditorData() {
     rowDataMap.forEach((changes, rowIndex) => {
       // TODO: 根据表结构去找
       const uniqueField: FieldWithValue = {
-        field: "id",
+        field: appState.uniqueFieldName,
         value: rowIndex,
       };
       const fieldArr: FieldWithValue[] = [];
@@ -104,9 +107,15 @@ export function TableEditorData() {
       sqls.push(genUpdateFieldCmd(appState.currentTableName, uniqueField, fieldArr));
     });
 
-    // 最后执行删除行
-    // TODO: 根据表结构去找 id
-    sqls.push(genDeleteRowsCmd(appState.currentTableName, "id", Array.from(deletedSet)));
+    // 最后处理删除行
+    const arr = []; // 要删除的唯一字段(主键或唯一索引)的值
+    for (let index = 0; index < tableData.length; index++) {
+      const row = tableData[index];
+      if (deletedSet.has(index)) {
+        arr.push(row[appState.uniqueFieldName]);
+      }
+    }
+    sqls.push(genDeleteRowsCmd(appState.currentTableName, appState.uniqueFieldName, arr));
 
     setWillExecCmd(sqls.join(""));
     setShowDialogAlter(true);
@@ -122,6 +131,8 @@ export function TableEditorData() {
   }
 
   function handleDelete() {
+    if (appState.uniqueFieldName === "") return;
+
     tableRef.current?.deleteMultiSelectedRow();
   }
 
@@ -196,7 +207,7 @@ export function TableEditorData() {
         <div className={cn("gap-4 px-2 pb-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
           <TooltipGroup dataArr={tooltipSectionData} />
         </div>
-        <div className="flex flex-1 justify-between">
+        <div className="flex flex-1">
           <PaginationSection
             currentPage={currentPage}
             setCurrentPage={(val) => setCurrentPage(val)}
@@ -204,19 +215,24 @@ export function TableEditorData() {
             itemsTotal={itemsTotal}
             getData={getData}
           />
+          {appState.uniqueFieldName === "" && (
+            <TextWarning
+              type="error"
+              message={"当前表格没有主键或唯一索引, 为了确保数据不被误操作,不可以编辑该表格"}
+            ></TextWarning>
+          )}
         </div>
       </div>
 
       {/* 主体表格 */}
       <div className="flex-1 overflow-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})` }}>
-        {/* TODO: 找到主键和唯一索引, 不能写死 id */}
         <EditableTable
           ref={tableRef}
           fieldNames={fieldNames}
-          fieldNamesUnique={["id"]}
+          fieldNamesUnique={[appState.uniqueFieldName]}
           dataArr={dataArr}
           onChange={onChange}
-          editable={true}
+          editable={appState.uniqueFieldName !== ""}
           multiSelect={true}
         />
       </div>

@@ -15,8 +15,8 @@ export interface TooltipSectionProp {
 export function TooltipGroup({ dataArr: data }: TooltipSectionProp) {
   return (
     <>
-      {data.map((item) => (
-        <Tooltip>
+      {data.map((item, index) => (
+        <Tooltip key={index}>
           <TooltipTrigger asChild>{item.trigger}</TooltipTrigger>
           <TooltipContent>{item.content}</TooltipContent>
         </Tooltip>
