@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { subscribeKey } from "valtio/utils";
 import { DEFAULT_PAGE_SIZE, HEDAER_H } from "@/constants";
@@ -7,11 +7,13 @@ import { getTableData } from "@/databases/adapter,";
 import { TableStructure } from "@/databases/types";
 import { cn } from "@/lib/utils";
 import { appState } from "@/store/valtio";
-import { EditableTable, ListItem, TableDataChange } from "../EditableTable";
+import { EditableTable, EditableTableMethods, ListItem, TableDataChange } from "../EditableTable";
 import { PaginationSection } from "../PaginationSection";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { TooltipSection } from "../TooltipSection";
 
 export function TableEditorData() {
+  const tableRef = useRef<EditableTableMethods | null>(null);
+
   const [tableData, setTableData] = useState<object[]>([]); // 表格数据
   const [fieldNames, setFieldNames] = useState<string[]>([]); // 字段名
 
@@ -71,9 +73,17 @@ export function TableEditorData() {
   const [changes, setChanges] = useState<TableDataChange[]>([]); // 记录所有修改的变量
   function onChange(val: TableDataChange[]) {
     setChanges(val);
-    // TODO: 保存时生成语句
   }
   // ========== 分页 结束 ==========
+
+  // 生成语句
+  function genSql() {
+    // TODO:; 删除的行
+    // const deletedArr = tableRef.current?.getMultiDeleteData() || [];
+
+    // TODO:; 删除的行
+    console.log("changes::", changes);
+  }
 
   const [dataArr, setDataArr] = useState<ListItem[]>([]);
   function updateDataArr(data: object[]) {
@@ -107,51 +117,35 @@ export function TableEditorData() {
     return () => unsubscribe();
   }, []);
 
+  const tooltipSectionData = [
+    {
+      trigger: <RotateCw color="var(--fvm-info-clr)" onClick={() => getData(currentPage)} />,
+      content: <p>刷新</p>,
+    },
+    {
+      trigger: <CirclePlus color="var(--fvm-primary-clr)" />,
+      content: <p>添加行</p>,
+    },
+    {
+      trigger: <CircleMinus color="var(--fvm-danger-clr)" />,
+      content: <p>删除行</p>,
+    },
+    {
+      trigger: <CircleCheck color="var(--fvm-success-clr)" />,
+      content: <p>应用</p>,
+    },
+    {
+      trigger: <CircleX color="var(--fvm-warning-clr)" />,
+      content: <p>取消</p>,
+    },
+  ];
+
   return (
     <div>
       {/* 按钮栏 */}
       <div className="flex flex-wrap pb-2">
         <div className={cn("gap-4 px-2 pb-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <RotateCw color="var(--fvm-info-clr)" onClick={() => getData(currentPage)} />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>刷新</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <CirclePlus color="var(--fvm-primary-clr)" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>添加行</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <CircleMinus color="var(--fvm-danger-clr)" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>删除行</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <CircleCheck color="var(--fvm-success-clr)" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>应用</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <CircleX color="var(--fvm-warning-clr)" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>取消</p>
-            </TooltipContent>
-          </Tooltip>
+          <TooltipSection dataArr={tooltipSectionData} />
         </div>
         <div className="flex flex-1 justify-between">
           <PaginationSection
@@ -168,6 +162,7 @@ export function TableEditorData() {
       <div className="flex-1 overflow-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})` }}>
         {/* TODO: 找到主键和唯一索引, 不能写死 id */}
         <EditableTable
+          ref={tableRef}
           fieldNames={fieldNames}
           fieldNamesUnique={["id"]}
           dataArr={dataArr}

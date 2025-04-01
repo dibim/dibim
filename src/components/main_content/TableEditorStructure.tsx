@@ -19,8 +19,8 @@ import { Checkbox } from "../ui/checkbox";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { renderDataTypeIcon } from "./TableEditorStructureIcon";
+import { TooltipSection } from "../TooltipSection";
 
 type DialogAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
 
@@ -372,51 +372,35 @@ export function TableEditorStructure({
     return () => unsubscribe();
   }, []);
 
+  const tooltipSectionData = [
+    {
+      trigger: <RotateCw color="var(--fvm-info-clr)" onClick={() => getData()} />,
+      content: <p>刷新</p>,
+    },
+    {
+      trigger: <CirclePlus color="var(--fvm-primary-clr)" onClick={handleAddField} />,
+      content: <p>添加字段</p>,
+    },
+    {
+      trigger: <CircleMinus color="var(--fvm-danger-clr)" onClick={handleDelSelectedField} />,
+      content: <p>删除字段</p>,
+    },
+    {
+      trigger: <CircleCheck color="var(--fvm-success-clr)" onClick={handleApply} />,
+      content: <p>应用</p>,
+    },
+    {
+      trigger: <CircleX color="var(--fvm-warning-clr)" onClick={handleCancel} />,
+      content: <p>取消</p>,
+    },
+  ];
+
   return (
     <div>
       {/* 按钮栏 */}
       <div className="flex pb-2">
         <div className={cn("gap-4 px-2 pb-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <RotateCw color="var(--fvm-info-clr)" onClick={() => getData()} />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>刷新</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <CirclePlus color="var(--fvm-primary-clr)" onClick={handleAddField} />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>添加字段</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <CircleMinus color="var(--fvm-danger-clr)" onClick={handleDelSelectedField} />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>删除字段</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <CircleCheck color="var(--fvm-success-clr)" onClick={handleApply} />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>应用</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <CircleX color="var(--fvm-warning-clr)" onClick={handleCancel} />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>取消</p>
-            </TooltipContent>
-          </Tooltip>
+          <TooltipSection dataArr={tooltipSectionData} />
         </div>
         <div className="flex-1">
           <Input
