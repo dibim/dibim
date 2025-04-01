@@ -1,10 +1,15 @@
 import { proxy } from "valtio";
-import { DB_TYPE_POSTGRESQL, LIST_BAR_TYPE_DB_LIST, MAIN_CONTEN_TYPE_WELCOME, MAIN_PASSWORD_DEFAULT } from "@/constants";
+import {
+  DB_TYPE_POSTGRESQL,
+  LIST_BAR_TYPE_DB_LIST,
+  MAIN_CONTEN_TYPE_WELCOME,
+  MAIN_PASSWORD_DEFAULT,
+} from "@/constants";
 import { TableStructure } from "@/databases/types";
+import { invoker } from "@/invoker";
 import { ConfigFile } from "@/types/conf_file";
 import { DbType, ListBarType, MainContenType, MainContentTab } from "@/types/types";
 import { saveConfigFile } from "@/utils/config_file";
-import { invoker } from "@/invoker";
 
 interface AppState {
   // 配置文件相关
@@ -31,6 +36,10 @@ interface AppState {
   // 当前表名
   currentTableName: string;
   setCurrentTableName: (val: string) => void;
+
+  // 唯一字段(主键或唯一索引)的字段名
+  uniqueFieldName: string;
+  setUniqueFieldName: (val: string) => void;
 
   // 当前表结构
   currentTableStructure: TableStructure[];
@@ -99,6 +108,8 @@ export const appState = proxy<AppState>({
 
   currentTableName: "",
   setCurrentTableName: (val: string) => (appState.currentTableName = val),
+  uniqueFieldName: "",
+  setUniqueFieldName: (val: string) => (appState.uniqueFieldName = val),
 
   currentTableStructure: [],
   setCurrentTableStructure: (val: TableStructure[]) => (appState.currentTableStructure = val),

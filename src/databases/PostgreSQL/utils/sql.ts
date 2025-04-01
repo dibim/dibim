@@ -183,7 +183,7 @@ export async function getTableStructurePg(connName: string, tbName: string) {
   // 合并结果
   const result = columns.map((column) => ({
     ...column,
-    size: column.size ? column.size : 0,
+    size: column.size ? column.size : "",
     indexes: columnIndexMap[column.column_name] || [],
   }));
 
@@ -352,62 +352,6 @@ export async function getTableDataPg(connName: string, p: GetTableDataParam) {
   };
 }
 
-/**
- * 查询表格数据的时候, 必须使用一个排序字段
- *
- * 优先级: 主键 > 唯一索引 > 索引 > 普通字段
- * 普通字段的优先级: 数值、日期/时间类型 > 字符串类型(按字符的编码排序, 比如 UTF-8)
- * BOOLEAN 不能用, JSON 或复杂类型 行为可能未定义或不符合预期
- *
- * @param tsa 表结构数据
- */
-export function getDefultOrderField(tsa: TableStructure[]) {
-  // 优先使用索引字段
-  for (const f of tsa) {
-    // 主键
-    if (f.is_primary_key) {
-      return f.column_name;
-    }
-
-    // 唯一索引
-    if (f.is_unique_key) {
-      return f.column_name;
-    }
-  }
-
-  // 找不到索引字段的, 找数字或时间字段
-  // 找数字字段
-  for (const f of tsa) {
-    if (
-      f.data_type.includes("int") ||
-      f.data_type.includes("float") ||
-      f.data_type.includes("serial") ||
-      f.data_type.includes("numeric") ||
-      f.data_type.includes("decimal") ||
-      f.data_type.includes("real") ||
-      f.data_type.includes("double") ||
-      f.data_type.includes("money")
-    ) {
-      return f.column_name;
-    }
-  }
-  // 找时间字段
-  for (const f of tsa) {
-    if (f.data_type.includes("time") || f.data_type.includes("date")) {
-      return f.column_name;
-    }
-  }
-
-  // 找字符串字段
-  // 找不到索引字段的, 也找数字或时间字段, 找字符串字段
-  for (const f of tsa) {
-    if (f.data_type.includes("text") || f.data_type.includes("char")) {
-      return f.column_name;
-    }
-  }
-
-  return "";
-}
 
 // 执行事务语句
 export async function execTransactionPg(connName: string, sqls: string[]) {

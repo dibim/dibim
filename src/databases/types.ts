@@ -72,7 +72,10 @@ export type CommonSQLValue =
   | Array<CommonSQLValue>; // 数组类型（部分数据库支持）
 
 // 表结构列表的数据
-// 这是从数据库查询的结果, 注意命名方式
+// 这是从数据库查询的结果
+//
+// 注意: 命名方式按照数据库的
+//
 export type TableStructure = {
   has_check_conditions: any;
   column_name: string;

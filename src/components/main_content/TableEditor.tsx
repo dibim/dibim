@@ -15,6 +15,7 @@ import {
 } from "@/constants";
 import { getTableStructure } from "@/databases/adapter,";
 import { AllAlterAction, TableAlterAction } from "@/databases/types";
+import { getUniqueFieldName } from "@/databases/utils";
 import { appState } from "@/store/valtio";
 import { Card, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
@@ -39,6 +40,7 @@ export function TableEditor() {
     const res = await getTableStructure(appState.currentTableName);
     if (res && res.data) {
       appState.setCurrentTableStructure(res.data);
+      appState.setUniqueFieldName(getUniqueFieldName(appState.currentTableStructure));
       if (appState.mainContenTab === STR_EMPTY) appState.setMainContenTab(TAB_DATA);
     }
   }

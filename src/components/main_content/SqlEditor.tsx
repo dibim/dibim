@@ -298,13 +298,12 @@ export function SqlEditor() {
               getData={getData}
             />
             <div className="flex-1 w-full h-full overflow-scroll">
-              {/* FIXME: 找到主键和唯一索引, 不能写死 id */}
               <EditableTable
                 fieldNames={fieldNames}
-                fieldNamesUnique={["id"]}
+                fieldNamesUnique={[appState.uniqueFieldName]}
                 dataArr={tableData}
                 onChange={onChange}
-                editable={true}
+                editable={appState.uniqueFieldName !== ""}
                 multiSelect={true}
               />
             </div>

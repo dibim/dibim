@@ -130,7 +130,6 @@ export function TableEditorStructure({
   function handleCancel() {
     setAlterData([]);
     tableRef.current?.resetMultiSelectData();
-    console.log("tableRef.current::: ", tableRef.current);
   }
 
   // 点击编辑按钮, 弹出编辑对话框
@@ -419,14 +418,13 @@ export function TableEditorStructure({
 
       {/* 主体表格 */}
       <div className="flex-1 overflow-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})` }}>
-        {/* TODO: 找到主键和唯一索引, 不能写死 id */}
         <EditableTable
           ref={tableRef}
-          editable={false}
+          editable={appState.uniqueFieldName !== ""}
           multiSelect={true}
           fieldNames={fieldNames}
           fieldNamesTitle={fieldNameTitle}
-          fieldNamesUnique={["id"]}
+          fieldNamesUnique={[appState.uniqueFieldName]}
           dataArr={dataArr}
           onChange={() => {
             // TODO: 快捷修改字段名等
