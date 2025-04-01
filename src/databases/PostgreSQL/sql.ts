@@ -7,8 +7,8 @@ import {
   GetTableDataParam,
   IndexQueryResult,
   TableStructure,
-} from "../../types";
-import "../types";
+} from "../types";
+import "./types";
 import { formatToSqlValuePg } from "./format";
 
 /**

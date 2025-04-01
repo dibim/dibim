@@ -2,8 +2,8 @@
  * 修改字段的功能
  */
 import { STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD, STR_TABLE, reNumStr } from "@/constants";
-import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "../../constants";
-import { AllAlterAction, FieldAlterAction, TableAlterAction } from "../../types";
+import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "../constants";
+import { AllAlterAction, FieldAlterAction, TableAlterAction } from "../types";
 import { formatToSqlValuePg } from "./format";
 
 function genSizeStr(faa: FieldAlterAction) {
