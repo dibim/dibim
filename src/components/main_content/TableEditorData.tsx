@@ -201,7 +201,7 @@ export function TableEditorData() {
   ];
 
   return (
-    <div>
+    <>
       {/* 按钮栏 */}
       <div className="flex flex-wrap pb-2">
         <div className={cn("gap-4 px-2 pb-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
@@ -225,17 +225,15 @@ export function TableEditorData() {
       </div>
 
       {/* 主体表格 */}
-      <div className="flex-1 overflow-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})` }}>
-        <EditableTable
-          ref={tableRef}
-          fieldNames={fieldNames}
-          fieldNamesUnique={[appState.uniqueFieldName]}
-          dataArr={dataArr}
-          onChange={onChange}
-          editable={appState.uniqueFieldName !== ""}
-          multiSelect={true}
-        />
-      </div>
+      <EditableTable
+        ref={tableRef}
+        fieldNames={fieldNames}
+        fieldNamesUnique={[appState.uniqueFieldName]}
+        dataArr={dataArr}
+        onChange={onChange}
+        editable={appState.uniqueFieldName !== ""}
+        multiSelect={true}
+      />
 
       {/* 确认要执行的变更语句 */}
       <ConfirmDialog
@@ -250,6 +248,6 @@ export function TableEditorData() {
         okText={"确定"}
         okCb={handleConfirm}
       />
-    </div>
+    </>
   );
 }
