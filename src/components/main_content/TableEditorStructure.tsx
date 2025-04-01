@@ -255,9 +255,19 @@ export function TableEditorStructure({
 
       // 添加字段的还得在前端添加表结构数据
       appState.setCurrentTableStructure([
-        ...(appState.currentTableStructure as unknown as TableStructure[]),
+        ...appState.currentTableStructure,
         {
-          // ...新项...
+          column_default: fieldDefalut,
+          column_name: actionData.fieldName,
+          comment: fieldComment,
+          data_type: fieldType,
+          has_check_conditions: false,
+          is_foreign_key: false,
+          is_not_null: fieldNotNull,
+          is_primary_key: fieldIndexType === INDEX_PRIMARY_KEY,
+          is_unique_key: fieldIndexType === INDEX_UNIQUE,
+          size: fieldSize,
+
           indexes: fieldIndexType
             ? [
                 {
@@ -269,7 +279,9 @@ export function TableEditorStructure({
               ]
             : undefined,
         },
-      ] as TableStructure[]);
+      ]);
+
+      updateDataArr();
     }
 
     setShowDialogEdit(false);
@@ -419,7 +431,6 @@ export function TableEditorStructure({
       </div>
 
       {/* 主体表格 */}
-
       <div className="flex-1 overflow-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})` }}>
         {/* TODO: 找到主键和唯一索引, 不能写死 id */}
         <EditableTable

@@ -79,7 +79,7 @@ export type TableStructure = {
   data_type: string;
   column_default: string;
   comment: string;
-  size: number;
+  size: string;
   is_primary_key: boolean;
   is_unique_key: boolean;
   is_foreign_key: boolean;
@@ -144,6 +144,5 @@ export type TableAlterAction = {
   tableNameOld: string; // 原先的表名, 重命名的时候用
   comment: string; // 表注释
 };
-
 
 export type AllAlterAction = FieldAlterAction | TableAlterAction;

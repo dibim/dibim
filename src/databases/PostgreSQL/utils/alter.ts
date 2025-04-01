@@ -6,28 +6,33 @@ import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "../../constants";
 import { AllAlterAction, FieldAlterAction, TableAlterAction } from "../../types";
 import { formatToSqlValuePg } from "./format";
 
-function genSizeStr(sizeStr: string) {
-  if (sizeStr === "") return "";
+function genSizeStr(faa: FieldAlterAction) {
+  if (faa.fieldSize === "") return "";
 
-  if (reNumStr.test(sizeStr)) {
-    const size = parseInt(sizeStr) | 0;
+  if (reNumStr.test(faa.fieldSize)) {
+    const size = parseInt(faa.fieldSize) | 0;
     return size && size > 0 ? `(${size})` : "";
   }
 
-  return `(${sizeStr})`;
+  return `(${faa.fieldSize})`;
 }
 
-function genFieldDefault(fieldDefalut: string | null) {
-  if (fieldDefalut === null) return "";
+function genFieldDefault(faa: FieldAlterAction) {
+  if (faa.fieldDefalut === null) return "";
+  if (faa.fieldIndexType === INDEX_PRIMARY_KEY) return "";
+
+  if (faa.fieldDefalut === `''` || faa.fieldDefalut === `""`) return `DEFAULT ''`;
 
   // TODO: 支持以下类型:
   // 多维数组: 使用 ARRAY[[1,2],[3,4]]
-  let defalutValue = reNumStr.test(fieldDefalut) ? `${fieldDefalut}` : formatToSqlValuePg(fieldDefalut, true);
-  return fieldDefalut ? "DEFAULT " + defalutValue : "";
+  let defalutValue = reNumStr.test(faa.fieldDefalut)
+    ? `${faa.fieldDefalut}`
+    : formatToSqlValuePg(faa.fieldDefalut, true);
+  return faa.fieldDefalut ? `DEFAULT ${defalutValue}` : "";
 }
 
-function genNotNull(fieldNotNull: boolean) {
-  return fieldNotNull ? "NOT NULL" : "";
+function genNotNull(faa: FieldAlterAction) {
+  return faa.fieldNotNull ? "NOT NULL" : "";
 }
 
 // TODO: 支持符合主键
@@ -42,9 +47,9 @@ function genIndxConstraint(faa: FieldAlterAction) {
 // 生成每个字段的sql
 // 用于 CREATE TABLE 和ALTER TABLE 语句里每个字段名及其后面的属性
 function genFieldSql(faa: FieldAlterAction) {
-  const sizeStr = genSizeStr(faa.fieldSize);
-  const defaultValue = genFieldDefault(faa.fieldDefalut);
-  const notNull = genNotNull(faa.fieldNotNull);
+  const sizeStr = genSizeStr(faa);
+  const defaultValue = genFieldDefault(faa);
+  const notNull = genNotNull(faa);
 
   return `"${faa.fieldName}" ${faa.fieldType}${sizeStr} ${notNull} ${defaultValue}`;
 }
@@ -55,7 +60,7 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
 
   // 修改数据类型
   if (faa.fieldType !== "") {
-    const sizeStr = genSizeStr(faa.fieldSize);
+    const sizeStr = genSizeStr(faa);
     res.push(
       `ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.fieldNameExt}" TYPE ${faa.fieldType}${sizeStr} USING "${faa.fieldNameExt}"::${faa.fieldType}${sizeStr};`,
     );
@@ -207,7 +212,6 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
 }
 
 // 添加字段
-// 为了最终的代码比较美观, 要注意这里的字符串格式.
 export function genAlterFieldAdd(faa: FieldAlterAction) {
   let res: string[] = [];
   const indxConstraint = genIndxConstraint(faa);
@@ -269,6 +273,16 @@ export function genAlterTableAdd(taa: TableAlterAction, faas: FieldAlterAction[]
     );
   `);
 
+  // 添加字段注释
+  for (const faa of faas) {
+    if (faa.fieldComment) {
+      const fv = formatToSqlValuePg(faa.fieldComment, true);
+      res.push(`COMMENT ON COLUMN "${taa.tableName}"."${faa.fieldNameExt}" IS ${fv};`);
+    } else {
+      res.push(`COMMENT ON COLUMN "${taa.tableName}"."${faa.fieldNameExt}" IS NULL;`);
+    }
+  }
+
   return res;
 }
 
@@ -290,7 +304,7 @@ export function genAlterCmdPg(val: AllAlterAction[]) {
         });
 
         res = res.concat(genAlterTableAdd(taa, faas));
-        return res.join("\n");
+        return res.join("");
       }
     }
   }
@@ -320,5 +334,5 @@ export function genAlterCmdPg(val: AllAlterAction[]) {
     }
   }
 
-  return res.join("\n");
+  return res.join("");
 }

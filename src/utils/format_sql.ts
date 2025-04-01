@@ -17,7 +17,7 @@ export function formatSql(dbType: DbType, sql: string) {
     language: dbTypeStr as SqlLanguage,
     tabWidth: 4,
     keywordCase: "upper",
-    linesBetweenQueries: 2,
+    linesBetweenQueries: 0,
   });
 
   return prettySQL;
