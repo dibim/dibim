@@ -184,9 +184,8 @@ export function EditableTable({
         </TableRow>
       );
 
-      if (renderRowContextMenu) {
-        renderRowContextMenu(rowIndex, node);
-      }
+      if (renderRowContextMenu) return renderRowContextMenu(rowIndex, node);
+
       return node;
     });
   }
