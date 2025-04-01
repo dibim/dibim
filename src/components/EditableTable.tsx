@@ -19,6 +19,7 @@ export interface TableDataChange {
 
 export type EditableTableMethods = {
   getMultiSelectData: () => Set<number>;
+  getMultiDeleteData: () => Set<number>;
   resetMultiSelectData: () => void;
   deleteMultiSelectedRow: () => void;
 };
@@ -100,6 +101,7 @@ export function EditableTable({
 
   useImperativeHandle(ref, () => ({
     getMultiSelectData: () => selectedFieldIndex,
+    getMultiDeleteData: () => deletedFieldIndex,
     resetMultiSelectData: () => {
       setDeletedFieldIndex(new Set());
       setSelectedFieldIndex(new Set());

@@ -12,10 +12,10 @@ export async function readConfigFile(key: string) {
     if (dec.errorMessage === "") {
       return dec.result;
     } else {
-      console.log("aesGcmDecryptBase64", dec.errorMessage);
+      console.log("aesGcmDecryptBase64 error: ", dec.errorMessage);
     }
   } else {
-    console.log("readFileBase64 出错", res.errorMessage);
+    console.log("readFileBase64 error: ", res.errorMessage);
   }
 
   return "";
@@ -32,10 +32,10 @@ export async function saveConfigFile(val: string, key: string) {
     if (res.errorMessage === "") {
       return res.result;
     } else {
-      console.log("writeFileBase64 出错", res.errorMessage);
+      console.log("writeFileBase64 error: ", res.errorMessage);
     }
   } else {
-    console.log("aesGcmEncryptString 出错", enc.errorMessage);
+    console.log("aesGcmEncryptString error: ", enc.errorMessage);
   }
 
   return false;
