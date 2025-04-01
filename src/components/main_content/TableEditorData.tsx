@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { appState } from "@/store/valtio";
 import { EditableTable, EditableTableMethods, ListItem, TableDataChange } from "../EditableTable";
 import { PaginationSection } from "../PaginationSection";
-import { TooltipSection } from "../TooltipSection";
+import { TooltipGroup } from "../TooltipGroup";
 
 export function TableEditorData() {
   const tableRef = useRef<EditableTableMethods | null>(null);
@@ -145,7 +145,7 @@ export function TableEditorData() {
       {/* 按钮栏 */}
       <div className="flex flex-wrap pb-2">
         <div className={cn("gap-4 px-2 pb-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
-          <TooltipSection dataArr={tooltipSectionData} />
+          <TooltipGroup dataArr={tooltipSectionData} />
         </div>
         <div className="flex flex-1 justify-between">
           <PaginationSection
