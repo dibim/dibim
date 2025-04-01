@@ -1,39 +1,46 @@
-# DIBIM
+# 🚀 DIBIM - 数据库管理工具
 
-## 简介
+## ✨ 简介
 
-**DIBIM** 是一个简单易用的数据库管理软件.
+**DIBIM** 是一个简单易用的跨平台数据库管理软件。
 
-依托于 [Tauri](https://tauri.app/), 操作数据库等基础功能均在rust中实现, 前端所需的数据在前端通过原生 SQL 语句传递给 rust 执行.
+- ⚡ **基于 Tauri 框架**：安装包较小，内存占用较低。
+- 🖥️ **前端技术**：TypeScript + React + shadcn/ui
+- ⚙️ **后端技术**：Rust + SQLx
+- 🗄️ **数据库支持**：PostgreSQL / MySQL / MariaDB / SQLite
 
-前端使用 [TypeScript](https://www.typescriptlang.org) + [React](https://react.dev/) + [shadcn/ui](https://ui.shadcn.com/), 易于扩展.
+## 🎯 核心特性
 
-后端使用 [sqlx](https://github.com/launchbadge/sqlx) 操作 SQL 数据库, 支持  PostgreSQL, MySQL, MariaDB, SQLite.
+- 🚀 轻量级跨平台应用，支持 Windows / macOS / Linux
+- 🔍 原生SQL操作体验，变更数据的操作均会显示要执行的语句
+- 💅 响应式用户界面
+- 🔄 多数据库统一管理
+- 💡 可通过 TypeScript 轻松扩展更多功能
 
-## 快捷键
+## ⌨️ 快捷键
 
-- f2: 切换侧边栏
-- f3: 切换列表栏
-- f9: 执行 sql 编辑器里的代码
-- alt + shift + f: 执行 sql 编辑器里的代码
+| 快捷键        | 功能描述                     |
+|--------------|----------------------------|
+| `F2`         | 切换侧边栏 🗄️              |
+| `F3`         | 切换列表栏 📜              |
+| `F8`         | 格式化SQL编辑器代码 🧹     |
+| `F9`         | 执行SQL编辑器代码 ▶️       |
 
-## 使用 valtio
+## ⚛️ 状态管理（Valtio）
 
-在组件中使用 Valtio 时，通过 `const snap = useSnapshot(appState)` 获取的状态快照（snap）应当用于组件的渲染输出（return 语句）中读取值。
+在组件中使用 Valtio 时，通过 `const snap = useSnapshot(appState)` 获取的状态快照（snap）应当用于组件的渲染输出（return 语句）中读取值。  
 在事件处理、副作用等逻辑操作中，应当直接操作原始状态对象 appState 而不是快照对象 snap。
 
-## TODO
+## 📝 TODO
 
 ### v0.1 pg
 
 - 查询结果的编辑
   - sql 编辑器的结果集
   - 分页还有问题
-- 表格数据列表  
-  - 待生成删除语句 ---
-  - 添加行数据
-  - 按钮功能函数还有未做完的
-
+- 表格数据列表
+  - 添加行数据 ---
+  
 ### v0.2 sqlite
 
 - 支持 sqlite
@@ -79,7 +86,6 @@
   - alt + b 备份
   - alt + l 锁屏(设置主密码之后)
   - f1 关于
-  - f3 切换sql编辑器下方的提示栏栏
   - f5 刷新数据(表结构/ddl等)
 
 ## 更多功能
