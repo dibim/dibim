@@ -12,7 +12,7 @@ export interface TooltipSectionProp {
   dataArr: TooltipSectionItem[];
 }
 
-export function TooltipSection({ dataArr: data }: TooltipSectionProp) {
+export function TooltipGroup({ dataArr: data }: TooltipSectionProp) {
   return (
     <>
       {data.map((item) => (
