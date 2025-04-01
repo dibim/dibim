@@ -45,6 +45,10 @@ interface AppState {
   currentTableStructure: TableStructure[];
   setCurrentTableStructure: (val: TableStructure[]) => void;
 
+  // 关于
+  aboutOpen: boolean;
+  setAboutOpen: (val: boolean) => void;
+
   // 侧边栏
   sidebarOpen: boolean;
   setSidebarOpen: (val: boolean) => void;
@@ -113,6 +117,9 @@ export const appState = proxy<AppState>({
 
   currentTableStructure: [],
   setCurrentTableStructure: (val: TableStructure[]) => (appState.currentTableStructure = val),
+
+  aboutOpen: false,
+  setAboutOpen: (val: boolean) => (appState.aboutOpen = val),
 
   sidebarOpen: true,
   setSidebarOpen: (val: boolean) => (appState.sidebarOpen = val),
