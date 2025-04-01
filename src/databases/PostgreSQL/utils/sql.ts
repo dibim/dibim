@@ -215,7 +215,7 @@ export async function getTableDdlPg(connName: string, tbName: string) {
         SELECT 
             ti.oid,
             string_agg(
-                '    ' || a.attname || ' ' || 
+                '    "' || a.attname || '" ' || 
                 pg_catalog.format_type(a.atttypid, a.atttypmod) ||
                 CASE WHEN a.attnotnull THEN ' NOT NULL' ELSE '' END ||
                 CASE 
@@ -246,8 +246,37 @@ export async function getTableDdlPg(connName: string, tbName: string) {
         SELECT 
             ti.oid,
             string_agg(
-                '    CONSTRAINT ' || con.conname || ' ' || 
-                pg_catalog.pg_get_constraintdef(con.oid),
+                '    CONSTRAINT "' || con.conname || '" ' ||
+                CASE 
+                    -- 主键约束
+                    WHEN con.contype = 'p' THEN
+                        'PRIMARY KEY (' || 
+                        (SELECT string_agg('"' || a.attname || '"', ', ')
+                         FROM pg_attribute a
+                         WHERE a.attrelid = con.conrelid
+                         AND a.attnum = ANY(con.conkey)) || 
+                        ')'
+                    -- 外键约束
+                    WHEN con.contype = 'f' THEN
+                        'FOREIGN KEY (' || 
+                        (SELECT string_agg('"' || a.attname || '"', ', ')
+                         FROM pg_attribute a
+                         WHERE a.attrelid = con.conrelid
+                         AND a.attnum = ANY(con.conkey)) || 
+                        ') REFERENCES ' ||
+                        (SELECT n.nspname || '."' || c.relname || '"'
+                         FROM pg_class c
+                         JOIN pg_namespace n ON n.oid = c.relnamespace
+                         WHERE c.oid = con.confrelid) || 
+                        ' (' ||
+                        (SELECT string_agg('"' || a.attname || '"', ', ')
+                         FROM pg_attribute a
+                         WHERE a.attrelid = con.confrelid
+                         AND a.attnum = ANY(con.confkey)) ||
+                        ')'
+                    -- 其他约束原样输出
+                    ELSE pg_catalog.pg_get_constraintdef(con.oid)
+                END,
                 E',\n'
             ) AS constraints
         FROM 
@@ -260,7 +289,7 @@ export async function getTableDdlPg(connName: string, tbName: string) {
             ti.oid
     )
     SELECT 
-        'CREATE TABLE ' || ti.schema_name || '.' || ti.table_name || ' (\n' ||
+        'CREATE TABLE "' || ti.schema_name || '"."' || ti.table_name || '" (\n' ||
         cd.columns ||
         CASE WHEN cts.constraints IS NOT NULL THEN E',\n' || cts.constraints ELSE '' END ||
         E'\n);'
@@ -312,18 +341,7 @@ export async function getTableDataPg(connName: string, p: GetTableDataParam) {
 
   // 有指定排序数据的
   const where = p.lastOrderByValue === null ? "" : `WHERE ${p.sortField} > ${p.lastOrderByValue}`;
-  const sqlHasPkey = `
-    SELECT 
-      * 
-    FROM 
-      "${p.tableName}"
-    ${where}
-    ORDER BY 
-      ${p.sortField} ${p.sortOrder}    
-    LIMIT 
-      ${p.pageSize}
-    ;`;
-
+  const sqlHasPkey = `SELECT * FROM "${p.tableName}" ${where} ORDER BY ${p.sortField} ${p.sortOrder} LIMIT ${p.pageSize};`;
   const dbRes = await invoker.querySql(connName, sqlHasPkey);
 
   return {
