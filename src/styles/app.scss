@@ -1,7 +1,28 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 table {
   th,
   td {
     border-left: 1px solid #666;
     border-right: 1px solid #666;
+  }
+}
+
+.table-body-scroll {
+  // height: 200px; // 在 style 里动态设置
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
   }
 }
