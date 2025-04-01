@@ -22,10 +22,10 @@ import {
 import { invoker } from "@/invoker";
 import { appState } from "@/store/valtio";
 import { readConfigFile } from "@/utils/config_file";
+import { TooltipGroup } from "./TooltipGroup";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function Main() {
   const snap = useSnapshot(appState);
@@ -130,6 +130,43 @@ export function Main() {
     return () => unsubscribe();
   }, []);
 
+  const tooltipSectionData = [
+    {
+      trigger: (
+        <Button data-sidebar="trigger" variant="ghost" onClick={toggleSidebarOpen}>
+          <PanelLeftIcon />
+          <span className="sr-only">切换侧边栏</span>
+        </Button>
+      ),
+      content: <p>切换侧边栏(F2)</p>,
+    },
+    {
+      trigger: (
+        <Button
+          variant="ghost"
+          onClick={() => {
+            snap.setListBarOpen(!snap.listBarOpen);
+          }}
+        >
+          <PanelLeftDashed />
+          <span className="sr-only">切换列表栏</span>
+        </Button>
+      ),
+      content: <p>切换列表栏(F3)</p>,
+    },
+    {
+      trigger: (
+        <span
+          className="cursor-pointer"
+          style={{ borderBottom: `0.25rem solid ${snap.currentConnColor || "rgba(0,0,0,0)"}` }}
+        >
+          {snap.currentDbNme || "无数据库连接"}
+        </span>
+      ),
+      content: <p>当前数据库连接</p>,
+    },
+  ];
+
   return (
     <>
       {showPwdInput ? (
@@ -166,34 +203,7 @@ export function Main() {
             {!snap.sidebarOpen && <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>}
 
             {/* 复制 sidebar-trigger 过来, 这里添加了函数, 记录 sidebar 的状态*/}
-            <Button data-sidebar="trigger" variant="ghost" onClick={toggleSidebarOpen}>
-              <PanelLeftIcon />
-              <span className="sr-only">切换侧边栏</span>
-            </Button>
-
-            <Button
-              variant="ghost"
-              onClick={() => {
-                snap.setListBarOpen(!snap.listBarOpen);
-              }}
-            >
-              <PanelLeftDashed />
-              <span className="sr-only">切换列表栏</span>
-            </Button>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span
-                  className="cursor-pointer"
-                  style={{ borderBottom: `0.25rem solid ${snap.currentConnColor || "rgba(0,0,0,0)"}` }}
-                >
-                  {snap.currentDbNme || "无数据库连接"}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>当前数据库连接</p>
-              </TooltipContent>
-            </Tooltip>
+            <TooltipGroup dataArr={tooltipSectionData} />
           </header>
 
           <PanelGroup direction="horizontal">

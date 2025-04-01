@@ -144,7 +144,9 @@ export function SqlEditor() {
       await execCode();
     });
     // 格式化代码
-    editor.addCommand(monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KeyF, () => formatCode());
+    editor.addCommand(monaco.KeyCode.F8, async () => {
+      formatCode();
+    });
   };
 
   const beforeMount: BeforeMount = useMemo(
@@ -229,11 +231,11 @@ export function SqlEditor() {
   const tooltipSectionData = [
     {
       trigger: <Play className="mb-2" onClick={execCode} />,
-      content: <p>执行</p>,
+      content: <p>执行(F9)</p>,
     },
     {
       trigger: <NotebookText className="mb-2" onClick={formatCode} />,
-      content: <p>格式化</p>,
+      content: <p>格式化(F8)</p>,
     },
     // FIXME: 3个 panel 先后折叠 2 个会有问题, 这 2 个里始终会显示一个
     // {
