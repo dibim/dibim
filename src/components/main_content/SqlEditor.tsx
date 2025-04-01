@@ -12,7 +12,7 @@ import { DbResult } from "@/types/types";
 import { formatSql } from "@/utils/format_sql";
 import { EditableTable, TableDataChange } from "../EditableTable";
 import { PaginationSection } from "../PaginationSection";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { TooltipGroup } from "../TooltipGroup";
 
 // 初始化 Monaco 环境, 避免从 CDN 加载
 self.MonacoEnvironment = {
@@ -226,44 +226,31 @@ export function SqlEditor() {
 
   // ========== 分页 结束 ==========
 
+  const tooltipSectionData = [
+    {
+      trigger: <Play className="mb-2" onClick={execCode} />,
+      content: <p>执行</p>,
+    },
+    {
+      trigger: <NotebookText className="mb-2" onClick={formatCode} />,
+      content: <p>格式化</p>,
+    },
+    // FIXME: 3个 panel 先后折叠 2 个会有问题, 这 2 个里始终会显示一个
+    // {
+    //   trigger: <Grid3x3 className="mb-2" onClick={toggleResultBar} />,
+    //   content: <p>显示结果集</p>,
+    // },
+    // {
+    //   trigger: <ShieldAlert className="mb-2" onClick={toggleStatusBar} />,
+    //   content: <p>显示状态栏</p>,
+    // },
+  ];
+
   function renderEditor() {
     return (
       <div className="flex">
         <div className="pe-2 ">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Play className="mb-2" onClick={execCode} />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>执行</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <NotebookText className="mb-2" onClick={formatCode} />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>格式化</p>
-            </TooltipContent>
-          </Tooltip>
-          {/*           
-          FIXME: 3个 panel 先后折叠 2 个会有问题, 这 2 个里始终会显示一个
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Grid3x3 className="mb-2" onClick={toggleResultBar} />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>显示结果集</p>
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ShieldAlert className="mb-2" onClick={toggleStatusBar} />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>显示状态栏</p>
-            </TooltipContent>
-          </Tooltip> */}
+          <TooltipGroup dataArr={tooltipSectionData} />
         </div>
         <div className="flex-1">
           <Editor
