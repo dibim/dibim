@@ -22,6 +22,7 @@ import {
 import { invoker } from "@/invoker";
 import { appState } from "@/store/valtio";
 import { readConfigFile } from "@/utils/config_file";
+import { About } from "./About";
 import { TooltipGroup } from "./TooltipGroup";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
@@ -37,8 +38,11 @@ export function Main() {
     appState.setSidebarOpen(!appState.sidebarOpen);
     toggleSidebar();
   }
+  const toggleAboutOpen = () => appState.setAboutOpen(!appState.aboutOpen);
 
   // ========== 快捷键 ==========
+
+  useHotkeys("f1", () => toggleAboutOpen(), [appState.aboutOpen]);
   useHotkeys("f2", () => toggleSidebarOpen(), [appState.sidebarOpen]);
   useHotkeys("f3", () => appState.setListBarOpen(!appState.listBarOpen), [appState.listBarOpen]);
 
@@ -231,6 +235,8 @@ export function Main() {
           </PanelGroup>
         </>
       )}
+
+      <About />
     </>
   );
 }

@@ -1,7 +1,9 @@
+// APP 标志相关
+export const APP_NAME = "DIBIM";
+export const APP_VERSION = "v0.1.1";
+
 // 常用字符串
 // Common strings
-export const APP_NAME = "DIBIM";
-
 export const STR_EMPTY = "";
 export const STR_ADD = "add";
 export const STR_EDIT = "edit";
