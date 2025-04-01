@@ -5,7 +5,7 @@ import * as Monaco from "monaco-editor";
 import sqlWorker from "monaco-editor/esm/vs/basic-languages/sql/sql?worker";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
-import { DEFAULT_PAGE_SIZE } from "@/constants";
+import { DEFAULT_PAGE_SIZE, reIsSingletQuery } from "@/constants";
 import { exec, query } from "@/databases/adapter,";
 import { appState } from "@/store/valtio";
 import { DbResult } from "@/types/types";
@@ -70,7 +70,11 @@ export function SqlEditor() {
 
     // 检查是否包含"select"
     if (first10Chars.includes("select")) {
-      await queryPage(currentPage);
+      if (reIsSingletQuery.test(code)) {
+        await queryPage(currentPage);
+      } else {
+        console.log("不是单表查询");
+      }
     } else {
       const res = await exec(code);
 
