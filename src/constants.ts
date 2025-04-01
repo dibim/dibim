@@ -103,6 +103,7 @@ export const DIR_V = "vertical";
 // 正则
 // Regular Expression
 export const reNumStr = /^\d+$/;
+export const reIsSingletQuery = /^\s*SELECT\b(?!.*\b(?:JOIN|UNION|,|SELECT\b.*\bFROM\b)).*\bFROM\b\s+\w+\s*$/i; // 是单表查询
 
 // 分页
 // pagination
