@@ -13,11 +13,11 @@ import {
   getTableDataPg,
   getTableDdlPg,
   getTableStructurePg,
-} from "@/databases/PostgreSQL/utils/sql";
+} from "@/databases/PostgreSQL/sql";
 import { invoker } from "@/invoker";
 import { appState } from "@/store/valtio";
-import { genAlterCmdPg } from "./PostgreSQL/utils/alter";
-import { getDataTypeCategoryPg } from "./PostgreSQL/utils/icon";
+import { genAlterCmdPg } from "./PostgreSQL/alter";
+import { getDataTypeCategoryPg } from "./PostgreSQL/icon";
 import { AllAlterAction, DbConnectionParam, FieldWithValue, GetTableDataParam } from "./types";
 
 // 连接数据库

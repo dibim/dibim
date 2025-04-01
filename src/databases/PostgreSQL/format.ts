@@ -1,6 +1,6 @@
-import { CommonSQLValue } from "../../types";
-import { formatToSqlValueCommon } from "../../utils";
-import { PGValue } from "../types";
+import { CommonSQLValue } from "../types";
+import { formatToSqlValueCommon } from "../utils";
+import { PGValue } from "./types";
 
 /**
  * 判断是否是PostgreSQL函数调用的形式
