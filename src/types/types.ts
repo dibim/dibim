@@ -36,6 +36,7 @@ export type DbResult = {
 };
 
 // 数据库的查询(query)结果
+// Returned (query) results from database
 export type QueryResult = {
   // 列表数组的 json
   // JSON for list arrays
@@ -46,7 +47,7 @@ export type QueryResult = {
 };
 
 // 数据库的执行(exec)结果
-// Execute database (exec) results
+// Execution (exec) results of the database
 export type ExecResult = {
   affectedRows: number;
   lastInsertId: number;
