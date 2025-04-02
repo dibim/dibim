@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { useSnapshot } from "valtio";
 import { subscribeKey } from "valtio/utils";
-import { DEFAULT_PAGE_SIZE } from "@/constants";
+import { DEFAULT_PAGE_SIZE, HEDAER_H } from "@/constants";
 import { exec, genDeleteRowsCmd, genUpdateFieldCmd, getTableData } from "@/databases/adapter,";
 import { FieldWithValue } from "@/databases/types";
 import { getDefultOrderField } from "@/databases/utils";
@@ -222,6 +222,7 @@ export function TableEditorData() {
         onChange={onChange}
         editable={appState.uniqueFieldName !== ""}
         multiSelect={true}
+        height={`calc(100vh - var(--spacing) * ${HEDAER_H * 4})`}
         width={`clac(100vw - ${snap.sideBarWidth + snap.listBarWidth + 40}px)`} // TODO: 临时减40px
       />
 

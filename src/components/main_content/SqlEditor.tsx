@@ -7,7 +7,9 @@ import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import { useSnapshot } from "valtio";
 import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
 import { DEFAULT_PAGE_SIZE, reIsSingletQuery } from "@/constants";
+import { getPageCount } from "@/databases/PostgreSQL/sql";
 import { exec, query } from "@/databases/adapter,";
+import { extractConditionClause } from "@/databases/utils";
 import { appState } from "@/store/valtio";
 import { DbResult } from "@/types/types";
 import { formatSql } from "@/utils/format_sql";
@@ -44,15 +46,24 @@ export function SqlEditor() {
 
   // ========== 执行语句 ==========
   async function queryPage(page: number) {
-    // FIXME: 查询页码1 媒介过, 第二页才有, 估计是rust的问题
-    console.log("查询 页码 :  ", page);
-
-    const dbRes = await query(getEditorCode(), true, page, DEFAULT_PAGE_SIZE);
+    const code = getEditorCode();
+    const dbRes = await query(code, true, page, DEFAULT_PAGE_SIZE);
     if (dbRes) {
       setFieldNames(dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : []);
       const data = dbRes.data ? (JSON.parse(dbRes.data) as Record<string, any>[]) : [];
 
       setTableData(rawRow2EtRow(data));
+
+      const condition = extractConditionClause(code);
+      const ppp = await getPageCount(
+        appState.currentConnName,
+        condition.tableName,
+        DEFAULT_PAGE_SIZE,
+        condition.condition,
+      );
+
+      setPageTotal(ppp.pageTotal);
+      setItemsTotal(ppp.itemsTotal);
     }
   }
 
@@ -70,8 +81,6 @@ export function SqlEditor() {
 
     // 检查是否包含"select"
     if (first10Chars.includes("select")) {
-      console.log("code:: ", code);
-
       if (reIsSingletQuery.test(code)) {
         await queryPage(currentPage);
       } else {
@@ -79,9 +88,6 @@ export function SqlEditor() {
       }
     } else {
       const res = await exec(code);
-
-      // TODO:
-      console.log("res:   ", res);
 
       if (res) {
         const resData = res as unknown as DbResult;
@@ -240,12 +246,10 @@ export function SqlEditor() {
     // TODO: 保存时生成语句
   }
 
-  async function getData() {
+  async function getData(page: number) {
     if (getEditorCode() === "") return;
-    // setCurrentPage(currentPage + 1);
 
-    // FIXME: 这里的分页有问题. 可能是 rust 的问题, 也可能是没有执行 setPageTotal 和 setItemsTotal, 计算出错
-    await queryPage(currentPage + 1);
+    await queryPage(page);
   }
 
   // ========== 分页 结束 ==========
@@ -258,10 +262,6 @@ export function SqlEditor() {
   useEffect(() => {
     resizeLayout();
   }, [showResultBar, showStatusBar]);
-
-  useEffect(() => {
-    setEditorCode(snap.sqlEditorContent);
-  }, [snap.sqlEditorContent]);
 
   useEffect(() => {
     resizeLayout();
@@ -332,15 +332,17 @@ export function SqlEditor() {
         cursor="row-resize"
       >
         <div>{renderEditor()}</div>
-        <div>
-          <PaginationSection
-            currentPage={currentPage}
-            setCurrentPage={(val) => setCurrentPage(val)}
-            pageTotal={pageTotal}
-            itemsTotal={itemsTotal}
-            getData={getData}
-          />
-          <div className="w-full h-full overflow-scroll">
+        <div className="flex flex-col">
+          <div>
+            <PaginationSection
+              currentPage={currentPage}
+              setCurrentPage={(val) => setCurrentPage(val)}
+              pageTotal={pageTotal}
+              itemsTotal={itemsTotal}
+              getData={getData}
+            />
+          </div>
+          <div className="flex-1 w-full h-full overflow-scroll">
             <EditableTable
               fieldNames={fieldNames}
               fieldNamesUnique={[appState.uniqueFieldName]}
@@ -348,6 +350,7 @@ export function SqlEditor() {
               onChange={onChange}
               editable={appState.uniqueFieldName !== ""}
               multiSelect={true}
+              height={`100%`}
               width={`clac(100vw - ${snap.sideBarWidth + snap.listBarWidth})`}
             />
           </div>

@@ -40,6 +40,7 @@ interface EditableTableProps {
   fieldNamesTitle?: string[]; // 字段名的标题
   fieldNamesUnique: string[]; // 是唯一的字段名
   dataArr: ListRow[]; // 每行的数据
+  height: string;
   width: string;
   onChange: (val: TableDataChange[]) => void;
   renderRowContextMenu?: (index: number, node: React.ReactNode) => React.ReactElement;
@@ -54,6 +55,7 @@ export function EditableTable({
   multiSelect,
   fieldNamesUnique,
   dataArr,
+  height,
   width,
   onChange,
   renderRowContextMenu,
@@ -151,10 +153,7 @@ export function EditableTable({
       <div
         data-slot="table-container"
         className="relative table-body-scroll overflow-x-scroll overflow-y-scroll"
-        style={{
-          height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})`,
-          width: width,
-        }}
+        style={{ height, width }}
       >
         <table data-slot="table" className={cn("caption-bottom text-sm", className)} {...props} />
       </div>
