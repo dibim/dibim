@@ -5,7 +5,7 @@ import * as Monaco from "monaco-editor";
 import sqlWorker from "monaco-editor/esm/vs/basic-languages/sql/sql?worker";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import { useSnapshot } from "valtio";
-import Editor, { BeforeMount, OnMount } from "@monaco-editor/react";
+import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
 import { DEFAULT_PAGE_SIZE, reIsSingletQuery } from "@/constants";
 import { exec, query } from "@/databases/adapter,";
 import { appState } from "@/store/valtio";
@@ -139,10 +139,13 @@ export function SqlEditor() {
   // ========== 结果集和状态栏 结束 ==========
 
   // ========== 编辑器 ==========
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
+
+    // 恢复上次编辑的语句
+    editor.setValue(snap.sqlEditorContent);
 
     // 添加快捷键
     // 运行代码
@@ -212,6 +215,12 @@ export function SqlEditor() {
     }
   }
 
+  const handleEditorChange: OnChange = (value: string | undefined, _ev: Monaco.editor.IModelContentChangedEvent) => {
+    if (value !== undefined) {
+      appState.setSqlEditorContent(value);
+    }
+  };
+
   function resizeEditor() {
     if (editorRef.current) {
       editorRef.current.layout();
@@ -251,6 +260,10 @@ export function SqlEditor() {
   }, [showResultBar, showStatusBar]);
 
   useEffect(() => {
+    setEditorCode(snap.sqlEditorContent);
+  }, [snap.sqlEditorContent]);
+
+  useEffect(() => {
     resizeLayout();
     resizeEditor();
   }, []);
@@ -287,6 +300,7 @@ export function SqlEditor() {
             theme="vs-dark"
             beforeMount={beforeMount}
             onMount={handleEditorDidMount}
+            onChange={handleEditorChange}
             options={{
               suggestOnTriggerCharacters: true, // 必须开启
               quickSuggestions: {

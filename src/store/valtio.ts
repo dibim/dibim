@@ -73,6 +73,10 @@ interface AppState {
   mainContenTab: MainContentTab;
   setMainContenTab: (val: MainContentTab) => void;
 
+  // 编辑器里的内容
+  sqlEditorContent: string;
+  setSqlEditorContent: (val: string) => void;
+
   // 是建表
   isAddingTable: boolean;
   setIsAddingTable: (val: boolean) => void;
@@ -143,6 +147,9 @@ export const appState = proxy<AppState>({
   setMainContenType: (val: MainContenType) => (appState.mainContenType = val),
   mainContenTab: "",
   setMainContenTab: (val: MainContentTab) => (appState.mainContenTab = val),
+
+  sqlEditorContent: "",
+  setSqlEditorContent: (val: string) => (appState.sqlEditorContent = val),
 
   isAddingTable: false,
   setIsAddingTable: (val: boolean) => (appState.isAddingTable = val),
