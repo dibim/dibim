@@ -16,7 +16,7 @@ import {
 } from "@/databases/PostgreSQL/sql";
 import { invoker } from "@/invoker";
 import { appState } from "@/store/valtio";
-import { genAlterCmdPg } from "./PostgreSQL/alter";
+import { genAlterCmdPg } from "./PostgreSQL/alterTable";
 import { getDataTypeCategoryPg } from "./PostgreSQL/icon";
 import { AllAlterAction, DbConnectionParam, FieldWithValue, GetTableDataParam } from "./types";
 
