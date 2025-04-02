@@ -1,16 +1,19 @@
-import { useMemo, useRef, useState } from "react";
-import { ImperativePanelHandle, Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import { NotebookText, Play } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Split from "react-split";
+import { Grid3x3, NotebookText, Play, ShieldAlert } from "lucide-react";
 import * as Monaco from "monaco-editor";
 import sqlWorker from "monaco-editor/esm/vs/basic-languages/sql/sql?worker";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
-import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
+import { useSnapshot } from "valtio";
+import Editor, { BeforeMount, OnMount } from "@monaco-editor/react";
 import { DEFAULT_PAGE_SIZE, reIsSingletQuery } from "@/constants";
 import { exec, query } from "@/databases/adapter,";
 import { appState } from "@/store/valtio";
 import { DbResult } from "@/types/types";
 import { formatSql } from "@/utils/format_sql";
-import { EditableTable, TableDataChange } from "../EditableTable";
+import { rawRow2EtRow } from "@/utils/render";
+import { genPanelPercent } from "@/utils/util";
+import { EditableTable, ListRow, TableDataChange } from "../EditableTable";
 import { PaginationSection } from "../PaginationSection";
 import { TooltipGroup } from "../TooltipGroup";
 
@@ -37,22 +40,19 @@ const SQL_KEYWORDS = [
 ];
 
 export function SqlEditor() {
+  const snap = useSnapshot(appState);
+
+  // ========== 执行语句 ==========
   async function queryPage(page: number) {
     // FIXME: 查询页码1 媒介过, 第二页才有, 估计是rust的问题
     console.log("查询 页码 :  ", page);
 
-    const res = await query(code, true, page, DEFAULT_PAGE_SIZE);
+    const dbRes = await query(getEditorCode(), true, page, DEFAULT_PAGE_SIZE);
+    if (dbRes) {
+      setFieldNames(dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : []);
+      const data = dbRes.data ? (JSON.parse(dbRes.data) as Record<string, any>[]) : [];
 
-    console.log("查询 res :  ", res);
-
-    if (res) {
-      const resData = res as unknown as DbResult;
-      if (resData.errorMessage !== "") {
-        setErrorMessage(resData.errorMessage.replace("error returned from database: ", " "));
-      } else {
-        setFieldNames(JSON.parse(resData.columnName) as string[]);
-        setTableData(JSON.parse(resData.data) as { [key: string]: any }[]);
-      }
+      setTableData(rawRow2EtRow(data));
     }
   }
 
@@ -64,12 +64,14 @@ export function SqlEditor() {
 
   // 执行代码
   async function execCode() {
+    const code = getEditorCode();
     // 获取前10个字符（如果字符串不足10个字符则取全部）
-    const first10Chars = getEditorCode().trim().substring(0, 10).toLowerCase();
-    // TODO: 只需支持单表查询
+    const first10Chars = code.trim().substring(0, 10).toLowerCase();
 
     // 检查是否包含"select"
     if (first10Chars.includes("select")) {
+      console.log("code:: ", code);
+
       if (reIsSingletQuery.test(code)) {
         await queryPage(currentPage);
       } else {
@@ -92,48 +94,52 @@ export function SqlEditor() {
     }
   }
 
+  // ========== 执行语句 结束 ==========
+
   // ========== 面板控制  ==========
-  const [showResultBar, setShowResultBar] = useState<boolean>(false);
-  const panelResultRef = useRef<ImperativePanelHandle>(null);
-  function toggleResultBar() {
-    if (panelResultRef.current) {
-      if (showResultBar) {
-        panelResultRef.current.expand();
-      } else {
-        panelResultRef.current.collapse();
-      }
-      setShowResultBar(!showResultBar);
+  const [sizes, setSizes] = useState<number[]>([50, 30, 20]);
+  const [editorHeight, setEditorHeight] = useState<string>("300px");
+  const [showResultBar, setShowResultBar] = useState<boolean>(true);
+  const [showStatusBar, setShowStatusBar] = useState<boolean>(true);
+  const handleResize = (sizes: number[]) => {
+    setEditorHeight(`calc(${sizes[0]}vh - 40px)`); // TODO: 临时减 40px
+  };
+
+  const defaultSizes = [genPanelPercent(50), genPanelPercent(30), genPanelPercent(20)];
+
+  function resizeLayout() {
+    let ehp = 0;
+    let res = structuredClone(defaultSizes);
+
+    if (showResultBar && showStatusBar) {
+      ehp = genPanelPercent(50);
+      res = [ehp, genPanelPercent(30), genPanelPercent(20)];
+    } else if (!showResultBar && !showStatusBar) {
+      ehp = genPanelPercent(100);
+      res = [ehp, 0, 0];
+    } else if (!showResultBar) {
+      ehp = genPanelPercent(70);
+      res = [ehp, 0, genPanelPercent(30)];
+    } else if (!showStatusBar) {
+      ehp = genPanelPercent(70);
+      res = [ehp, genPanelPercent(30), 0];
     }
+
+    setEditorHeight(`calc(${ehp}vh - 40px)`); // TODO: 临时减 40px
+    setSizes(res);
   }
 
-  const [showStatusBar, setShowStatusBar] = useState<boolean>(false);
-  const panelStatusBarRef = useRef<ImperativePanelHandle>(null);
-  function toggleStatusBar() {
-    if (panelStatusBarRef.current) {
-      if (showStatusBar) {
-        panelStatusBarRef.current.expand();
-      } else {
-        panelStatusBarRef.current.collapse();
-      }
-      setShowStatusBar(!showStatusBar);
-    }
-  }
   // ========== 面板控制 结束 ==========
 
   // ========== 结果集和状态栏 ==========
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [fieldNames, setFieldNames] = useState<string[]>([]);
-  const [tableData, setTableData] = useState<any[]>([]);
+  const [tableData, setTableData] = useState<ListRow[]>([]);
 
   // ========== 结果集和状态栏 结束 ==========
 
   // ========== 编辑器 ==========
-  const [code, setCode] = useState<string>("");
   const editorRef = useRef<any>(null);
-
-  const handleEditorChange: OnChange = (value: string | undefined, _ev: Monaco.editor.IModelContentChangedEvent) => {
-    setCode(value || "");
-  };
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
@@ -205,6 +211,12 @@ export function SqlEditor() {
       editorRef.current.setValue(newCode);
     }
   }
+
+  function resizeEditor() {
+    if (editorRef.current) {
+      editorRef.current.layout();
+    }
+  }
   // ========== 编辑器 结束 ==========
 
   // ========== 分页 结束 ==========
@@ -220,6 +232,7 @@ export function SqlEditor() {
   }
 
   async function getData() {
+    if (getEditorCode() === "") return;
     // setCurrentPage(currentPage + 1);
 
     // FIXME: 这里的分页有问题. 可能是 rust 的问题, 也可能是没有执行 setPageTotal 和 setItemsTotal, 计算出错
@@ -227,6 +240,20 @@ export function SqlEditor() {
   }
 
   // ========== 分页 结束 ==========
+
+  // 监听 editorHeight 变化，强制更新编辑器布局
+  useEffect(() => {
+    resizeEditor();
+  }, [editorHeight]);
+
+  useEffect(() => {
+    resizeLayout();
+  }, [showResultBar, showStatusBar]);
+
+  useEffect(() => {
+    resizeLayout();
+    resizeEditor();
+  }, []);
 
   const tooltipSectionData = [
     {
@@ -237,31 +264,29 @@ export function SqlEditor() {
       trigger: <NotebookText className="mb-2" onClick={formatCode} />,
       content: <p>格式化(F8)</p>,
     },
-    // FIXME: 3个 panel 先后折叠 2 个会有问题, 这 2 个里始终会显示一个
-    // {
-    //   trigger: <Grid3x3 className="mb-2" onClick={toggleResultBar} />,
-    //   content: <p>显示结果集</p>,
-    // },
-    // {
-    //   trigger: <ShieldAlert className="mb-2" onClick={toggleStatusBar} />,
-    //   content: <p>显示状态栏</p>,
-    // },
+    {
+      trigger: <Grid3x3 className="mb-2" onClick={() => setShowResultBar(!showResultBar)} />,
+      content: <p>显示结果集</p>,
+    },
+    {
+      trigger: <ShieldAlert className="mb-2" onClick={() => setShowStatusBar(!showStatusBar)} />,
+      content: <p>显示状态栏</p>,
+    },
   ];
 
   function renderEditor() {
     return (
-      <div className="flex">
+      <div className="flex" style={{ height: editorHeight }}>
         <div className="pe-2 ">
           <TooltipGroup dataArr={tooltipSectionData} />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 flex flex-col min-h-0">
           <Editor
-            height="500px"
+            height="100%"
             language="sql"
             theme="vs-dark"
             beforeMount={beforeMount}
             onMount={handleEditorDidMount}
-            onChange={handleEditorChange}
             options={{
               suggestOnTriggerCharacters: true, // 必须开启
               quickSuggestions: {
@@ -274,6 +299,7 @@ export function SqlEditor() {
               formatOnType: true,
               wordBasedSuggestions: "off", // 禁用默认单词补全（关键！）
               acceptSuggestionOnEnter: "on", // 回车直接选中
+              automaticLayout: true,
             }}
           />
         </div>
@@ -282,40 +308,40 @@ export function SqlEditor() {
   }
 
   return (
-    <div className="h-full">
-      <PanelGroup direction="vertical">
-        <Panel defaultSize={60} minSize={20}>
-          <div className="w-full">{renderEditor()}</div>
-        </Panel>
-        <PanelResizeHandle className="h-1 bg-secondary hover:bg-blue-500" />
-        <Panel defaultSize={30} collapsible collapsedSize={0} ref={panelResultRef}>
-          <div className="flex flex-col">
-            <PaginationSection
-              currentPage={currentPage}
-              setCurrentPage={(val) => setCurrentPage(val)}
-              pageTotal={pageTotal}
-              itemsTotal={itemsTotal}
-              getData={getData}
+    <div className="h-full nested-vertical-container">
+      <Split
+        sizes={sizes}
+        minSize={0}
+        onDragEnd={handleResize}
+        className="flex overflow-hidden split-container split-vertical"
+        direction="vertical"
+        cursor="row-resize"
+      >
+        <div>{renderEditor()}</div>
+        <div>
+          <PaginationSection
+            currentPage={currentPage}
+            setCurrentPage={(val) => setCurrentPage(val)}
+            pageTotal={pageTotal}
+            itemsTotal={itemsTotal}
+            getData={getData}
+          />
+          <div className="w-full h-full overflow-scroll">
+            <EditableTable
+              fieldNames={fieldNames}
+              fieldNamesUnique={[appState.uniqueFieldName]}
+              dataArr={tableData}
+              onChange={onChange}
+              editable={appState.uniqueFieldName !== ""}
+              multiSelect={true}
+              width={`clac(100vw - ${snap.sideBarWidth + snap.listBarWidth})`}
             />
-            <div className="flex-1 w-full h-full overflow-scroll">
-              <EditableTable
-                fieldNames={fieldNames}
-                fieldNamesUnique={[appState.uniqueFieldName]}
-                dataArr={tableData}
-                onChange={onChange}
-                editable={appState.uniqueFieldName !== ""}
-                multiSelect={true}
-              />
-            </div>
           </div>
-        </Panel>
-        <PanelResizeHandle className="h-1 bg-secondary hover:bg-blue-500" />
-        <Panel defaultSize={10} collapsible collapsedSize={0} ref={panelStatusBarRef}>
-          <div className="w-full">
-            <div>{errorMessage}</div>
-          </div>
-        </Panel>
-      </PanelGroup>
+        </div>
+        <div>
+          <div>{errorMessage}</div>
+        </div>
+      </Split>
     </div>
   );
 }
