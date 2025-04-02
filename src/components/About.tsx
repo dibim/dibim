@@ -1,4 +1,5 @@
 import { useSnapshot } from "valtio";
+import Logo from "@/assets/logo.svg?react";
 import { APP_NAME, APP_VERSION } from "@/constants";
 import { appState } from "@/store/valtio";
 import {
@@ -23,8 +24,13 @@ export function About() {
         </AlertDialogHeader>
 
         <div className="p-2">
-          <div className="text-6xl">{APP_NAME}</div>
-          <div className="text-2xl text-accent-foreground">{APP_VERSION}</div>
+          <div className="flex">
+            <Logo className="size-28" />
+            <div>
+              <div className="text-6xl">{APP_NAME}</div>
+              <div className="text-2xl text-accent-foreground">{APP_VERSION}</div>
+            </div>
+          </div>
           <div className="pt-4">
             本项目的官方仓库如下:
             <ul>
