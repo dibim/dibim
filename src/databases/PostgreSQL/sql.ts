@@ -8,8 +8,8 @@ import {
   IndexQueryResult,
   TableStructure,
 } from "../types";
-import "./types";
 import { formatToSqlValuePg } from "./format";
+import "./types";
 
 /**
  * 连接到 postgre_sql
@@ -66,7 +66,6 @@ export async function getAllTableSizePg(connName: string) {
     `;
 
   const dbRes = await invoker.querySql(connName, sql);
-
   return {
     columnName: dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : [],
     data: dbRes.data ? (JSON.parse(dbRes.data) as getAllTableSizeRes[]) : [],
@@ -314,7 +313,6 @@ export async function getTableDdlPg(connName: string, tbName: string) {
 // 获取表格数据
 export async function getTableDataPg(connName: string, p: GetTableDataParam) {
   const dbResTotal = await invoker.querySql(connName, `SELECT COUNT(*) AS total FROM "${p.tableName}";`);
-  console.log("getTableDataPg dbResTotal>>>>   ", dbResTotal);
 
   let itemsTotal = 0; // 总条数
   if (dbResTotal && dbResTotal.data) {
@@ -351,7 +349,6 @@ export async function getTableDataPg(connName: string, p: GetTableDataParam) {
     data: dbRes.data ? (JSON.parse(dbRes.data) as object[]) : [],
   };
 }
-
 
 // 执行事务语句
 export async function execTransactionPg(connName: string, sqls: string[]) {

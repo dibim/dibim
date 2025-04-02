@@ -1,3 +1,6 @@
+import { GUTTER_SIZE } from "@/constants";
+import { getPageWidth } from "./ media_query";
+
 type ObjectType = "Object" | "Array" | "Date" | "RegExp" | "Promise" | "Proxy" | "Null" | "Undefined" | string; // 其他自定义类
 
 /**
@@ -83,4 +86,10 @@ export function getProxyTarget<T>(proxy: T): T {
   }
 
   return result as T;
+}
+
+// 极端布局百分比, 自动口建 gutter 的尺寸
+export function genPanelPercent(percent: number) {
+  const pageW = getPageWidth();
+  return (pageW * percent - GUTTER_SIZE) / pageW;
 }

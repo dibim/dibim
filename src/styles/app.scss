@@ -26,3 +26,50 @@ table {
     }
   }
 }
+
+// resizer
+.split-container {
+  .gutter {
+    width: 5px !important;
+    background-color: rgba(128, 128, 128, 0.28);
+    transition: background-color 0.3s ease;
+  }
+  .gutter:hover {
+    background-color: rgba(128, 128, 128, 0.87);
+  }
+  .gutter.gutter-horizontal {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNCAxMEgyYTIgMiAwIDAxLTRtOC0yaDRhMiAyIDAgMDEtNHptOCAyaDRhMiAyIDAgMDEtNEE2IDYgMCAwIDEgMTAgaDJBNiA2IDAgMDEgMTggOGgzQTcgNyAwIDAwIDI0IDEyQzI0IDE4IDE4IDI0IDEyIDI0SDdBNiA2IDAgMDEgMyAxOEg2QTYgNiAwIDAwIDkgMTJ6TTUgMTBoMTRhMSAxIDAgMDEtMmgtMTRBMiAyIDAgMDEgNSAxMHoiIGZpbGw9IiMwMDAiLz48L3N2Zz4=");
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: col-resize;
+  }
+  .gutter.gutter-vertical {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNCAxMGgyYTIgMiAwIDAxLTRtOC0yaDRhMiAyIDAgMDEtNHptOCAyaDRhMiAyIDAgMDEtNEE2IDYgMCAwIDEgMTAgaDJBNiA2IDAgMDEgMTggOGgzQTcgNyAwIDAwIDI0IDEyQzI0IDE4IDE4IDI0IDEyIDI0SDdBNiA2IDAgMDEgMyAxOEg2QTYgNiAwIDAwIDkgMTJ6TTUgMTBoMTRhMSAxIDAgMDEtMmgtMTRBMiAyIDAgMDEgNSAxMHoiIGZpbGw9IiMwMDAiLz48L3N2Zz4=");
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: row-resize;
+  }
+
+  &.split-horizontal {
+    height: 100vh;
+  }
+
+  &.split-vertical {
+    flex: 1;
+    min-height: 0; /* 防止 flex 容器溢出 */
+  }
+}
+
+// 修复嵌套垂直布局无效的问题
+.nested-vertical-container {
+  .split-vertical {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+  }
+  .gutter-vertical {
+    height: 5px !important;
+    width: 100% !important;
+  }
+}

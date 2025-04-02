@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { AlertCircle } from "lucide-react";
-import { TooltipProvider } from "@radix-ui/react-tooltip";
-import { Sidebar } from "@/components/Sidebar";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import "@/styles/app.scss";
 import "@/styles/index.css";
 import "@/styles/theme.scss";
@@ -12,7 +9,9 @@ import { Alert, AlertDescription, AlertTitle } from "./components/ui/alert";
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./components/ui/card";
 import { Input } from "./components/ui/input";
+import { SidebarProvider } from "./components/ui/sidebar";
 import { Toaster } from "./components/ui/sonner";
+import { TooltipProvider } from "./components/ui/tooltip";
 import { APP_NAME, CONFIG_FILE_MAIN, MAIN_PASSWORD_DEFAULT } from "./constants";
 import { invoker } from "./invoker";
 import { appState } from "./store/valtio";
@@ -103,21 +102,16 @@ export function App() {
           </div>
         </div>
       ) : (
-        <div className="w-[100vw]">
-          <SidebarProvider
-            style={{
-              "--sidebar-width": "8rem",
-              "--sidebar-width-mobile": "20rem",
-            }}
-          >
-            <TooltipProvider>
-              <Sidebar />
-              <SidebarInset>
-                <Main />
-              </SidebarInset>
-            </TooltipProvider>
-          </SidebarProvider>
-        </div>
+        <SidebarProvider
+          style={{
+            "--sidebar-width": "8rem",
+            "--sidebar-width-mobile": "20rem",
+          }}
+        >
+          <TooltipProvider>
+            <Main id="main" className={""} />
+          </TooltipProvider>
+        </SidebarProvider>
       )}
 
       <Toaster />
