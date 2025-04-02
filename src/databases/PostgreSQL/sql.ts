@@ -55,8 +55,10 @@ export async function getAllTableSizePg(connName: string) {
         tablename AS table_name,
         pg_size_pretty(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS total_size,
         pg_size_pretty(pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS table_size,
-        pg_size_pretty(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)) - 
-                      pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS index_size
+        pg_size_pretty(
+            pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)) - 
+            pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))
+        ) AS index_size
     FROM
         pg_tables
     WHERE
@@ -86,41 +88,39 @@ export async function getTableStructurePg(connName: string, tbName: string) {
             ELSE NULL
         END AS size,
         EXISTS(
-            SELECT 1 FROM pg_constraint 
+            SELECT 1 
+            FROM pg_constraint 
             WHERE conrelid = a.attrelid 
-            AND a.attnum = ANY(conkey) 
-            AND contype = 'p'
+              AND a.attnum = ANY(conkey) 
+              AND contype = 'p'
         ) AS is_primary_key,
         EXISTS(
-            SELECT 1 FROM pg_constraint 
+            SELECT 1 
+            FROM pg_constraint 
             WHERE conrelid = a.attrelid 
-            AND a.attnum = ANY(conkey) 
-            AND contype = 'u'
+              AND a.attnum = ANY(conkey) 
+              AND contype = 'u'
         ) AS is_unique_key,
         EXISTS(
-            SELECT 1 FROM pg_constraint 
+            SELECT 1 
+            FROM pg_constraint 
             WHERE conrelid = a.attrelid 
-            AND a.attnum = ANY(conkey) 
-            AND contype = 'f'
+              AND a.attnum = ANY(conkey) 
+              AND contype = 'f'
         ) AS is_foreign_key,
         pg_get_expr(ad.adbin, ad.adrelid) AS column_default,
         a.attnotnull AS is_not_null,
         d.description AS comment
     FROM
         pg_attribute a
-    JOIN
-        pg_type t ON a.atttypid = t.oid
-    LEFT JOIN
-        pg_attrdef ad ON (a.attrelid = ad.adrelid AND a.attnum = ad.adnum)
-    LEFT JOIN
-        pg_description d ON (a.attrelid = d.objoid AND a.attnum = d.objsubid)
-    JOIN
-        pg_class c ON a.attrelid = c.oid
-    JOIN
-        pg_namespace n ON c.relnamespace = n.oid
+        JOIN pg_type t ON a.atttypid = t.oid
+        LEFT JOIN pg_attrdef ad ON (a.attrelid = ad.adrelid AND a.attnum = ad.adnum)
+        LEFT JOIN pg_description d ON (a.attrelid = d.objoid AND a.attnum = d.objsubid)
+        JOIN pg_class c ON a.attrelid = c.oid
+        JOIN pg_namespace n ON c.relnamespace = n.oid
     WHERE
         c.relname = '${tbName}'
-        AND n.nspname = 'public' -- TODO: 假设表在 public模式
+        AND n.nspname = 'public' -- TODO: 假设表在 public 模式
         AND a.attnum > 0
         AND NOT a.attisdropped
     ORDER BY
@@ -137,16 +137,11 @@ export async function getTableStructurePg(connName: string, tbName: string) {
         idx.indisprimary AS is_primary
     FROM
         pg_index idx
-    JOIN
-        pg_class i ON i.oid = idx.indexrelid
-    JOIN
-        pg_class t ON t.oid = idx.indrelid
-    JOIN
-        pg_namespace n ON n.oid = t.relnamespace
-    JOIN
-        pg_am am ON i.relam = am.oid
-    JOIN
-        pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY(idx.indkey)
+        JOIN pg_class i ON i.oid = idx.indexrelid
+        JOIN pg_class t ON t.oid = idx.indrelid
+        JOIN pg_namespace n ON n.oid = t.relnamespace
+        JOIN pg_am am ON i.relam = am.oid
+        JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY(idx.indkey)
     WHERE
         t.relname = '${tbName}'
         AND n.nspname = 'public'
@@ -203,12 +198,9 @@ export async function getTableDdlPg(connName: string, tbName: string) {
             c.relname AS table_name
         FROM 
             pg_class c
-        JOIN 
-            pg_namespace n ON n.oid = c.relnamespace
+            JOIN pg_namespace n ON n.oid = c.relnamespace
         WHERE 
-            c.relname = '${tbName}' AND 
-            n.nspname = 'public' AND
-            c.relkind = 'r'
+            c.relname = '${tbName}' AND n.nspname = 'public' AND c.relkind = 'r'
     ),
     column_defs AS (
         SELECT 
@@ -231,16 +223,14 @@ export async function getTableDdlPg(connName: string, tbName: string) {
             ) AS columns
         FROM 
             table_info ti
-        JOIN 
-            pg_catalog.pg_attribute a ON a.attrelid = ti.oid
-        LEFT JOIN 
-            pg_catalog.pg_attrdef ad ON (a.attrelid = ad.adrelid AND a.attnum = ad.adnum)
+            JOIN pg_catalog.pg_attribute a ON a.attrelid = ti.oid
+            LEFT JOIN pg_catalog.pg_attrdef ad ON (a.attrelid = ad.adrelid AND a.attnum = ad.adnum)
         WHERE 
-            a.attnum > 0 AND 
-            NOT a.attisdropped
+            a.attnum > 0 AND NOT a.attisdropped
         GROUP BY 
             ti.oid
     ),
+
     constraint_defs AS (
         SELECT 
             ti.oid,
@@ -251,27 +241,27 @@ export async function getTableDdlPg(connName: string, tbName: string) {
                     WHEN con.contype = 'p' THEN
                         'PRIMARY KEY (' || 
                         (SELECT string_agg('"' || a.attname || '"', ', ')
-                         FROM pg_attribute a
-                         WHERE a.attrelid = con.conrelid
-                         AND a.attnum = ANY(con.conkey)) || 
+                        FROM pg_attribute a
+                        WHERE a.attrelid = con.conrelid
+                        AND a.attnum = ANY(con.conkey)) || 
                         ')'
                     -- 外键约束
                     WHEN con.contype = 'f' THEN
                         'FOREIGN KEY (' || 
                         (SELECT string_agg('"' || a.attname || '"', ', ')
-                         FROM pg_attribute a
-                         WHERE a.attrelid = con.conrelid
-                         AND a.attnum = ANY(con.conkey)) || 
+                        FROM pg_attribute a
+                        WHERE a.attrelid = con.conrelid
+                        AND a.attnum = ANY(con.conkey)) || 
                         ') REFERENCES ' ||
                         (SELECT n.nspname || '."' || c.relname || '"'
-                         FROM pg_class c
-                         JOIN pg_namespace n ON n.oid = c.relnamespace
-                         WHERE c.oid = con.confrelid) || 
+                        FROM pg_class c
+                        JOIN pg_namespace n ON n.oid = c.relnamespace
+                        WHERE c.oid = con.confrelid) || 
                         ' (' ||
                         (SELECT string_agg('"' || a.attname || '"', ', ')
-                         FROM pg_attribute a
-                         WHERE a.attrelid = con.confrelid
-                         AND a.attnum = ANY(con.confkey)) ||
+                        FROM pg_attribute a
+                        WHERE a.attrelid = con.confrelid
+                        AND a.attnum = ANY(con.confkey)) ||
                         ')'
                     -- 其他约束原样输出
                     ELSE pg_catalog.pg_get_constraintdef(con.oid)
@@ -280,13 +270,13 @@ export async function getTableDdlPg(connName: string, tbName: string) {
             ) AS constraints
         FROM 
             table_info ti
-        JOIN 
-            pg_catalog.pg_constraint con ON con.conrelid = ti.oid
+        JOIN pg_catalog.pg_constraint con ON con.conrelid = ti.oid
         WHERE 
             con.contype IN ('p','u','f','c')
         GROUP BY 
             ti.oid
     )
+
     SELECT 
         'CREATE TABLE "' || ti.schema_name || '"."' || ti.table_name || '" (\n' ||
         cd.columns ||
@@ -294,10 +284,9 @@ export async function getTableDdlPg(connName: string, tbName: string) {
         E'\n);'
     FROM 
         table_info ti
-    JOIN 
-        column_defs cd ON cd.oid = ti.oid
-    LEFT JOIN 
-        constraint_defs cts ON cts.oid = ti.oid;`;
+    JOIN column_defs cd ON cd.oid = ti.oid
+    LEFT JOIN constraint_defs cts ON cts.oid = ti.oid;
+    `;
 
   const dbRes = await invoker.querySql(connName, sql);
 
@@ -313,7 +302,6 @@ export async function getTableDdlPg(connName: string, tbName: string) {
 // 获取表格数据
 export async function getTableDataPg(connName: string, p: GetTableDataParam) {
   const dbResTotal = await invoker.querySql(connName, `SELECT COUNT(*) AS total FROM "${p.tableName}";`);
-
   let itemsTotal = 0; // 总条数
   if (dbResTotal && dbResTotal.data) {
     const bbCountRes = JSON.parse(dbResTotal.data) as DbCountRes[];
