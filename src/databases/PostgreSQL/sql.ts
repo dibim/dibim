@@ -299,9 +299,19 @@ export async function getTableDdlPg(connName: string, tbName: string) {
   };
 }
 
-// 获取表格数据
-export async function getTableDataPg(connName: string, p: GetTableDataParam) {
-  const dbResTotal = await invoker.querySql(connName, `SELECT COUNT(*) AS total FROM "${p.tableName}";`);
+/**
+ * 获取分页的统计
+ * @param connName
+ * @param tableName
+ * @param pageSize
+ * @param condition 条件与据, 包括 where 及之后的所有部分
+ * @returns
+ */
+export async function getPageCount(connName: string, tableName: string, pageSize: number, condition: string) {
+  const dbResTotal = await invoker.querySql(
+    connName,
+    `SELECT COUNT(*) AS total FROM "${tableName}" ${condition ? condition : ""};`,
+  );
   let itemsTotal = 0; // 总条数
   if (dbResTotal && dbResTotal.data) {
     const bbCountRes = JSON.parse(dbResTotal.data) as DbCountRes[];
@@ -309,7 +319,17 @@ export async function getTableDataPg(connName: string, p: GetTableDataParam) {
     if (bbCountRes.length > 0) itemsTotal = bbCountRes[0].total;
   }
 
-  const pageTotal = Math.ceil(itemsTotal / p.pageSize); // 页数
+  const pageTotal = Math.ceil(itemsTotal / pageSize); // 页数
+
+  return {
+    itemsTotal,
+    pageTotal,
+  };
+}
+
+// 获取表格数据
+export async function getTableDataPg(connName: string, p: GetTableDataParam) {
+  const { itemsTotal, pageTotal } = await getPageCount(connName, p.tableName, p.pageSize, "");
 
   // 如果没有主键, 且没有指定排序字段
   // TODO: 实现逻辑

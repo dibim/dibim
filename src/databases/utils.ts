@@ -1,3 +1,4 @@
+import { reIsSingletQuery, reWhereClause } from "@/constants";
 import { CommonSQLValue, TableStructure } from "./types";
 
 /**
@@ -133,4 +134,23 @@ export function getDefultOrderField(tsa: TableStructure[]) {
   }
 
   return "";
+}
+
+// 匹配 色了传统语句里 where 及之后的部分
+export function extractConditionClause(sql: string) {
+  const res = {
+    tableName: "",
+    condition: "",
+  };
+
+  if (reIsSingletQuery.test(sql)) {
+    const match = sql.match(reWhereClause);
+
+    if (match) {
+      res.tableName = match[1];
+      res.condition = match[2] ? match[2] : "";
+    }
+  }
+
+  return res;
 }

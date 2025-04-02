@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { reIsSingletQuery } from "@/constants";
+import { reIsSingletQuery, reWhereClause } from "@/constants";
 
 // Test suite for validating single-table query detection
 
@@ -61,4 +61,40 @@ test(`should accept simple SELECT with semicolon: ${sql9}`, () => {
 const sql10 = `select "id" from a_api;`;
 test(`should accept SELECT with quoted identifier: ${sql10}`, () => {
   expect(reIsSingletQuery.test(sql10)).toBe(true);
+});
+
+// SELECT with quoted identifier - should accept
+const sql100 = "SELECT * FROM `users` WHERE age > 30;";
+test(`should accept SELECT with quoted identifier: ${sql100}`, () => {
+  expect(sql100.match(reWhereClause)?.[2] || "").toBe("WHERE age > 30;");
+});
+
+// SELECT with quoted identifier - should accept
+const sql101 = 'SELECT * FROM "users" WHERE age > 30;';
+test(`should accept SELECT with quoted identifier: ${sql101}`, () => {
+  expect(sql101.match(reWhereClause)?.[2] || "").toBe("WHERE age > 30;");
+});
+
+// SELECT with quoted identifier - should accept
+const sql102 = "SELECT * FROM 'users' WHERE age > 30;";
+test(`should accept SELECT with quoted identifier: ${sql102}`, () => {
+  expect(sql102.match(reWhereClause)?.[2] || "").toBe("WHERE age > 30;");
+});
+
+// SELECT with quoted identifier - should accept
+const sql103 = "SELECT * FROM users WHERE age > 30;";
+test(`should accept SELECT with quoted identifier: ${sql103}`, () => {
+  expect(sql103.match(reWhereClause)?.[2] || "").toBe("WHERE age > 30;");
+});
+
+// SELECT with quoted identifier - should accept
+const sql104 = "SELECT * FROM users;";
+test(`should accept SELECT with quoted identifier: ${sql104}`, () => {
+  expect(sql104.match(reWhereClause)?.[1] || "").toBe("users");
+});
+
+// SELECT with quoted identifier - should accept
+const sql105 = " SELECT  *  FROM users ;";
+test(`should accept SELECT with quoted identifier: ${sql105}`, () => {
+  expect(sql105.match(reWhereClause)?.[1] || "").toBe("users");
 });
