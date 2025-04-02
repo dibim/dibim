@@ -50,3 +50,15 @@ const sql8 = "INSERT INTO users SELECT * FROM backup";
 test(`should reject non-SELECT statements: ${sql8}`, () => {
   expect(reIsSingletQuery.test(sql8)).toBe(false);
 });
+
+// Simple SELECT with semicolon - should accept
+const sql9 = "select * from a_api;";
+test(`should accept simple SELECT with semicolon: ${sql9}`, () => {
+  expect(reIsSingletQuery.test(sql9)).toBe(true);
+});
+
+// SELECT with quoted identifier - should accept
+const sql10 = `select "id" from a_api;`;
+test(`should accept SELECT with quoted identifier: ${sql10}`, () => {
+  expect(reIsSingletQuery.test(sql10)).toBe(true);
+});

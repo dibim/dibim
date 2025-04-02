@@ -28,6 +28,8 @@ export const LIST_BAR_DEFAULT_WIDTH = 280;
 // 最小宽度
 // Minimum width
 export const LIST_BAR_MIN_WIDTH = 150;
+// 多列布局的 resizer 的宽度
+export const GUTTER_SIZE = 5; // 和 css 里的一致
 
 // 配置文件相关
 // Configuration file related
@@ -105,7 +107,8 @@ export const DIR_V = "vertical";
 // 正则
 // Regular Expression
 export const reNumStr = /^\d+$/;
-export const reIsSingletQuery = /^\s*SELECT\b(?!.*\b(?:JOIN|UNION|,|SELECT\b.*\bFROM\b)).*\bFROM\b\s+\w+\s*$/i; // 是单表查询
+export const reIsSingletQuery =
+  /^select\b(?!(.*\bselect\b))(?!.*\b(join|inner\s+join|outer\s+join|left\s+join|right\s+join|cross\s+join|natural\s+join)\b)(?!.*\bfrom\b[^,]*(,[^,]+)+).*$/i; // 是单表查询
 
 // 分页
 // pagination

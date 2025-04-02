@@ -52,17 +52,20 @@ interface AppState {
   // 侧边栏
   sidebarOpen: boolean;
   setSidebarOpen: (val: boolean) => void;
+  // 侧边栏的宽度
+  sideBarWidth: number;
+  setSideBarWidth: (val: number) => void;
 
   // 列表栏是否显示
   listBarOpen: boolean;
   setListBarOpen: (val: boolean) => void;
+  // 列表栏的宽度
+  listBarWidth: number;
+  setListBarWidth: (val: number) => void;
   // 列表栏的类型
   listBarType: ListBarType;
   setListBarType: (val: ListBarType) => void;
 
-  // 主要区域的宽度
-  mainContentWidth: number;
-  setMainContentWidth: (val: number) => void;
   // 主要区域的类型
   mainContenType: MainContenType;
   setMainContenType: (val: MainContenType) => void;
@@ -126,14 +129,16 @@ export const appState = proxy<AppState>({
 
   sidebarOpen: true,
   setSidebarOpen: (val: boolean) => (appState.sidebarOpen = val),
+  sideBarWidth: 0,
+  setSideBarWidth: (val: number) => (appState.sideBarWidth = val),
 
   listBarOpen: true,
   setListBarOpen: (val: boolean) => (appState.listBarOpen = val),
+  listBarWidth: 0,
+  setListBarWidth: (val: number) => (appState.listBarWidth = val),
   listBarType: LIST_BAR_TYPE_DB_LIST,
   setListBarType: (val: ListBarType) => (appState.listBarType = val),
 
-  mainContentWidth: 0,
-  setMainContentWidth: (val: number) => (appState.mainContentWidth = val),
   mainContenType: MAIN_CONTEN_TYPE_WELCOME,
   setMainContenType: (val: MainContenType) => (appState.mainContenType = val),
   mainContenTab: "",

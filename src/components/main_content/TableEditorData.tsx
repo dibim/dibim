@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
+import { useSnapshot } from "valtio";
 import { subscribeKey } from "valtio/utils";
-import { DEFAULT_PAGE_SIZE, HEDAER_H } from "@/constants";
+import { DEFAULT_PAGE_SIZE } from "@/constants";
 import { exec, genDeleteRowsCmd, genUpdateFieldCmd, getTableData } from "@/databases/adapter,";
 import { FieldWithValue } from "@/databases/types";
 import { getDefultOrderField } from "@/databases/utils";
 import { cn } from "@/lib/utils";
 import { appState } from "@/store/valtio";
+import { rawRow2EtRow } from "@/utils/render";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EditableTable, EditableTableMethods, ListRow, TableDataChange } from "../EditableTable";
 import { PaginationSection } from "../PaginationSection";
@@ -15,6 +17,7 @@ import { TextWarning } from "../TextWarning";
 import { TooltipGroup } from "../TooltipGroup";
 
 export function TableEditorData() {
+  const snap = useSnapshot(appState);
   const tableRef = useRef<EditableTableMethods | null>(null);
 
   const [tableData, setTableData] = useState<Record<string, any>[]>([]); // 表格数据
@@ -137,22 +140,8 @@ export function TableEditorData() {
   }
 
   const [dataArr, setDataArr] = useState<ListRow[]>([]);
-  function updateDataArr(data: object[]) {
-    const dataArrTemp: ListRow[] = [];
-    data.map((row) => {
-      const wrappedRow: ListRow = {};
-      for (const key in row) {
-        if (row.hasOwnProperty(key)) {
-          wrappedRow[key] = {
-            render: (val: any) => <div>{val}</div>,
-            value: (row as any)[key],
-          };
-        }
-      }
-
-      dataArrTemp.push(wrappedRow);
-    });
-    setDataArr(dataArrTemp);
+  function updateDataArr(data: Record<string, any>[]) {
+    setDataArr(rawRow2EtRow(data));
   }
 
   // 确定执行语句
@@ -233,6 +222,7 @@ export function TableEditorData() {
         onChange={onChange}
         editable={appState.uniqueFieldName !== ""}
         multiSelect={true}
+        width={`clac(100vw - ${snap.sideBarWidth + snap.listBarWidth + 40}px)`} // TODO: 临时减40px
       />
 
       {/* 确认要执行的变更语句 */}

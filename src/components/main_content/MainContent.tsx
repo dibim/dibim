@@ -1,5 +1,6 @@
 import { useSnapshot } from "valtio";
 import {
+  HEDAER_H,
   MAIN_CONTEN_TYPE_ADD_CONNECTION,
   MAIN_CONTEN_TYPE_EDIT_CONNECTION,
   MAIN_CONTEN_TYPE_SETTINGS,
@@ -18,7 +19,7 @@ export function MainContent() {
   const snap = useSnapshot(appState);
 
   return (
-    <div className="h-full">
+    <div style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}>
       {snap.mainContenType === MAIN_CONTEN_TYPE_ADD_CONNECTION && <Connection action={"add"} />}
       {snap.mainContenType === MAIN_CONTEN_TYPE_EDIT_CONNECTION && <Connection action={"edit"} />}
       {snap.mainContenType === MAIN_CONTEN_TYPE_TABLE_EDITOR && <TableEditor />}
