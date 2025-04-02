@@ -46,6 +46,11 @@ export function SqlEditor() {
 
   // ========== 执行语句 ==========
   async function queryPage(page: number) {
+    if (appState.currentConnName === "") {
+      setErrorMessage("请先连接数据库");
+      return;
+    }
+
     const code = getEditorCode();
     const dbRes = await query(code, true, page, DEFAULT_PAGE_SIZE);
     if (dbRes) {
@@ -64,6 +69,10 @@ export function SqlEditor() {
 
       setPageTotal(ppp.pageTotal);
       setItemsTotal(ppp.itemsTotal);
+
+      if (dbRes.errorMessage !== "") {
+        setErrorMessage(dbRes.errorMessage.replace("error returned from database: ", " "));
+      }
     }
   }
 
@@ -76,10 +85,9 @@ export function SqlEditor() {
   // 执行代码
   async function execCode() {
     const code = getEditorCode();
-    // 获取前10个字符（如果字符串不足10个字符则取全部）
-    const first10Chars = code.trim().substring(0, 10).toLowerCase();
 
-    // 检查是否包含"select"
+    // 检查前10个字符是否包含"select"
+    const first10Chars = code.trim().substring(0, 10).toLowerCase();
     if (first10Chars.includes("select")) {
       if (reIsSingletQuery.test(code)) {
         await queryPage(currentPage);
