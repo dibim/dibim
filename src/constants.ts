@@ -107,8 +107,11 @@ export const DIR_V = "vertical";
 // 正则
 // Regular Expression
 export const reNumStr = /^\d+$/;
+// 是单表查询
 export const reIsSingletQuery =
-  /^select\b(?!(.*\bselect\b))(?!.*\b(join|inner\s+join|outer\s+join|left\s+join|right\s+join|cross\s+join|natural\s+join)\b)(?!.*\bfrom\b[^,]*(,[^,]+)+).*$/i; // 是单表查询
+  /^select\b(?!(.*\bselect\b))(?!.*\b(join|inner\s+join|outer\s+join|left\s+join|right\s+join|cross\s+join|natural\s+join)\b)(?!.*\bfrom\b[^,]*(,[^,]+)+).*$/i;
+// 正则表达式用于匹配 WHERE 之后的部分
+export const reWhereClause = /from\s+("[^"]+"|`[^`]+`|'[^']+'|\w+)(?:\s+(.*))?/i;
 
 // 分页
 // pagination
