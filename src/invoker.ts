@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { DbResult, ExecResult, QueryResult } from "./types/types";
+import { DbResult, ExecResult } from "./types/types";
 
 // AES-GCM 加密解密的结果
 // The result of AES-GCM encryption and decryption
@@ -54,7 +54,7 @@ export const invoker = {
     streaming ??= false;
     page ??= 1;
     pageSize ??= 100;
-    return invoke<QueryResult>("sqlx_query", { connName, sql, streaming, page, pageSize });
+    return invoke<DbResult>("sqlx_query", { connName, sql, streaming, page, pageSize });
   },
   /**
    * 执行非查询语句 | Execute non query statements
