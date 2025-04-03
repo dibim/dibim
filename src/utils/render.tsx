@@ -1,6 +1,7 @@
 import { ListRow } from "@/components/EditableTable";
+import { RowData } from "@/types/types";
 
-export function rawRow2EtRow(data: Record<string, any>[]) {
+export function rawRow2EtRow(data: RowData[]) {
   const dataArrTemp: ListRow[] = [];
   data.map((row) => {
     const wrappedRow: ListRow = {};

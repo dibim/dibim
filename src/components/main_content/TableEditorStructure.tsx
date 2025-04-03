@@ -430,6 +430,8 @@ export function TableEditorStructure({
             // TODO: 快捷修改字段名等
           }}
           renderRowContextMenu={renderRowContextMenu}
+          height={""}
+          width={""}
         />
       </div>
 

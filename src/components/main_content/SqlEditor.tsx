@@ -11,12 +11,12 @@ import { getPageCount } from "@/databases/PostgreSQL/sql";
 import { exec, query } from "@/databases/adapter,";
 import { extractConditionClause } from "@/databases/utils";
 import { appState } from "@/store/valtio";
-import { DbResult } from "@/types/types";
+import { DbResult, RowData } from "@/types/types";
 import { formatSql } from "@/utils/format_sql";
 import { rawRow2EtRow } from "@/utils/render";
 import { genPanelPercent } from "@/utils/util";
-import { EditableTable, ListRow, TableDataChange } from "../EditableTable";
-import { PaginationSection } from "../PaginationSection";
+import { TableDataChange } from "../EditableTable";
+import { TableSection, TableSectionMethods } from "../TableSection";
 import { TooltipGroup } from "../TooltipGroup";
 
 // 初始化 Monaco 环境, 避免从 CDN 加载
@@ -43,6 +43,8 @@ const SQL_KEYWORDS = [
 
 export function SqlEditor() {
   const snap = useSnapshot(appState);
+  const tableRef = useRef<TableSectionMethods | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   // ========== 执行语句 ==========
   async function queryPage(page: number) {
@@ -54,10 +56,7 @@ export function SqlEditor() {
     const code = getEditorCode();
     const dbRes = await query(code, true, page, DEFAULT_PAGE_SIZE);
     if (dbRes) {
-      setFieldNames(dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : []);
-      const data = dbRes.data ? (JSON.parse(dbRes.data) as Record<string, any>[]) : [];
-
-      setTableData(rawRow2EtRow(data));
+      const data = dbRes.data ? (JSON.parse(dbRes.data) as RowData[]) : [];
 
       const condition = extractConditionClause(code);
       const ppp = await getPageCount(
@@ -67,8 +66,12 @@ export function SqlEditor() {
         condition.condition,
       );
 
-      setPageTotal(ppp.pageTotal);
-      setItemsTotal(ppp.itemsTotal);
+      if (tableRef.current) {
+        tableRef.current.setFieldNames(dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : []);
+        tableRef.current.setTableData(rawRow2EtRow(data));
+        tableRef.current.setPageTotal(ppp.pageTotal);
+        tableRef.current.setItemsTotal(ppp.itemsTotal);
+      }
 
       if (dbRes.errorMessage !== "") {
         setErrorMessage(dbRes.errorMessage.replace("error returned from database: ", " "));
@@ -90,6 +93,7 @@ export function SqlEditor() {
     const first10Chars = code.trim().substring(0, 10).toLowerCase();
     if (first10Chars.includes("select")) {
       if (reIsSingletQuery.test(code)) {
+        const currentPage = tableRef.current ? tableRef.current.getCurrentPage() : 1;
         await queryPage(currentPage);
       } else {
         console.log("不是单表查询");
@@ -146,9 +150,6 @@ export function SqlEditor() {
   // ========== 面板控制 结束 ==========
 
   // ========== 结果集和状态栏 ==========
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [fieldNames, setFieldNames] = useState<string[]>([]);
-  const [tableData, setTableData] = useState<ListRow[]>([]);
 
   // ========== 结果集和状态栏 结束 ==========
 
@@ -242,11 +243,6 @@ export function SqlEditor() {
   }
   // ========== 编辑器 结束 ==========
 
-  // ========== 分页 结束 ==========
-  const [currentPage, setCurrentPage] = useState<number>(1); // 当前页码
-  const [pageTotal, setPageTotal] = useState<number>(0); // 页数
-  const [itemsTotal, setItemsTotal] = useState<number>(0); // 数据总条数
-
   //  表格的变化
   const [changes, setChanges] = useState<TableDataChange[]>([]); // 记录所有修改的变量
   function onChange(val: TableDataChange[]) {
@@ -259,8 +255,6 @@ export function SqlEditor() {
 
     await queryPage(page);
   }
-
-  // ========== 分页 结束 ==========
 
   // 监听 editorHeight 变化，强制更新编辑器布局
   useEffect(() => {
@@ -341,27 +335,12 @@ export function SqlEditor() {
       >
         <div>{renderEditor()}</div>
         <div className="flex flex-col">
-          <div>
-            <PaginationSection
-              currentPage={currentPage}
-              setCurrentPage={(val) => setCurrentPage(val)}
-              pageTotal={pageTotal}
-              itemsTotal={itemsTotal}
-              getData={getData}
-            />
-          </div>
-          <div className="flex-1 w-full h-full overflow-scroll">
-            <EditableTable
-              fieldNames={fieldNames}
-              fieldNamesUnique={[appState.uniqueFieldName]}
-              dataArr={tableData}
-              onChange={onChange}
-              editable={appState.uniqueFieldName !== ""}
-              multiSelect={true}
-              height={`100%`}
-              width={`clac(100vw - ${snap.sideBarWidth + snap.listBarWidth})`}
-            />
-          </div>
+          <TableSection
+            ref={tableRef}
+            width={`clac(100vw - ${snap.sideBarWidth + snap.listBarWidth})`}
+            getData={getData}
+            initData={() => {}}
+          />
         </div>
         <div>
           <div>{errorMessage}</div>

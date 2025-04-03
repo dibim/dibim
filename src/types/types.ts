@@ -61,6 +61,9 @@ export type DbType = typeof DB_TYPE_MYSQL | typeof DB_TYPE_POSTGRESQL | typeof D
 // Unique constraint, primary key or unique index
 export type UniqueConstraint = typeof STR_EMPTY | typeof INDEX_PRIMARY_KEY | typeof INDEX_UNIQUE;
 
+// 数据库里每一行的数据
+export type RowData = Record<string, any>;
+
 // 列表栏的类型
 export type ListBarType =
   | typeof LIST_BAR_TYPE_DB_LIST
