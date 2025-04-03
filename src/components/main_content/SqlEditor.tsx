@@ -59,7 +59,7 @@ export function SqlEditor() {
       const data = dbRes.data ? (JSON.parse(dbRes.data) as RowData[]) : [];
 
       const condition = extractConditionClause(code);
-      const ppp = await getPageCount(
+      const res = await getPageCount(
         appState.currentConnName,
         condition.tableName,
         DEFAULT_PAGE_SIZE,
@@ -68,9 +68,9 @@ export function SqlEditor() {
 
       if (tableRef.current) {
         tableRef.current.setFieldNames(dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : []);
-        tableRef.current.setTableData(rawRow2EtRow(data));
-        tableRef.current.setPageTotal(ppp.pageTotal);
-        tableRef.current.setItemsTotal(ppp.itemsTotal);
+        tableRef.current.setTableData(data);
+        tableRef.current.setPageTotal(res.pageTotal);
+        tableRef.current.setItemsTotal(res.itemsTotal);
       }
 
       if (dbRes.errorMessage !== "") {
@@ -148,10 +148,6 @@ export function SqlEditor() {
   }
 
   // ========== 面板控制 结束 ==========
-
-  // ========== 结果集和状态栏 ==========
-
-  // ========== 结果集和状态栏 结束 ==========
 
   // ========== 编辑器 ==========
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
