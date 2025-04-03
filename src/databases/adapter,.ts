@@ -4,6 +4,7 @@ import {
   genDeleteFieldCmdPg,
   genDeleteRowsCmdPg,
   genDeleteTableCmdPg,
+  genInsertRowCmdPg,
   genRenameFieldCmdPg,
   genRenameTableCmdPg,
   genTruncateTableCmdPg,
@@ -174,6 +175,17 @@ export function genDeleteRowsCmd(tbName: string, fieldName: string, fieldValues:
 
   if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return genDeleteRowsCmdPg(tbName, fieldName, fieldValues);
+  if (currentDbType === DB_TYPE_SQLITE) return ""; // TODO:
+
+  return "";
+}
+
+// 生成插入一行数据
+export function genInsertRowCmd(tbName: string, fieldNames: string[], fieldValues: any[]) {
+  const { currentDbType } = appState;
+
+  if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
+  if (currentDbType === DB_TYPE_POSTGRESQL) return genInsertRowCmdPg(tbName, fieldNames, fieldValues);
   if (currentDbType === DB_TYPE_SQLITE) return ""; // TODO:
 
   return "";

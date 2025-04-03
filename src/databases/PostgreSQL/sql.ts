@@ -416,3 +416,10 @@ export function genDeleteRowsCmdPg(tbName: string, fieldName: string, fieldValue
   const values = fieldValues.map((item) => formatToSqlValuePg(item)).join(",");
   return `DELETE FROM "${tbName}" WHERE "${fieldName}" IN (${values});`;
 }
+
+// 生成插入一行数据
+export function genInsertRowCmdPg(tbName: string, fieldNames: string[], fieldValues: any[]) {
+  const fields = fieldNames.join(`","`);
+  const values = fieldValues.map((item) => formatToSqlValuePg(item, true)).join(`,`);
+  return `INSERT INTO "${tbName}" ("${fields}") VALUES (${values});`;
+}
