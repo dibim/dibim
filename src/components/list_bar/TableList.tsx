@@ -166,7 +166,6 @@ export function TableList() {
   async function getData() {
     // 获取表名
     const res = await getAllTableName();
-
     if (res && res.data) {
       // 获取表格大小
       const sizeRes = await getAllTableSize();
