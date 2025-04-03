@@ -12,13 +12,21 @@ export function getDbTypeLowerCase(dbType: DbType) {
 
 export function formatSql(dbType: DbType, sql: string) {
   let dbTypeStr = getDbTypeLowerCase(dbType);
+  const res = {
+    result: "",
+    errorMessage: "",
+  };
 
-  const prettySQL = format(sql, {
-    language: dbTypeStr as SqlLanguage,
-    tabWidth: 4,
-    keywordCase: "upper",
-    linesBetweenQueries: 0,
-  });
+  try {
+    res.result = format(sql, {
+      language: dbTypeStr as SqlLanguage,
+      tabWidth: 4,
+      keywordCase: "upper",
+      linesBetweenQueries: 0,
+    });
+  } catch (error) {
+    res.errorMessage = `${error}`;
+  }
 
-  return prettySQL;
+  return res;
 }

@@ -4,6 +4,7 @@ import { JSX, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState 
 import { SquareCheckBig } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
+import { NEW_ROW_IS_ADDED_FIELD } from "@/constants";
 import { cn } from "@/lib/utils";
 import { getRandomNegativeInt } from "@/utils/number";
 
@@ -25,6 +26,7 @@ export interface TableDataChange {
 }
 
 export type EditableTableMethods = {
+  getAddedRow: () => ListRow[];
   getMultiSelectData: () => Set<number>;
   getMultiDeleteData: () => Set<number>;
   resetMultiSelectData: () => void;
@@ -93,6 +95,11 @@ export function EditableTable({
     setEditingRowIndex(-1);
     setEditingFieldName("");
 
+    // 是新添加的行, 不记录修改
+    if (data[rowIndex][NEW_ROW_IS_ADDED_FIELD]) {
+      return;
+    }
+
     // 记录修改
     const oldValue = getCellValue(data[rowIndex], fieldName);
     if (oldValue !== tempValue) {
@@ -150,6 +157,7 @@ export function EditableTable({
   // ========== 防止重新渲染滚动表格 结束 ==========
 
   useImperativeHandle(ref, () => ({
+    getAddedRow: () => data.filter((item) => item[NEW_ROW_IS_ADDED_FIELD]),
     getMultiSelectData: () => selectedFieldIndex,
     getMultiDeleteData: () => deletedFieldIndex,
     resetMultiSelectData: () => {

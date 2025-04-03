@@ -13,7 +13,6 @@ import { extractConditionClause } from "@/databases/utils";
 import { appState } from "@/store/valtio";
 import { DbResult, RowData } from "@/types/types";
 import { formatSql } from "@/utils/format_sql";
-import { rawRow2EtRow } from "@/utils/render";
 import { genPanelPercent } from "@/utils/util";
 import { TableDataChange } from "../EditableTable";
 import { TableSection, TableSectionMethods } from "../TableSection";
@@ -82,7 +81,12 @@ export function SqlEditor() {
   // 格式化代码
   function formatCode() {
     const code = getEditorCode();
-    setEditorCode(formatSql(appState.currentDbType, code));
+    const res = formatSql(appState.currentDbType, code);
+    if (res.errorMessage !== "") {
+      setErrorMessage(res.errorMessage);
+    } else {
+      setEditorCode(res.result);
+    }
   }
 
   // 执行代码

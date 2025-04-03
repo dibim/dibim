@@ -1,11 +1,19 @@
 import { TableDataChange } from "@/components/EditableTable";
+import { NEW_ROW_IS_ADDED_FIELD } from "@/constants";
 import { appState } from "@/store/valtio";
 import { RowData } from "@/types/types";
-import { genDeleteRowsCmd, genUpdateFieldCmd } from "../adapter,";
+import { genDeleteRowsCmd, genInsertRowCmd, genUpdateFieldCmd } from "../adapter,";
 import { FieldWithValue } from "../types";
 
-export function modifyTableData(deletedSet: Set<number>, changes: TableDataChange[], tableData: RowData[]) {
-  // 处理变更数据的航
+export function modifyTableData(
+  deletedSet: Set<number>,
+  changes: TableDataChange[],
+  tableData: RowData[],
+  addedRows: RowData[],
+) {
+  const tbName = appState.currentTableName;
+
+  // 处理变更数据的行
   const rowDataMap = new Map<number, TableDataChange[]>();
   for (const c of changes) {
     // 是删除的行的 index 不处理
@@ -33,10 +41,10 @@ export function modifyTableData(deletedSet: Set<number>, changes: TableDataChang
       });
     }
 
-    sqls.push(genUpdateFieldCmd(appState.currentTableName, uniqueField, fieldArr));
+    if (fieldArr.length > 0) sqls.push(genUpdateFieldCmd(tbName, uniqueField, fieldArr));
   });
 
-  // 最后处理删除行
+  // 处理删除行
   const arr = []; // 要删除的唯一字段(主键或唯一索引)的值
   for (let index = 0; index < tableData.length; index++) {
     const row = tableData[index];
@@ -44,7 +52,19 @@ export function modifyTableData(deletedSet: Set<number>, changes: TableDataChang
       arr.push(row[appState.uniqueFieldName]);
     }
   }
-  sqls.push(genDeleteRowsCmd(appState.currentTableName, appState.uniqueFieldName, arr));
+  if (arr.length > 0) sqls.push(genDeleteRowsCmd(tbName, appState.uniqueFieldName, arr));
+
+  // 处理新添加的行
+  for (const r of addedRows) {
+    const fieldNames = Object.keys(r).filter((item) => item !== NEW_ROW_IS_ADDED_FIELD);
+    const sql = genInsertRowCmd(
+      tbName,
+      fieldNames,
+      fieldNames.map((item) => r[item].value),
+    );
+
+    sqls.push(sql);
+  }
 
   return sqls;
 }
