@@ -1,10 +1,11 @@
 "use client";
 
-import { JSX, useEffect, useImperativeHandle, useState } from "react";
+import { JSX, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import { SquareCheckBig } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { getRandomNegativeInt } from "@/utils/number";
 
 export interface ListCell {
   render: (val: any) => JSX.Element; // 渲染 value, 可以添加其它元素
@@ -28,6 +29,7 @@ export type EditableTableMethods = {
   getMultiDeleteData: () => Set<number>;
   resetMultiSelectData: () => void;
   deleteMultiSelectedRow: () => void;
+  willRanderTable: () => void;
 };
 
 interface EditableTableProps {
@@ -66,8 +68,9 @@ export function EditableTable({
   const [changes, setChanges] = useState<TableDataChange[]>([]); // 记录所有修改的变量
 
   // 开始编辑
-  function handleEditStart(indrowIndex: number, fieldName: string, value: string) {
-    setEditingRowIndex(indrowIndex);
+  function handleEditStart(rowIndex: number, fieldName: string, value: string) {
+    setActiveIndex(rowIndex);
+    setEditingRowIndex(rowIndex);
     setEditingFieldName(fieldName);
     setTempValue(value);
   }
@@ -119,7 +122,32 @@ export function EditableTable({
     }
     setSelectedFieldIndex(newSelectedRows);
   }
-  // ========== 多选 =========
+  // ========== 多选 结束 =========
+
+  // ========== 防止重新渲染滚动表格 ==========
+  // 状态管理 (全部在return之外)
+  const [activeIndex, setActiveIndex] = useState<number>(-1);
+  const containerRef = useRef<HTMLTableSectionElement | null>(null);
+  const scrollPosRef = useRef(0);
+
+  // 要触发修改表格重新渲染之前调用, 本组件外部用
+  function willRanderTable() {
+    setActiveIndex(getRandomNegativeInt());
+  }
+
+  function handleClickRow(index: number) {
+    if (!containerRef.current) return;
+
+    scrollPosRef.current = containerRef.current.scrollTop;
+    setActiveIndex(index);
+  }
+
+  useLayoutEffect(() => {
+    if (!containerRef.current) return;
+
+    containerRef.current.scrollTop = scrollPosRef.current;
+  }, [activeIndex]);
+  // ========== 防止重新渲染滚动表格 结束 ==========
 
   useImperativeHandle(ref, () => ({
     getMultiSelectData: () => selectedFieldIndex,
@@ -131,6 +159,7 @@ export function EditableTable({
     deleteMultiSelectedRow: () => {
       setDeletedFieldIndex(selectedFieldIndex);
     },
+    willRanderTable,
   }));
 
   useEffect(() => {
@@ -147,6 +176,7 @@ export function EditableTable({
   function XTable({ className, ...props }: React.ComponentProps<"table">) {
     return (
       <div
+        ref={containerRef}
         data-slot="table-container"
         className="relative table-body-scroll overflow-x-scroll overflow-y-scroll"
         style={{ height, width }}
@@ -204,7 +234,7 @@ export function EditableTable({
 
     return data.map((rowData, rowIndex) => {
       const node = (
-        <TableRow key={rowIndex} className={genClassName(rowIndex)}>
+        <TableRow key={rowIndex} className={genClassName(rowIndex)} onClick={() => handleClickRow(rowIndex)}>
           {/* 多选触发器 */}
           {multiSelect && (
             <TableCell

@@ -69,16 +69,21 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
 
   function handleCancel() {
     setChanges([]);
+
+    tableRef.current?.willRanderTable();
     tableRef.current?.resetMultiSelectData();
   }
 
   function handleAdd() {
     //TODO:; 为了简单, 直接在表格最开始的位置添加
+
+    tableRef.current?.willRanderTable();
   }
 
   function handleDelete() {
     if (appState.uniqueFieldName === "") return;
 
+    tableRef.current?.willRanderTable();
     tableRef.current?.deleteMultiSelectedRow();
   }
 

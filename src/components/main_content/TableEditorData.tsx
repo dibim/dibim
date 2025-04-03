@@ -53,7 +53,7 @@ export function TableEditorData() {
 
   async function initData() {
     await getData(1);
-    if (tableRef.current) tableRef.current.setCurrentPage(1);
+    tableRef.current?.setCurrentPage(1);
   }
 
   return (
