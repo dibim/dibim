@@ -42,6 +42,8 @@ export function DatabaseList() {
 
   // 点击连接
   async function clickConn(conn: DbConnections) {
+    appState.setCurrentConnName(conn.name); // TODO: 先设置, 否则 connect 里获取不到
+
     const res = await connect({
       dbName: conn.dbName,
       host: conn.host,
@@ -50,16 +52,16 @@ export function DatabaseList() {
       user: conn.user,
     });
 
-    console.log("链接数据库的 res :: ", res);
-
-    if (res && res.errorMessage === "") {
-      appState.setCurrentDbName(conn.dbName);
-      appState.setCurrentConnColor(conn.color);
-      appState.setListBarType(LIST_BAR_TYPE_TABLE_LIST);
-      appState.setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
-    } else {
-      // TODO: 优化一下报错
-      console.log("打开数据库连接出错: ", res && res.errorMessage);
+    if (res) {
+      if (res.errorMessage !== "" && !res.errorMessage.includes("Duplicate connection name")) {
+        // TODO: 优化一下报错
+        console.log("打开数据库连接出错: ", res && res.errorMessage);
+      } else {
+        appState.setCurrentDbName(conn.dbName);
+        appState.setCurrentConnColor(conn.color);
+        appState.setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
+        appState.setListBarType(LIST_BAR_TYPE_TABLE_LIST);
+      }
     }
   }
 

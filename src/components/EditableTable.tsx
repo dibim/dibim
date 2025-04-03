@@ -2,12 +2,9 @@
 
 import { JSX, useEffect, useImperativeHandle, useState } from "react";
 import { SquareCheckBig } from "lucide-react";
-import { useSnapshot } from "valtio";
 import { Input } from "@/components/ui/input";
 import { TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
-import { HEDAER_H } from "@/constants";
 import { cn } from "@/lib/utils";
-import { appState } from "@/store/valtio";
 
 export interface ListCell {
   render: (val: any) => JSX.Element; // 渲染 value, 可以添加其它元素
@@ -62,7 +59,6 @@ export function EditableTable({
   showChanges,
   ref,
 }: EditableTableProps) {
-  const snap = useSnapshot(appState);
   const [data, setData] = useState<ListRow[]>(dataArr);
   const [editingRowIdndex, setEditingRowIndex] = useState<number>(-1); // 正在编辑的索引
   const [editingFieldName, setEditingFieldName] = useState<string>(""); // 正在编辑的字段名

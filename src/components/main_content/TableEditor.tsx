@@ -40,7 +40,7 @@ export function TableEditor() {
     const res = await getTableStructure(appState.currentTableName);
     if (res && res.data) {
       appState.setCurrentTableStructure(res.data);
-      appState.setUniqueFieldName(getUniqueFieldName(appState.currentTableStructure));
+      appState.setUniqueFieldName(getUniqueFieldName(res.data));
       if (appState.mainContenTab === STR_EMPTY) appState.setMainContenTab(TAB_DATA);
     }
   }
