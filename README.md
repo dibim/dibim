@@ -9,6 +9,12 @@
 - ⚙️ **后端技术**：Rust + SQLx
 - 🗄️ **数据库支持**：PostgreSQL / MySQL / MariaDB / SQLite
 
+官方仓库地址：
+
+- GitHub: [https://github.com/dibim/dibim](https://github.com/dibim/dibim)
+- Gitee(中国): [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)
+- Codeberg(德国): [https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)
+
 ## 🎯 核心特性
 
 - 🚀 轻量级跨平台应用，支持 Windows / macOS / Linux
