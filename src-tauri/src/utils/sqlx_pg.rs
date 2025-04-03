@@ -1,4 +1,5 @@
 use crate::types::QueryResult;
+use crate::utils::common::print_sql;
 use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
 use bigdecimal::BigDecimal;
@@ -7,10 +8,10 @@ use lazy_static::lazy_static;
 use serde_json::json;
 use sqlx::postgres::{PgPool, PgRow};
 use sqlx::types::chrono;
-use sqlx::Column;
 use sqlx::Error as SqlxError;
 use sqlx::Row;
 use sqlx::TypeInfo;
+use sqlx::{Column, Execute};
 use std::collections::HashMap;
 use std::pin::Pin;
 use std::sync::Arc;
@@ -36,7 +37,7 @@ struct CursorState {
 /// - `page`: 当前页码（从1开始） | Current page number (starting from 1)
 /// - `page_size`: 每页的条目数 | Number of entries per page
 ///
-pub async fn process_pg_query(
+pub async fn query_pg(
     pool: &PgPool,
     sql: &str,
     streaming: bool,
@@ -101,7 +102,13 @@ async fn stream_pagination(
         let pool_clone = Arc::clone(&pool);
 
         *stream_guard = Some(Box::pin(async_stream::stream! {
-            let mut stream = sqlx::query(&*sql_clone)
+            let query = sqlx::query(&*sql_clone);
+            #[cfg(debug_assertions)]
+            {
+                print_sql(query.sql());
+            }
+
+            let mut stream = query
                 .persistent(true)
                 .fetch(&*pool_clone);
 
@@ -154,7 +161,13 @@ async fn fetch_all_data(
     pool: &PgPool,
     sql: &str,
 ) -> Result<QueryResult, Box<dyn std::error::Error>> {
-    let rows = sqlx::query(sql).fetch_all(pool).await?;
+    let query = sqlx::query(sql);
+    #[cfg(debug_assertions)]
+    {
+        print_sql(query.sql());
+    }
+
+    let rows = query.fetch_all(pool).await?;
     let (column_names, json_rows) = process_rows(rows)?;
 
     Ok(QueryResult {

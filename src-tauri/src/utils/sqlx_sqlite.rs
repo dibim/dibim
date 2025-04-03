@@ -16,7 +16,7 @@ use sqlx::TypeInfo;
 /// - `page`: 当前页码（从1开始） | Current page number (starting from 1)
 /// - `page_size`: 每页的条目数 | Number of entries per page
 ///
-pub async fn process_sqlite_query(
+pub async fn query_sqlite(
     pool: &SqlitePool,
     sql: &str,
     streaming: bool,
