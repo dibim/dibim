@@ -1,7 +1,7 @@
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { subscribeKey } from "valtio/utils";
-import { HEDAER_H } from "@/constants";
+import { HEDAER_H, NEW_ROW_IS_ADDED_FIELD } from "@/constants";
 import { modifyTableData } from "@/databases/PostgreSQL/modifyTableData";
 import { exec } from "@/databases/adapter,";
 import { cn } from "@/lib/utils";
@@ -61,7 +61,8 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
     if (appState.uniqueFieldName === "") return;
 
     const deletedSet = tableRef.current?.getMultiDeleteData() || new Set();
-    const sqls = modifyTableData(deletedSet, changes, tableData);
+    const addedRows = tableRef.current?.getAddedRow()||[]
+    const sqls = modifyTableData(deletedSet, changes, tableData, addedRows);
 
     setWillExecCmd(sqls.join(""));
     setShowDialogAlter(true);
@@ -75,9 +76,14 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
   }
 
   function handleAdd() {
-    //TODO:; 为了简单, 直接在表格最开始的位置添加
-
     tableRef.current?.willRanderTable();
+
+    const fields = appState.currentTableStructure.map((item) => item.column_name);
+    const rowData = Object.fromEntries(fields.map((key) => [key, ""]));
+    rowData[NEW_ROW_IS_ADDED_FIELD] = "true"; // 新添加的行的标记
+    const newTableData = [...tableData, rowData]; // 为了避免和更新的行的索引有冲突, 添加到表格的最后
+    setTableData(newTableData);
+    updateDataArr(newTableData);
   }
 
   function handleDelete() {

@@ -32,7 +32,7 @@ export function SqlCodeViewer(props: { ddl: string }) {
   return (
     <pre>
       <code ref={codeRef} className={`language-${getLang()}`}>
-        {formatSql(snap.currentDbType, props.ddl)}
+        {formatSql(snap.currentDbType, props.ddl).result}
       </code>
     </pre>
   );

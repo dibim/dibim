@@ -116,3 +116,7 @@ export const reWhereClause = /from\s+("[^"]+"|`[^`]+`|'[^']+'|\w+)(?:\s+(.*))?/i
 // 分页
 // pagination
 export const DEFAULT_PAGE_SIZE = 50;
+
+//
+// 新添加的行的标记, 这是一个非法的 sql 字段名, 避免和已有的字段名重名
+export const NEW_ROW_IS_ADDED_FIELD = "; -- IS-NEW-ROW -- ;";
