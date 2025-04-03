@@ -44,6 +44,18 @@ impl DbPool {
         url: &str,
     ) -> Result<(), sqlx::Error> {
         let name = name.into();
+        let mut connections = self.connections.lock().await;
+        if connections.contains_key(&name) {
+            return Err(sqlx::Error::Configuration(
+                // 这里的提示文字在前端会匹配字符串, 要统一
+                format!(
+                    "Duplicate connection name: '{}'. Connection names must be unique.",
+                    name
+                )
+                .into(),
+            ));
+        }
+
         let connection = match db_type {
             DbType::Postgres => {
                 let pool = PgPoolOptions::new().max_connections(5).connect(url).await?;
@@ -65,9 +77,7 @@ impl DbPool {
             }
         };
 
-        // 记录连接（使用异步锁）
-        // Record connection (using asynchronous lock)
-        self.connections.lock().await.insert(name, connection);
+        connections.insert(name, connection);
 
         Ok(())
     }
@@ -95,7 +105,7 @@ impl DbPool {
 
     // 检查连接是否存在
     // Check if the connection exists
-    pub async fn contains(&self, name: &str) -> bool {
-        self.connections.lock().await.contains_key(name)
-    }
+    // pub async fn contains(&self, name: &str) -> bool {
+    //     self.connections.lock().await.contains_key(name)
+    // }
 }
