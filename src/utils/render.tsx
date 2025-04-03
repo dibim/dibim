@@ -8,7 +8,11 @@ export function rawRow2EtRow(data: RowData[]) {
     for (const key in row) {
       if (row.hasOwnProperty(key)) {
         wrappedRow[key] = {
-          render: (val: any) => <div>{val}</div>,
+          render: (val: any) => {
+            if (val === null) return <div className="text-gray-500">NULL</div>;
+
+            return <div>{val}</div>;
+          },
           value: (row as any)[key],
         };
       }
