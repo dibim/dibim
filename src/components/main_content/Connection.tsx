@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSnapshot } from "valtio";
 import { open } from "@tauri-apps/plugin-dialog";
 import MysqlLogo from "@/assets/db_logo/mysql.svg?react";
 import PostgresqlLogo from "@/assets/db_logo/postgresql.svg?react";
@@ -18,6 +19,7 @@ type ConnectionProp = {
 };
 
 export function Connection(props: ConnectionProp) {
+  const snap = useSnapshot(appState);
   const [name, setName] = useState<string>(""); // 连接名称
   const [dbType, setDbType] = useState<DbType>(DB_TYPE_POSTGRESQL); // 默认类型是 PostgreSQL
   const [host, setHost] = useState<string>("");
@@ -143,7 +145,7 @@ export function Connection(props: ConnectionProp) {
     );
   }
 
-  useEffect(() => {
+  function setEditingData() {
     // 编辑连接的要获取数据
     if (props.action === STR_EDIT) {
       const conn = appState.config.dbConnections[appState.editDbConnIndex];
@@ -157,6 +159,14 @@ export function Connection(props: ConnectionProp) {
       setPort(conn.port);
       setUser(conn.user);
     }
+  }
+
+  useEffect(() => {
+    setEditingData();
+  }, [snap.editDbConnIndex]);
+
+  useEffect(() => {
+    setEditingData();
   }, []);
 
   return (
