@@ -2,7 +2,7 @@ import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { subscribeKey } from "valtio/utils";
 import { HEDAER_H, NEW_ROW_IS_ADDED_FIELD } from "@/constants";
-import { modifyTableData } from "@/databases/PostgreSQL/modifyTableData";
+import { modifyTableData } from "@/databases/PostgreSQL/modify_table_data";
 import { exec } from "@/databases/adapter,";
 import { cn } from "@/lib/utils";
 import { appState } from "@/store/valtio";
