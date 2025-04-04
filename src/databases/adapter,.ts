@@ -17,9 +17,11 @@ import {
 } from "@/databases/PostgreSQL/sql";
 import { invoker } from "@/invoker";
 import { appState } from "@/store/valtio";
+import { fieldTypeOptionsMysql } from "./MySQL/select_options";
 import { genAlterCmdPg } from "./PostgreSQL/alter_table";
 import { getDataTypeCategoryPg } from "./PostgreSQL/icon";
 import { fieldTypeOptionsPg } from "./PostgreSQL/select_options";
+import { fieldTypeOptionsSqlite } from "./SQLite/select_options";
 import { AllAlterAction, DbConnectionParam, FieldWithValue, GetTableDataParam } from "./types";
 
 // 连接数据库
@@ -207,9 +209,9 @@ export function getDataTypeCategory(val: string) {
 export function fieldTypeOptions() {
   const { currentDbType } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return []; // TODO:
+  if (currentDbType === DB_TYPE_MYSQL) return fieldTypeOptionsMysql;
   if (currentDbType === DB_TYPE_POSTGRESQL) return fieldTypeOptionsPg;
-  if (currentDbType === DB_TYPE_SQLITE) return []; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return fieldTypeOptionsSqlite;
 
   return [];
 }
