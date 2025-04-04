@@ -86,7 +86,7 @@ In event handling, useEffect, and other logic, the original state object appStat
 ### v0.2 sqlite
 
 - 支持 sqlite
-- 添加连接要检查是否重复
+- 添加连接要检查是否重复✅
 - 字段类型改为下拉框
 - 表格数据列表的 添加行的语句改为批量插入✅
 
