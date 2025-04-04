@@ -12,7 +12,7 @@ import { ConfirmDialog } from "./ConfirmDialog";
 import { EditableTable, EditableTableMethods, ListRow, TableDataChange } from "./EditableTable";
 import { PaginationSection } from "./PaginationSection";
 import { SqlCodeViewer } from "./SqlCodeViewer";
-import { TextWarning } from "./TextWarning";
+import { TextNotification } from "./TextNotification";
 import { TooltipGroup } from "./TooltipGroup";
 
 export type TableSectionMethods = {
@@ -163,10 +163,10 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
             getData={getData}
           />
           {dataArr.length > 0 && appState.uniqueFieldName === "" && (
-            <TextWarning
+            <TextNotification
               type="error"
               message={"当前表格没有主键或唯一索引, 为了确保数据不被误操作,不可以编辑该表格"}
-            ></TextWarning>
+            ></TextNotification>
           )}
         </div>
       </div>
