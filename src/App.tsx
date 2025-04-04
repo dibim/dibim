@@ -15,6 +15,7 @@ import { TooltipProvider } from "./components/ui/tooltip";
 import { APP_NAME, CONFIG_FILE_MAIN, MAIN_PASSWORD_DEFAULT } from "./constants";
 import { invoker } from "./invoker";
 import { appState } from "./store/valtio";
+import { ConfigFile } from "./types/conf_file";
 import { readConfigFile } from "./utils/config_file";
 
 export function App() {
@@ -30,7 +31,17 @@ export function App() {
   async function initConfFile(pwd: string, isDefultPwd: boolean) {
     const conf = await readConfigFile(pwd);
     try {
-      await appState.setConfig(JSON.parse(conf), true);
+      const config = JSON.parse(conf) as ConfigFile;
+      // 如果发现崇明的连接名, 自动添加后缀
+      const nameSet = new Set<string>();
+      for (let index = 0; index < config.dbConnections.length; index++) {
+        const conn = config.dbConnections[index];
+
+        if (nameSet.has(conn.name)) config.dbConnections[index].name = `${conn.name}_${index}`;
+        nameSet.add(conn.name);
+      }
+
+      await appState.setConfig(config, true);
       return true;
     } catch (error) {
       console.log(
