@@ -3,7 +3,7 @@ import { AlertCircle, CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } 
 import { toast } from "sonner";
 import { subscribeKey } from "valtio/utils";
 import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
-import { exec, genAlterCmd, genDeleteFieldCmd } from "@/databases/adapter,";
+import { exec, fieldTypeOptions, genAlterCmd, genDeleteFieldCmd } from "@/databases/adapter,";
 import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "@/databases/constants";
 import { AllAlterAction, FieldAlterAction, TableStructure } from "@/databases/types";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ import { UniqueConstraint } from "@/types/types";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EditableTable, EditableTableMethods, ListRow } from "../EditableTable";
 import { LabeledDiv } from "../LabeledDiv";
+import { SearchableSelect } from "../SearchableSelect";
 import { SqlCodeViewer } from "../SqlCodeViewer";
 import { TooltipGroup } from "../TooltipGroup";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
@@ -447,6 +448,8 @@ export function TableEditorStructure({
 
           <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"类型"}>
             <Input value={fieldType} onInput={(e) => setFieldType(e.currentTarget.value)} />
+            <div className="py-1"></div>
+            <SearchableSelect value={fieldType} optionsData={fieldTypeOptions()} onChange={setFieldType} />
           </LabeledDiv>
 
           <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"大小"}>

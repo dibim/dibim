@@ -19,6 +19,7 @@ import { invoker } from "@/invoker";
 import { appState } from "@/store/valtio";
 import { genAlterCmdPg } from "./PostgreSQL/alterTable";
 import { getDataTypeCategoryPg } from "./PostgreSQL/icon";
+import { fieldTypeOptionsPg } from "./PostgreSQL/select_options";
 import { AllAlterAction, DbConnectionParam, FieldWithValue, GetTableDataParam } from "./types";
 
 // 连接数据库
@@ -200,4 +201,15 @@ export function getDataTypeCategory(val: string) {
   if (currentDbType === DB_TYPE_SQLITE) return ""; // TODO:
 
   return "";
+}
+
+// 字段外形的下拉选项
+export function fieldTypeOptions() {
+  const { currentDbType } = appState;
+
+  if (currentDbType === DB_TYPE_MYSQL) return []; // TODO:
+  if (currentDbType === DB_TYPE_POSTGRESQL) return fieldTypeOptionsPg;
+  if (currentDbType === DB_TYPE_SQLITE) return []; // TODO:
+
+  return [];
 }
