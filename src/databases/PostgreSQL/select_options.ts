@@ -1,3 +1,6 @@
+/**
+ * 官方文档: https://www.postgresql.org/docs/current/datatype.html
+ */
 import { SelectOption } from "@/components/SearchableSelect";
 
 export const fieldTypeOptionsPg: SelectOption[] = [
