@@ -12,7 +12,7 @@ import { formatToSqlValuePg } from "./format";
 import "./types";
 
 /**
- * 连接到 postgre_sql
+ * 连接到 PostgreSQL
  *
  * "postgres://user:password@localhost:5432/mydb?sslmode=require";
  *
