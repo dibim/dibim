@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { AlertCircle } from "lucide-react";
 import MysqlLogo from "@/assets/db_logo/mysql.svg?react";
 import PostgresqlLogo from "@/assets/db_logo/postgresql.svg?react";
 import SqliteLogo from "@/assets/db_logo/sqlite.svg?react";
@@ -8,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE, DIR_H, STR_ADD, STR_EDIT } from "@/constants";
 import { appState } from "@/store/valtio";
 import { DbType, SvgComponentType } from "@/types/types";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { TextNotification } from "../TextNotification";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
@@ -65,6 +64,11 @@ export function Connection(props: ConnectionProp) {
   }
 
   async function onSubmit() {
+    if (appState.config.dbConnections.some((item) => item.name === name)) {
+      setErrorMessage(`该连接名称"${name}"已存在`);
+      return;
+    }
+
     if (dbType === DB_TYPE_MYSQL || dbType === DB_TYPE_POSTGRESQL) {
       if (valueIsError(host === "", "主机地址")) return;
       if (valueIsError(port === 0, "端口")) return;
@@ -204,21 +208,8 @@ export function Connection(props: ConnectionProp) {
             <Input type="color" value={color} onInput={onInputColor} />
           </LabeledDiv>
 
-          {errorMessage && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>错误提示</AlertTitle>
-              <AlertDescription>{errorMessage}</AlertDescription>
-            </Alert>
-          )}
-
-          {okMessage && (
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>提示</AlertTitle>
-              <AlertDescription>{okMessage}</AlertDescription>
-            </Alert>
-          )}
+          {errorMessage && <TextNotification type="error" message={errorMessage}></TextNotification>}
+          {okMessage && <TextNotification type="success" message={okMessage}></TextNotification>}
         </CardContent>
         <CardFooter className="flex justify-between">
           {/* <Button variant="outline">取消</Button> */}
