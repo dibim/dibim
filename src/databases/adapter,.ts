@@ -22,6 +22,7 @@ import { genAlterCmdPg } from "./PostgreSQL/alter_table";
 import { getDataTypeCategoryPg } from "./PostgreSQL/icon";
 import { fieldTypeOptionsPg } from "./PostgreSQL/select_options";
 import { fieldTypeOptionsSqlite } from "./SQLite/select_options";
+import { connectSqlite, getAllTableNameSqlite, getAllTableSizeSqlite, getTableDdlSqlite, getTableStructureSqlite } from "./SQLite/sql";
 import { AllAlterAction, DbConnectionParam, FieldWithValue, GetTableDataParam } from "./types";
 
 // 连接数据库
@@ -30,7 +31,7 @@ export async function connect(p: DbConnectionParam) {
 
   if (currentDbType === DB_TYPE_MYSQL) return; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return connectPg(currentConnName, p);
-  if (currentDbType === DB_TYPE_SQLITE) return; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return connectSqlite(currentConnName, p);
 }
 
 // 断开数据库
@@ -56,7 +57,7 @@ export async function getAllTableName() {
 
   if (currentDbType === DB_TYPE_MYSQL) return; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return getAllTableNamePg(currentConnName);
-  if (currentDbType === DB_TYPE_SQLITE) return; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return getAllTableNameSqlite(currentConnName);
 }
 
 // 获取所有表格的大小
@@ -65,7 +66,7 @@ export async function getAllTableSize() {
 
   if (currentDbType === DB_TYPE_MYSQL) return; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return getAllTableSizePg(currentConnName);
-  if (currentDbType === DB_TYPE_SQLITE) return; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return getAllTableSizeSqlite(currentConnName);
 }
 
 // 获取表格数据
@@ -74,7 +75,7 @@ export async function getTableStructure(tbName: string) {
 
   if (currentDbType === DB_TYPE_MYSQL) return; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return getTableStructurePg(currentConnName, tbName);
-  if (currentDbType === DB_TYPE_SQLITE) return; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return getTableStructureSqlite(currentConnName, tbName);
 }
 
 // 获取表格的 DDL
@@ -83,7 +84,7 @@ export async function getTableDdl(tbName: string) {
 
   if (currentDbType === DB_TYPE_MYSQL) return; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return getTableDdlPg(currentConnName, tbName);
-  if (currentDbType === DB_TYPE_SQLITE) return; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return getTableDdlSqlite(currentConnName, tbName);
 }
 
 // 获取表格数据

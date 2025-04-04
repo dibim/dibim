@@ -78,17 +78,17 @@ export type CommonSQLValue =
 // 注意: 命名方式按照数据库的
 //
 export type TableStructure = {
-  has_check_conditions: any;
-  column_name: string;
-  data_type: string;
   column_default: string;
+  column_name: string;
   comment: string;
-  size: string;
-  is_primary_key: boolean;
-  is_unique_key: boolean;
+  data_type: string;
+  has_check_conditions: any;
+  indexes?: ColumnIndex[];
   is_foreign_key: boolean;
   is_not_null: boolean;
-  indexes?: ColumnIndex[];
+  is_primary_key: boolean;
+  is_unique_key: boolean;
+  size: string;
 };
 
 // 字段的索引信息
