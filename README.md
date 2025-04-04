@@ -1,19 +1,32 @@
-# 🚀 DIBIM - 数据库管理工具
+# 🚀 DIBIM - 数据库管理工具 | Database Management Tools
 
 ## ✨ 简介
 
 **DIBIM** 是一个简单易用的跨平台数据库管理软件。
 
 - ⚡ **基于 Tauri 框架**：安装包较小，内存占用较低。
-- 🖥️ **前端技术**：TypeScript + React + shadcn/ui
-- ⚙️ **后端技术**：Rust + SQLx
-- 🗄️ **数据库支持**：PostgreSQL / MySQL / MariaDB / SQLite
+- 🖥️ **前端**：TypeScript + React + shadcn/ui。
+- ⚙️ **后端**：Rust + SQLx。
+- 🗄️ **数据库支持**：PostgreSQL / MySQL / MariaDB / SQLite。
 
-官方仓库地址：
+**DIBIM** is a simple and easy-to-use cross platform database management software.
+
+- ⚡ **Based on Tauri framework**: small binary & low memory.
+- 🖥️ **Frontend**: TypeScript + React + shadcn/ui
+- ⚙️ **Backend**: Rust + SQLx。
+- 🗄️ **Database support**: PostgreSQL / MySQL / MariaDB / SQLite。
+
+官方仓库地址:
 
 - GitHub: [https://github.com/dibim/dibim](https://github.com/dibim/dibim)
 - Gitee(中国): [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)
 - Codeberg(德国): [https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)
+
+Official repository:
+
+- GitHub: [https://github.com/dibim/dibim](https://github.com/dibim/dibim)
+- Gitee(China): [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)
+- Codeberg(Germany): [https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)
 
 ## 🎯 核心特性
 
@@ -23,28 +36,52 @@
 - 🔄 多数据库统一管理
 - 💡 可通过 TypeScript 轻松扩展更多功能
 
+## 🎯 Core features
+
+- 🚀 Windows / macOS / Linux Lightweight cross platform application, supporting Windows/macOS/Linux
+- 🔍 Native SQL operation experience, all operations that change data will display the statements to be executed
+- 💅 Responsive User Interface
+- 🔄 Unified management of multiple databases
+- 💡 More features can be easily extended through TypeScript
+
 ## ⌨️ 快捷键
 
 | 快捷键        | 功能描述                     |
 |--------------|----------------------------|
-| `F1`         | 关于 ℹ️                    |
-| `F2`         | 切换侧边栏 🗄️              |
-| `F3`         | 切换列表栏 📜              |
-| `F8`         | 格式化SQL编辑器代码 🧹     |
-| `F9`         | 执行SQL编辑器代码 ▶️       |
+| `F1`         | ℹ️ 关于                     |
+| `F2`         | 🗄️ 切换侧边栏               |
+| `F3`         | 📜 切换列表栏               |
+| `F8`         | 🧹 格式化SQL编辑器代码      |
+| `F9`         | ▶️ 执行SQL编辑器代码        |
+
+## ⌨️ Shortcut keys
+
+| Keys       |  function                    |
+|--------------|----------------------------|
+| `F1`         | ℹ️ About                    |
+| `F2`         | 🗄️ Switch sidebar               |
+| `F3`         | 📜 Switch list bar               |
+| `F8`         | 🧹 Format SQL Editor Code      |
+| `F9`         | ▶️ Execute SQL editor code        |
 
 ## ⚛️ 状态管理（Valtio）
 
 在组件中使用 Valtio 时，通过 `const snap = useSnapshot(appState)` 获取的状态快照（snap）应当用于组件的渲染输出（return 语句）中读取值。  
-在事件处理、副作用等逻辑操作中，应当直接操作原始状态对象 appState 而不是快照对象 snap。
+在事件处理、useEffect等逻辑中，应当直接操作原始状态对象 appState 而不是快照对象 snap。
+
+## ⚛️ State Management (Valtio)
+
+When using Valtio in a component, the state snapshot (snap) obtained through `const snap = useSnapshot(appState)` should be used to read values in the rendering output (return statement) of the component.
+In event handling, useEffect, and other logic, the original state object appState should be directly manipulated instead of the snapshot object snap.
 
 ## 📝 TODO
 
-### v0.1.1 pg
+### v0.1.0 pg✅
 
-- 优化表格数据的尺寸, ok
-- sql 编辑器结果集分页, ok
-- 表格数据列表的 添加行 ok
+- 支持 pg 的基本功能✅
+- 优化表格数据的尺寸✅
+- sql 编辑器结果集分页✅
+- 表格数据列表的 添加行✅
   
 ### v0.2 sqlite
 
