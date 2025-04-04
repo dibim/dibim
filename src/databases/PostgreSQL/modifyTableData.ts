@@ -2,7 +2,7 @@ import { TableDataChange } from "@/components/EditableTable";
 import { NEW_ROW_IS_ADDED_FIELD } from "@/constants";
 import { appState } from "@/store/valtio";
 import { RowData } from "@/types/types";
-import { genDeleteRowsCmd, genInsertRowCmd, genUpdateFieldCmd } from "../adapter,";
+import { genDeleteRowsCmd, genInsertRowsCmd, genUpdateFieldCmd } from "../adapter,";
 import { FieldWithValue } from "../types";
 
 export function modifyTableData(
@@ -28,7 +28,6 @@ export function modifyTableData(
 
   const sqls: string[] = [];
   rowDataMap.forEach((changes, rowIndex) => {
-    // TODO: 根据表结构去找
     const uniqueField: FieldWithValue = {
       field: appState.uniqueFieldName,
       value: rowIndex,
@@ -55,15 +54,14 @@ export function modifyTableData(
   if (arr.length > 0) sqls.push(genDeleteRowsCmd(tbName, appState.uniqueFieldName, arr));
 
   // 处理新添加的行
-  for (const r of addedRows) {
-    const fieldNames = Object.keys(r).filter((item) => item !== NEW_ROW_IS_ADDED_FIELD);
-    const sql = genInsertRowCmd(
-      tbName,
-      fieldNames,
-      fieldNames.map((item) => r[item].value),
-    );
+  if (addedRows.length > 0) {
+    const fieldNames = Object.keys(addedRows[0]).filter((item) => item !== NEW_ROW_IS_ADDED_FIELD);
+    const values: any[][] = [];
+    for (const r of addedRows) {
+      values.push(fieldNames.map((item) => r[item].value));
+    }
 
-    sqls.push(sql);
+    sqls.push(genInsertRowsCmd(tbName, fieldNames, values));
   }
 
   return sqls;
