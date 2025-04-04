@@ -67,7 +67,7 @@ export function Connection(props: ConnectionProp) {
   }
 
   async function onSubmit() {
-    if (appState.config.dbConnections.some((item) => item.name === name)) {
+    if (props.action === STR_ADD && appState.config.dbConnections.some((item) => item.name === name)) {
       setErrorMessage(`该连接名称"${name}"已存在`);
       return;
     }
