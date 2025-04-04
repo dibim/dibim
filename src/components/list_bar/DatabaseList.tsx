@@ -76,7 +76,7 @@ export function DatabaseList() {
       arr.push({
         id: item.name,
         content: (
-          <div className="flex cursor-pointer" style={{ borderBottom: `2px  solid ${item.color}` }}>
+          <div className="flex cursor-pointer p-1" style={{ borderBottom: `2px  solid ${item.color}` }}>
             <div className="pe-2">
               {item.dbType === DB_TYPE_MYSQL && <MysqlLogo className="w-6 h-6" />}
               {item.dbType === DB_TYPE_POSTGRESQL && <PostgresqlLogo className="w-6 h-6" />}
@@ -134,11 +134,7 @@ export function DatabaseList() {
 
   return (
     <>
-      {!snap.config.dbConnections ? (
-        <EmptyList />
-      ) : (
-        <ListWithAction items={listData} itemClassName="py-2 cursor-pointer" />
-      )}
+      {!snap.config.dbConnections ? <EmptyList /> : <ListWithAction items={listData} itemClassName="py-2" />}
 
       <ConfirmDialog
         open={showDialog}

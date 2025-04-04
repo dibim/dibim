@@ -78,7 +78,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-
+        {/* 
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -116,6 +116,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+         */}
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
@@ -148,12 +149,13 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
           </SidebarMenuItem>
         </SidebarMenu>
 
+        {/* 
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip={"备份"}
               onClick={() => {
-                // setMainContenType(MAIN_CONTEN_TYPE_SETTINGS);
+                snap.setMainContenType(MAIN_CONTEN_TYPE_SETTINGS);
                 snap.setListBarOpen(true);
               }}
             >
@@ -161,7 +163,8 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
               <span>备份</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarMenu>
+        </SidebarMenu> 
+        */}
 
         <SidebarMenu>
           <SidebarMenuItem>
