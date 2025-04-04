@@ -83,7 +83,7 @@ interface AppState {
 
   // 要编辑的数据库连接
   editDbConnIndex: number;
-  setEditDbConnndex: (val: number) => void;
+  setEditDbConnIndex: (val: number) => void;
 }
 
 // 按照默认密码生成默认的 sha
@@ -155,5 +155,5 @@ export const appState = proxy<AppState>({
   setIsAddingTable: (val: boolean) => (appState.isAddingTable = val),
 
   editDbConnIndex: 0,
-  setEditDbConnndex: (val: number) => (appState.editDbConnIndex = val),
+  setEditDbConnIndex: (val: number) => (appState.editDbConnIndex = val),
 }) as AppState;

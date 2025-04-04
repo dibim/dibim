@@ -93,6 +93,7 @@ export function DatabaseList() {
           {
             label: "编辑",
             onClick: () => {
+              appState.setEditDbConnIndex(index);
               appState.setMainContenType(MAIN_CONTEN_TYPE_EDIT_CONNECTION);
             },
             icon: <Edit className="h-4 w-4" />,
