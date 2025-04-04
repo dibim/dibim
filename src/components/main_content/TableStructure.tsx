@@ -21,7 +21,7 @@ import { Checkbox } from "../ui/checkbox";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { renderDataTypeIcon } from "./TableEditorStructureIcon";
+import { renderDataTypeIcon } from "./TableStructureIcon";
 
 type DialogAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
 
