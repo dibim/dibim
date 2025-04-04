@@ -1,4 +1,5 @@
 use crate::types::QueryResult;
+use crate::utils::common::print_sql;
 use serde_json::json;
 use sqlx::types::chrono;
 use sqlx::Column;
@@ -22,7 +23,10 @@ pub async fn query_mysql(
     page_size: Option<usize>,
 ) -> Result<QueryResult, Box<dyn std::error::Error>> {
     let query = sqlx::query(sql);
-    println!("Executing SQL: {}", query.sql());
+    #[cfg(debug_assertions)]
+    {
+        print_sql(query.sql());
+    }
 
     let rows = query.fetch_all(pool).await?;
     let mut json_rows = Vec::new();

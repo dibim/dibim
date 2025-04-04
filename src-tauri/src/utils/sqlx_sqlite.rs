@@ -1,12 +1,9 @@
 use crate::types::QueryResult;
+use crate::utils::common::print_sql;
 use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
 use serde_json::json;
-use sqlx::Column;
-use sqlx::Execute;
-use sqlx::Row;
-use sqlx::SqlitePool;
-use sqlx::TypeInfo;
+use sqlx::{Column, Execute, Row, SqlitePool};
 
 /// 处理 SQLite 的查询 | Handling SQLite queries
 ///
@@ -23,38 +20,47 @@ pub async fn query_sqlite(
     page: Option<usize>,
     page_size: Option<usize>,
 ) -> Result<QueryResult, Box<dyn std::error::Error>> {
+    // TODO: 实现六四 pg 的流式查询
+
     let query = sqlx::query(sql);
-    println!("Executing SQL: {}", query.sql());
+    #[cfg(debug_assertions)]
+    {
+        print_sql(query.sql());
+    }
 
     let rows = query.fetch_all(pool).await?;
     let mut json_rows = Vec::new();
     let mut column_names: Vec<String> = Vec::new();
-    let mut index = 0;
+
+    if let Some(first_row) = rows.first() {
+        for column in first_row.columns() {
+            column_names.push(column.name().to_owned());
+        }
+    }
 
     for row in rows {
-        let mut json_row = json!({});
-        for column in row.columns() {
-            let col_name = column.name();
-            let value = match column.type_info().name() {
-                "BOOLEAN" => json!(row.get::<bool, _>(col_name)),
-                "INTEGER" => json!(row.get::<i64, _>(col_name)),
-                "REAL" => json!(row.get::<f64, _>(col_name)),
-                "TEXT" => json!(row.get::<String, _>(col_name)),
-                "BLOB" => json!(STANDARD.encode(row.get::<Vec<u8>, _>(col_name))),
-                "DATETIME" => {
-                    let s: String = row.get(col_name);
-                    json!(s)
-                }
-                _ => json!("unsupported_type"),
+        let mut json_row = serde_json::Map::new();
+        for (idx, col_name) in column_names.iter().enumerate() {
+            // 类型的判断不能依赖 type_info, 因为 type_info().name() 返回的全部都是 NULL
+            // 这里遵循 SQLite 的 类型优先级规则动态解析
+            // Refer: https://www.sqlite.org/datatype3.html#type_conversions
+            let value = if let Ok(val) = row.try_get::<i64, _>(idx) {
+                json!(val)
+            } else if let Ok(val) = row.try_get::<f64, _>(idx) {
+                json!(val)
+            } else if let Ok(val) = row.try_get::<String, _>(idx) {
+                json!(val)
+            } else if let Ok(val) = row.try_get::<Vec<u8>, _>(idx) {
+                json!(STANDARD.encode(&val))
+            } else if row.try_get::<Option<i64>, _>(idx)?.is_none() {
+                json!(null)
+            } else {
+                json!("unknown_type")
             };
-            json_row[col_name] = value;
 
-            if index == 0 {
-                column_names.push(col_name.to_owned())
-            }
+            json_row.insert(col_name.clone(), value);
         }
-        json_rows.push(json_row);
-        index += 1;
+        json_rows.push(json!(json_row));
     }
 
     Ok(QueryResult {

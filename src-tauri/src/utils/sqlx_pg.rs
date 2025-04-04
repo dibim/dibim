@@ -282,13 +282,10 @@ fn convert_value_pg(row: &PgRow, idx: usize) -> Result<serde_json::Value, sqlx::
         "BOOL" => Ok(json!(row.get::<Option<bool>, _>(col_name))),
 
         // 整数类型
-        "INT2" => Ok(json!(row.get::<Option<i16>, _>(col_name))),
-        "INT4" => Ok(json!(row.get::<Option<i32>, _>(col_name))),
-        "INT8" => Ok(json!(row.get::<Option<i64>, _>(col_name))),
+        "INT2" | "INT4" | "INT8" => Ok(json!(row.get::<Option<i64>, _>(col_name))),
 
         // 浮点数类型
-        "FLOAT4" => Ok(json!(row.get::<Option<f32>, _>(col_name))),
-        "FLOAT8" => Ok(json!(row.get::<Option<f64>, _>(col_name))),
+        "FLOAT4" | "FLOAT8" => Ok(json!(row.get::<Option<f64>, _>(col_name))),
 
         // 高精度数值
         "NUMERIC" => {
@@ -360,8 +357,12 @@ fn convert_value_pg(row: &PgRow, idx: usize) -> Result<serde_json::Value, sqlx::
         "INET" | "CIDR" | "MACADDR" => Ok(json!(row.get::<Option<String>, _>(col_name))),
 
         // 数组类型
-        "INT4[]" => Ok(json!(row.get::<Option<Vec<Option<i32>>>, _>(col_name))),
-        "TEXT[]" => Ok(json!(row.get::<Option<Vec<Option<String>>>, _>(col_name))),
+        "INT2[]" | "INT4[]" | "INT8[]" => {
+            Ok(json!(row.get::<Option<Vec<Option<i64>>>, _>(col_name)))
+        }
+        "TEXT[]" | "VARCHAR[]" | "BPCHAR[]" | "NAME[]" => {
+            Ok(json!(row.get::<Option<Vec<Option<String>>>, _>(col_name)))
+        }
 
         // 默认处理为字符串或标记不支持
         _ => {
