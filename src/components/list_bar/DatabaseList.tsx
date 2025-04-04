@@ -126,7 +126,7 @@ export function DatabaseList() {
     getData();
 
     // 监听 store 的变化
-    const unsubscribe = subscribeKey(appState, "currentTableName", (_value: any) => {
+    const unsubscribe = subscribeKey(appState, "config", (_value: any) => {
       getData();
     });
     return () => unsubscribe();
