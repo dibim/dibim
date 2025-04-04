@@ -20,10 +20,10 @@ import { appState } from "@/store/valtio";
 import { Card, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { TableEditorConstraint } from "./TableEditorConstraint";
-import { TableEditorData } from "./TableEditorData";
-import { TableEditorDdl } from "./TableEditorDdl";
-import { TableEditorStructure } from "./TableEditorStructure";
+import { TableEditorConstraint } from "./TableConstraint";
+import { TableEditorData } from "./TableData";
+import { TableEditorDdl } from "./TableDdl";
+import { TableEditorStructure } from "./TableStructure";
 
 export function TableEditor() {
   const snap = useSnapshot(appState);
