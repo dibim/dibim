@@ -334,5 +334,5 @@ export function genAlterCmdPg(val: AllAlterAction[]) {
     }
   }
 
-  return res.join("");
+  return res.join("\n");
 }
