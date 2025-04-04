@@ -107,7 +107,7 @@ export function TableEditor() {
             }}
           />
         </div>
-        <TabsList className="grid grid-cols-6">
+        <TabsList className="grid grid-cols-3">
           <TabsTrigger
             value={TAB_STRUCTURE}
             onClick={() => {
@@ -126,6 +126,7 @@ export function TableEditor() {
             DDL
           </TabsTrigger>
 
+          {/* 
           <TabsTrigger
             value={TAB_CONSTRAINT}
             onClick={() => {
@@ -151,7 +152,8 @@ export function TableEditor() {
             }}
           >
             分区
-          </TabsTrigger>
+          </TabsTrigger> 
+          */}
 
           <TabsTrigger
             value={TAB_DATA}
