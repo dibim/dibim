@@ -17,7 +17,7 @@ pub fn get_db_type(url: &str) -> Result<DbType, Error> {
         Ok(DbType::Postgres)
     } else if url_lower.starts_with("mysql://") {
         Ok(DbType::MySql)
-    } else if url_lower.starts_with("sqlite::") {
+    } else if url_lower.starts_with("sqlite:") {
         Ok(DbType::Sqlite)
     } else {
         Err(Error::Configuration(

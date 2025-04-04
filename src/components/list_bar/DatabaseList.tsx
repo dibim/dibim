@@ -42,7 +42,9 @@ export function DatabaseList() {
 
   // 点击连接
   async function clickConn(conn: DbConnections) {
-    appState.setCurrentConnName(conn.name); // TODO: 先设置, 否则 connect 里获取不到
+    // 先设置这两项, 否则 connect 里获取不到
+    appState.setCurrentDbType(conn.dbType);
+    appState.setCurrentConnName(conn.name);
 
     const res = await connect({
       dbName: conn.dbName,
@@ -50,6 +52,7 @@ export function DatabaseList() {
       password: conn.password,
       port: conn.port,
       user: conn.user,
+      filePath: conn.filePath,
     });
 
     if (res) {

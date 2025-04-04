@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { open } from "@tauri-apps/plugin-dialog";
 import MysqlLogo from "@/assets/db_logo/mysql.svg?react";
 import PostgresqlLogo from "@/assets/db_logo/postgresql.svg?react";
 import SqliteLogo from "@/assets/db_logo/sqlite.svg?react";
@@ -201,6 +202,20 @@ export function Connection(props: ConnectionProp) {
           {dbType === DB_TYPE_SQLITE && (
             <LabeledDiv direction={DIR_H} label={"文件路径"} className="py-2">
               <Input value={filePath} onInput={onInputFilePath} />
+              <div className="py-1"></div>
+              <Button
+                variant={"outline"}
+                onClick={async () => {
+                  const file = await open({
+                    multiple: false,
+                    directory: false,
+                  });
+                  console.log(file);
+                  if (file) setFilePath(file);
+                }}
+              >
+                选择
+              </Button>
             </LabeledDiv>
           )}
 

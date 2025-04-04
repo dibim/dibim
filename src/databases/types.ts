@@ -32,6 +32,7 @@ export interface DbConnectionParam {
   host: string;
   password: string;
   port: number;
+  filePath: string; // 数据库文件, 用于 SQLite | Database file, used for SQLite
   sslmode?: SslMode;
   user: string;
 }
