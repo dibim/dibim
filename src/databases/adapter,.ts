@@ -21,8 +21,24 @@ import { fieldTypeOptionsMysql } from "./MySQL/select_options";
 import { genAlterCmdPg } from "./PostgreSQL/alter_table";
 import { getDataTypeCategoryPg } from "./PostgreSQL/icon";
 import { fieldTypeOptionsPg } from "./PostgreSQL/select_options";
+import { getDataTypeCategorySqlite } from "./SQLite/icon";
 import { fieldTypeOptionsSqlite } from "./SQLite/select_options";
-import { connectSqlite, getAllTableNameSqlite, getAllTableSizeSqlite, getTableDdlSqlite, getTableStructureSqlite } from "./SQLite/sql";
+import {
+  connectSqlite,
+  genDeleteFieldCmdSqlite,
+  genDeleteRowsCmdSqlite,
+  genDeleteTableCmdSqlite,
+  genInsertRowsCmdSqlite,
+  genRenameFieldCmdSqlite,
+  genRenameTableCmdSqlite,
+  genTruncateTableCmdSqlite,
+  genUpdateFieldCmdSqlite,
+  getAllTableNameSqlite,
+  getAllTableSizeSqlite,
+  getTableDataSqlite,
+  getTableDdlSqlite,
+  getTableStructureSqlite,
+} from "./SQLite/sql";
 import { AllAlterAction, DbConnectionParam, FieldWithValue, GetTableDataParam } from "./types";
 
 // 连接数据库
@@ -93,7 +109,7 @@ export async function getTableData(params: GetTableDataParam) {
 
   if (currentDbType === DB_TYPE_MYSQL) return; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return getTableDataPg(currentConnName, params);
-  if (currentDbType === DB_TYPE_SQLITE) return; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return getTableDataSqlite(currentConnName, params);
 }
 
 // 生成重命名表格的语句
@@ -102,7 +118,7 @@ export function genRenameTableCmd(oldName: string, newName: string) {
 
   if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return genRenameTableCmdPg(oldName, newName);
-  if (currentDbType === DB_TYPE_SQLITE) return ""; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return genRenameTableCmdSqlite(oldName, newName);
 
   return "";
 }
@@ -113,7 +129,7 @@ export function genTruncateTableCmd(tbName: string) {
 
   if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return genTruncateTableCmdPg(tbName);
-  if (currentDbType === DB_TYPE_SQLITE) return ""; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return genTruncateTableCmdSqlite(tbName);
 
   return "";
 }
@@ -124,7 +140,7 @@ export function genDeleteTableCmd(tbName: string) {
 
   if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return genDeleteTableCmdPg(tbName);
-  if (currentDbType === DB_TYPE_SQLITE) return ""; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) genDeleteTableCmdSqlite(tbName);
 
   return "";
 }
@@ -135,7 +151,7 @@ export function genRenameFieldCmd(tbName: string, oldName: string, newName: stri
 
   if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return genRenameFieldCmdPg(tbName, oldName, newName);
-  if (currentDbType === DB_TYPE_SQLITE) return ""; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return genRenameFieldCmdSqlite(tbName, oldName, newName);
 
   return "";
 }
@@ -146,7 +162,7 @@ export function genDeleteFieldCmd(tbName: string, fieldName: string) {
 
   if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return genDeleteFieldCmdPg(tbName, fieldName);
-  if (currentDbType === DB_TYPE_SQLITE) return ""; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return genDeleteFieldCmdSqlite(tbName, fieldName);
 
   return "";
 }
@@ -168,7 +184,7 @@ export function genUpdateFieldCmd(tbName: string, uniqueField: FieldWithValue, f
 
   if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return genUpdateFieldCmdPg(tbName, uniqueField, fieldArr);
-  if (currentDbType === DB_TYPE_SQLITE) return ""; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return genUpdateFieldCmdSqlite(tbName, uniqueField, fieldArr);
 
   return "";
 }
@@ -179,7 +195,7 @@ export function genDeleteRowsCmd(tbName: string, fieldName: string, fieldValues:
 
   if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return genDeleteRowsCmdPg(tbName, fieldName, fieldValues);
-  if (currentDbType === DB_TYPE_SQLITE) return ""; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return genDeleteRowsCmdSqlite(tbName, fieldName, fieldValues);
 
   return "";
 }
@@ -190,7 +206,7 @@ export function genInsertRowsCmd(tbName: string, fieldNames: string[], fieldValu
 
   if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return genInsertRowsCmdPg(tbName, fieldNames, fieldValues);
-  if (currentDbType === DB_TYPE_SQLITE) return ""; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return genInsertRowsCmdSqlite(tbName, fieldNames, fieldValues);
 
   return "";
 }
@@ -201,7 +217,7 @@ export function getDataTypeCategory(val: string) {
 
   if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return getDataTypeCategoryPg(val);
-  if (currentDbType === DB_TYPE_SQLITE) return ""; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return getDataTypeCategorySqlite(val);
 
   return "";
 }
