@@ -21,7 +21,7 @@ import { Checkbox } from "../ui/checkbox";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { renderDataTypeIcon } from "./TableStructureIcon";
+import { DataTypeIcon } from "../DataTypeIcon";
 
 type DialogAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
 
@@ -167,6 +167,11 @@ export function TableEditorStructure({
       fieldIndexPkAutoIncrement: false,
       fieldIndexName: fieldIndexName,
       fieldComment: field.comment,
+      //TODO:
+      fieldIndexTypeOld: "",
+      fieldTypeOld: "",
+      fieldNotNullOld: false,
+      fieldDefalutOld: null,
     });
     setFieldNameEditing(field.column_name);
     setShowDialogEdit(true);
@@ -244,6 +249,11 @@ export function TableEditorStructure({
       fieldNotNull,
       fieldSize,
       fieldType,
+      // TODO:
+      fieldIndexTypeOld: "",
+      fieldTypeOld: "",
+      fieldNotNullOld: false,
+      fieldDefalutOld: null,
     };
 
     if (actionDataFindedIndex > -1) {
@@ -346,7 +356,7 @@ export function TableEditorStructure({
           data_type: {
             render: (val: any) => (
               <div className="flex">
-                <span className="pe-2">{renderDataTypeIcon(val)}</span>
+                <span className="pe-2">{DataTypeIcon(val)}</span>
                 <span>{val}</span>
               </div>
             ),

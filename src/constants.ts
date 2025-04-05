@@ -62,16 +62,13 @@ export const FIELD_TYPE_BOOLEAN = "BOOLEAN";
 export const FIELD_TYPE_CHARACTER = "CHARACTER";
 export const FIELD_TYPE_COMPOSITE = "COMPOSITE";
 export const FIELD_TYPE_DATETIME = "DATETIME";
-export const FIELD_TYPE_DOMAIN = "DOMAIN";
-export const FIELD_TYPE_ENUM = "ENUM";
 export const FIELD_TYPE_GEOMETRIC = "GEOMETRIC";
 export const FIELD_TYPE_JSON = "JSON";
-export const FIELD_TYPE_MONETARY = "MONETARY";
 export const FIELD_TYPE_NETWORK = "NETWORK";
 export const FIELD_TYPE_NUMERIC = "NUMERIC";
 export const FIELD_TYPE_RANGE = "RANGE";
 export const FIELD_TYPE_TEXT_SEARCH = "TEXT_SEARCH";
-export const FIELD_TYPE_UUID = "UUID";
+export const FIELD_TYPE_OTHER = "OTHER";
 
 // 列表栏的类型
 // Type of List Bar
