@@ -4,18 +4,14 @@ import {
   FIELD_TYPE_BIT_STRING,
   FIELD_TYPE_BOOLEAN,
   FIELD_TYPE_CHARACTER,
-  FIELD_TYPE_COMPOSITE,
   FIELD_TYPE_DATETIME,
-  FIELD_TYPE_DOMAIN,
-  FIELD_TYPE_ENUM,
   FIELD_TYPE_GEOMETRIC,
   FIELD_TYPE_JSON,
-  FIELD_TYPE_MONETARY,
   FIELD_TYPE_NETWORK,
   FIELD_TYPE_NUMERIC,
+  FIELD_TYPE_OTHER,
   FIELD_TYPE_RANGE,
   FIELD_TYPE_TEXT_SEARCH,
-  FIELD_TYPE_UUID,
 } from "@/constants";
 
 const typeCategoryMap: Record<string, string> = {
@@ -31,7 +27,7 @@ const typeCategoryMap: Record<string, string> = {
   int8: FIELD_TYPE_NUMERIC,
   int: FIELD_TYPE_NUMERIC,
   integer: FIELD_TYPE_NUMERIC,
-  money: FIELD_TYPE_MONETARY,
+  money: FIELD_TYPE_NUMERIC,
   numeric: FIELD_TYPE_NUMERIC,
   real: FIELD_TYPE_NUMERIC,
   serial2: FIELD_TYPE_NUMERIC,
@@ -107,9 +103,9 @@ const typeCategoryMap: Record<string, string> = {
   daterange: FIELD_TYPE_RANGE,
 
   // ================ 特殊 | Special ================
-  enum: FIELD_TYPE_ENUM,
-  uuid: FIELD_TYPE_UUID,
-  domain: FIELD_TYPE_DOMAIN,
+  enum: FIELD_TYPE_OTHER,
+  uuid: FIELD_TYPE_OTHER,
+  domain: FIELD_TYPE_OTHER,
 
   // 其它类型不应当在建表的时候使用
 };

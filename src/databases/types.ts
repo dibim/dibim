@@ -138,6 +138,12 @@ export type FieldAlterAction = {
   fieldIndexPkAutoIncrement: boolean; // 字段主键自增
   fieldIndexName: string; // 字段索引名
   fieldComment: string; // 字段备注
+
+  // 原先的信息, sqlite 需要对比是否修改
+  fieldIndexTypeOld: UniqueConstraint; // 字段索引类型
+  fieldTypeOld: string; // 字段类型
+  fieldNotNullOld: boolean; // 字段非空
+  fieldDefalutOld: string | null; // 字段默认值
 };
 
 // 对表的修改数据
