@@ -36,7 +36,7 @@ export async function getAllTableSizeSqlite(connName: string) {
   const sql = `
     WITH storage_info AS (
       SELECT
-        COALESCE(i.tbl_name, t.name) AS table_name,  -- 修正列名
+        COALESCE(i.tbl_name, t.name) AS table_name,  -- 修正字段名
         SUM(CASE WHEN t.type = 'table' THEN s.pgsize ELSE 0 END) AS table_bytes,
         SUM(CASE WHEN i.type = 'index' THEN s.pgsize ELSE 0 END) AS index_bytes
       FROM dbstat s
@@ -47,7 +47,7 @@ export async function getAllTableSizeSqlite(connName: string) {
       LEFT JOIN sqlite_schema i 
         ON s.name = i.name 
         AND i.type = 'index' 
-        AND i.tbl_name NOT LIKE 'sqlite_%'  -- 修正列名
+        AND i.tbl_name NOT LIKE 'sqlite_%'  -- 修正字段名
       GROUP BY COALESCE(i.tbl_name, t.name)
       )
     SELECT
@@ -87,7 +87,7 @@ type TableStructureSqlite = {
 export async function getTableStructureSqlite(connName: string, tbName: string) {
   const sql = `
     WITH 
-    -- 基础列信息
+    -- 基础字段信息
     table_info AS (
         SELECT 
             cid,
@@ -179,7 +179,7 @@ export async function getTableStructureSqlite(connName: string, tbName: string) 
       return {
         column_default: item.default_value,
         column_name: item.column_name,
-        comment: "", // SQLite不原生支持列注释
+        comment: "", // SQLite不原生支持字段注释
         data_type: item.data_type,
         has_check_conditions: item.check_constraint,
         indexes: [],

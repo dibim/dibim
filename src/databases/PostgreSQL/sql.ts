@@ -76,7 +76,7 @@ export async function getAllTableSizePg(connName: string) {
 
 // 获取表结构
 export async function getTableStructurePg(connName: string, tbName: string) {
-  // 基础列信息
+  // 基础字段信息
   const columnSql = `
     SELECT
         a.attname AS column_name,
@@ -155,12 +155,12 @@ export async function getTableStructurePg(connName: string, tbName: string) {
     invoker.querySql(connName, indexSql),
   ]);
 
-  // 处理列信息
+  // 处理字段信息
   const columns = columnRes.data ? (JSON.parse(columnRes.data) as TableStructure[]) : [];
   // 处理索引信息
   const indexes = indexRes.data ? (JSON.parse(indexRes.data) as IndexQueryResult[]) : [];
 
-  // 将索引信息合并到列信息中
+  // 将索引信息合并到字段信息中
   const columnIndexMap: Record<string, ColumnIndex[]> = {};
   indexes.forEach((index) => {
     if (!columnIndexMap[index.column_name]) {

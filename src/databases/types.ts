@@ -72,7 +72,7 @@ export type CommonSQLValue =
   | ArrayBuffer // 二进制数据通用表示
   | Array<CommonSQLValue>; // 数组类型（部分数据库支持）
 
-// 表结构列表的数据
+// 表结构字段表的数据
 // 这是从数据库查询的结果
 //
 // 注意: 命名方式按照数据库的
@@ -129,7 +129,7 @@ export type FieldAlterAction = {
   tableName: string;
 
   fieldName: string;
-  fieldNameExt: string; // 改名时作为新字段名, 设置索引时作为作音的列名 TODO: 后续要支持复合索引
+  fieldNameExt: string; // 改名时作为新字段名, 设置索引时作为作音的字段名 TODO: 后续要支持复合索引
   fieldType: string; // 字段类型
   fieldSize: string; // 字段大小
   fieldDefalut: string | null; // 字段默认值
