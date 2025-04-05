@@ -164,14 +164,14 @@ export async function getTableStructureSqlite(connName: string, tbName: string) 
     SELECT 
       ti.cid AS "columnId",
       ti.name AS "columnName",
-      ti.type AS "dataType',
+      ti.type AS "dataType",
       ti.type_size AS "typeSize",
       ti.[notnull] AS "isNotNull",
       ti.default_value AS "defaultValue",
       ti.pk AS "isPrimaryKey",
       fk.fk_table AS "fkTable",
       fk.fk_column AS "fkColumn",
-      COALESCE(ui.isUnique, 0) AS "isUnique",
+      COALESCE(ui.is_unique, 0) AS "isUnique",
       cc.sql AS "checkConstraint",
       (SELECT sql FROM sqlite_master 
       WHERE type = 'table' AND name = '${tbName}') AS "fullDdl"
