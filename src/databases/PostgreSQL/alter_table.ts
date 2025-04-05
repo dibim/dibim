@@ -195,7 +195,7 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
     res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.fieldNameExt}" DROP DEFAULT;`);
   }
 
-  // 修改列备注
+  // 修改字段备注
   if (faa.fieldComment) {
     const fv = formatToSqlValuePg(faa.fieldComment, true);
     res.push(`COMMENT ON COLUMN "${faa.tableName}"."${faa.fieldNameExt}" IS ${fv};`);
@@ -203,7 +203,7 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
     res.push(`COMMENT ON COLUMN "${faa.tableName}"."${faa.fieldNameExt}" IS NULL;`);
   }
 
-  // 修改列名要放在最后处理, 避免其它修改找不到表名
+  // 修改字段名要放在最后处理, 避免其它修改找不到表名
   if (faa.fieldName !== faa.fieldNameExt) {
     res.push(`ALTER TABLE "${faa.tableName}" RENAME COLUMN "${faa.fieldName}" TO "${faa.fieldNameExt}";`);
   }
@@ -313,14 +313,14 @@ export function genAlterCmdPg(val: AllAlterAction[]) {
   for (const item of val) {
     if (item.target === STR_TABLE) {
       const taa = item as TableAlterAction;
-      // 修改表
+      // 对表的修改
       if (taa.action === STR_EDIT) {
         res = res.concat(genAlterTableEdit(taa));
       }
     }
 
     if (item.target === STR_FIELD) {
-      // 对列的修改
+      // 对字段的修改
       const faa = item as FieldAlterAction;
       if (faa.action === STR_EDIT) {
         res = res.concat(genAlterFieldEdit(faa));
