@@ -112,6 +112,10 @@ export const reIsSingletQuery =
 export const reNumStr = /^\d+$/;
 // 正则表达式用于匹配 WHERE 之后的部分
 export const reWhereClause = /from\s+("[^"]+"|`[^`]+`|'[^']+'|\w+)(?:\s+(.*))?/i;
+// 一个单词
+export const reOneWord = /^\s*(\S+)\s*$/;
+// 两个单词, 中间使用任意空白分割
+export const reTwoWords = /^\s*(\S+)\s+(\S+)\s*$/;
 
 // 分页
 // pagination

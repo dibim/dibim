@@ -74,32 +74,37 @@ export type SqlValueCommon =
 
 // 所有 SQL 数据库类性共有的字段属性
 export interface SqlFieldDefinitionCommon {
-  checkConstraint: string | null; //CHECK 约束条件
-  defaultValue: string | null; // 默认值表达式
-  isNullable: boolean; // 是否允许 NULL
-  isPrimaryKey: boolean; // 是否是主键
-  isUniqueKey: boolean; // 是否唯一
-  name: string; // 字段名
-  type: string; // 数据类型
-}
-
-// 表结构字段表的数据
-// 这是从数据库查询的结果
-//
-// 注意: 数据来自数据库, 要和查询语句对应
-//
-export type TableStructure = {
-  defaultValue: string;
-  columnName: string;
   comment: string;
-  dataType: string;
-  hasCheckConditions: any;
-  indexes?: ColumnIndex[];
-  isForeignKey: boolean;
-  isNotNull: boolean;
+  defaultValue: string | null;
+  isNullable: boolean;
   isPrimaryKey: boolean;
   isUniqueKey: boolean;
-  size: string;
+  name: string;
+  size: string | null;
+  type: string;
+  checkConstraint?: string | null; //CHECK 约束条件
+}
+
+// 所有 SQL 数据库类性共有的表格约束
+export type ReferentialAction = "NO ACTION" | "RESTRICT" | "SET NULL" | "SET DEFAULT" | "CASCADE";
+export interface SqlTableConstraintCommon {
+  type: "PRIMARY_KEY" | "UNIQUE" | "CHECK" | "FOREIGN_KEY"; // 约束类型
+  name: string | null; // 约束名称（允许匿名约束）
+  columns: string[] | null; // 作用列（CHECK约束可能不需要）
+  condition: string | null; // CHECK约束表达式
+
+  // 外键专用属性
+  referenceTable: string | null; // 引用表名
+  referenceColumns: string[] | null; // 引用表列
+  onDelete: ReferentialAction | null; // 级联删除策略
+  onUpdate: ReferentialAction | null; // 级联更新策略
+}
+
+// 表结构的字段数据
+export type FieldStructure = SqlFieldDefinitionCommon & {
+  isForeignKey: boolean;
+  hasCheckConditions: any;
+  indexes?: ColumnIndex[];
 };
 
 // 字段的索引信息
@@ -144,7 +149,7 @@ export type FieldAlterAction = {
   fieldType: string; // 字段类型
   fieldSize: string; // 字段大小
   fieldDefalut: string | null; // 字段默认值
-  fieldNotNull: boolean; // 字段非空
+  fieldIsNullable: boolean; // 字段非空
   fieldIndexType: UniqueConstraint; // 字段索引类型
   fieldIndexPkAutoIncrement: boolean; // 字段主键自增
   fieldIndexName: string; // 字段索引名
