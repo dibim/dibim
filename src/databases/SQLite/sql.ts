@@ -1,3 +1,19 @@
+/**
+ *
+ * 注意:
+ * 查询 SQL 的返回值为了和 Javascript 的命名方式统一, 使用了 lowerCamelCase 命名方式, 因此也要修改 SQL 语句要输出的字段名,
+ * 但是:
+ * MySQL / MariaDB /  PostgreSQL / SQL Server / Oracle 需要使用引号把字段名套起来才能返回预期的字段名, 否则会变成全部小写.
+ * SQLite 可以保留大小写, 但为了统一, 字段名也都套上引号.
+ *
+ * 数据库	    引用符号	示例
+ * PostgreSQL	"	        SELECT "columnName"
+ * SQLite	    "       	SELECT "columnName"
+ * Oracle	    "	        SELECT "columnName"
+ * MySQL	    `       	SELECT `columnName`
+ * SQL Server	[]	      SELECT [columnName]
+ *
+ */
 import { invoker } from "@/invoker";
 import { DbConnectionParam, DbCountRes, FieldWithValue, GetTableDataParam, TableStructure } from "../types";
 import { formatToSqlValueSqlite } from "./format";
@@ -69,18 +85,18 @@ export async function getAllTableSizeSqlite(connName: string) {
 }
 
 type TableStructureSqlite = {
-  check_constraint: number;
-  column_id: number;
-  column_name: string;
-  data_type: string;
-  default_value: string;
-  fk_column: number;
-  fk_table: number;
-  full_ddl: string;
-  is_not_null: number;
-  is_primary_key: number;
-  is_unique: number;
-  type_size: number;
+  checkConstraint: number;
+  columnId: number;
+  columnName: string;
+  dataType: string;
+  defaultValue: string;
+  fkColumn: number;
+  fkTable: number;
+  fullDdl: string;
+  isNotNull: number;
+  isPrimaryKey: number;
+  isUnique: number;
+  typeSize: number;
 };
 
 // 获取表结构
@@ -89,105 +105,106 @@ export async function getTableStructureSqlite(connName: string, tbName: string) 
     WITH 
     -- 基础字段信息
     table_info AS (
-        SELECT 
-            cid,
-            name,
-            type,
-            CASE 
-                WHEN type LIKE '%(%)%' THEN
-                    substr(
-                        type,
-                        instr(type, '(') + 1,
-                        instr(type, ')') - instr(type, '(') - 1
-                    )
-                ELSE NULL
-            END AS type_size,
-            [notnull],
-            CASE 
-                WHEN dflt_value IS NULL THEN 'NULL'
-                WHEN dflt_value = '' THEN ''''''
-                ELSE dflt_value 
-            END AS dflt_value,
-            pk
-        FROM pragma_table_info('${tbName}')
+      SELECT 
+        cid,
+        name,
+        type,
+        CASE 
+          WHEN type LIKE '%(%)%' THEN
+            substr(
+              type,
+              instr(type, '(') + 1,
+              instr(type, ')') - instr(type, '(') - 1
+            )
+          ELSE NULL
+        END AS type_size,
+        [notnull],
+        CASE 
+            WHEN dflt_value IS NULL THEN 'NULL'
+            WHEN dflt_value = '' THEN ''''''
+            ELSE dflt_value 
+        END AS default_value,
+        pk
+      FROM pragma_table_info('${tbName}')
     ),
     -- 外键信息
     fk_info AS (
-        SELECT 
-            [from] AS column_name,
-            [table] AS fk_table,
-            [to] AS fk_column
-        FROM pragma_foreign_key_list('${tbName}')
+      SELECT 
+        [from] AS column_name,
+        [table] AS fk_table,
+        [to] AS fk_column
+      FROM pragma_foreign_key_list('${tbName}')
     ),
     -- 唯一索引信息
     unique_indexes AS (
-        SELECT 
-            ix.name AS column_name,
-            1 AS is_unique
-        FROM 
-            pragma_index_list('${tbName}') il
-        JOIN 
-            pragma_index_xinfo(il.name) ix
-        WHERE 
-            il.[unique] = 1
-        GROUP BY 
-            ix.name
+      SELECT 
+        ix.name AS column_name,
+        1 AS is_unique
+      FROM 
+        pragma_index_list('${tbName}') il
+      JOIN 
+        pragma_index_xinfo(il.name) ix
+      WHERE 
+        il.[unique] = 1
+      GROUP BY 
+        ix.name
     ),
     -- 检查约束信息
     check_constraints AS (
-        SELECT 
-            name AS constraint_name,
-            sql
-        FROM 
-            sqlite_master
-        WHERE 
-            type = 'table'
-            AND name = '${tbName}'
-            AND sql LIKE '%CHECK%'
+      SELECT 
+        name AS constraint_name,
+        sql
+      FROM 
+        sqlite_master
+      WHERE 
+        type = 'table'
+        AND name = '${tbName}'
+        AND sql LIKE '%CHECK%'
     )
     SELECT 
-        ti.cid AS column_id,
-        ti.name AS column_name,
-        ti.type AS data_type,
-        ti.type_size,
-        ti.[notnull] AS is_not_null,
-        ti.dflt_value AS default_value,
-        ti.pk AS is_primary_key,
-        fk.fk_table,
-        fk.fk_column,
-        COALESCE(ui.is_unique, 0) AS is_unique,
-        cc.sql AS check_constraint,
-        (SELECT sql FROM sqlite_master 
-        WHERE type = 'table' AND name = '${tbName}') AS full_ddl
+      ti.cid AS "columnId",
+      ti.name AS "columnName",
+      ti.type AS "dataType',
+      ti.type_size AS "typeSize",
+      ti.[notnull] AS "isNotNull",
+      ti.default_value AS "defaultValue",
+      ti.pk AS "isPrimaryKey",
+      fk.fk_table AS "fkTable",
+      fk.fk_column AS "fkColumn",
+      COALESCE(ui.isUnique, 0) AS "isUnique",
+      cc.sql AS "checkConstraint",
+      (SELECT sql FROM sqlite_master 
+      WHERE type = 'table' AND name = '${tbName}') AS "fullDdl"
     FROM 
-        table_info ti
+      table_info ti
     LEFT JOIN 
-        fk_info fk ON ti.name = fk.column_name
+      fk_info fk ON ti.name = fk.column_name
     LEFT JOIN 
-        unique_indexes ui ON ti.name = ui.column_name
+      unique_indexes ui ON ti.name = ui.column_name
     LEFT JOIN
-        check_constraints cc ON 1=1
+      check_constraints cc ON 1=1
     ORDER BY 
         ti.cid;
   ;`;
   const dbRes = await invoker.querySql(connName, sql);
+
   const structureArr = JSON.parse(dbRes.data) as TableStructureSqlite[];
 
   return {
     columnName: [],
     data: structureArr.map((item) => {
       return {
-        column_default: item.default_value,
-        column_name: item.column_name,
+        defaultValue: item.defaultValue,
+        columnName: item.columnName,
         comment: "", // SQLite不原生支持字段注释
-        data_type: item.data_type,
-        has_check_conditions: item.check_constraint,
+        dataType: item.dataType,
+        hasCheckConditions: item.checkConstraint,
         indexes: [],
-        is_foreign_key: item.fk_column > 0,
-        is_not_null: item.is_not_null > 0,
-        is_primary_key: item.is_primary_key === 1,
-        is_unique_key: item.is_unique === 1,
-        size: `${item.type_size}`,
+        isForeignKey: item.fkColumn > 0,
+        isNotNull: item.isNotNull > 0,
+        isPrimaryKey: item.isPrimaryKey === 1,
+        isUniqueKey: item.isUnique === 1,
+        size: `${item.typeSize}`,
       } as TableStructure;
     }),
   };
