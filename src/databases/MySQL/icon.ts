@@ -4,11 +4,10 @@ import {
   FIELD_TYPE_BOOLEAN,
   FIELD_TYPE_CHARACTER,
   FIELD_TYPE_DATETIME,
-  FIELD_TYPE_ENUM,
   FIELD_TYPE_GEOMETRIC,
   FIELD_TYPE_JSON,
-  FIELD_TYPE_MONETARY,
   FIELD_TYPE_NUMERIC,
+  FIELD_TYPE_OTHER,
 } from "@/constants";
 
 const typeCategoryMap: Record<string, string> = {
@@ -70,10 +69,10 @@ const typeCategoryMap: Record<string, string> = {
 
   // ====================== 结构化数据 | Structured data ======================
   json: FIELD_TYPE_JSON,
-  set: FIELD_TYPE_MONETARY,
+  set: FIELD_TYPE_JSON,
 
   // ================ 特殊 | Special ================
-  enum: FIELD_TYPE_ENUM,
+  enum: FIELD_TYPE_OTHER,
 };
 
 /**
