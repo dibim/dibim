@@ -5,7 +5,7 @@ import { subscribeKey } from "valtio/utils";
 import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
 import { exec, fieldTypeOptions, genAlterCmd, genDeleteFieldCmd } from "@/databases/adapter,";
 import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "@/databases/constants";
-import { AllAlterAction, FieldAlterAction, TableStructure } from "@/databases/types";
+import { AllAlterAction, FieldAlterAction, FieldStructure } from "@/databases/types";
 import { cn } from "@/lib/utils";
 import { appState } from "@/store/valtio";
 import { UniqueConstraint } from "@/types/types";
@@ -77,7 +77,7 @@ export function TableEditorStructure({
     setFieldIndexPkAutoIncrement(faa?.fieldIndexPkAutoIncrement || false);
     setFieldIndexType(faa?.fieldIndexType || "");
     setFieldName(faa?.fieldName || "");
-    setFieldNotNull(faa?.fieldNotNull || false);
+    setFieldNotNull(faa?.fieldIsNullable || false);
     setFieldSize(faa?.fieldSize || "");
     setFieldType(faa?.fieldType || "");
 
@@ -107,12 +107,12 @@ export function TableEditorStructure({
           action: STR_DELETE,
           tableName: appState.currentTableName,
 
-          fieldName: field.columnName,
+          fieldName: field.name,
           fieldNameExt: "",
           fieldType: "",
           fieldSize: "",
           fieldDefalut: "",
-          fieldNotNull: false,
+          fieldIsNullable: false,
           fieldIndexType: "",
           fieldIndexPkAutoIncrement: false,
           fieldIndexName: "",
@@ -173,18 +173,18 @@ export function TableEditorStructure({
       fieldIndexName: fieldIndexName,
       fieldIndexPkAutoIncrement: false,
       fieldIndexType: fieldIndexType,
-      fieldName: field.columnName,
+      fieldName: field.name,
       fieldNameExt: "",
-      fieldNotNull: field.isNotNull,
+      fieldIsNullable: field.isNullable,
       fieldSize: `${field.size}`,
-      fieldType: field.dataType,
+      fieldType: field.type,
 
       fieldDefalutOld: field.defaultValue,
       fieldIndexTypeOld: fieldIndexType,
-      fieldNotNullOld: field.isNotNull,
-      fieldTypeOld: field.dataType,
+      fieldNotNullOld: field.isNullable,
+      fieldTypeOld: field.type,
     });
-    setFieldNameEditing(field.columnName);
+    setFieldNameEditing(field.name);
     setShowDialogEdit(true);
     setDialogAction(STR_EDIT);
   }
@@ -193,7 +193,7 @@ export function TableEditorStructure({
   async function handleCopyFieldName(index: number) {
     const field = appState.currentTableStructure[index];
     try {
-      await navigator.clipboard.writeText(field.columnName);
+      await navigator.clipboard.writeText(field.name);
       toast("复制成功");
     } catch (err) {
       toast("复制失败");
@@ -204,7 +204,7 @@ export function TableEditorStructure({
   async function handleCopyFieldType(index: number) {
     const field = appState.currentTableStructure[index];
     try {
-      await navigator.clipboard.writeText(field.dataType);
+      await navigator.clipboard.writeText(field.type);
       toast("复制成功");
     } catch (err) {
       toast("复制失败");
@@ -255,7 +255,7 @@ export function TableEditorStructure({
       fieldIndexType,
       fieldName: dialogAction === STR_EDIT ? fieldNameEditing : fieldName, // 如果是编辑, 要记录编辑之前的字段名
       fieldNameExt: fieldName, // 输入框里的字段名
-      fieldNotNull,
+      fieldIsNullable: fieldNotNull,
       fieldSize,
       fieldType,
 
@@ -277,12 +277,12 @@ export function TableEditorStructure({
         ...appState.currentTableStructure,
         {
           defaultValue: fieldDefalut,
-          columnName: actionData.fieldName,
+          name: actionData.fieldName,
           comment: fieldComment,
-          dataType: fieldType,
+          type: fieldType,
           hasCheckConditions: false,
           isForeignKey: false,
-          isNotNull: fieldNotNull,
+          isNullable: fieldNotNull,
           isPrimaryKey: fieldIndexType === INDEX_PRIMARY_KEY,
           isUniqueKey: fieldIndexType === INDEX_UNIQUE,
           size: fieldSize,
@@ -312,9 +312,9 @@ export function TableEditorStructure({
    * @returns
    */
   function findFieldNameByIndex(index: number) {
-    const tableDataPg = appState.currentTableStructure as unknown as TableStructure[];
+    const tableDataPg = appState.currentTableStructure as unknown as FieldStructure[];
     if (index <= tableDataPg.length) {
-      return tableDataPg[index].columnName;
+      return tableDataPg[index].name;
     }
 
     return "";
@@ -361,7 +361,7 @@ export function TableEditorStructure({
     const dataArrTemp = appState.currentTableStructure.map(
       (row) =>
         ({
-          columnName: { render: (val: any) => <div>{val}</div>, value: row.columnName },
+          columnName: { render: (val: any) => <div>{val}</div>, value: row.name },
           dataType: {
             render: (val: any) => (
               <div className="flex">
@@ -369,13 +369,13 @@ export function TableEditorStructure({
                 <span>{val}</span>
               </div>
             ),
-            value: row.dataType,
+            value: row.type,
           },
           isPrimaryKey: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: row.isPrimaryKey },
           isForeignKey: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: row.isForeignKey },
           isUniqueKey: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: row.isUniqueKey },
           hasCheckConditions: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: row.hasCheckConditions },
-          isNotNull: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: row.isNotNull },
+          isNotNull: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: !row.isNullable },
           defaultValue: { render: (val: any) => <div>{val}</div>, value: row.defaultValue },
           comment: { render: (val: any) => <div className="w-full">{val}</div>, value: row.comment },
         }) as ListRow,

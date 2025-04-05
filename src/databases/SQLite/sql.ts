@@ -15,7 +15,7 @@
  *
  */
 import { invoker } from "@/invoker";
-import { DbConnectionParam, DbCountRes, FieldWithValue, GetTableDataParam, TableStructure } from "../types";
+import { DbConnectionParam, DbCountRes, FieldWithValue, GetTableDataParam, FieldStructure } from "../types";
 import { formatToSqlValueSqlite } from "./format";
 import "./types";
 
@@ -195,17 +195,17 @@ export async function getTableStructureSqlite(connName: string, tbName: string) 
     data: structureArr.map((item) => {
       return {
         defaultValue: item.defaultValue,
-        columnName: item.columnName,
+        name: item.columnName,
         comment: "", // SQLite不原生支持字段注释
-        dataType: item.dataType,
+        type: item.dataType,
         hasCheckConditions: item.checkConstraint,
         indexes: [],
         isForeignKey: item.fkColumn > 0,
-        isNotNull: item.isNotNull > 0,
+        isNullable: item.isNotNull > 0,
         isPrimaryKey: item.isPrimaryKey === 1,
         isUniqueKey: item.isUnique === 1,
         size: `${item.typeSize}`,
-      } as TableStructure;
+      } as FieldStructure;
     }),
   };
 }
