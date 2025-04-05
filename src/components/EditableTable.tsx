@@ -31,7 +31,7 @@ export type EditableTableMethods = {
   getAddedRow: () => ListRow[];
   getMultiDeleteData: () => Set<number>;
   getMultiSelectData: () => Set<number>;
-  resetMultiSelectData: () => void;
+  resettData: () => void;
   willRanderTable: () => void;
 };
 
@@ -167,7 +167,8 @@ export function EditableTable({
     getAddedRow: () => data.filter((item) => item[NEW_ROW_IS_ADDED_FIELD]),
     getMultiDeleteData: () => deletedFieldIndex,
     getMultiSelectData: () => selectedFieldIndex,
-    resetMultiSelectData: () => {
+    resettData: () => {
+      setChanges([]);
       setDeletedFieldIndex(new Set());
       setSelectedFieldIndex(new Set());
     },

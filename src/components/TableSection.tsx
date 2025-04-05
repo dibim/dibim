@@ -2,8 +2,8 @@ import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { subscribeKey } from "valtio/utils";
 import { HEDAER_H, NEW_ROW_IS_ADDED_FIELD } from "@/constants";
-import { modifyTableData } from "@/databases/modify_table_data";
 import { exec } from "@/databases/adapter,";
+import { modifyTableData } from "@/databases/modify_table_data";
 import { cn } from "@/lib/utils";
 import { appState } from "@/store/valtio";
 import { RowData } from "@/types/types";
@@ -73,7 +73,7 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
     setChanges([]);
 
     tableRef.current?.willRanderTable();
-    tableRef.current?.resetMultiSelectData();
+    tableRef.current?.resettData();
   }
 
   function handleAdd() {

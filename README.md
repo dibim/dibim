@@ -1,4 +1,4 @@
-# 🚀 DIBIM - 数据库管理工具 | Database Management Tools
+# 🚀 DIBIM
 
 ## ✨ 简介
 
