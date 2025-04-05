@@ -1,20 +1,11 @@
 import { STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD, STR_TABLE } from "@/constants";
-import { UniqueConstraint } from "@/types/types";
 import {
-  FIELD,
-  FIELD_COMMENT,
-  FIELD_DEFAULT,
-  FIELD_INDEX_TYPE,
-  FIELD_NAME,
-  FIELD_NOT_NULL,
-  FIELD_TYPE,
   SSL_MODE_ALLOW,
   SSL_MODE_DISABLE,
   SSL_MODE_PREFER,
   SSL_MODE_REQUIRE,
   SSL_MODE_VERIFY_CA,
   SSL_MODE_VERIFY_FULL,
-  TABLE_COMMENT,
 } from "./constants";
 
 // rust 的 sqlx 在连接字符串中添加 sslmode 参数控制 TLS 行为
@@ -104,37 +95,20 @@ export interface SqlTableConstraintCommon {
 export type FieldStructure = SqlFieldDefinitionCommon & {
   isForeignKey: boolean;
   hasCheckConditions: any;
-  indexes?: ColumnIndex[];
+  indexes?: FieldIndex[];
 };
 
 // 字段的索引信息
-export interface ColumnIndex {
-  name: string; // 索引名称
-  type: string; // 索引类型 (如 btree, hash 等)
-  isUnique: boolean; // 是否唯一索引
-  isPrimary: boolean; // 是否主键索引
-}
-
-export interface IndexQueryResult {
-  indexName: string;
+export interface FieldIndex {
+  indexName: string; // 索引名称
   columnName: string;
-  indexType: string;
-  isUnique: boolean;
-  isPrimary: boolean;
+  indexType: string; // 索引类型 (如 btree, hash 等)
+  isUniqueKey: boolean; // 是否唯一索引
+  isPrimaryKey: boolean; // 是否主键索引
 }
 
 // 变更表更表结构的动作类性
 export type AlterAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
-// 变更表更表结构的动作目标
-export type AlterActionTarget =
-  | typeof TABLE_COMMENT
-  | typeof FIELD_NAME
-  | typeof FIELD_TYPE
-  | typeof FIELD_INDEX_TYPE
-  | typeof FIELD_NOT_NULL
-  | typeof FIELD_DEFAULT
-  | typeof FIELD_COMMENT
-  | typeof FIELD;
 
 export type ActionTarget = typeof STR_FIELD | typeof STR_TABLE;
 
@@ -144,22 +118,24 @@ export type FieldAlterAction = {
   action: AlterAction;
   tableName: string;
 
-  fieldName: string;
-  fieldNameExt: string; // 改名时作为新字段名, 设置索引时作为作音的字段名 TODO: 后续要支持复合索引
-  fieldType: string; // 字段类型
-  fieldSize: string; // 字段大小
-  fieldDefalut: string | null; // 字段默认值
-  fieldIsNullable: boolean; // 字段非空
-  fieldIndexType: UniqueConstraint; // 字段索引类型
-  fieldIndexPkAutoIncrement: boolean; // 字段主键自增
-  fieldIndexName: string; // 字段索引名
-  fieldComment: string; // 字段备注
+  autoIncrement: boolean;
+  comment: string;
+  defalutValue: string | null;
+  indexName: string; // 索引名
+  isNullable: boolean; // 字段可以为空
+  isPrimaryKey: boolean;
+  isUniqueKey: boolean;
+  name: string;
+  nameExt: string; // 改名时作为新字段名, 设置索引时作为作新的字段名 TODO: 后续要支持复合索引
+  size: string;
+  type: string;
 
   // 原先的信息, sqlite 需要对比是否修改
-  fieldIndexTypeOld: UniqueConstraint; // 字段索引类型
-  fieldTypeOld: string; // 字段类型
-  fieldNotNullOld: boolean; // 字段非空
-  fieldDefalutOld: string | null; // 字段默认值
+  defalutValueOld: string | null;
+  isNullableOld: boolean;
+  isPrimaryKeyOld: boolean;
+  isUniqueKeyOld: boolean;
+  typeOld: string;
 };
 
 // 对表的修改数据

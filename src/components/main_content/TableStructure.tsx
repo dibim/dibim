@@ -3,12 +3,10 @@ import { AlertCircle, CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } 
 import { toast } from "sonner";
 import { subscribeKey } from "valtio/utils";
 import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
-import { exec, fieldTypeOptions, genAlterCmd, genDeleteFieldCmd } from "@/databases/adapter,";
-import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "@/databases/constants";
+import { exec, fieldTypeOptions, genAlterCmd } from "@/databases/adapter,";
 import { AllAlterAction, FieldAlterAction, FieldStructure } from "@/databases/types";
 import { cn } from "@/lib/utils";
 import { appState } from "@/store/valtio";
-import { UniqueConstraint } from "@/types/types";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { DataTypeIcon } from "../DataTypeIcon";
 import { EditableTable, EditableTableMethods, ListRow } from "../EditableTable";
@@ -44,55 +42,59 @@ export function TableEditorStructure({
 }: MainContentStructureProp) {
   const tableRef = useRef<EditableTableMethods | null>(null);
 
-  const [operateFieldName, setOperateFieldName] = useState<string>(""); // 现在操作的行的索引
-  const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
   const [dialogAction, setDialogAction] = useState<DialogAction>("");
-  const [showDialogEdit, setShowDialogEdit] = useState<boolean>(false);
-  const [showDialogDelete, setShowDialogDelete] = useState<boolean>(false);
-  const [showDialogAlter, setShowDialogAlter] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>(""); // 错误消息
   const [okMessage, setOkMessage] = useState<string>(""); // 成功消息
+  const [operateFieldName, setOperateFieldName] = useState<string>(""); // 现在操作的行的索引
+  const [showDialogAlter, setShowDialogAlter] = useState<boolean>(false);
+  const [showDialogDelete, setShowDialogDelete] = useState<boolean>(false);
+  const [showDialogEdit, setShowDialogEdit] = useState<boolean>(false);
+  const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
 
-  const [fieldNameEditing, setFieldNameEditing] = useState<string>(""); // 字段名, 编辑之前记录的原先的字段名
-  const [fieldIndexEditing, setFieldIndexEditing] = useState<number>(-1); // 字段索引, 右键菜单点击删除时临时记录
+  const [nameEditing, setNameEditing] = useState<string>(""); // 字段名, 编辑之前记录的原先的字段名
+  const [indexEditing, setIndexEditing] = useState<number>(-1); // 字段索引, 右键菜单点击删除时临时记录
   // 对话框里的数据
-  const [fieldComment, setFieldComment] = useState<string>(""); // 字段备注
-  const [fieldDefalut, setFieldDefault] = useState<string>(""); // 字段默认值
-  const [fieldIndexName, setFieldIndexName] = useState<string>(""); // 字段索引名
-  const [fieldIndexPkAutoIncrement, setFieldIndexPkAutoIncrement] = useState<boolean>(false); // 字段主键自增
-  const [fieldIndexType, setFieldIndexType] = useState<UniqueConstraint>(""); // 字段索引类型
-  const [fieldName, setFieldName] = useState<string>(""); // 字段名, 输入框里的
-  const [fieldNotNull, setFieldNotNull] = useState<boolean>(false); // 字段非空
-  const [fieldSize, setFieldSize] = useState<string>(""); // 字段大小
-  const [fieldType, setFieldType] = useState<string>(""); // 字段类型
+  const [autoIncrement, setAutoIncrement] = useState<boolean>(false);
+  const [comment, setComment] = useState<string>("");
+  const [defalutValue, setDefaultValue] = useState<string>("");
+  const [indexName, setIndexName] = useState<string>(""); // 字段索引名
+  const [isNullable, setIsNullable] = useState<boolean>(false);
+  const [isPrimaryKey, setIsPrimaryKey] = useState<boolean>(false);
+  const [isUniqueKey, setIsUniqueKey] = useState<boolean>(false);
+  const [name, setdName] = useState<string>(""); // 字段名, 输入框里的
+  const [size, setSize] = useState<string>("");
+  const [type, setType] = useState<string>("");
   // 备份原先的数据
-  const [fieldDefalutOld, setFieldDefaultOld] = useState<string>(""); // 字段默认值
-  const [fieldIndexTypeOld, setFieldIndexTypeOld] = useState<UniqueConstraint>(""); // 字段索引类型
-  const [fieldNotNullOld, setFieldNotNullOld] = useState<boolean>(false); // 字段类型
-  const [fieldTypeOld, setFieldTypeOld] = useState<string>(""); // 字段类型
+  const [fieldDefalutOld, setFieldDefaultOld] = useState<string>("");
+  const [fieldIsNullableOld, setFieldIsNullableOld] = useState<boolean>(false);
+  const [fieldIsPrimaryKeyOld, setFieldIsPrimaryKeyOld] = useState<boolean>(false);
+  const [fieldIsUniqueKeyOld, setFieldIsUniqueKeyOld] = useState<boolean>(false);
+  const [fieldTypeOld, setFieldTypeOld] = useState<string>("");
 
   function resetDialogData(faa: FieldAlterAction | null) {
-    setFieldComment(faa?.fieldComment || "");
-    setFieldDefault(faa?.fieldDefalut || "");
-    setFieldIndexName(faa?.fieldIndexName || "");
-    setFieldIndexPkAutoIncrement(faa?.fieldIndexPkAutoIncrement || false);
-    setFieldIndexType(faa?.fieldIndexType || "");
-    setFieldName(faa?.fieldName || "");
-    setFieldNotNull(faa?.fieldIsNullable || false);
-    setFieldSize(faa?.fieldSize || "");
-    setFieldType(faa?.fieldType || "");
+    setAutoIncrement(faa?.autoIncrement || false);
+    setComment(faa?.comment || "");
+    setDefaultValue(faa?.defalutValue || "");
+    setdName(faa?.name || "");
+    setIndexName(faa?.indexName || "");
+    setIsNullable(faa?.isNullable || false);
+    setIsPrimaryKey(faa?.isPrimaryKey || false);
+    setIsUniqueKey(faa?.isUniqueKey || false);
+    setSize(faa?.size || "");
+    setType(faa?.type || "");
 
-    setFieldDefaultOld(faa?.fieldDefalutOld || "");
-    setFieldIndexTypeOld(faa?.fieldIndexTypeOld || "");
-    setFieldNotNullOld(faa?.fieldNotNullOld || false);
-    setFieldTypeOld(faa?.fieldTypeOld || "");
+    setFieldDefaultOld(faa?.defalutValueOld || "");
+    setFieldIsNullableOld(faa?.isNullableOld || false);
+    setFieldIsPrimaryKeyOld(faa?.isPrimaryKeyOld || false);
+    setFieldIsUniqueKeyOld(faa?.isUniqueKeyOld || false);
+    setFieldTypeOld(faa?.typeOld || "");
   }
 
   // 点击添加字段
   function handleAddField() {
     resetDialogData(null);
-    setShowDialogEdit(true);
     setDialogAction(STR_ADD);
+    setShowDialogEdit(true);
   }
 
   // 删除选中的字段
@@ -108,16 +110,17 @@ export function TableEditorStructure({
           action: STR_DELETE,
           tableName: appState.currentTableName,
 
-          fieldName: field.name,
-          fieldNameExt: "",
-          fieldType: "",
-          fieldSize: "",
-          fieldDefalut: "",
-          fieldIsNullable: false,
-          fieldIndexType: "",
-          fieldIndexPkAutoIncrement: false,
-          fieldIndexName: "",
-          fieldComment: "",
+          comment: "",
+          defalutValue: "",
+          autoIncrement: false,
+          indexName: "",
+          isNullable: false,
+          isPrimaryKey: false,
+          isUniqueKey: false,
+          name: field.name,
+          nameExt: "",
+          size: "",
+          type: "",
         } as FieldAlterAction;
         alterData.push(action);
       }
@@ -148,18 +151,19 @@ export function TableEditorStructure({
   function handleEditFieldPopup(index: number) {
     const field = appState.currentTableStructure[index];
 
-    let fieldIndexType: UniqueConstraint = "";
+    let isPrimaryKey = false;
+    let isUniqueKey = false;
     let fieldIndexName = "";
     if (field.indexes) {
       for (const idx of field.indexes) {
-        if (idx.isPrimary) {
-          fieldIndexType = INDEX_PRIMARY_KEY;
-          fieldIndexName = idx.name;
+        if (idx.isPrimaryKey) {
+          isPrimaryKey = true;
+          fieldIndexName = idx.indexName;
         }
 
-        if (idx.isUnique) {
-          fieldIndexType = INDEX_UNIQUE;
-          fieldIndexName = idx.name;
+        if (idx.isUniqueKey) {
+          isUniqueKey = true;
+          fieldIndexName = idx.indexName;
         }
       }
     }
@@ -169,23 +173,25 @@ export function TableEditorStructure({
       action: STR_EDIT,
       tableName: appState.currentTableName,
 
-      fieldComment: field.comment,
-      fieldDefalut: field.defaultValue,
-      fieldIndexName: fieldIndexName,
-      fieldIndexPkAutoIncrement: false,
-      fieldIndexType: fieldIndexType,
-      fieldName: field.name,
-      fieldNameExt: "",
-      fieldIsNullable: field.isNullable,
-      fieldSize: `${field.size}`,
-      fieldType: field.type,
+      autoIncrement: false,
+      comment: field.comment,
+      defalutValue: field.defaultValue,
+      indexName: fieldIndexName,
+      isNullable: field.isNullable,
+      isPrimaryKey: isPrimaryKey,
+      isUniqueKey: isUniqueKey,
+      name: field.name,
+      nameExt: "",
+      size: `${field.size}`,
+      type: field.type,
 
-      fieldDefalutOld: field.defaultValue,
-      fieldIndexTypeOld: fieldIndexType,
-      fieldNotNullOld: field.isNullable,
-      fieldTypeOld: field.type,
+      defalutValueOld: field.defaultValue,
+      isNullableOld: field.isNullable,
+      isPrimaryKeyOld: field.isPrimaryKey,
+      isUniqueKeyOld: field.isUniqueKey,
+      typeOld: field.type,
     });
-    setFieldNameEditing(field.name);
+    setNameEditing(field.name);
     setShowDialogEdit(true);
     setDialogAction(STR_EDIT);
   }
@@ -218,7 +224,7 @@ export function TableEditorStructure({
     if (fieldName !== "") {
       setOperateFieldName(fieldName);
       setShowDialogDelete(true);
-      setFieldIndexEditing(index);
+      setIndexEditing(index);
     } else {
       // TODO: 报错
     }
@@ -239,7 +245,7 @@ export function TableEditorStructure({
       const item = alterData[index];
       if (item.target === STR_FIELD) {
         const ad = item as FieldAlterAction;
-        if (ad.fieldName === fieldName) {
+        if (ad.name === name) {
           actionDataFindedIndex = index;
         }
       }
@@ -250,21 +256,23 @@ export function TableEditorStructure({
       action: dialogAction,
       tableName: appState.currentTableName,
 
-      fieldComment,
-      fieldDefalut,
-      fieldIndexName,
-      fieldIndexPkAutoIncrement,
-      fieldIndexType,
-      fieldName: dialogAction === STR_EDIT ? fieldNameEditing : fieldName, // 如果是编辑, 要记录编辑之前的字段名
-      fieldNameExt: fieldName, // 输入框里的字段名
-      fieldIsNullable: fieldNotNull,
-      fieldSize,
-      fieldType,
+      autoIncrement: autoIncrement,
+      comment: comment,
+      defalutValue: defalutValue,
+      indexName: indexName,
+      isNullable: isNullable,
+      isPrimaryKey: isPrimaryKey,
+      isUniqueKey: false,
+      name: dialogAction === STR_EDIT ? nameEditing : name, // 如果是编辑, 要记录编辑之前的字段名
+      nameExt: name, // 输入框里的字段名
+      size: size,
+      type: type,
 
-      fieldDefalutOld,
-      fieldIndexTypeOld,
-      fieldNotNullOld,
-      fieldTypeOld,
+      defalutValueOld: fieldDefalutOld,
+      isNullableOld: fieldIsNullableOld,
+      isPrimaryKeyOld: fieldIsPrimaryKeyOld,
+      isUniqueKeyOld: fieldIsUniqueKeyOld,
+      typeOld: fieldTypeOld,
     };
 
     if (actionDataFindedIndex > -1) {
@@ -278,24 +286,25 @@ export function TableEditorStructure({
       appState.setCurrentTableStructure([
         ...appState.currentTableStructure,
         {
-          defaultValue: fieldDefalut,
-          name: actionData.fieldName,
-          comment: fieldComment,
-          type: fieldType,
+          comment: comment,
+          defaultValue: defalutValue,
           hasCheckConditions: false,
           isForeignKey: false,
-          isNullable: fieldNotNull,
-          isPrimaryKey: fieldIndexType === INDEX_PRIMARY_KEY,
-          isUniqueKey: fieldIndexType === INDEX_UNIQUE,
-          size: fieldSize,
+          isNullable: isNullable,
+          isPrimaryKey: isPrimaryKey,
+          isUniqueKey: isUniqueKey,
+          name: actionData.name,
+          size: size,
+          type: type,
 
-          indexes: fieldIndexType
+          indexes: isPrimaryKey
             ? [
                 {
-                  name: "",
-                  type: fieldIndexType,
-                  isUnique: fieldIndexType === INDEX_UNIQUE,
-                  isPrimary: fieldIndexType === INDEX_PRIMARY_KEY,
+                  columnName: "", // 仅显示用,留空
+                  indexName: "", // 仅显示用,留空
+                  indexType: "", // 仅显示用,留空
+                  isPrimaryKey: isUniqueKey,
+                  isUniqueKey: isPrimaryKey,
                 },
               ]
             : undefined,
@@ -364,22 +373,22 @@ export function TableEditorStructure({
       (row) =>
         ({
           columnName: { value: row.name, render: (val: any) => <div>{val}</div> },
+          comment: { value: row.comment, render: (val: any) => <div className="w-full">{val}</div> },
           dataType: {
             value: row.type,
             render: (val: any) => (
               <div className="flex">
-                <span className="pe-2">{DataTypeIcon(val)}</span>
-                <span>{val}</span>
+                {" "}
+                <span className="pe-2">{DataTypeIcon(val)}</span> <span>{val}</span>{" "}
               </div>
             ),
           },
-          isPrimaryKey: { value: row.isPrimaryKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
-          isForeignKey: { value: row.isForeignKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
-          isUniqueKey: { value: row.isUniqueKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
-          hasCheckConditions: { value: row.hasCheckConditions, render: (val: any) => <div>{val ? "✅" : ""}</div> },
-          isNotNull: { value: !row.isNullable, render: (val: any) => <div>{val ? "✅" : ""}</div> },
           defaultValue: { value: row.defaultValue, render: (val: any) => <div>{val}</div> },
-          comment: { value: row.comment, render: (val: any) => <div className="w-full">{val}</div> },
+          hasCheckConditions: { value: row.hasCheckConditions, render: (val: any) => <div>{val ? "✅" : ""}</div> },
+          isForeignKey: { value: row.isForeignKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
+          isNotNull: { value: !row.isNullable, render: (val: any) => <div>{val ? "✅" : ""}</div> },
+          isPrimaryKey: { value: row.isPrimaryKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
+          isUniqueKey: { value: row.isUniqueKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
         }) as ListRow,
     );
 
@@ -464,25 +473,25 @@ export function TableEditorStructure({
           </DialogHeader>
 
           <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"字段名"}>
-            <Input value={fieldName} onInput={(e) => setFieldName(e.currentTarget.value)} />
+            <Input value={name} onInput={(e) => setdName(e.currentTarget.value)} />
           </LabeledDiv>
 
           <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"类型"}>
-            <Input value={fieldType} onInput={(e) => setFieldType(e.currentTarget.value)} />
+            <Input value={type} onInput={(e) => setType(e.currentTarget.value)} />
             <div className="py-1"></div>
-            <SearchableSelect value={fieldType} optionsData={fieldTypeOptions()} onChange={setFieldType} />
+            <SearchableSelect value={type} optionsData={fieldTypeOptions()} onChange={setType} />
           </LabeledDiv>
 
           <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"大小"}>
-            <Input value={fieldSize} onInput={(e) => setFieldSize(e.currentTarget.value)} />
+            <Input value={size} onInput={(e) => setSize(e.currentTarget.value)} />
           </LabeledDiv>
 
           <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"默认值"}>
-            <Input value={fieldDefalut} onInput={(e) => setFieldDefault(e.currentTarget.value)} />
+            <Input value={defalutValue} onInput={(e) => setDefaultValue(e.currentTarget.value)} />
             <div className="flex items-center pt-2">
               <Checkbox
-                checked={fieldNotNull}
-                onClick={() => setFieldNotNull(!fieldNotNull)}
+                checked={!isNullable}
+                onClick={() => setIsNullable(!isNullable)}
                 className="me-4"
                 id="fieldNotNull"
               />
@@ -496,10 +505,8 @@ export function TableEditorStructure({
             <div className="flex gap-4">
               <div className="flex items-center">
                 <Checkbox
-                  checked={fieldIndexType === INDEX_PRIMARY_KEY}
-                  onClick={() =>
-                    setFieldIndexType(fieldIndexType === INDEX_PRIMARY_KEY ? STR_EMPTY : INDEX_PRIMARY_KEY)
-                  }
+                  checked={isPrimaryKey}
+                  onClick={() => setIsPrimaryKey(!isPrimaryKey)}
                   className="me-4"
                   id="INDEX_PRIMARY_KEY"
                 />
@@ -510,11 +517,11 @@ export function TableEditorStructure({
 
               <div className="flex items-center">
                 <Checkbox
-                  checked={fieldIndexPkAutoIncrement}
-                  onClick={() => setFieldIndexPkAutoIncrement(!fieldIndexPkAutoIncrement)}
+                  checked={autoIncrement}
+                  onClick={() => setAutoIncrement(!autoIncrement)}
                   className="me-4"
                   id="fieldIndexAutoIncrement"
-                  disabled={!(fieldIndexType === INDEX_PRIMARY_KEY)}
+                  disabled={!isPrimaryKey}
                 />
                 <label htmlFor="fieldIndexAutoIncrement" className="text-sm font-medium">
                   主键自增
@@ -523,8 +530,8 @@ export function TableEditorStructure({
 
               <div className="flex items-center">
                 <Checkbox
-                  checked={fieldIndexType === INDEX_UNIQUE}
-                  onClick={() => setFieldIndexType(fieldIndexType === INDEX_UNIQUE ? STR_EMPTY : INDEX_UNIQUE)}
+                  checked={isUniqueKey}
+                  onClick={() => setIsUniqueKey(isUniqueKey)}
                   className="me-4"
                   id="INDEX_UNIQUE"
                 />
@@ -535,15 +542,15 @@ export function TableEditorStructure({
             </div>
             <div className="pt-2">
               <Input
-                value={fieldIndexName}
-                onInput={(e) => setFieldIndexName(e.currentTarget.value)}
+                value={indexName}
+                onInput={(e) => setIndexName(e.currentTarget.value)}
                 placeholder="索引名"
-                disabled={fieldIndexType === STR_EMPTY}
+                disabled={isPrimaryKey || isUniqueKey}
               />
             </div>
           </LabeledDiv>
           <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"备注"}>
-            <Input value={fieldComment} onInput={(e) => setFieldComment(e.currentTarget.value)} />
+            <Input value={comment} onInput={(e) => setComment(e.currentTarget.value)} />
           </LabeledDiv>
 
           {errorMessage && (
@@ -582,7 +589,7 @@ export function TableEditorStructure({
         okText={"确定"}
         okCb={() => {
           setShowDialogDelete(false);
-          tableRef.current?.deleteRow(fieldIndexEditing);
+          tableRef.current?.deleteRow(indexEditing);
         }}
       />
 

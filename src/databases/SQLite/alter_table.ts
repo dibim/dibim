@@ -3,46 +3,44 @@
  */
 import { STR_ADD, STR_DELETE, STR_EDIT, STR_FIELD, STR_TABLE } from "@/constants";
 import { appState } from "@/store/valtio";
-import { getTableDdl } from "../adapter,";
-import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "../constants";
 import { AllAlterAction, FieldAlterAction, TableAlterAction } from "../types";
 import { formatToSqlValueSqlite } from "./format";
-import { TableStructure, generateCreateTableDdl, parseCreateTableDdl, test } from "./utils";
+import { TableStructure, generateCreateTableDdl, parseCreateTableDdl } from "./utils";
 
 function genSizeStr(faa: FieldAlterAction) {
-  if (!faa.fieldSize) return "";
-  const size = parseInt(faa.fieldSize);
+  if (!faa.size) return "";
+  const size = parseInt(faa.size);
   return Number.isInteger(size) && size > 0 ? `(${size})` : "";
 }
 
 function genFieldDefault(faa: FieldAlterAction) {
-  if (faa.fieldDefalut === null || faa.fieldIndexType === INDEX_PRIMARY_KEY) return "";
-  return faa.fieldDefalut ? `DEFAULT ${formatToSqlValueSqlite(faa.fieldDefalut, true)}` : "";
+  if (faa.defalutValue === null || faa.isPrimaryKey) return "";
+  return faa.defalutValue ? `DEFAULT ${formatToSqlValueSqlite(faa.defalutValue, true)}` : "";
 }
 
 function genNotNull(faa: FieldAlterAction) {
-  return faa.fieldIsNullable ? "NOT NULL" : "";
+  return faa.isNullable ? "NOT NULL" : "";
 }
 
 function genPrimaryKey(faa: FieldAlterAction) {
-  return faa.fieldIndexType === INDEX_PRIMARY_KEY ? "PRIMARY KEY" : "";
+  return faa.isPrimaryKey ? "PRIMARY KEY" : "";
 }
 
 function genAutoIncrement(faa: FieldAlterAction) {
-  return faa.fieldIndexPkAutoIncrement ? "AUTOINCREMENT" : "";
+  return faa.autoIncrement ? "AUTOINCREMENT" : "";
 }
 
 // TODO: 支持符合主键
 function genIndxConstraint(faa: FieldAlterAction) {
-  if (faa.fieldIndexType === INDEX_UNIQUE) {
-    return `CONSTRAINT "${faa.fieldIndexName}" UNIQUE ("${faa.fieldName}")`;
+  if (faa.isUniqueKey) {
+    return `CONSTRAINT "${faa.indexName}" UNIQUE ("${faa.name}")`;
   } else return "";
 }
 
 function genFieldSql(faa: FieldAlterAction) {
   const parts = [
-    `"${faa.fieldName}"`,
-    faa.fieldType + genSizeStr(faa),
+    `"${faa.name}"`,
+    faa.type + genSizeStr(faa),
     genPrimaryKey(faa),
     genAutoIncrement(faa),
     genNotNull(faa),
@@ -66,14 +64,15 @@ function handleSqliteAlterColumn(table: string, retainedFieldsNames: string, def
   ];
 }
 
-const isTypeChange = (faa: FieldAlterAction) => faa.fieldType !== faa.fieldTypeOld || faa.fieldSize !== faa.fieldSize; // 类型变化
-const isIndexTypeChange = (faa: FieldAlterAction) => faa.fieldIndexType !== faa.fieldIndexTypeOld; // 索引变化
-const isNotNullChange = (faa: FieldAlterAction) => faa.fieldIsNullable !== faa.fieldNotNullOld;
+const isTypeChange = (faa: FieldAlterAction) => faa.type !== faa.typeOld || faa.size !== faa.size; // 类型变化
+const isIndexTypeChange = (faa: FieldAlterAction) =>
+  faa.isPrimaryKey !== faa.isPrimaryKeyOld || faa.isUniqueKey !== faa.isUniqueKeyOld; // 索引变化
+const isNotNullChange = (faa: FieldAlterAction) => faa.isNullable !== faa.isNullableOld;
 
 export function genAlterFieldEdit(faa: FieldAlterAction) {
   const newFaa = {
     ...faa,
-    fieldName: faa.fieldNameExt,
+    fieldName: faa.nameExt,
   };
 
   const newDef = genFieldSql(newFaa);
@@ -82,7 +81,7 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
   if (isTypeChange(faa) || isIndexTypeChange(faa)) {
     return handleSqliteAlterColumn(
       `${faa.tableName}`,
-      `${faa.fieldNameExt}`, // FIXME: 这里应该是要保留的字段
+      `${faa.nameExt}`, // FIXME: 这里应该是要保留的字段
       newDef, // 新字段定义
     );
   }
@@ -90,23 +89,23 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
   if (isNotNullChange(faa)) {
     handleSqliteAlterColumn(
       `${faa.tableName}`,
-      `${faa.fieldNameExt}`, // FIXME: 这里应该是要保留的字段
-      genFieldSql({ ...faa, fieldName: faa.fieldNameExt }),
+      `${faa.nameExt}`, // FIXME: 这里应该是要保留的字段
+      genFieldSql({ ...faa, name: faa.nameExt }),
     );
   }
 
   const res: string[] = [];
 
-  if (faa.fieldName !== faa.fieldNameExt) {
+  if (faa.name !== faa.nameExt) {
     // SQLite 3.25.0 (2018-09-15 发布) 开始原生支持 RENAME COLUMN 语法. 之前的版本，必须使用表重建方式
-    res.push(`ALTER TABLE "${faa.tableName}" RENAME COLUMN "${faa.fieldName}" TO "${faa.fieldNameExt}";`);
+    res.push(`ALTER TABLE "${faa.tableName}" RENAME COLUMN "${faa.name}" TO "${faa.nameExt}";`);
   }
 
-  if (faa.fieldDefalut !== null) {
-    const fv = formatToSqlValueSqlite(faa.fieldDefalut, true);
-    res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.fieldNameExt}" SET DEFAULT ${fv};`);
+  if (faa.defalutValue !== null) {
+    const fv = formatToSqlValueSqlite(faa.defalutValue, true);
+    res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.nameExt}" SET DEFAULT ${fv};`);
   } else {
-    res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.fieldNameExt}" DROP DEFAULT;`);
+    res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.nameExt}" DROP DEFAULT;`);
   }
 
   return res;
@@ -116,8 +115,8 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
 export function genAlterFieldAdd(faa: FieldAlterAction) {
   return [
     `ALTER TABLE "${faa.tableName}" ADD COLUMN ${genFieldSql(faa)};`,
-    ...(faa.fieldIndexType === INDEX_UNIQUE
-      ? [`CREATE UNIQUE INDEX "${faa.fieldIndexName}" ON "${faa.tableName}"("${faa.fieldName}");`]
+    ...(faa.isUniqueKey
+      ? [`CREATE UNIQUE INDEX "${faa.indexName}" ON "${faa.tableName}"("${faa.name}");`]
       : []),
   ];
 }
@@ -125,9 +124,9 @@ export function genAlterFieldAdd(faa: FieldAlterAction) {
 export function genAlterFieldDel(faa: FieldAlterAction) {
   return handleSqliteAlterColumn(
     `${faa.tableName}`,
-    `"${faa.fieldName}"`,
+    `"${faa.name}"`,
     appState.currentTableStructure
-      ?.filter((f) => f.name !== faa.fieldName)
+      ?.filter((f) => f.name !== faa.name)
       .map((f) => genFieldSql(faa))
       .join(", ") || "",
   );
@@ -168,26 +167,26 @@ function recreateTable(ts: TableStructure, faas: FieldAlterAction[]) {
     if (isTypeChange(faa)) {
       for (let index = 0; index < ts.columns.length; index++) {
         const f = ts.columns[index];
-        if (f.name === faa.fieldName) {
-          ts.columns[index].type = faa.fieldType;
+        if (f.name === faa.name) {
+          ts.columns[index].type = faa.type;
         }
       }
     }
     if (isNotNullChange(faa)) {
       for (let index = 0; index < ts.columns.length; index++) {
         const f = ts.columns[index];
-        if (f.name === faa.fieldName) {
-          ts.columns[index].isNullable = faa.fieldIsNullable;
+        if (f.name === faa.name) {
+          ts.columns[index].isNullable = faa.isNullable;
         }
       }
     }
     if (isIndexTypeChange(faa)) {
       for (let index = 0; index < ts.columns.length; index++) {
         const f = ts.columns[index];
-        if (f.name === faa.fieldName) {
-          ts.columns[index].isPrimaryKey = faa.fieldIndexType === INDEX_PRIMARY_KEY;
-          ts.columns[index].autoIncrement = faa.fieldIndexPkAutoIncrement;
-          ts.columns[index].isUniqueKey = faa.fieldIndexType === INDEX_UNIQUE;
+        if (f.name === faa.name) {
+          ts.columns[index].isPrimaryKey = faa.isPrimaryKey;
+          ts.columns[index].autoIncrement = faa.autoIncrement;
+          ts.columns[index].isUniqueKey = faa.isUniqueKey;
         }
       }
     }
