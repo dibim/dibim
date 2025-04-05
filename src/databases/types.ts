@@ -61,7 +61,7 @@ export type DbCountRes = {
 /**
  * SQL通用数据类型（所有主流数据库支持的基础类型）
  */
-export type CommonSQLValue =
+export type SqlValueCommon =
   | string
   | number
   | boolean
@@ -70,24 +70,35 @@ export type CommonSQLValue =
   | undefined
   | bigint
   | ArrayBuffer // 二进制数据通用表示
-  | Array<CommonSQLValue>; // 数组类型（部分数据库支持）
+  | Array<SqlValueCommon>; // 数组类型（部分数据库支持）
+
+// 所有 SQL 数据库类性共有的字段属性
+export interface SqlFieldDefinitionCommon {
+  checkConstraint: string | null; //CHECK 约束条件
+  defaultValue: string | null; // 默认值表达式
+  isNullable: boolean; // 是否允许 NULL
+  isPrimaryKey: boolean; // 是否是主键
+  isUniqueKey: boolean; // 是否唯一
+  name: string; // 字段名
+  type: string; // 数据类型
+}
 
 // 表结构字段表的数据
 // 这是从数据库查询的结果
 //
-// 注意: 命名方式按照数据库的
+// 注意: 数据来自数据库, 要和查询语句对应
 //
 export type TableStructure = {
-  column_default: string;
-  column_name: string;
+  defaultValue: string;
+  columnName: string;
   comment: string;
-  data_type: string;
-  has_check_conditions: any;
+  dataType: string;
+  hasCheckConditions: any;
   indexes?: ColumnIndex[];
-  is_foreign_key: boolean;
-  is_not_null: boolean;
-  is_primary_key: boolean;
-  is_unique_key: boolean;
+  isForeignKey: boolean;
+  isNotNull: boolean;
+  isPrimaryKey: boolean;
+  isUniqueKey: boolean;
   size: string;
 };
 
@@ -100,11 +111,11 @@ export interface ColumnIndex {
 }
 
 export interface IndexQueryResult {
-  index_name: string;
-  column_name: string;
-  index_type: string;
-  is_unique: boolean;
-  is_primary: boolean;
+  indexName: string;
+  columnName: string;
+  indexType: string;
+  isUnique: boolean;
+  isPrimary: boolean;
 }
 
 // 变更表更表结构的动作类性

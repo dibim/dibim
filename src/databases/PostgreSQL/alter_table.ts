@@ -47,11 +47,7 @@ function genIndxConstraint(faa: FieldAlterAction) {
 // 生成每个字段的sql
 // 用于 CREATE TABLE 和ALTER TABLE 语句里每个字段名及其后面的属性
 function genFieldSql(faa: FieldAlterAction) {
-  const sizeStr = genSizeStr(faa);
-  const defaultValue = genFieldDefault(faa);
-  const notNull = genNotNull(faa);
-
-  return `"${faa.fieldName}" ${faa.fieldType}${sizeStr} ${notNull} ${defaultValue}`;
+  return `"${faa.fieldName}" ${faa.fieldType}${genSizeStr(faa)} ${genNotNull(faa)} ${genFieldDefault(faa)}`;
 }
 
 // 编辑字段
@@ -256,14 +252,14 @@ export function genAlterTableEdit(taa: TableAlterAction) {
 
 // 创建表
 export function genAlterTableAdd(taa: TableAlterAction, faas: FieldAlterAction[]) {
-  let res: string[] = [`-- 将要对表格${taa.tableName}执行以下语句:`];
+  let res: string[] = [];
 
   const fields: string[] = [];
   const indxConstraints: string[] = [];
   for (const faa of faas) {
     fields.push(genFieldSql(faa));
-    const sss = genIndxConstraint(faa);
-    if (sss.length > 0) indxConstraints.push(sss);
+    const constraint = genIndxConstraint(faa);
+    if (constraint.length > 0) indxConstraints.push(constraint);
   }
 
   res.push(`

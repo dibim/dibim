@@ -1,6 +1,6 @@
-import { CommonSQLValue } from "../types";
+import { SqlValueCommon } from "../types";
 import { formatToSqlValueCommon } from "../utils";
-import { PGValue } from "./types";
+import { PgValue } from "./types";
 
 /**
  * 判断是否是PostgreSQL函数调用的形式
@@ -20,7 +20,7 @@ export function isPostgresFunctionCall(str: string): boolean {
  * @param allowFuncAcll 是否允许函数调用的形式
  * @returns
  */
-export function formatToSqlValuePg(value: PGValue, allowFuncAcll?: boolean): string {
+export function formatToSqlValuePg(value: PgValue, allowFuncAcll?: boolean): string {
   // 首先检查是否是调用 PostgreSQL 函数
   if (allowFuncAcll && typeof value === "string" && isPostgresFunctionCall(value)) {
     return value;
@@ -28,7 +28,7 @@ export function formatToSqlValuePg(value: PGValue, allowFuncAcll?: boolean): str
 
   // 尝试通用格式化
   try {
-    return formatToSqlValueCommon(value as CommonSQLValue);
+    return formatToSqlValueCommon(value as SqlValueCommon);
   } catch (e) {
     // 如果通用格式化失败，继续处理 PG 特有类型
   }

@@ -89,6 +89,7 @@ In event handling, useEffect, and other logic, the original state object appStat
 - 添加连接要检查是否重复✅
 - 表结构里的字段类型可使用下拉框选择✅
 - 表格数据列表的 添加行的语句改为批量插入✅
+- 修复:在表结构里编辑字段类型会添加字段
 
 ### v0.3 mysql
 
@@ -102,6 +103,7 @@ In event handling, useEffect, and other logic, the original state object appStat
 - sql 编辑器
   - 记录到历史
   - 要实现代码提示(表名和字段名) 推迟
+- 字段添加 COLLATE  
 - 大字符串查看器
 - 分区  
 
@@ -114,10 +116,13 @@ In event handling, useEffect, and other logic, the original state object appStat
 ### v1.0
 
 - 实现多标签页
+
+## 更多功能
+
+- 实现表数据导入/导出
 - 支持符合主键
 - 支持外键
 - 支持触发器
-- 实现表数据导入/导出
 - 添加更多快捷键:
 
   - alt + d 数据库连接列表
@@ -128,8 +133,6 @@ In event handling, useEffect, and other logic, the original state object appStat
   - alt + b 备份
   - alt + l 锁屏(设置主密码之后)  
   - f5 刷新数据(表结构/ddl等)
-
-## 更多功能
 
 - 同步配置文件等, 使用 gist 存储
 - ER 图
