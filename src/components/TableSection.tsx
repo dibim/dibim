@@ -78,7 +78,7 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
   function handleAdd() {
     tableRef.current?.willRanderTable();
 
-    const fields = appState.currentTableStructure.map((item) => item.column_name);
+    const fields = appState.currentTableStructure.map((item) => item.columnName);
     const rowData = Object.fromEntries(fields.map((key) => [key, ""]));
     rowData[NEW_ROW_IS_ADDED_FIELD] = "true"; // 新添加的行的标记
     const newTableData = [...tableData, rowData]; // 为了避免和更新的行的索引有冲突, 添加到表格的最后

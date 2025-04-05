@@ -1,5 +1,5 @@
 import { invoker } from "@/invoker";
-import { CommonSQLValue } from "../types";
+import { SqlValueCommon } from "../types";
 import { formatToSqlValueCommon } from "../utils";
 
 const testConnName = "testPg";
@@ -19,7 +19,7 @@ export function isMySQLFunctionCall(str: string): boolean {
 // MySQL 特有类型处理
 export function formatMySQLValue(value: unknown): string {
   try {
-    return formatToSqlValueCommon(value as CommonSQLValue);
+    return formatToSqlValueCommon(value as SqlValueCommon);
   } catch {
     // 处理MySQL特有类型
     if (value instanceof Uint8Array) {
@@ -43,7 +43,7 @@ export async function getTableStructureMysql(tbName: string) {
     WHERE table_name = '${tbName}';
     ;`;
 
-  const dbRes = await invoker.query(testConnName, sql);
+  const dbRes = await invoker.querySql(testConnName, sql);
 
   return {
     columnName: dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : [],

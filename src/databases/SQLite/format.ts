@@ -1,4 +1,4 @@
-import { CommonSQLValue } from "../types";
+import { SqlValueCommon } from "../types";
 import { formatToSqlValueCommon } from "../utils";
 
 /**
@@ -19,7 +19,7 @@ export function isSqliteFunctionCall(str: string): boolean {
  * @param allowFuncAcll 是否允许函数调用的形式
  * @returns
  */
-export function formatToSqlValueSqlite(value: CommonSQLValue, allowFuncAcll?: boolean): string {
+export function formatToSqlValueSqlite(value: SqlValueCommon, allowFuncAcll?: boolean): string {
   // 首先检查是否是调用 PostgreSQL 函数
   if (allowFuncAcll && typeof value === "string" && isSqliteFunctionCall(value)) {
     return value;

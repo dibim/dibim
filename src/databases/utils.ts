@@ -1,5 +1,5 @@
 import { reIsSingletQuery, reWhereClause } from "@/constants";
-import { CommonSQLValue, TableStructure } from "./types";
+import { SqlValueCommon, TableStructure } from "./types";
 
 /**
  * 类型守卫函数
@@ -7,7 +7,7 @@ import { CommonSQLValue, TableStructure } from "./types";
  * @param value
  * @returns
  */
-export function isCommonSQLValue(value: unknown): value is CommonSQLValue {
+export function isCommonSQLValue(value: unknown): value is SqlValueCommon {
   const type = typeof value;
   return (
     type === "string" ||
@@ -26,7 +26,7 @@ export function isCommonSQLValue(value: unknown): value is CommonSQLValue {
  * 格式化所有SQL数据库通用的数据类型
  * 类型和 isCommonSQLValue 一致
  */
-export function formatToSqlValueCommon(value: CommonSQLValue): string {
+export function formatToSqlValueCommon(value: SqlValueCommon): string {
   // 处理空值
   if (value == null) return "NULL";
 
@@ -68,12 +68,12 @@ export function formatToSqlValueCommon(value: CommonSQLValue): string {
 export function getUniqueFieldName(tsa: TableStructure[]) {
   // 优先使用主键
   for (const f of tsa) {
-    if (f.is_primary_key) return f.column_name;
+    if (f.isPrimaryKey) return f.columnName;
   }
 
   // 其次唯一索引
   for (const f of tsa) {
-    if (f.is_unique_key) return f.column_name;
+    if (f.isUniqueKey) return f.columnName;
   }
 
   return "";
@@ -92,13 +92,13 @@ export function getDefultOrderField(tsa: TableStructure[]) {
   // 优先使用索引字段
   for (const f of tsa) {
     // 主键
-    if (f.is_primary_key) {
-      return f.column_name;
+    if (f.isPrimaryKey) {
+      return f.columnName;
     }
 
     // 唯一索引
-    if (f.is_unique_key) {
-      return f.column_name;
+    if (f.isUniqueKey) {
+      return f.columnName;
     }
   }
 
@@ -106,30 +106,30 @@ export function getDefultOrderField(tsa: TableStructure[]) {
   // 找数字字段
   for (const f of tsa) {
     if (
-      f.data_type.includes("int") ||
-      f.data_type.includes("float") ||
-      f.data_type.includes("serial") ||
-      f.data_type.includes("numeric") ||
-      f.data_type.includes("decimal") ||
-      f.data_type.includes("real") ||
-      f.data_type.includes("double") ||
-      f.data_type.includes("money")
+      f.dataType.includes("int") ||
+      f.dataType.includes("float") ||
+      f.dataType.includes("serial") ||
+      f.dataType.includes("numeric") ||
+      f.dataType.includes("decimal") ||
+      f.dataType.includes("real") ||
+      f.dataType.includes("double") ||
+      f.dataType.includes("money")
     ) {
-      return f.column_name;
+      return f.columnName;
     }
   }
   // 找时间字段
   for (const f of tsa) {
-    if (f.data_type.includes("time") || f.data_type.includes("date")) {
-      return f.column_name;
+    if (f.dataType.includes("time") || f.dataType.includes("date")) {
+      return f.columnName;
     }
   }
 
   // 找字符串字段
   // 找不到索引字段的, 也找数字或时间字段, 找字符串字段
   for (const f of tsa) {
-    if (f.data_type.includes("text") || f.data_type.includes("char")) {
-      return f.column_name;
+    if (f.dataType.includes("text") || f.dataType.includes("char")) {
+      return f.columnName;
     }
   }
 

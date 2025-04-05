@@ -21,6 +21,7 @@ import { fieldTypeOptionsMysql } from "./MySQL/select_options";
 import { genAlterCmdPg } from "./PostgreSQL/alter_table";
 import { getDataTypeCategoryPg } from "./PostgreSQL/icon";
 import { fieldTypeOptionsPg } from "./PostgreSQL/select_options";
+import { genAlterCmdSqlite } from "./SQLite/alter_table";
 import { getDataTypeCategorySqlite } from "./SQLite/icon";
 import { fieldTypeOptionsSqlite } from "./SQLite/select_options";
 import {
@@ -173,7 +174,7 @@ export function genAlterCmd(val: AllAlterAction[]) {
 
   if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return genAlterCmdPg(val);
-  if (currentDbType === DB_TYPE_SQLITE) return ""; // TODO:
+  if (currentDbType === DB_TYPE_SQLITE) return genAlterCmdSqlite(val);
 
   return "";
 }
