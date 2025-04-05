@@ -2,11 +2,9 @@ import { reOneWord, reTwoWords } from "@/constants";
 import { formatToSqlValueSqlite } from "./format";
 import { FieldDefinitionSqlite, SqlTableConstraintCommonSqlite } from "./types";
 
-type ColumnDefinition = FieldDefinitionSqlite;
-
 export interface TableStructure {
   tableName: string;
-  columns: ColumnDefinition[];
+  columns: FieldDefinitionSqlite[];
   constraints: SqlTableConstraintCommonSqlite[];
   options: {
     withoutRowId: boolean;
@@ -14,7 +12,7 @@ export interface TableStructure {
   };
 }
 
-function createDefaultColumn(): ColumnDefinition {
+function createDefaultColumn(): FieldDefinitionSqlite {
   return {
     autoIncrement: false,
     checkConstraint: null,
@@ -135,7 +133,7 @@ function isTableConstraint(definition: string): boolean {
   return /^(CONSTRAINT\s+[^\s]+\s+)?(PRIMARY KEY|UNIQUE|CHECK|FOREIGN KEY)/i.test(definition);
 }
 
-function parseColumnDefinition(colDef: string): ColumnDefinition {
+function parseColumnDefinition(colDef: string): FieldDefinitionSqlite {
   const column = createDefaultColumn();
 
   // 容错解析列名和类型部分（带括号参数）
