@@ -15,15 +15,7 @@
  *
  */
 import { invoker } from "@/invoker";
-import {
-  ColumnIndex,
-  DbConnectionParam,
-  DbCountRes,
-  FieldWithValue,
-  GetTableDataParam,
-  IndexQueryResult,
-  FieldStructure,
-} from "../types";
+import { DbConnectionParam, DbCountRes, FieldIndex, FieldStructure, FieldWithValue, GetTableDataParam } from "../types";
 import { formatToSqlValuePg } from "./format";
 import "./types";
 
@@ -149,8 +141,8 @@ export async function getTableStructurePg(connName: string, tbName: string) {
       i.relname AS "indexName",
       a.attname AS "columnName",
       am.amname AS "indexType",
-      idx.indisunique AS "isUnique",
-      idx.indisprimary AS "isPrimary"
+      idx.indisunique AS "isUniqueKey",
+      idx.indisprimary AS "isPrimaryKey"
     FROM
       pg_index idx
       JOIN pg_class i ON i.oid = idx.indexrelid
@@ -174,20 +166,15 @@ export async function getTableStructurePg(connName: string, tbName: string) {
   // 处理字段信息
   const columns = columnRes.data ? (JSON.parse(columnRes.data) as FieldStructure[]) : [];
   // 处理索引信息
-  const indexes = indexRes.data ? (JSON.parse(indexRes.data) as IndexQueryResult[]) : [];
+  const indexes = indexRes.data ? (JSON.parse(indexRes.data) as FieldIndex[]) : [];
 
   // 将索引信息合并到字段信息中
-  const columnIndexMap: Record<string, ColumnIndex[]> = {};
-  indexes.forEach((index) => {
-    if (!columnIndexMap[index.columnName]) {
-      columnIndexMap[index.columnName] = [];
+  const columnIndexMap: Record<string, FieldIndex[]> = {};
+  indexes.forEach((item) => {
+    if (!columnIndexMap[item.columnName]) {
+      columnIndexMap[item.columnName] = [];
     }
-    columnIndexMap[index.columnName].push({
-      name: index.indexName,
-      type: index.indexType,
-      isUnique: index.isUnique,
-      isPrimary: index.isPrimary,
-    });
+    columnIndexMap[item.columnName].push(item);
   });
 
   // 合并结果
