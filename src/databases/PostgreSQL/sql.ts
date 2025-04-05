@@ -22,7 +22,7 @@ import {
   FieldWithValue,
   GetTableDataParam,
   IndexQueryResult,
-  TableStructure,
+  FieldStructure,
 } from "../types";
 import { formatToSqlValuePg } from "./format";
 import "./types";
@@ -172,7 +172,7 @@ export async function getTableStructurePg(connName: string, tbName: string) {
   ]);
 
   // 处理字段信息
-  const columns = columnRes.data ? (JSON.parse(columnRes.data) as TableStructure[]) : [];
+  const columns = columnRes.data ? (JSON.parse(columnRes.data) as FieldStructure[]) : [];
   // 处理索引信息
   const indexes = indexRes.data ? (JSON.parse(indexRes.data) as IndexQueryResult[]) : [];
 
@@ -194,7 +194,7 @@ export async function getTableStructurePg(connName: string, tbName: string) {
   const result = columns.map((column) => ({
     ...column,
     size: column.size ? column.size : "",
-    indexes: columnIndexMap[column.columnName] || [],
+    indexes: columnIndexMap[column.name] || [],
   }));
 
   return {

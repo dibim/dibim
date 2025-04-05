@@ -1,4 +1,4 @@
-import { SqlFieldDefinitionCommon } from "../types";
+import { SqlFieldDefinitionCommon, SqlTableConstraintCommon } from "../types";
 
 export interface FieldDefinitionSqlite extends SqlFieldDefinitionCommon {
   /** 自增标识 (AUTOINCREMENT) */
@@ -11,6 +11,11 @@ export interface FieldDefinitionSqlite extends SqlFieldDefinitionCommon {
     type: "STORED" | "VIRTUAL";
   } | null;
 }
+
+export type SqlTableConstraintCommonSqlite = SqlTableConstraintCommon & {
+  /** 仅支持内置冲突解决策略 */
+  onConflict?: "ROLLBACK" | "ABORT" | "FAIL" | "IGNORE" | "REPLACE";
+};
 
 export type TableStructureSqlite = {
   cid: number; // 字段 ID（从 0 开始）

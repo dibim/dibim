@@ -32,7 +32,7 @@ function genFieldDefault(faa: FieldAlterAction) {
 }
 
 function genNotNull(faa: FieldAlterAction) {
-  return faa.fieldNotNull ? "NOT NULL" : "";
+  return faa.fieldIsNullable ? "NOT NULL" : "";
 }
 
 // TODO: 支持符合主键
@@ -177,7 +177,7 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
   }
 
   // 设置字段为 NOT NULL
-  if (faa.fieldNotNull) {
+  if (faa.fieldIsNullable) {
     res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.fieldNameExt}" SET NOT NULL;`);
   } else {
     res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.fieldNameExt}" DROP NOT NULL;`);

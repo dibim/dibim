@@ -1,4 +1,4 @@
-import { SqlValueCommon } from "../types";
+import { SqlTableConstraintCommon, SqlValueCommon } from "../types";
 import { SqlFieldDefinitionCommon } from "../types";
 
 export interface FieldDefinitionPg extends SqlFieldDefinitionCommon {
@@ -15,8 +15,18 @@ export interface FieldDefinitionPg extends SqlFieldDefinitionCommon {
   } | null;
   /** 标识列 */
   identity: "ALWAYS" | "BY DEFAULT" | null;
-
 }
+
+export type SqlTableConstraintPg = SqlTableConstraintCommon & {
+  /** 排除约束 */
+  type: SqlTableConstraintCommon["type"] | "EXCLUDE";
+  /** 延迟约束检查 */
+  deferrable?: "DEFERRABLE" | "NOT DEFERRABLE";
+  /** 约束检查时机 */
+  checkTime?: "INITIALLY DEFERRED" | "INITIALLY IMMEDIATE";
+  /** 排除约束使用的运算符 */
+  using?: string;
+};
 
 // PostgreSQL 特有类型
 export type PgValue =

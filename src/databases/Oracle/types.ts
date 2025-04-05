@@ -1,4 +1,4 @@
-import { SqlFieldDefinitionCommon } from "../types";
+import { SqlFieldDefinitionCommon, SqlTableConstraintCommon } from "../types";
 
 export interface FieldDefinitionOracle extends SqlFieldDefinitionCommon {
   /** 排序规则 */
@@ -12,3 +12,12 @@ export interface FieldDefinitionOracle extends SqlFieldDefinitionCommon {
   /** 序列缓存配置 */
   sequenceCache: number | null;
 }
+
+export type SqlTableConstraintOracle = SqlTableConstraintCommon & {
+  /** 约束状态 */
+  state?: "ENABLE" | "DISABLE";
+  /** 校验模式 */
+  validate?: "VALIDATE" | "NOVALIDATE";
+  /** 延迟校验 */
+  deferrable?: "DEFERRABLE" | "NOT DEFERRABLE";
+};

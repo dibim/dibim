@@ -5,7 +5,7 @@ import {
   MAIN_CONTEN_TYPE_WELCOME,
   MAIN_PASSWORD_DEFAULT,
 } from "@/constants";
-import { TableStructure } from "@/databases/types";
+import { FieldStructure } from "@/databases/types";
 import { invoker } from "@/invoker";
 import { ConfigFile } from "@/types/conf_file";
 import { DbType, ListBarType, MainContenType, MainContentTab } from "@/types/types";
@@ -41,9 +41,13 @@ interface AppState {
   uniqueFieldName: string;
   setUniqueFieldName: (val: string) => void;
 
+  // 当前表的建表语句
+  currentTableDdl: string;
+  setCurrentTableDdl: (val: string) => void;
+
   // 当前表结构
-  currentTableStructure: TableStructure[];
-  setCurrentTableStructure: (val: TableStructure[]) => void;
+  currentTableStructure: FieldStructure[];
+  setCurrentTableStructure: (val: FieldStructure[]) => void;
 
   // 关于
   aboutOpen: boolean;
@@ -125,8 +129,11 @@ export const appState = proxy<AppState>({
   uniqueFieldName: "",
   setUniqueFieldName: (val: string) => (appState.uniqueFieldName = val),
 
+  currentTableDdl: "",
+  setCurrentTableDdl: (val: string) => (appState.currentTableDdl = val),
+
   currentTableStructure: [],
-  setCurrentTableStructure: (val: TableStructure[]) => (appState.currentTableStructure = val),
+  setCurrentTableStructure: (val: FieldStructure[]) => (appState.currentTableStructure = val),
 
   aboutOpen: false,
   setAboutOpen: (val: boolean) => (appState.aboutOpen = val),

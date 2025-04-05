@@ -13,7 +13,7 @@ import {
   TAB_PARTITION,
   TAB_STRUCTURE,
 } from "@/constants";
-import { getTableStructure } from "@/databases/adapter,";
+import { getTableDdl, getTableStructure } from "@/databases/adapter,";
 import { AllAlterAction, TableAlterAction } from "@/databases/types";
 import { getUniqueFieldName } from "@/databases/utils";
 import { appState } from "@/store/valtio";
@@ -31,17 +31,25 @@ export function TableEditor() {
   const [editingTableName, setEditingTableName] = useState<string>(""); // 输入框中的表名
   const [editingTableComment, setEditingTableComment] = useState<string>(""); // 输入框中的表注释
 
-  // 获取表结构, 会在多个地方用, 在这里记录到 store
   async function getData() {
     if (appState.currentTableName === "") {
       return;
     }
 
+    // 获取表结构, 会在多个地方用, 在这里记录到 store
     const res = await getTableStructure(appState.currentTableName);
     if (res && res.data) {
       appState.setCurrentTableStructure(res.data);
       appState.setUniqueFieldName(getUniqueFieldName(res.data));
       if (appState.mainContenTab === STR_EMPTY) appState.setMainContenTab(TAB_DATA);
+    }
+    // 获取建表语句, 会在多个地方用, 在这里记录到 store
+    const resDdl = await getTableDdl(appState.currentTableName);
+    if (resDdl && resDdl.data) {
+      let sql = resDdl.data;
+      if (sql === "") sql = "未查询到 DDL";
+
+      appState.setCurrentTableDdl(sql);
     }
   }
 
