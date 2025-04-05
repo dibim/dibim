@@ -87,6 +87,7 @@ In event handling, useEffect, and other logic, the original state object appStat
 
 - 支持 sqlite
   - 实现 recreateTable 函数
+  - 右键菜单里的删除字段没有生成语句?
 - 添加连接要检查是否重复✅
 - 表结构里的字段类型可使用下拉框选择✅
 - 表格数据列表的 添加行的语句改为批量插入✅

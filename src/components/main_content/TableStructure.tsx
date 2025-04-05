@@ -54,6 +54,7 @@ export function TableEditorStructure({
   const [okMessage, setOkMessage] = useState<string>(""); // 成功消息
 
   const [fieldNameEditing, setFieldNameEditing] = useState<string>(""); // 字段名, 编辑之前记录的原先的字段名
+  const [fieldIndexEditing, setFieldIndexEditing] = useState<number>(-1); // 字段索引, 右键菜单点击删除时临时记录
   // 对话框里的数据
   const [fieldComment, setFieldComment] = useState<string>(""); // 字段备注
   const [fieldDefalut, setFieldDefault] = useState<string>(""); // 字段默认值
@@ -217,11 +218,12 @@ export function TableEditorStructure({
     if (fieldName !== "") {
       setOperateFieldName(fieldName);
       setShowDialogDelete(true);
-      setWillExecCmd(genDeleteFieldCmd(appState.currentTableName, fieldName) || "");
+      setFieldIndexEditing(index);
     } else {
       // TODO: 报错
     }
   }
+
   // 确定执行语句
   function handleConfirm() {
     exec(willExecCmd);
@@ -571,14 +573,17 @@ export function TableEditorStructure({
       {/* 确认要执行的删除语句 */}
       <ConfirmDialog
         open={showDialogDelete}
-        title={`确认要删除字段${operateFieldName}吗?`}
+        title={`确认要删除字段"${operateFieldName}"吗?`}
         content={<div />}
         cancelText={"取消"}
         cancelCb={() => {
           setShowDialogDelete(false);
         }}
         okText={"确定"}
-        okCb={handleConfirm}
+        okCb={() => {
+          setShowDialogDelete(false);
+          tableRef.current?.deleteRow(fieldIndexEditing);
+        }}
       />
 
       {/* 确认要执行的变更语句 */}

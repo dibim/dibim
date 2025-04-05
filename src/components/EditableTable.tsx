@@ -26,11 +26,12 @@ export interface TableDataChange {
 }
 
 export type EditableTableMethods = {
-  getAddedRow: () => ListRow[];
-  getMultiSelectData: () => Set<number>;
-  getMultiDeleteData: () => Set<number>;
-  resetMultiSelectData: () => void;
   deleteMultiSelectedRow: () => void;
+  deleteRow: (val: number) => void;
+  getAddedRow: () => ListRow[];
+  getMultiDeleteData: () => Set<number>;
+  getMultiSelectData: () => Set<number>;
+  resetMultiSelectData: () => void;
   willRanderTable: () => void;
 };
 
@@ -157,15 +158,18 @@ export function EditableTable({
   // ========== 防止重新渲染滚动表格 结束 ==========
 
   useImperativeHandle(ref, () => ({
+    deleteMultiSelectedRow: () => {
+      setDeletedFieldIndex(selectedFieldIndex);
+    },
+    deleteRow: (val: number) => {
+      setDeletedFieldIndex(new Set([...deletedFieldIndex, val]));
+    },
     getAddedRow: () => data.filter((item) => item[NEW_ROW_IS_ADDED_FIELD]),
-    getMultiSelectData: () => selectedFieldIndex,
     getMultiDeleteData: () => deletedFieldIndex,
+    getMultiSelectData: () => selectedFieldIndex,
     resetMultiSelectData: () => {
       setDeletedFieldIndex(new Set());
       setSelectedFieldIndex(new Set());
-    },
-    deleteMultiSelectedRow: () => {
-      setDeletedFieldIndex(selectedFieldIndex);
     },
     willRanderTable,
   }));
