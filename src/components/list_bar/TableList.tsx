@@ -326,7 +326,7 @@ export function TableList() {
 
       <ConfirmDialog
         open={showDialogTruncate}
-        title={`确认要截断${operateTableName}吗?`}
+        title={`确认要截断表格"${operateTableName}"吗?`}
         description={`请确认将要执行的语句:`}
         content={<SqlCodeViewer ddl={willExecCmd} />}
         cancelText={"取消"}
@@ -338,7 +338,7 @@ export function TableList() {
       />
       <ConfirmDialog
         open={showDialogDelete}
-        title={`确认要删除表格${operateTableName}吗?`}
+        title={`确认要删除表格"${operateTableName}"吗?`}
         description={`请确认将要执行的语句:`}
         content={<SqlCodeViewer ddl={willExecCmd} />}
         cancelText={"取消"}
