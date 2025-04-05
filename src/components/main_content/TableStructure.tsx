@@ -144,7 +144,7 @@ export function TableEditorStructure({
   // 点击取消按钮
   function handleCancel() {
     setAlterData([]);
-    tableRef.current?.resetMultiSelectData();
+    tableRef.current?.resettData();
   }
 
   // 点击编辑按钮, 弹出编辑对话框

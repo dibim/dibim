@@ -30,7 +30,7 @@ export function modifyTableData(
   rowDataMap.forEach((changes, rowIndex) => {
     const uniqueField: FieldWithValue = {
       field: appState.uniqueFieldName,
-      value: rowIndex,
+      value: tableData[rowIndex][appState.uniqueFieldName],
     };
     const fieldArr: FieldWithValue[] = [];
     for (const c of changes) {
