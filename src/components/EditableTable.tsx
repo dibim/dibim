@@ -9,8 +9,8 @@ import { cn } from "@/lib/utils";
 import { getRandomNegativeInt } from "@/utils/number";
 
 export interface ListCell {
-  render: (val: any) => JSX.Element; // 渲染 value, 可以添加其它元素
   value: any;
+  render: (val: any) => JSX.Element; // 渲染 value, 可以添加其它元素
 }
 
 export interface ListRow {

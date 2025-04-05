@@ -361,23 +361,23 @@ export function TableEditorStructure({
     const dataArrTemp = appState.currentTableStructure.map(
       (row) =>
         ({
-          columnName: { render: (val: any) => <div>{val}</div>, value: row.name },
+          columnName: { value: row.name, render: (val: any) => <div>{val}</div> },
           dataType: {
+            value: row.type,
             render: (val: any) => (
               <div className="flex">
                 <span className="pe-2">{DataTypeIcon(val)}</span>
                 <span>{val}</span>
               </div>
             ),
-            value: row.type,
           },
-          isPrimaryKey: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: row.isPrimaryKey },
-          isForeignKey: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: row.isForeignKey },
-          isUniqueKey: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: row.isUniqueKey },
-          hasCheckConditions: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: row.hasCheckConditions },
-          isNotNull: { render: (val: any) => <div>{val ? "✅" : ""}</div>, value: !row.isNullable },
-          defaultValue: { render: (val: any) => <div>{val}</div>, value: row.defaultValue },
-          comment: { render: (val: any) => <div className="w-full">{val}</div>, value: row.comment },
+          isPrimaryKey: { value: row.isPrimaryKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
+          isForeignKey: { value: row.isForeignKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
+          isUniqueKey: { value: row.isUniqueKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
+          hasCheckConditions: { value: row.hasCheckConditions, render: (val: any) => <div>{val ? "✅" : ""}</div> },
+          isNotNull: { value: !row.isNullable, render: (val: any) => <div>{val ? "✅" : ""}</div> },
+          defaultValue: { value: row.defaultValue, render: (val: any) => <div>{val}</div> },
+          comment: { value: row.comment, render: (val: any) => <div className="w-full">{val}</div> },
         }) as ListRow,
     );
 

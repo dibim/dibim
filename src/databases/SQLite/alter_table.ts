@@ -198,6 +198,7 @@ function recreateTable(ts: TableStructure, faas: FieldAlterAction[]) {
   console.log("新的建表语句据  ", ddlNew);
 
   // TODO: 重新建表
+  // 调用 handleSqliteAlterColumn
 }
 
 export function genAlterCmdSqlite(val: AllAlterAction[]) {
