@@ -1,4 +1,5 @@
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { subscribeKey } from "valtio/utils";
 import { HEDAER_H, NEW_ROW_IS_ADDED_FIELD } from "@/constants";
@@ -36,6 +37,7 @@ export type TableSectionProp = {
 };
 
 export function TableSection({ width, getData, initData, ref }: TableSectionProp) {
+  const { t } = useTranslation();
   const tableRef = useRef<EditableTableMethods | null>(null);
 
   const [tableData, setTableData] = useState<RowData[]>([]); // 表格数据
@@ -104,23 +106,23 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
   const tooltipSectionData = [
     {
       trigger: <RotateCw color="var(--fvm-info-clr)" onClick={() => getData(currentPage)} />,
-      content: <p>刷新</p>,
+      content: <p>{t("Refresh")}</p>,
     },
     {
       trigger: <CirclePlus color="var(--fvm-primary-clr)" onClick={handleAdd} />,
-      content: <p>添加行</p>,
+      content: <p>{t("Add row")}</p>,
     },
     {
       trigger: <CircleMinus color="var(--fvm-danger-clr)" onClick={handleDelete} />,
-      content: <p>删除行</p>,
+      content: <p>{t("Delete row")}</p>,
     },
     {
       trigger: <CircleCheck color="var(--fvm-success-clr)" onClick={handleApply} />,
-      content: <p>应用</p>,
+      content: <p>{t("Apply")}</p>,
     },
     {
       trigger: <CircleX color="var(--fvm-warning-clr)" onClick={handleCancel} />,
-      content: <p>取消</p>,
+      content: <p>{t("Cancel")}</p>,
     },
   ];
   // ========== 按钮 结束 ==========
@@ -171,10 +173,7 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
             getData={getData}
           />
           {dataArr.length > 0 && appState.uniqueFieldName === "" && (
-            <TextNotification
-              type="error"
-              message={"当前表格没有主键或唯一索引, 为了确保数据不被误操作,不可以编辑该表格"}
-            ></TextNotification>
+            <TextNotification type="error" message={t("&notUniqueKeyTip")}></TextNotification>
           )}
         </div>
       </div>
@@ -195,14 +194,14 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
       {/* 确认要执行的变更语句 */}
       <ConfirmDialog
         open={showDialogAlter}
-        title={`确认要保存变更吗?`}
-        description={`请确认将要执行的语句:`}
+        title={t("Are you sure you want to save the changes?")}
+        description={t("Please confirm the statement to be executed:")}
         content={<SqlCodeViewer ddl={willExecCmd} />}
-        cancelText={"取消"}
+        cancelText={t("Cancel")}
         cancelCb={() => {
           setShowDialogAlter(false);
         }}
-        okText={"确定"}
+        okText={t("Confirm")}
         okCb={handleConfirm}
       />
     </>

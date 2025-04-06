@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AlertCircle } from "lucide-react";
 import { DIR_H, MAIN_PASSWORD_MIN_LEN } from "@/constants";
 import { getTableDdl } from "@/databases/adapter,";
@@ -12,6 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "../ui/input";
 
 export function Settings() {
+  const { t, i18n } = useTranslation();
   const [mainPassword, setMainPassword] = useState<string>("");
   const [theme, setTheme] = useState<string>("");
   const [lang, setLang] = useState<string>("");
@@ -23,14 +25,19 @@ export function Settings() {
     setMainPassword(event.target.value || "");
   }
 
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    setLang(lng);
+  };
+
   function onInpuTheme(event: React.ChangeEvent<HTMLInputElement>) {
     setTheme(event.target.value || "");
   }
 
   async function onSubmit() {
     // 检查密码
-    if (mainPassword.length < MAIN_PASSWORD_MIN_LEN) {
-      setErrorMessage(`主密码的长度不低于 ${MAIN_PASSWORD_MIN_LEN}`);
+    if (mainPassword.length > 0 && mainPassword.length < MAIN_PASSWORD_MIN_LEN) {
+      setErrorMessage(t("&minimumLengthOfMasterPassword", { len: MAIN_PASSWORD_MIN_LEN }));
       return;
     }
 
@@ -49,7 +56,7 @@ export function Settings() {
       dbConnections: [...appState.config.dbConnections],
     } as ConfigFile);
 
-    setOkMessage("保存成功");
+    setOkMessage(t("Saved successfully"));
   }
 
   async function getData() {
@@ -75,26 +82,35 @@ export function Settings() {
     <div className="flex items-center justify-center min-h-screen p-4">
       <Card className="w-200">
         <CardHeader>
-          <CardTitle>设置</CardTitle>
+          <CardTitle>{t("Settings")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <LabeledDiv direction={DIR_H} label={"主密码"} className="py-2">
+          <LabeledDiv direction={DIR_H} label={t("Master password")} className="py-2">
             <Input value={mainPassword} onInput={onInputMainPassword} />
 
             <div className="pt-2">
-              <CardDescription>为了您的数据安全, 强烈建议您设置一个健壮的主密码. </CardDescription>
-              <CardDescription>主密码将会用于使用 AES_GCM 算法加密您的所有配置文件.</CardDescription>
+              <CardDescription>{t("welcome.&p1")} </CardDescription>
+              <CardDescription>{t("welcome.&p2")}</CardDescription>
             </div>
           </LabeledDiv>
 
-          <LabeledDiv direction={DIR_H} label={"主题"} className="py-2">
+          <LabeledDiv direction={DIR_H} label={t("Language")} className="py-2">
+            <Button className="me-2" onClick={() => changeLanguage("en")}>
+              English
+            </Button>
+            <Button className="me-2" onClick={() => changeLanguage("zh")}>
+              中文
+            </Button>
+          </LabeledDiv>
+
+          <LabeledDiv direction={DIR_H} label={t("Theme")} className="py-2">
             <Input value={theme} onInput={onInpuTheme} />
           </LabeledDiv>
 
           {errorMessage && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>错误提示</AlertTitle>
+              <AlertTitle>{t("Error message")}</AlertTitle>
               <AlertDescription>{errorMessage}</AlertDescription>
             </Alert>
           )}
@@ -102,14 +118,14 @@ export function Settings() {
           {okMessage && (
             <Alert>
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>提示</AlertTitle>
+              <AlertTitle>{t("Tips")}</AlertTitle>
               <AlertDescription>{okMessage}</AlertDescription>
             </Alert>
           )}
         </CardContent>
         <CardFooter className="flex justify-between">
-          {/* <Button variant="outline">取消</Button> */}
-          <Button onClick={onSubmit}>确认</Button>
+          {/* <Button variant="outline">{t("Cancel")}</Button> */}
+          <Button onClick={onSubmit}>{t("Confirm")}</Button>
         </CardFooter>
       </Card>
     </div>

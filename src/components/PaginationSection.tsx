@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CornerDownLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
@@ -22,6 +23,7 @@ export interface PaginationProps {
   getData: (page: number) => Promise<any>;
 }
 export function PaginationSection({ currentPage, setCurrentPage, pageTotal, itemsTotal, getData }: PaginationProps) {
+  const { t } = useTranslation();
   const [inputedPage, setInputedPage] = useState<number>(1); // 输入的页码
 
   const firstPage = () => {
@@ -80,7 +82,7 @@ export function PaginationSection({ currentPage, setCurrentPage, pageTotal, item
                 <PaginationFirst className="!px-1" href="#" text={""} onClick={() => firstPage()} />
               </TooltipTrigger>
               <TooltipContent>
-                <p>第一页</p>
+                <p>{t("First page")}</p>
               </TooltipContent>
             </Tooltip>
           </PaginationItem>
@@ -90,7 +92,7 @@ export function PaginationSection({ currentPage, setCurrentPage, pageTotal, item
                 <PaginationPrevious className="!px-1" href="#" text={""} onClick={() => prevPage()} />
               </TooltipTrigger>
               <TooltipContent>
-                <p>上一页</p>
+                <p>{t("Previous page")}</p>
               </TooltipContent>
             </Tooltip>
           </PaginationItem>
@@ -114,7 +116,7 @@ export function PaginationSection({ currentPage, setCurrentPage, pageTotal, item
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p>跳转到第{inputedPage}页</p>
+                <p>{t("&Go to page", { page: inputedPage })}</p>
               </TooltipContent>
             </Tooltip>
           </PaginationItem>
@@ -124,7 +126,7 @@ export function PaginationSection({ currentPage, setCurrentPage, pageTotal, item
                 <PaginationNext className="!px-1" href="#" text={""} onClick={() => nextPage()} />
               </TooltipTrigger>
               <TooltipContent>
-                <p>下一页</p>
+                <p>{t("Next page")}</p>
               </TooltipContent>
             </Tooltip>
           </PaginationItem>
@@ -134,15 +136,13 @@ export function PaginationSection({ currentPage, setCurrentPage, pageTotal, item
                 <PaginationLast className="!px-1" href="#" text={""} onClick={() => lastPage()} />
               </TooltipTrigger>
               <TooltipContent>
-                <p>最后一页</p>
+                <p>{t("Last page")}</p>
               </TooltipContent>
             </Tooltip>
           </PaginationItem>
         </PaginationContent>
       </Pagination>
-      <div className="text-muted-foreground">
-        {pageTotal} <strong>页</strong> {itemsTotal} 行
-      </div>
+      <div className="text-muted-foreground">{t("&pageCounter", { pageTotal, itemsTotal })}</div>
     </div>
   );
 }
