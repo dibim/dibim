@@ -95,7 +95,7 @@ export interface SqlTableConstraintCommon {
 export type FieldStructure = SqlFieldDefinitionCommon & {
   isForeignKey: boolean;
   hasCheckConditions: any;
-  indexes?: FieldIndex[];
+  indexes?: FieldIndex[]; // 这个字段的索引数据
 };
 
 // 字段的索引信息

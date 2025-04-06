@@ -15,7 +15,7 @@
  *
  */
 import { invoker } from "@/invoker";
-import { DbConnectionParam, DbCountRes, FieldWithValue, GetTableDataParam, FieldStructure } from "../types";
+import { DbConnectionParam, DbCountRes, FieldIndex, FieldStructure, FieldWithValue, GetTableDataParam } from "../types";
 import { formatToSqlValueSqlite } from "./format";
 import "./types";
 
@@ -87,8 +87,8 @@ export async function getAllTableSizeSqlite(connName: string) {
 type TableStructureSqlite = {
   checkConstraint: number;
   columnId: number;
-  columnName: string;
-  dataType: string;
+  name: string;
+  type: string;
   defaultValue: string;
   fkColumn: number;
   fkTable: number;
@@ -101,7 +101,8 @@ type TableStructureSqlite = {
 
 // 获取表结构
 export async function getTableStructureSqlite(connName: string, tbName: string) {
-  const sql = `
+  // 基础字段信息
+  const columnSql = `
     WITH 
     -- 基础字段信息
     table_info AS (
@@ -163,8 +164,8 @@ export async function getTableStructureSqlite(connName: string, tbName: string) 
     )
     SELECT 
       ti.cid AS "columnId",
-      ti.name AS "columnName",
-      ti.type AS "dataType",
+      ti.name AS "name",
+      ti.type AS "type",
       ti.type_size AS "typeSize",
       ti.[notnull] AS "isNotNull",
       ti.default_value AS "defaultValue",
@@ -184,29 +185,96 @@ export async function getTableStructureSqlite(connName: string, tbName: string) 
     LEFT JOIN
       check_constraints cc ON 1=1
     ORDER BY 
-        ti.cid;
+      ti.cid;
   ;`;
-  const dbRes = await invoker.querySql(connName, sql);
 
-  const structureArr = JSON.parse(dbRes.data) as TableStructureSqlite[];
+  // 索引信息查询
+  const indexSql = `
+    WITH 
+    -- 获取所有普通索引
+    regular_indexes AS (
+      SELECT 
+        il.name AS indexName,
+        ii.name AS columnName,
+        CASE WHEN il.sql LIKE '%UNIQUE%' THEN 1 ELSE 0 END AS isUniqueKey,
+        0 AS isPrimaryKey
+      FROM 
+        sqlite_master il
+        JOIN pragma_index_info(il.name) ii
+      WHERE 
+        il.type = 'index'
+        AND il.tbl_name = '${tbName}'
+        AND il.name NOT LIKE 'sqlite_autoindex_%'
+    ),
+    -- 获取主键列信息（修正点：移除错误的 tbl_name）
+    primary_keys AS (
+      SELECT 
+        'sqlite_autoindex_' || '${tbName}' || '_' || pk AS indexName,
+        name AS columnName,
+        1 AS isUniqueKey,
+        1 AS isPrimaryKey,
+        pk AS seqno
+      FROM 
+        pragma_table_info('${tbName}')
+      WHERE 
+        pk > 0
+    )
+    -- 合并结果
+    SELECT 
+      indexName AS "indexName",
+      columnName AS "columnName",
+      isUniqueKey AS "isUniqueKey",
+      isPrimaryKey AS "isPrimaryKey",
+      'btree' AS "indexType"
+    FROM regular_indexes
+    UNION ALL
+    SELECT 
+      indexName,
+      columnName,
+      isUniqueKey,
+      isPrimaryKey,
+      'btree' AS "indexType"
+    FROM primary_keys
+    ORDER BY indexName, columnName;
+    `;
+  // 执行查询
+  const [columnRes, indexRes] = await Promise.all([
+    invoker.querySql(connName, columnSql),
+    invoker.querySql(connName, indexSql),
+  ]);
+
+  // 处理字段信息
+  const columns = columnRes.data ? (JSON.parse(columnRes.data) as TableStructureSqlite[]) : [];
+  // 处理索引信息
+  const indexes = indexRes.data ? (JSON.parse(indexRes.data) as FieldIndex[]) : [];
+
+  // 将索引信息合并到字段信息中
+  const columnIndexMap: Record<string, FieldIndex[]> = {};
+  indexes.forEach((item) => {
+    if (!columnIndexMap[item.columnName]) {
+      columnIndexMap[item.columnName] = [];
+    }
+    columnIndexMap[item.columnName].push(item);
+  });
+
+  // 合并结果
+  const result: FieldStructure[] = columns.map((column) => ({
+    defaultValue: column.defaultValue,
+    name: column.name,
+    comment: "", // SQLite不原生支持字段注释
+    type: column.type,
+    hasCheckConditions: column.checkConstraint,
+    isForeignKey: column.fkColumn > 0,
+    isNullable: column.isNotNull > 0,
+    isPrimaryKey: column.isPrimaryKey === 1,
+    isUniqueKey: column.isUnique === 1,
+    size: `${column.typeSize}`,
+    indexes: columnIndexMap[column.name] || [],
+  }));
 
   return {
     columnName: [],
-    data: structureArr.map((item) => {
-      return {
-        defaultValue: item.defaultValue,
-        name: item.columnName,
-        comment: "", // SQLite不原生支持字段注释
-        type: item.dataType,
-        hasCheckConditions: item.checkConstraint,
-        indexes: [],
-        isForeignKey: item.fkColumn > 0,
-        isNullable: item.isNotNull > 0,
-        isPrimaryKey: item.isPrimaryKey === 1,
-        isUniqueKey: item.isUnique === 1,
-        size: `${item.typeSize}`,
-      } as FieldStructure;
-    }),
+    data: result,
   };
 }
 
