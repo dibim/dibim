@@ -1,18 +1,8 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSnapshot } from "valtio";
 import { subscribeKey } from "valtio/utils";
-import {
-  STR_ADD,
-  STR_EDIT,
-  STR_EMPTY,
-  STR_TABLE,
-  TAB_CONSTRAINT,
-  TAB_DATA,
-  TAB_DDL,
-  TAB_FOREIGN_KEY,
-  TAB_PARTITION,
-  TAB_STRUCTURE,
-} from "@/constants";
+import { STR_ADD, STR_EDIT, STR_EMPTY, STR_TABLE, TAB_CONSTRAINT, TAB_DATA, TAB_DDL, TAB_STRUCTURE } from "@/constants";
 import { getTableDdl, getTableStructure } from "@/databases/adapter,";
 import { AllAlterAction, TableAlterAction } from "@/databases/types";
 import { getUniqueFieldName } from "@/databases/utils";
@@ -26,6 +16,7 @@ import { TableEditorDdl } from "./TableDdl";
 import { TableEditorStructure } from "./TableStructure";
 
 export function TableEditor() {
+  const { t } = useTranslation();
   const snap = useSnapshot(appState);
   const [alterData, setAlterData] = useState<AllAlterAction[]>([]); // 对表格和字段的修改数据
   const [editingTableName, setEditingTableName] = useState<string>(""); // 输入框中的表名
@@ -47,7 +38,7 @@ export function TableEditor() {
     const resDdl = await getTableDdl(appState.currentTableName);
     if (resDdl && resDdl.data) {
       let sql = resDdl.data;
-      if (sql === "") sql = "未查询到 DDL";
+      if (sql === "") sql = t("No DDL found");
 
       appState.setCurrentTableDdl(sql);
     }
@@ -108,7 +99,7 @@ export function TableEditor() {
       <div className="flex">
         <div className="flex items-center pe-4">
           <Input
-            placeholder={"请输入表名"}
+            placeholder={t("Please enter the table name")}
             defaultValue={editingTableName}
             onInput={(e) => {
               setEditingTableName(e.currentTarget.value);
@@ -122,7 +113,7 @@ export function TableEditor() {
               appState.setMainContenTab(TAB_STRUCTURE);
             }}
           >
-            表结构
+            {t("Table structure")}
           </TabsTrigger>
 
           <TabsTrigger
@@ -141,7 +132,7 @@ export function TableEditor() {
               appState.setMainContenTab(TAB_CONSTRAINT);
             }}
           >
-            约束
+            {t("Constraint")}
           </TabsTrigger>
 
           <TabsTrigger
@@ -150,7 +141,7 @@ export function TableEditor() {
               appState.setMainContenTab(TAB_FOREIGN_KEY);
             }}
           >
-            外键
+            {t("Foreign key")}
           </TabsTrigger>
 
           <TabsTrigger
@@ -159,7 +150,7 @@ export function TableEditor() {
               appState.setMainContenTab(TAB_PARTITION);
             }}
           >
-            分区
+            {t("Partition")}
           </TabsTrigger> 
           */}
 
@@ -169,7 +160,7 @@ export function TableEditor() {
               appState.setMainContenTab(TAB_DATA);
             }}
           >
-            数据
+            {t("Data")}
           </TabsTrigger>
         </TabsList>
       </div>

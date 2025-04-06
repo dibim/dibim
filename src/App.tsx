@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { I18nextProvider, useTranslation } from "react-i18next";
 import { AlertCircle } from "lucide-react";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import "@/styles/app.scss";
@@ -13,12 +14,14 @@ import { SidebarProvider } from "./components/ui/sidebar";
 import { Toaster } from "./components/ui/sonner";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { APP_NAME, CONFIG_FILE_MAIN, MAIN_PASSWORD_DEFAULT } from "./constants";
+import i18n from "./i18n";
 import { invoker } from "./invoker";
 import { appState } from "./store/valtio";
 import { ConfigFile } from "./types/conf_file";
 import { readConfigFile } from "./utils/config_file";
 
 export function App() {
+  const { t } = useTranslation();
   const [showLock, setShowLock] = useState(true);
   const [mainPassword, setMainPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -74,7 +77,7 @@ export function App() {
     if (await initConfFile(sha256, false)) {
       setShowLock(false);
     } else {
-      setErrorMessage("密码错误");
+      setErrorMessage(t("Incorrect password"));
     }
   }
 
@@ -84,48 +87,50 @@ export function App() {
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      {showLock ? (
-        <div className={"w-full h-full fixed top-0 left-0  z-10 bg-background"}>
-          <div className="flex items-center justify-center min-h-screen p-4">
-            <Card className="w-100">
-              <CardHeader>
-                <CardTitle>
-                  <div> 欢迎使用 {APP_NAME}</div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="py-4">
-                  <Input value={mainPassword} onInput={onInputMainPassword} />
-                </div>
+      <I18nextProvider i18n={i18n}>
+        {showLock ? (
+          <div className={"w-full h-full fixed top-0 left-0  z-10 bg-background"}>
+            <div className="flex items-center justify-center min-h-screen p-4">
+              <Card className="w-100">
+                <CardHeader>
+                  <CardTitle>
+                    <div> {t("welcome.title", { name: APP_NAME })}</div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="py-4">
+                    <Input value={mainPassword} onInput={onInputMainPassword} />
+                  </div>
 
-                {errorMessage && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>错误提示</AlertTitle>
-                    <AlertDescription>{errorMessage}</AlertDescription>
-                  </Alert>
-                )}
-              </CardContent>
-              <CardFooter className="flex justify-center">
-                <Button onClick={onSubmit}>解锁</Button>
-              </CardFooter>
-            </Card>
+                  {errorMessage && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>{t("Error message")}</AlertTitle>
+                      <AlertDescription>{errorMessage}</AlertDescription>
+                    </Alert>
+                  )}
+                </CardContent>
+                <CardFooter className="flex justify-center">
+                  <Button onClick={onSubmit}>{t("Unlock")}</Button>
+                </CardFooter>
+              </Card>
+            </div>
           </div>
-        </div>
-      ) : (
-        <SidebarProvider
-          style={{
-            "--sidebar-width": "8rem",
-            "--sidebar-width-mobile": "20rem",
-          }}
-        >
-          <TooltipProvider>
-            <Main id="main" className={""} />
-          </TooltipProvider>
-        </SidebarProvider>
-      )}
+        ) : (
+          <SidebarProvider
+            style={{
+              "--sidebar-width": "8rem",
+              "--sidebar-width-mobile": "20rem",
+            }}
+          >
+            <TooltipProvider>
+              <Main id="main" className={""} />
+            </TooltipProvider>
+          </SidebarProvider>
+        )}
 
-      <Toaster />
+        <Toaster />
+      </I18nextProvider>
     </ThemeProvider>
   );
 }

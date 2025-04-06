@@ -1,6 +1,7 @@
 "use client";
 
 import { JSX, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { SquareCheckBig } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
@@ -65,6 +66,7 @@ export function EditableTable({
   showChanges,
   ref,
 }: EditableTableProps) {
+  const { t } = useTranslation();
   const [data, setData] = useState<ListRow[]>(dataArr);
   const [editingRowIdndex, setEditingRowIndex] = useState<number>(-1); // 正在编辑的索引
   const [editingFieldName, setEditingFieldName] = useState<string>(""); // 正在编辑的字段名
@@ -289,7 +291,7 @@ export function EditableTable({
 
   return (
     <>
-      {fieldNamesUnique.length === 0 && <p>由于无主键或唯一索引, 为了确保数据不被错误地修改, 该表格不能编辑</p>}
+      {fieldNamesUnique.length === 0 && <p>{t("&notUniqueKeyTip")}</p>}
       {dataArr.length > 0 && (
         <XTable>
           {renderHeader()}

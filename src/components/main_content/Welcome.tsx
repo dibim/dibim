@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CirclePlus, Settings, Smile } from "lucide-react";
 import {
   APP_NAME,
@@ -11,6 +12,7 @@ import { appState } from "@/store/valtio";
 import { Card, CardContent, CardDescription, CardFooter } from "../ui/card";
 
 export function Welcome() {
+  const { t } = useTranslation();
   const [showMainPasswordDiv, setShowMainPasswordDiv] = useState<boolean>(false);
 
   async function checkMainPassword() {
@@ -31,7 +33,7 @@ export function Welcome() {
             <div className="pe-8">
               <Smile size={40} />
             </div>
-            <div> 欢迎使用 {APP_NAME}</div>
+            <div> {t("welcome.title", { name: APP_NAME })}</div>
           </div>
           {showMainPasswordDiv && (
             <div
@@ -44,12 +46,11 @@ export function Welcome() {
                 <Settings />
               </div>
               <div>
-                <p className="pb-4 font-bold ">设置主密码</p>
+                <p className="pb-4 font-bold ">{t("Set master password")}</p>
                 <CardDescription className="pb-2">
-                  为了您的数据安全, <strong className="text-[var(--fvm-danger-clr)]">强烈建议</strong>
-                  <strong className="text-[var(--fvm-warning-clr)]">您设置一个健壮的主密码</strong>.
+                  <strong className="text-[var(--fvm-warning-clr)]">{t("welcome.&p1")}</strong>.
                 </CardDescription>
-                <CardDescription>主密码将会用于使用 AES_GCM 算法加密您的所有配置文件.</CardDescription>
+                <CardDescription>{t("welcome.&p2")}</CardDescription>
               </div>
             </div>
           )}
@@ -62,7 +63,7 @@ export function Welcome() {
             <div className="pe-4">
               <CirclePlus />
             </div>
-            <div>添加数据库</div>
+            <div>{t("Add database connection")}</div>
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">

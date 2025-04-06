@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Database, DatabaseBackup, FilePenLine, Link, Settings, SquareFunction, Table, View } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Database, FilePenLine, Link, Settings, Table } from "lucide-react";
 import { useSnapshot } from "valtio";
 import Logo from "@/assets/logo.svg?react";
 import {
@@ -15,9 +16,7 @@ import {
 import {
   APP_NAME,
   LIST_BAR_TYPE_DB_LIST,
-  LIST_BAR_TYPE_FUNC_LIST,
   LIST_BAR_TYPE_TABLE_LIST,
-  LIST_SUB_SIDEBAR_TYPE_VIEW_LIST,
   MAIN_CONTEN_TYPE_ADD_CONNECTION,
   MAIN_CONTEN_TYPE_SETTINGS,
   MAIN_CONTEN_TYPE_SQL_EDITOR,
@@ -25,6 +24,7 @@ import {
 import { appState } from "@/store/valtio";
 
 export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
+  const { t } = useTranslation();
   const snap = useSnapshot(appState);
 
   return (
@@ -44,7 +44,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              tooltip={"数据库"}
+              tooltip={t("Databases")}
               onClick={() => {
                 snap.setListBarType(LIST_BAR_TYPE_DB_LIST);
                 snap.setListBarOpen(true);
@@ -54,7 +54,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
               <span
                 className={`${snap.listBarType === LIST_BAR_TYPE_DB_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
               >
-                数据库
+                {t("Databases")}
               </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -63,7 +63,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              tooltip={"表格"}
+              tooltip={t("Tables")}
               onClick={() => {
                 snap.setListBarType(LIST_BAR_TYPE_TABLE_LIST);
                 snap.setListBarOpen(true);
@@ -73,7 +73,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
               <span
                 className={`${snap.listBarType === LIST_BAR_TYPE_TABLE_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
               >
-                表格
+                {t("Tables")}
               </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -82,7 +82,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              tooltip={"函数"}
+              tooltip={t("Functions")}
               onClick={() => {
                 snap.setListBarType(LIST_BAR_TYPE_FUNC_LIST);
                 snap.setListBarOpen(true);
@@ -92,7 +92,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
               <span
                 className={`${snap.listBarType === LIST_BAR_TYPE_FUNC_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
               >
-                函数
+                {t("Functions")}
               </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -101,7 +101,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              tooltip={"视图"}
+              tooltip={t("Views")}
               onClick={() => {
                 snap.setListBarType(LIST_SUB_SIDEBAR_TYPE_VIEW_LIST);
                 snap.setListBarOpen(true);
@@ -111,7 +111,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
               <span
                 className={`${snap.listBarType === LIST_SUB_SIDEBAR_TYPE_VIEW_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
               >
-                视图
+              {t("Views")}
               </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -122,14 +122,14 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              tooltip={"添加数据库"}
+              tooltip={t("Add database connection")}
               onClick={() => {
                 snap.setMainContenType(MAIN_CONTEN_TYPE_ADD_CONNECTION);
                 snap.setListBarOpen(true);
               }}
             >
               <Link color="var(--fvm-info-clr)" />
-              <span>添加数据库</span>
+              <span>{t("Add database connection")}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -137,14 +137,14 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              tooltip={"SQL编辑器"}
+              tooltip={t("SQL editor")}
               onClick={() => {
                 snap.setMainContenType(MAIN_CONTEN_TYPE_SQL_EDITOR);
                 snap.setListBarOpen(true);
               }}
             >
               <FilePenLine color="var(--fvm-info-clr)" />
-              <span>SQL编辑器</span>
+              <span>{t("SQL editor")}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -153,14 +153,14 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              tooltip={"备份"}
+              tooltip={t("Backup")}
               onClick={() => {
                 snap.setMainContenType(MAIN_CONTEN_TYPE_SETTINGS);
                 snap.setListBarOpen(true);
               }}
             >
               <DatabaseBackup color="var(--fvm-info-clr)" />
-              <span>备份</span>
+              <span>{t("Backup")}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu> 
@@ -169,14 +169,14 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              tooltip={"设置"}
+              tooltip={t("Settings")}
               onClick={() => {
                 snap.setMainContenType(MAIN_CONTEN_TYPE_SETTINGS);
                 snap.setListBarOpen(true);
               }}
             >
               <Settings color="var(--fvm-info-clr)" />
-              <span>设置</span>
+              <span>{t("Settings")}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
