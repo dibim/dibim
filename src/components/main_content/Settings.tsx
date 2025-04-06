@@ -41,9 +41,11 @@ export function Settings() {
       return;
     }
 
-    // 把数据写入配置文件, 先设置 sha256, 后 执行 setConfig
-    const sha256 = await invoker.sha256(mainPassword);
-    appState.setMainPasswordSha(sha256);
+    if (mainPassword !== "") {
+      // 设置主密码了的, 先设置 sha256, 后 执行 setConfig
+      const sha256 = await invoker.sha256(mainPassword);
+      appState.setMainPasswordSha(sha256);
+    }
 
     await appState.setConfig({
       ...appState.config,
