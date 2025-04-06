@@ -16,6 +16,7 @@ import { TextNotification } from "./TextNotification";
 import { TooltipGroup } from "./TooltipGroup";
 
 export type TableSectionMethods = {
+  addChange: (val: TableDataChange) => void;
   deleteRow: (val: number) => void;
   getCurrentPage: () => number;
   getTableData: () => RowData[];
@@ -125,6 +126,9 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
   // ========== 按钮 结束 ==========
 
   useImperativeHandle(ref, () => ({
+    addChange: (val: TableDataChange) => {
+      tableRef.current?.addChange(val);
+    },
     deleteRow: (val: number) => {
       tableRef.current?.deleteRow(val);
     },

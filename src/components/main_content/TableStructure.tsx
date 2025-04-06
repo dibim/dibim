@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { subscribeKey } from "valtio/utils";
 import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
 import { exec, fieldTypeOptions, genAlterCmd } from "@/databases/adapter,";
-import { AllAlterAction, FieldAlterAction, FieldStructure } from "@/databases/types";
+import { AllAlterAction, AlterAction, FieldAlterAction } from "@/databases/types";
 import { cn } from "@/lib/utils";
 import { appState } from "@/store/valtio";
 import { ConfirmDialog } from "../ConfirmDialog";
@@ -48,9 +48,7 @@ export function TableEditorStructure({
   const [dialogAction, setDialogAction] = useState<DialogAction>("");
   const [errorMessage, setErrorMessage] = useState<string>(""); // 错误消息
   const [okMessage, setOkMessage] = useState<string>(""); // 成功消息
-  const [operateFieldName, setOperateFieldName] = useState<string>(""); // 现在操作的行的索引
   const [showDialogAlter, setShowDialogAlter] = useState<boolean>(false);
-  const [showDialogDelete, setShowDialogDelete] = useState<boolean>(false);
   const [showDialogEdit, setShowDialogEdit] = useState<boolean>(false);
   const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
 
@@ -66,18 +64,21 @@ export function TableEditorStructure({
   const [size, setSize] = useState<string>("");
   const [type, setType] = useState<string>("");
   // 备份原先的数据
+  const [autoIncrementOld, setAutoIncrementOld] = useState<boolean>(false);
+  const [commentOld, setCommentOld] = useState<string>("");
   const [defalutValueOld, setDefaultValueOld] = useState<string>("");
+  const [indexNameOld, setIndexNameOld] = useState<string>(""); // 字段索引名
   const [isNullableOld, setIsNullableOld] = useState<boolean>(false);
   const [isPrimaryKeyOld, setIsPrimaryKeyOld] = useState<boolean>(false);
   const [isUniqueKeyOld, setIsUniqueKeyOld] = useState<boolean>(false);
-  const [typeOld, setTypeOld] = useState<string>("");
   const [nameOld, setNameOld] = useState<string>(""); // 字段名, 编辑之前记录的原先的字段名
-  const [indexEditing, setIndexEditing] = useState<number>(-1); // 字段索引, 右键菜单点击删除时临时记录
+  const [sizeOld, setSizeOld] = useState<string>("");
+  const [typeOld, setTypeOld] = useState<string>("");
 
   function resetDialogData(faa: FieldAlterAction | null) {
     setAutoIncrement(faa?.autoIncrement || false);
     setComment(faa?.comment || "");
-    setDefaultValue(faa?.defalutValue || "");
+    setDefaultValue(faa?.defaultValue || "");
     setName(faa?.name || "");
     setIndexName(faa?.indexName || "");
     setIsNullable(faa?.isNullable || false);
@@ -85,18 +86,21 @@ export function TableEditorStructure({
     setIsUniqueKey(faa?.isUniqueKey || false);
     setSize(faa?.size || "");
     setType(faa?.type || "");
-
-    setDefaultValueOld(faa?.defalutValueOld || "");
-    setIsNullableOld(faa?.isNullableOld || false);
-    setIsPrimaryKeyOld(faa?.isPrimaryKeyOld || false);
-    setIsUniqueKeyOld(faa?.isUniqueKeyOld || false);
-    setTypeOld(faa?.typeOld || "");
+    // 备份原先的数据
+    setAutoIncrementOld(faa?.autoIncrement || false);
+    setCommentOld(faa?.comment || "");
+    setDefaultValueOld(faa?.defaultValue || "");
+    setIndexNameOld(faa?.indexName || "");
+    setIsNullableOld(faa?.isNullable || false);
+    setIsPrimaryKeyOld(faa?.isPrimaryKey || false);
+    setIsUniqueKeyOld(faa?.isUniqueKey || false);
+    setSizeOld(faa?.size || "");
     setNameOld(faa?.name || "");
+    setTypeOld(faa?.type || "");
   }
 
-  // 对话框提交变更
-  async function onSubmit() {
-    // 找到 alterData 里对应的字段的数据
+  // 找到 alterData 里对应的字段的数据
+  function getActionDataIndex() {
     let actionDataIndex = -1;
 
     for (let index = 0; index < alterData.length; index++) {
@@ -109,30 +113,44 @@ export function TableEditorStructure({
       }
     }
 
-    const actionData: FieldAlterAction = {
+    return actionDataIndex;
+  }
+
+  function genActionData(action: AlterAction): FieldAlterAction {
+    return {
       target: STR_FIELD,
-      action: dialogAction,
+      action,
       tableName: appState.currentTableName,
 
       autoIncrement: autoIncrement,
       comment: comment,
-      defalutValue: defalutValue,
+      defaultValue: defalutValue,
       indexName: indexName,
       isNullable: isNullable,
       isPrimaryKey: isPrimaryKey,
       isUniqueKey: false,
-      name: dialogAction === STR_EDIT ? name : nameOld, // 如果是编辑, 要记录编辑之前的字段名
-      nameExt: name, // 输入框里的字段名
+      name: dialogAction === STR_ADD ? name : nameOld, // 添加时, 使用新 name
+      nameNew: name, // 重命名时使用新 name
       size: size,
       type: type,
 
+      autoIncrementOld: false,
+      commentOld: "",
       defalutValueOld: defalutValueOld,
+      indexNameOld: "",
       isNullableOld: isNullableOld,
       isPrimaryKeyOld: isPrimaryKeyOld,
       isUniqueKeyOld: isUniqueKeyOld,
+      nameOld: nameOld,
+      sizeOld: sizeOld,
       typeOld: typeOld,
     };
+  }
 
+  // 对话框提交变更
+  async function onSubmit() {
+    const actionDataIndex = getActionDataIndex();
+    const actionData = genActionData(dialogAction);
     if (actionDataIndex > -1) {
       setAlterData(alterData.map((item, index) => (index === actionDataIndex ? { ...item, ...actionData } : item)));
     } else {
@@ -173,17 +191,33 @@ export function TableEditorStructure({
     });
 
     if (dialogAction === STR_ADD) {
-      // 添加字段的, 添加字段结构
       appState.setCurrentTableStructure([...appState.currentTableStructure, newFieldData]);
-    } else if (dialogAction === STR_EDIT) {
-      // 更新字段的, 更新字段结构
+    }
+
+    if (dialogAction === STR_EDIT) {
       appState.setCurrentTableStructure(
         appState.currentTableStructure.map((field, index) => (index === fieldDataIndex ? newFieldData : field)),
       );
+
+      // 向 TableSection 内部添加变化
+      // if (autoIncrement != autoIncrementOld) addChange(fieldDataIndex, "", autoIncrementOld, autoIncrement); // FIXME: 添加支持
+      if (comment != commentOld) addChange(fieldDataIndex, "comment", commentOld, comment);
+      if (defalutValue != defalutValueOld) addChange(fieldDataIndex, "defalutValue", defalutValueOld, defalutValue);
+      if (indexName != indexNameOld) addChange(fieldDataIndex, "indexName", indexNameOld, indexName);
+      if (isNullable != isNullableOld) addChange(fieldDataIndex, "isNullable", isNullableOld, isNullable);
+      if (isPrimaryKey != isPrimaryKeyOld) addChange(fieldDataIndex, "isPrimaryKey", isPrimaryKeyOld, isPrimaryKey);
+      if (isUniqueKey != isUniqueKeyOld) addChange(fieldDataIndex, "isUniqueKey", isUniqueKeyOld, isUniqueKey);
+      if (name != nameOld) addChange(fieldDataIndex, "name", nameOld, name);
+      if (size != sizeOld) addChange(fieldDataIndex, "size", sizeOld, size);
+      if (type != typeOld) addChange(fieldDataIndex, "type", typeOld, type);
     }
 
     updateDataArr();
     setShowDialogEdit(false);
+  }
+
+  function addChange(index: number, field: string, old: any, newVal: any) {
+    tableRef.current?.addChange({ index, field, old, new: newVal });
   }
 
   // ========== 对话框 结束 ==========
@@ -211,14 +245,14 @@ export function TableEditorStructure({
           tableName: appState.currentTableName,
 
           comment: "",
-          defalutValue: "",
+          defaultValue: "",
           autoIncrement: false,
           indexName: "",
           isNullable: false,
           isPrimaryKey: false,
           isUniqueKey: false,
           name: field.name,
-          nameExt: "",
+          nameNew: "",
           size: "",
           type: "",
         } as FieldAlterAction;
@@ -278,20 +312,25 @@ export function TableEditorStructure({
 
       autoIncrement: false, // FIXME: 添加支持
       comment: field.comment,
-      defalutValue: field.defaultValue,
+      defaultValue: field.defaultValue,
       indexName: fieldIndexName,
       isNullable: field.isNullable,
       isPrimaryKey: isPrimaryKey,
       isUniqueKey: isUniqueKey,
       name: field.name,
-      nameExt: "",
+      nameNew: "",
       size: `${field.size}`,
       type: field.type,
 
+      autoIncrementOld: false,
+      commentOld: field.comment,
       defalutValueOld: field.defaultValue,
+      indexNameOld: "",
       isNullableOld: field.isNullable,
       isPrimaryKeyOld: isPrimaryKey,
       isUniqueKeyOld: isUniqueKey,
+      nameOld: field.name,
+      sizeOld: field.size || "",
       typeOld: field.type,
     });
     setShowDialogEdit(true);
@@ -320,22 +359,19 @@ export function TableEditorStructure({
     }
   }
 
-  // 弹出确认删除字段
-  function handleDeletePopup(index: number) {
-    let fieldName = "";
-
-    const tableDataPg = appState.currentTableStructure as unknown as FieldStructure[];
-    if (index <= tableDataPg.length) {
-      fieldName = tableDataPg[index].name;
-    }
-
-    if (fieldName !== "") {
-      setOperateFieldName(fieldName);
-      setShowDialogDelete(true);
-      setIndexEditing(index);
+  // 删除字段
+  function handleDeleteField(index: number) {
+    const field = appState.currentTableStructure[index]; // 要删除的字段
+    const actionDataIndex = getActionDataIndex();
+    const actionData = genActionData(STR_DELETE);
+    actionData.name = field.name;
+    if (actionDataIndex > -1) {
+      setAlterData(alterData.map((item, index) => (index === actionDataIndex ? { ...item, ...actionData } : item)));
     } else {
-      // TODO: 报错
+      setAlterData([...alterData, actionData]);
     }
+
+    tableRef.current?.deleteRow(index);
   }
 
   // 确定执行语句
@@ -386,7 +422,7 @@ export function TableEditorStructure({
           <ContextMenuItem onClick={() => handleCopyFieldName(index)}>复制字段名</ContextMenuItem>
           <ContextMenuItem onClick={() => handleCopyFieldType(index)}>复制类型</ContextMenuItem>
           <hr className="my-2" />
-          <ContextMenuItem onClick={() => handleDeletePopup(index)} className={`text-[var(--fvm-danger-clr)]`}>
+          <ContextMenuItem onClick={() => handleDeleteField(index)} className={`text-[var(--fvm-danger-clr)]`}>
             删除
           </ContextMenuItem>
         </ContextMenuContent>
@@ -595,22 +631,6 @@ export function TableEditorStructure({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* 确认要执行的删除语句 */}
-      <ConfirmDialog
-        open={showDialogDelete}
-        title={`确认要删除字段"${operateFieldName}"吗?`}
-        content={<div />}
-        cancelText={"取消"}
-        cancelCb={() => {
-          setShowDialogDelete(false);
-        }}
-        okText={"确定"}
-        okCb={() => {
-          setShowDialogDelete(false);
-          tableRef.current?.deleteRow(indexEditing);
-        }}
-      />
 
       {/* 确认要执行的变更语句 */}
       <ConfirmDialog

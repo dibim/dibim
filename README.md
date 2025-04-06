@@ -83,14 +83,23 @@ In event handling, useEffect, and other logic, the original state object appStat
 - sql 编辑器结果集分页✅
 - 表格数据列表的 添加行✅
   
-### v0.2 sqlite
+### v0.2 sqlite✅
 
-- 支持 sqlite
-  - 实现 recreateTable 函数
-  - 右键菜单里的删除字段没有生成语句?
+- 支持 sqlite✅
 - 添加连接要检查是否重复✅
 - 表结构里的字段类型可使用下拉框选择✅
 - 表格数据列表的 添加行的语句改为批量插入✅
+
+### v0.2.1
+
+- 使用中完善
+- 下个版本有时间在做
+
+### v0.2.2
+
+- 国际化
+- 字段添加 COLLATE
+- 字段添加 CHECK 约束
 
 ### v0.3 mysql
 
@@ -104,7 +113,6 @@ In event handling, useEffect, and other logic, the original state object appStat
 - sql 编辑器
   - 记录到历史
   - 要实现代码提示(表名和字段名) 推迟
-- 字段添加 COLLATE  
 - 大字符串查看器
 - 分区  
 
@@ -134,6 +142,8 @@ In event handling, useEffect, and other logic, the original state object appStat
   - alt + b 备份
   - alt + l 锁屏(设置主密码之后)  
   - f5 刷新数据(表结构/ddl等)
+  - delete 删除行
+  - enter 在对话框里快速确定
 
 - 同步配置文件等, 使用 gist 存储
 - ER 图

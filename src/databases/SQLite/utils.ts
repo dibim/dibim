@@ -4,6 +4,7 @@ import { FieldDefinitionSqlite, SqlTableConstraintCommonSqlite } from "./types";
 
 export interface TableStructure {
   tableName: string;
+  isTemporary: boolean; // 是否是临时表
   columns: FieldDefinitionSqlite[];
   constraints: SqlTableConstraintCommonSqlite[];
   options: {
@@ -63,6 +64,7 @@ export function parseCreateTableDdl(sql: string): TableStructure {
 
   const result: TableStructure = {
     tableName: tableNameMatch[1],
+    isTemporary: false,
     columns: [],
     constraints: [],
     options: {
@@ -340,18 +342,18 @@ function splitSqlTokens(sqlPart: string): string[] {
  * @param table 结构化数据
  * @returns
  */
-export function generateCreateTableDdl(table: TableStructure): string {
+export function genCreateTableDdl(table: TableStructure): string {
   const parts: string[] = [];
 
   // 基础建表语句
-  parts.push(`CREATE TABLE "${quoteIdentifier(table.tableName)}" (`);
+  parts.push(`CREATE ${table.isTemporary ? "TEMPORARY" : ""} TABLE "${quoteIdentifier(table.tableName)}" (`);
 
   // 处理列定义
   const columnDefinitions = table.columns.map((col) => {
     const tokens: string[] = [];
 
     // 列名和类型
-    tokens.push(`${quoteIdentifier(col.name)} ${col.type}`);
+    tokens.push(`"${quoteIdentifier(col.name)}" ${col.type}`);
 
     // 主键 (列级)
     if (col.isPrimaryKey) {
@@ -421,11 +423,14 @@ export function generateCreateTableDdl(table: TableStructure): string {
         break;
     }
 
-    return tokens.join(" ");
+    return tokens.length > 0 ? tokens.join(" ") : "";
   });
 
+  // 删除数组里的空字符串,否则最后一行会多一个逗号
+  const tableConstraints2 = tableConstraints.filter((item) => item !== "");
+
   // 合并列定义和约束
-  parts.push([...columnDefinitions, ...tableConstraints].join(",\n  "));
+  parts.push([...columnDefinitions, ...tableConstraints2].join(",\n  "));
 
   // 闭合基础建表语句的括号
   parts.push(")");
@@ -467,5 +472,5 @@ export function test() {
 
   console.log(JSON.stringify(tableStructure, null, 2));
 
-  console.log(generateCreateTableDdl(tableStructure));
+  console.log(genCreateTableDdl(tableStructure));
 }
