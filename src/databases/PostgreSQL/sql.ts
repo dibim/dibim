@@ -87,8 +87,8 @@ export async function getTableStructurePg(connName: string, tbName: string) {
   // 基础字段信息
   const columnSql = `
     SELECT
-      a.attname AS "columnName",
-      t.typname AS "dataType",
+      a.attname AS "name",
+      t.typname AS "type",
       CASE 
         WHEN t.typname = 'varchar' THEN a.atttypmod - 4
         WHEN t.typname = 'char' THEN a.atttypmod - 4

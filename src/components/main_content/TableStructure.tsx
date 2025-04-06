@@ -65,11 +65,11 @@ export function TableEditorStructure({
   const [size, setSize] = useState<string>("");
   const [type, setType] = useState<string>("");
   // 备份原先的数据
-  const [fieldDefalutOld, setFieldDefaultOld] = useState<string>("");
-  const [fieldIsNullableOld, setFieldIsNullableOld] = useState<boolean>(false);
-  const [fieldIsPrimaryKeyOld, setFieldIsPrimaryKeyOld] = useState<boolean>(false);
-  const [fieldIsUniqueKeyOld, setFieldIsUniqueKeyOld] = useState<boolean>(false);
-  const [fieldTypeOld, setFieldTypeOld] = useState<string>("");
+  const [defalutValueOld, setDefaultValueOld] = useState<string>("");
+  const [isNullableOld, setIsNullableOld] = useState<boolean>(false);
+  const [isPrimaryKeyOld, setIsPrimaryKeyOld] = useState<boolean>(false);
+  const [isUniqueKeyOld, setIsUniqueKeyOld] = useState<boolean>(false);
+  const [typeOld, setTypeOld] = useState<string>("");
 
   function resetDialogData(faa: FieldAlterAction | null) {
     setAutoIncrement(faa?.autoIncrement || false);
@@ -83,11 +83,11 @@ export function TableEditorStructure({
     setSize(faa?.size || "");
     setType(faa?.type || "");
 
-    setFieldDefaultOld(faa?.defalutValueOld || "");
-    setFieldIsNullableOld(faa?.isNullableOld || false);
-    setFieldIsPrimaryKeyOld(faa?.isPrimaryKeyOld || false);
-    setFieldIsUniqueKeyOld(faa?.isUniqueKeyOld || false);
-    setFieldTypeOld(faa?.typeOld || "");
+    setDefaultValueOld(faa?.defalutValueOld || "");
+    setIsNullableOld(faa?.isNullableOld || false);
+    setIsPrimaryKeyOld(faa?.isPrimaryKeyOld || false);
+    setIsUniqueKeyOld(faa?.isUniqueKeyOld || false);
+    setTypeOld(faa?.typeOld || "");
   }
 
   // 点击添加字段
@@ -151,19 +151,22 @@ export function TableEditorStructure({
   function handleEditFieldPopup(index: number) {
     const field = appState.currentTableStructure[index];
 
-    let isPrimaryKey = false;
-    let isUniqueKey = false;
+    let isPrimaryKey = field.isPrimaryKey;
+    let isUniqueKey = field.isUniqueKey;
     let fieldIndexName = "";
+
     if (field.indexes) {
       for (const idx of field.indexes) {
-        if (idx.isPrimaryKey) {
-          isPrimaryKey = true;
-          fieldIndexName = idx.indexName;
-        }
+        if (idx.columnName === field.name) {
+          if (idx.isPrimaryKey) {
+            isPrimaryKey = true;
+            fieldIndexName = idx.indexName;
+          }
 
-        if (idx.isUniqueKey) {
-          isUniqueKey = true;
-          fieldIndexName = idx.indexName;
+          if (idx.isUniqueKey) {
+            isUniqueKey = true;
+            fieldIndexName = idx.indexName;
+          }
         }
       }
     }
@@ -173,7 +176,7 @@ export function TableEditorStructure({
       action: STR_EDIT,
       tableName: appState.currentTableName,
 
-      autoIncrement: false,
+      autoIncrement: false, // FIXME: 添加支持
       comment: field.comment,
       defalutValue: field.defaultValue,
       indexName: fieldIndexName,
@@ -187,8 +190,8 @@ export function TableEditorStructure({
 
       defalutValueOld: field.defaultValue,
       isNullableOld: field.isNullable,
-      isPrimaryKeyOld: field.isPrimaryKey,
-      isUniqueKeyOld: field.isUniqueKey,
+      isPrimaryKeyOld: isPrimaryKey,
+      isUniqueKeyOld: isUniqueKey,
       typeOld: field.type,
     });
     setNameEditing(field.name);
@@ -268,11 +271,11 @@ export function TableEditorStructure({
       size: size,
       type: type,
 
-      defalutValueOld: fieldDefalutOld,
-      isNullableOld: fieldIsNullableOld,
-      isPrimaryKeyOld: fieldIsPrimaryKeyOld,
-      isUniqueKeyOld: fieldIsUniqueKeyOld,
-      typeOld: fieldTypeOld,
+      defalutValueOld: defalutValueOld,
+      isNullableOld: isNullableOld,
+      isPrimaryKeyOld: isPrimaryKeyOld,
+      isUniqueKeyOld: isUniqueKeyOld,
+      typeOld: typeOld,
     };
 
     if (actionDataFindedIndex > -1) {
@@ -355,40 +358,40 @@ export function TableEditorStructure({
   }
 
   const fieldNames = [
-    "columnName",
-    "dataType",
+    "name",
+    "type",
+    "isNotNull",
+    "defaultValue",
     "isPrimaryKey",
     "isForeignKey",
     "isUniqueKey",
     "hasCheckConditions",
-    "isNotNull",
-    "defaultValue",
     "comment",
   ];
-  const fieldNameTitle = ["字段名", "类型", "主键", "外键", "唯一", "条件", "非空", "默认值", "备注"];
+  const fieldNameTitle = ["字段名", "类型", "非空", "默认值", "主键", "外键", "唯一", "条件", "备注"];
   const [dataArr, setDataArr] = useState<ListRow[]>([]);
 
   function updateDataArr() {
     const dataArrTemp = appState.currentTableStructure.map(
       (row) =>
         ({
-          columnName: { value: row.name, render: (val: any) => <div>{val}</div> },
-          comment: { value: row.comment, render: (val: any) => <div className="w-full">{val}</div> },
-          dataType: {
+          name: { value: row.name, render: (val: any) => <div>{val}</div> },
+          type: {
             value: row.type,
             render: (val: any) => (
               <div className="flex">
-                {" "}
                 <span className="pe-2">{DataTypeIcon(val)}</span> <span>{val}</span>{" "}
               </div>
             ),
           },
+          isNotNull: { value: !(row.isNullable === true), render: (val: any) => <div>{val ? "✅" : ""}</div> },
           defaultValue: { value: row.defaultValue, render: (val: any) => <div>{val}</div> },
-          hasCheckConditions: { value: row.hasCheckConditions, render: (val: any) => <div>{val ? "✅" : ""}</div> },
-          isForeignKey: { value: row.isForeignKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
-          isNotNull: { value: !row.isNullable, render: (val: any) => <div>{val ? "✅" : ""}</div> },
           isPrimaryKey: { value: row.isPrimaryKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
           isUniqueKey: { value: row.isUniqueKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
+          hasCheckConditions: { value: row.hasCheckConditions, render: (val: any) => <div>{val ? "✅" : ""}</div> },
+          isForeignKey: { value: row.isForeignKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
+
+          comment: { value: row.comment, render: (val: any) => <div>{val}</div> },
         }) as ListRow,
     );
 
@@ -545,7 +548,7 @@ export function TableEditorStructure({
                 value={indexName}
                 onInput={(e) => setIndexName(e.currentTarget.value)}
                 placeholder="索引名"
-                disabled={isPrimaryKey || isUniqueKey}
+                disabled={!(isPrimaryKey || isUniqueKey)}
               />
             </div>
           </LabeledDiv>
