@@ -29,6 +29,7 @@ export function isCommonSQLValue(value: unknown): value is SqlValueCommon {
 export function formatToSqlValueCommon(value: SqlValueCommon): string {
   // 处理空值
   if (value == null) return "NULL";
+  // TODO: 好像有问题
   if (value == `""`) return value;
   if (value == "''") return value;
 

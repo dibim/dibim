@@ -141,7 +141,7 @@ export function genDeleteTableCmd(tbName: string) {
 
   if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
   if (currentDbType === DB_TYPE_POSTGRESQL) return genDeleteTableCmdPg(tbName);
-  if (currentDbType === DB_TYPE_SQLITE) genDeleteTableCmdSqlite(tbName);
+  if (currentDbType === DB_TYPE_SQLITE) return genDeleteTableCmdSqlite(tbName);
 
   return "";
 }

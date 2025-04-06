@@ -20,9 +20,15 @@ export function isSqliteFunctionCall(str: string): boolean {
  * @returns
  */
 export function formatToSqlValueSqlite(value: SqlValueCommon, allowFuncAcll?: boolean): string {
-  // 首先检查是否是调用 PostgreSQL 函数
-  if (allowFuncAcll && typeof value === "string" && isSqliteFunctionCall(value)) {
-    return value;
+  if (typeof value === "string") {
+    // 首先检查是否是调用 SQLite 函数
+    if (allowFuncAcll && isSqliteFunctionCall(value)) {
+      return value;
+    }
+
+    if ((value.startsWith("'") && value.endsWith("'")) || (value.startsWith('"') && value.endsWith('"'))) {
+      return value;
+    }
   }
 
   try {

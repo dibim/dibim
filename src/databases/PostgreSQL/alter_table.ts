@@ -17,17 +17,17 @@ function genSizeStr(faa: FieldAlterAction) {
 }
 
 function genFieldDefault(faa: FieldAlterAction) {
-  if (faa.defalutValue === null) return "";
+  if (faa.defaultValue === null) return "";
   if (faa.isPrimaryKey) return "";
 
-  if (faa.defalutValue === `''` || faa.defalutValue === `""`) return `DEFAULT ''`;
+  if (faa.defaultValue === `''` || faa.defaultValue === `""`) return `DEFAULT ''`;
 
   // TODO: 支持以下类型:
   // 多维数组: 使用 ARRAY[[1,2],[3,4]]
-  let defalutValue = reNumStr.test(faa.defalutValue)
-    ? `${faa.defalutValue}`
-    : formatToSqlValuePg(faa.defalutValue, true);
-  return faa.defalutValue ? `DEFAULT ${defalutValue}` : "";
+  let defalutValue = reNumStr.test(faa.defaultValue)
+    ? `${faa.defaultValue}`
+    : formatToSqlValuePg(faa.defaultValue, true);
+  return faa.defaultValue ? `DEFAULT ${defalutValue}` : "";
 }
 
 function genNotNull(faa: FieldAlterAction) {
@@ -54,10 +54,10 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
   let res: string[] = [`-- 将要对字段${faa.name}执行以下语句:`];
 
   // 修改数据类型
-  if (faa.type !== "") {
+  if (faa.type !== faa.typeOld) {
     const sizeStr = genSizeStr(faa);
     res.push(
-      `ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.nameExt}" TYPE ${faa.type}${sizeStr} USING "${faa.nameExt}"::${faa.type}${sizeStr};`,
+      `ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.name}" TYPE ${faa.type}${sizeStr} USING "${faa.name}"::${faa.type}${sizeStr};`,
     );
   }
 
@@ -65,11 +65,11 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
   if (faa.isPrimaryKey) {
     // 编辑主键的, 先都删除原先的, 如果有索引名再新建一个
     res.push(`
+      -- 删除关联到${faa.name}字段的主键约束名称
       DO $$
       DECLARE
         constraint_name text;
-      BEGIN
-        -- 查找关联到${faa.name}字段的主键约束名称
+      BEGIN        
         SELECT pg_constraint.conname INTO constraint_name
         FROM pg_constraint
         JOIN pg_class ON pg_constraint.conrelid = pg_class.oid
@@ -105,14 +105,14 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
   }
 
   // 修改唯一索引
-  else if (faa.isUniqueKey) {
+  if (faa.isUniqueKey) {
     // 编辑唯一索引的, 先都删除原先的, 如果有索引名再新建一个
     res.push(`
+      -- 删除关联到${faa.name}字段的唯一索引（不包括主键）
       DO $$
       DECLARE
         index_name text;
       BEGIN
-        -- 查找关联到${faa.name}字段的唯一索引（不包括主键）
         SELECT pgc.relname INTO index_name
         FROM pg_class pgc
         JOIN pg_index pgi ON pgi.indexrelid = pgc.oid
@@ -125,7 +125,7 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
         AND pgi.indisunique = true
         AND pgi.indisprimary = false;  -- 明确排除主键
         
-        -- 如果找到唯一索引，则删除它
+        -- 如果找到${faa.name}的唯一索引，则删除它
         IF index_name IS NOT NULL THEN
             EXECUTE 'DROP INDEX "' || index_name || '"';
             RAISE NOTICE '唯一索引 % 已从表"${faa.tableName}"的字段"${faa.name}"上删除', index_name;
@@ -136,16 +136,17 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
     `);
 
     if (faa.indexName) {
-      res.push(`CREATE UNIQUE INDEX "${faa.indexName}" ON "${faa.tableName}" ("${faa.nameExt}");`);
+      res.push(`CREATE UNIQUE INDEX "${faa.indexName}" ON "${faa.tableName}" ("${faa.name}");`);
     }
-  } else if (!faa.isPrimaryKey && !faa.isUniqueKey) {
+  }
+  if (!faa.isPrimaryKey && !faa.isUniqueKey) {
     // 没有设置主键和唯一索引的, 删除这一字段的主键和唯一索引
     res.push(`    
+      -- 删除关联到${faa.name}字段的唯一约束（包括主键）
       DO $$
       DECLARE
           constraint_rec record;
       BEGIN
-        -- 查找关联到指定字段的唯一约束（包括主键）
         FOR constraint_rec IN 
           SELECT pg_constraint.conname as constraint_name, pg_constraint.contype as constraint_type
           FROM pg_constraint
@@ -177,30 +178,30 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
 
   // 设置字段为 NOT NULL
   if (faa.isNullable) {
-    res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.nameExt}" SET NOT NULL;`);
+    res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.name}" DROP NOT NULL;`);
   } else {
-    res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.nameExt}" DROP NOT NULL;`);
+    res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.name}" SET NOT NULL;`);
   }
 
   // 设置字段默认值
-  if (faa.defalutValue !== null) {
-    const fv = formatToSqlValuePg(faa.defalutValue, true);
-    res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.nameExt}" SET DEFAULT ${fv};`);
+  if (faa.defaultValue !== null) {
+    const fv = formatToSqlValuePg(faa.defaultValue, true);
+    res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.name}" SET DEFAULT ${fv};`);
   } else {
-    res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.nameExt}" DROP DEFAULT;`);
+    res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.name}" DROP DEFAULT;`);
   }
 
   // 修改字段备注
   if (faa.comment) {
     const fv = formatToSqlValuePg(faa.comment, true);
-    res.push(`COMMENT ON COLUMN "${faa.tableName}"."${faa.nameExt}" IS ${fv};`);
+    res.push(`COMMENT ON COLUMN "${faa.tableName}"."${faa.name}" IS ${fv};`);
   } else {
-    res.push(`COMMENT ON COLUMN "${faa.tableName}"."${faa.nameExt}" IS NULL;`);
+    res.push(`COMMENT ON COLUMN "${faa.tableName}"."${faa.name}" IS NULL;`);
   }
 
   // 修改字段名要放在最后处理, 避免其它修改找不到表名
-  if (faa.name !== faa.nameExt) {
-    res.push(`ALTER TABLE "${faa.tableName}" RENAME COLUMN "${faa.name}" TO "${faa.nameExt}";`);
+  if (faa.name !== faa.nameNew) {
+    res.push(`ALTER TABLE "${faa.tableName}" RENAME COLUMN "${faa.name}" TO "${faa.nameNew}";`);
   }
 
   return res;
@@ -272,9 +273,9 @@ export function genAlterTableAdd(taa: TableAlterAction, faas: FieldAlterAction[]
   for (const faa of faas) {
     if (faa.comment) {
       const fv = formatToSqlValuePg(faa.comment, true);
-      res.push(`COMMENT ON COLUMN "${taa.tableName}"."${faa.nameExt}" IS ${fv};`);
+      res.push(`COMMENT ON COLUMN "${taa.tableName}"."${faa.name}" IS ${fv};`);
     } else {
-      res.push(`COMMENT ON COLUMN "${taa.tableName}"."${faa.nameExt}" IS NULL;`);
+      res.push(`COMMENT ON COLUMN "${taa.tableName}"."${faa.name}" IS NULL;`);
     }
   }
 

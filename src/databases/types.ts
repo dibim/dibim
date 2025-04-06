@@ -120,21 +120,26 @@ export type FieldAlterAction = {
 
   autoIncrement: boolean;
   comment: string;
-  defalutValue: string | null;
+  defaultValue: string | null;
   indexName: string; // 索引名
   isNullable: boolean; // 字段可以为空
   isPrimaryKey: boolean;
   isUniqueKey: boolean;
   name: string;
-  nameExt: string; // 改名时作为新字段名, 设置索引时作为作新的字段名 TODO: 后续要支持复合索引
   size: string;
   type: string;
+  nameNew: string; // 改名时的新字段名
 
-  // 原先的信息, sqlite 需要对比是否修改
+  // 原先的信息, 用于对比是否修改
+  autoIncrementOld: boolean;
+  commentOld: string;
   defalutValueOld: string | null;
+  indexNameOld: string; // 索引名
   isNullableOld: boolean;
   isPrimaryKeyOld: boolean;
   isUniqueKeyOld: boolean;
+  nameOld: string;
+  sizeOld: string;
   typeOld: string;
 };
 

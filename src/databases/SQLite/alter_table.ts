@@ -5,7 +5,7 @@ import { STR_ADD, STR_DELETE, STR_EDIT, STR_FIELD, STR_TABLE } from "@/constants
 import { appState } from "@/store/valtio";
 import { AllAlterAction, FieldAlterAction, TableAlterAction } from "../types";
 import { formatToSqlValueSqlite } from "./format";
-import { TableStructure, generateCreateTableDdl, parseCreateTableDdl } from "./utils";
+import { TableStructure, genCreateTableDdl, parseCreateTableDdl } from "./utils";
 
 function genSizeStr(faa: FieldAlterAction) {
   if (!faa.size) return "";
@@ -14,8 +14,8 @@ function genSizeStr(faa: FieldAlterAction) {
 }
 
 function genFieldDefault(faa: FieldAlterAction) {
-  if (faa.defalutValue === null || faa.isPrimaryKey) return "";
-  return faa.defalutValue ? `DEFAULT ${formatToSqlValueSqlite(faa.defalutValue, true)}` : "";
+  if (faa.defaultValue === null || faa.isPrimaryKey) return "";
+  return faa.defaultValue ? `DEFAULT ${formatToSqlValueSqlite(faa.defaultValue, true)}` : "";
 }
 
 function genNotNull(faa: FieldAlterAction) {
@@ -49,63 +49,53 @@ function genFieldSql(faa: FieldAlterAction) {
   return parts.filter((p) => p).join(" ");
 }
 
-function handleSqliteAlterColumn(table: string, retainedFieldsNames: string, def: string) {
+/**
+ * 重新建表
+ * @param table 表名
+ * @param ddl 建表语句
+ * @param tempTable 临时表的表名
+ * @param tempDdl 临时表的建表语句
+ * @param retainedFieldsNames 要保留的字段名
+ * @returns
+ */
+function genRecreateTable(table: string, ddl: string, newTable: string, retainedFieldsNames: string[]) {
+  const fields = `"${retainedFieldsNames.join('","')}"`;
   return [
-    `PRAGMA foreign_keys = off;`,
-    `BEGIN TRANSACTION;`,
-    `CREATE TEMPORARY TABLE "${table}_backup"(${def});`,
-    `INSERT INTO ${table}_backup SELECT ${retainedFieldsNames} FROM ${table};`,
-    `DROP TABLE ${table};`,
-    `CREATE TABLE ${table}(${def});`,
-    `INSERT INTO ${table} SELECT * FROM ${table}_backup;`,
-    `DROP TABLE ${table}_backup;`,
-    `COMMIT;`,
-    `PRAGMA foreign_keys = on;`,
+    `
+    -- 需要重新建表
+    PRAGMA foreign_keys = OFF;
+    BEGIN TRANSACTION;
+    
+    CREATE TEMPORARY TABLE "temp_backup" AS SELECT ${fields} FROM "${table}";
+    ${ddl};
+    INSERT INTO "${newTable}"(${fields}) SELECT ${fields} FROM "temp_backup";
+    DROP TABLE "${table}";
+    ALTER TABLE "${newTable}" RENAME TO "${table}";
+    DROP TABLE "temp_backup";
+
+    COMMIT;
+    PRAGMA foreign_keys = ON;
+    `,
   ];
 }
 
 const isTypeChange = (faa: FieldAlterAction) => faa.type !== faa.typeOld || faa.size !== faa.size; // 类型变化
-const isIndexTypeChange = (faa: FieldAlterAction) =>
-  faa.isPrimaryKey !== faa.isPrimaryKeyOld || faa.isUniqueKey !== faa.isUniqueKeyOld; // 索引变化
-const isNotNullChange = (faa: FieldAlterAction) => faa.isNullable !== faa.isNullableOld;
+const isPrimaryKeyChange = (faa: FieldAlterAction) => faa.isPrimaryKey !== faa.isPrimaryKeyOld;
+const isUniqueKeyChange = (faa: FieldAlterAction) => faa.isUniqueKey !== faa.isUniqueKeyOld;
+const isNullableChange = (faa: FieldAlterAction) => faa.isNullable !== faa.isNullableOld;
+const defaultValueChange = (faa: FieldAlterAction) => faa.defaultValue !== faa.defalutValueOld;
 
+/**
+ * 这里只能进行不需要重建表的对字段修改操作, 只有 重命名
+ * @param faa
+ * @returns
+ */
 export function genAlterFieldEdit(faa: FieldAlterAction) {
-  const newFaa = {
-    ...faa,
-    fieldName: faa.nameExt,
-  };
-
-  const newDef = genFieldSql(newFaa);
-
-  // FIXME: 重新建表要改成一次性执行
-  if (isTypeChange(faa) || isIndexTypeChange(faa)) {
-    return handleSqliteAlterColumn(
-      `${faa.tableName}`,
-      `${faa.nameExt}`, // FIXME: 这里应该是要保留的字段
-      newDef, // 新字段定义
-    );
-  }
-
-  if (isNotNullChange(faa)) {
-    handleSqliteAlterColumn(
-      `${faa.tableName}`,
-      `${faa.nameExt}`, // FIXME: 这里应该是要保留的字段
-      genFieldSql({ ...faa, name: faa.nameExt }),
-    );
-  }
-
   const res: string[] = [];
 
-  if (faa.name !== faa.nameExt) {
+  if (faa.name !== faa.nameNew) {
     // SQLite 3.25.0 (2018-09-15 发布) 开始原生支持 RENAME COLUMN 语法. 之前的版本，必须使用表重建方式
-    res.push(`ALTER TABLE "${faa.tableName}" RENAME COLUMN "${faa.name}" TO "${faa.nameExt}";`);
-  }
-
-  if (faa.defalutValue !== null) {
-    const fv = formatToSqlValueSqlite(faa.defalutValue, true);
-    res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.nameExt}" SET DEFAULT ${fv};`);
-  } else {
-    res.push(`ALTER TABLE "${faa.tableName}" ALTER COLUMN "${faa.nameExt}" DROP DEFAULT;`);
+    res.push(`ALTER TABLE "${faa.tableName}" RENAME COLUMN "${faa.name}" TO "${faa.nameNew}";`);
   }
 
   return res;
@@ -115,23 +105,18 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
 export function genAlterFieldAdd(faa: FieldAlterAction) {
   return [
     `ALTER TABLE "${faa.tableName}" ADD COLUMN ${genFieldSql(faa)};`,
-    ...(faa.isUniqueKey
-      ? [`CREATE UNIQUE INDEX "${faa.indexName}" ON "${faa.tableName}"("${faa.name}");`]
-      : []),
+    ...(faa.isUniqueKey ? [`CREATE UNIQUE INDEX "${faa.indexName}" ON "${faa.tableName}"("${faa.name}");`] : []),
   ];
 }
 
+// 删除字段
 export function genAlterFieldDel(faa: FieldAlterAction) {
-  return handleSqliteAlterColumn(
-    `${faa.tableName}`,
-    `"${faa.name}"`,
-    appState.currentTableStructure
-      ?.filter((f) => f.name !== faa.name)
-      .map((f) => genFieldSql(faa))
-      .join(", ") || "",
-  );
+  let res: string[] = [];
+  res.push(`ALTER TABLE "${faa.tableName}" DROP COLUMN "${faa.name}";`);
+  return res;
 }
 
+// 编辑表
 export function genAlterTableEdit(taa: TableAlterAction) {
   const steps: string[] = [];
   if (taa.tableName !== taa.tableNameOld) {
@@ -140,6 +125,7 @@ export function genAlterTableEdit(taa: TableAlterAction) {
   return steps;
 }
 
+// 创建表
 export function genAlterTableAdd(taa: TableAlterAction, faas: FieldAlterAction[]) {
   let res: string[] = [];
 
@@ -172,7 +158,7 @@ function recreateTable(ts: TableStructure, faas: FieldAlterAction[]) {
         }
       }
     }
-    if (isNotNullChange(faa)) {
+    if (isNullableChange(faa)) {
       for (let index = 0; index < ts.columns.length; index++) {
         const f = ts.columns[index];
         if (f.name === faa.name) {
@@ -180,24 +166,59 @@ function recreateTable(ts: TableStructure, faas: FieldAlterAction[]) {
         }
       }
     }
-    if (isIndexTypeChange(faa)) {
+    if (isPrimaryKeyChange(faa)) {
       for (let index = 0; index < ts.columns.length; index++) {
         const f = ts.columns[index];
         if (f.name === faa.name) {
-          ts.columns[index].isPrimaryKey = faa.isPrimaryKey;
           ts.columns[index].autoIncrement = faa.autoIncrement;
+          ts.columns[index].isPrimaryKey = faa.isPrimaryKey;
           ts.columns[index].isUniqueKey = faa.isUniqueKey;
         }
       }
     }
+    if (isUniqueKeyChange(faa)) {
+      for (let index = 0; index < ts.columns.length; index++) {
+        const f = ts.columns[index];
+        if (f.name === faa.name) {
+          ts.columns[index].autoIncrement = faa.autoIncrement;
+          ts.columns[index].isPrimaryKey = faa.isPrimaryKey;
+          ts.columns[index].isUniqueKey = faa.isUniqueKey;
+        }
+      }
+    }
+
+    // 其它数据
+    for (let index = 0; index < ts.columns.length; index++) {
+      const f = ts.columns[index];
+      if (f.name === faa.name) {
+        ts.columns[index].comment = faa.comment;
+        ts.columns[index].defaultValue = faa.defaultValue;
+        ts.columns[index].isNullable = faa.isNullable;
+        ts.columns[index].name = faa.name;
+        ts.columns[index].size = faa.size;
+      }
+    }
+  }
+  // FIXME: 还有 indexName
+
+  const newTable = `${ts.tableName}_new`;
+  function ddl() {
+    ts.tableName = newTable;
+    return genCreateTableDdl(ts);
   }
 
-  const ddlNew = generateCreateTableDdl(ts);
+  const retainedFieldsNames = ts.columns.map((item) => item.name);
+  return genRecreateTable(ts.tableName, ddl(), newTable, retainedFieldsNames);
+}
 
-  console.log("新的建表语句据  ", ddlNew);
-
-  // TODO: 重新建表
-  // 调用 handleSqliteAlterColumn
+function needRecreateTable(faa: FieldAlterAction) {
+  return (
+    isTypeChange(faa) ||
+    isPrimaryKeyChange(faa) ||
+    isUniqueKeyChange(faa) ||
+    isNullableChange(faa) ||
+    defaultValueChange(faa)
+  );
 }
 
 export function genAlterCmdSqlite(val: AllAlterAction[]) {
@@ -223,18 +244,25 @@ export function genAlterCmdSqlite(val: AllAlterAction[]) {
   }
 
   /** 
-   把需要重新建表的动作分离出来, 生成一条建表语句
+  把需要重新建表的动作分离出来, 生成一条建表语句
+  🚧🚧必须重建表的操作 🚧🚧
    
-   🚧🚧必须重建表的操作 🚧🚧
+  - 修改列数据类型
+  - 修改/删除主键约束
+  - 为已有列添加唯一约束（列级或表级）
+  - 删除任何唯一约束（列级或表级）
+  - 删除 NOT NULL 约束
+  - 已有列添加 NOT NULL 约束
+  - 修改默认值
+  - 添加/删除 CHECK 约束 TODO: 待实现
+  - 删除列（SQLite < 3.35.0）
+  - 重命名列（SQLite < 3.25.0）
 
-  - 修改列的数据类型
-  - 修改或删除主键约束
-  - 添加列级唯一约束. 在建表语句的字段定义里使用 UNIQUE
-  - 删除表定义中的唯一约束, 如果约束是在表定义中声明的） 例如删除 CREATE TABLE 时定义的 UNIQUE (col1, col2) 约束
-  - 删除非空约束(NOT NULL)
-  - 添加或删除 CHECK 约束
-  - 删除列(在 3.35.0 之前)
-  - 重命名列(在 3.25.0 之前)
+  无需重建表的字段修改操作:
+  - 重命名表
+  - 重命名列（≥3.25.0）
+  - 添加新列（带约束）
+  - 删除列（≥3.35.0）
    */
   const NeedToRecreateTableCmds: FieldAlterAction[] = [];
   // 记录需要建表的动作
@@ -242,7 +270,7 @@ export function genAlterCmdSqlite(val: AllAlterAction[]) {
     if (item.target === STR_FIELD) {
       const faa = item as FieldAlterAction;
       if (faa.action === STR_EDIT) {
-        if (isTypeChange(faa) || isIndexTypeChange(faa) || isNotNullChange(faa)) {
+        if (needRecreateTable(faa)) {
           NeedToRecreateTableCmds.push(faa);
         }
       }
@@ -253,7 +281,7 @@ export function genAlterCmdSqlite(val: AllAlterAction[]) {
     const sql = appState.currentTableDdl;
     try {
       const sd = parseCreateTableDdl(sql);
-      recreateTable(sd, NeedToRecreateTableCmds);
+      res = res.concat(recreateTable(sd, NeedToRecreateTableCmds));
     } catch (error) {
       console.log(`parseCreateTableDdl 报错  ${error}`);
     }
@@ -275,7 +303,7 @@ export function genAlterCmdSqlite(val: AllAlterAction[]) {
       const faa = item as FieldAlterAction;
       if (faa.action === STR_EDIT) {
         // 是要重新建表的动作, 先记录,最后执行
-        if (isTypeChange(faa) || isIndexTypeChange(faa) || isNotNullChange(faa)) {
+        if (needRecreateTable(faa)) {
           NeedToRecreateTableCmds.push(faa);
           continue;
         }
