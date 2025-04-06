@@ -53,6 +53,9 @@ export function TableEditorStructure({
 
   const [nameEditing, setNameEditing] = useState<string>(""); // 字段名, 编辑之前记录的原先的字段名
   const [indexEditing, setIndexEditing] = useState<number>(-1); // 字段索引, 右键菜单点击删除时临时记录
+
+  // ========== 对话框 ==========
+
   // 对话框里的数据
   const [autoIncrement, setAutoIncrement] = useState<boolean>(false);
   const [comment, setComment] = useState<string>("");
@@ -89,6 +92,91 @@ export function TableEditorStructure({
     setIsUniqueKeyOld(faa?.isUniqueKeyOld || false);
     setTypeOld(faa?.typeOld || "");
   }
+
+  // 对话框提交变更
+  async function onSubmit() {
+    // 找到 alterData 里对应的字段的数据
+    let actionDataFindedIndex = -1;
+
+    for (let index = 0; index < alterData.length; index++) {
+      const item = alterData[index];
+      if (item.target === STR_FIELD) {
+        const ad = item as FieldAlterAction;
+        if (ad.name === name) {
+          actionDataFindedIndex = index;
+        }
+      }
+    }
+
+    const actionData: FieldAlterAction = {
+      target: STR_FIELD,
+      action: dialogAction,
+      tableName: appState.currentTableName,
+
+      autoIncrement: autoIncrement,
+      comment: comment,
+      defalutValue: defalutValue,
+      indexName: indexName,
+      isNullable: isNullable,
+      isPrimaryKey: isPrimaryKey,
+      isUniqueKey: false,
+      name: dialogAction === STR_EDIT ? nameEditing : name, // 如果是编辑, 要记录编辑之前的字段名
+      nameExt: name, // 输入框里的字段名
+      size: size,
+      type: type,
+
+      defalutValueOld: defalutValueOld,
+      isNullableOld: isNullableOld,
+      isPrimaryKeyOld: isPrimaryKeyOld,
+      isUniqueKeyOld: isUniqueKeyOld,
+      typeOld: typeOld,
+    };
+
+    if (actionDataFindedIndex > -1) {
+      setAlterData(
+        alterData.map((item, index) => (index === actionDataFindedIndex ? { ...item, ...actionData } : item)),
+      );
+    } else {
+      setAlterData([...alterData, actionData]);
+
+      // 添加字段的还得在前端添加表结构数据
+      appState.setCurrentTableStructure([
+        ...appState.currentTableStructure,
+        {
+          comment: comment,
+          defaultValue: defalutValue,
+          hasCheckConditions: false,
+          isForeignKey: false,
+          isNullable: isNullable,
+          isPrimaryKey: isPrimaryKey,
+          isUniqueKey: isUniqueKey,
+          name: actionData.name,
+          size: size,
+          type: type,
+
+          indexes: isPrimaryKey
+            ? [
+                {
+                  columnName: "", // 仅显示用,留空
+                  indexName: "", // 仅显示用,留空
+                  indexType: "", // 仅显示用,留空
+                  isPrimaryKey: isUniqueKey,
+                  isUniqueKey: isPrimaryKey,
+                },
+              ]
+            : undefined,
+        },
+      ]);
+
+      updateDataArr();
+    }
+
+    setShowDialogEdit(false);
+  }
+
+  // ========== 对话框 结束 ==========
+
+  // ========== 按钮 ==========
 
   // 点击添加字段
   function handleAddField() {
@@ -223,7 +311,13 @@ export function TableEditorStructure({
 
   // 弹出确认删除字段
   function handleDeletePopup(index: number) {
-    const fieldName = findFieldNameByIndex(index);
+    let fieldName = "";
+
+    const tableDataPg = appState.currentTableStructure as unknown as FieldStructure[];
+    if (index <= tableDataPg.length) {
+      fieldName = tableDataPg[index].name;
+    }
+
     if (fieldName !== "") {
       setOperateFieldName(fieldName);
       setShowDialogDelete(true);
@@ -239,100 +333,30 @@ export function TableEditorStructure({
     getData();
   }
 
-  // 对话框提交变更
-  async function onSubmit() {
-    // 找到 alterData 里对应的字段的数据
-    let actionDataFindedIndex = -1;
+  const tooltipSectionData = [
+    {
+      trigger: <RotateCw color="var(--fvm-info-clr)" onClick={() => getData()} />,
+      content: <p>刷新</p>,
+    },
+    {
+      trigger: <CirclePlus color="var(--fvm-primary-clr)" onClick={handleAddField} />,
+      content: <p>添加字段</p>,
+    },
+    {
+      trigger: <CircleMinus color="var(--fvm-danger-clr)" onClick={handleDelSelectedField} />,
+      content: <p>删除字段</p>,
+    },
+    {
+      trigger: <CircleCheck color="var(--fvm-success-clr)" onClick={handleApply} />,
+      content: <p>应用</p>,
+    },
+    {
+      trigger: <CircleX color="var(--fvm-warning-clr)" onClick={handleCancel} />,
+      content: <p>取消</p>,
+    },
+  ];
 
-    for (let index = 0; index < alterData.length; index++) {
-      const item = alterData[index];
-      if (item.target === STR_FIELD) {
-        const ad = item as FieldAlterAction;
-        if (ad.name === name) {
-          actionDataFindedIndex = index;
-        }
-      }
-    }
-
-    const actionData: FieldAlterAction = {
-      target: STR_FIELD,
-      action: dialogAction,
-      tableName: appState.currentTableName,
-
-      autoIncrement: autoIncrement,
-      comment: comment,
-      defalutValue: defalutValue,
-      indexName: indexName,
-      isNullable: isNullable,
-      isPrimaryKey: isPrimaryKey,
-      isUniqueKey: false,
-      name: dialogAction === STR_EDIT ? nameEditing : name, // 如果是编辑, 要记录编辑之前的字段名
-      nameExt: name, // 输入框里的字段名
-      size: size,
-      type: type,
-
-      defalutValueOld: defalutValueOld,
-      isNullableOld: isNullableOld,
-      isPrimaryKeyOld: isPrimaryKeyOld,
-      isUniqueKeyOld: isUniqueKeyOld,
-      typeOld: typeOld,
-    };
-
-    if (actionDataFindedIndex > -1) {
-      setAlterData(
-        alterData.map((item, index) => (index === actionDataFindedIndex ? { ...item, ...actionData } : item)),
-      );
-    } else {
-      setAlterData([...alterData, actionData]);
-
-      // 添加字段的还得在前端添加表结构数据
-      appState.setCurrentTableStructure([
-        ...appState.currentTableStructure,
-        {
-          comment: comment,
-          defaultValue: defalutValue,
-          hasCheckConditions: false,
-          isForeignKey: false,
-          isNullable: isNullable,
-          isPrimaryKey: isPrimaryKey,
-          isUniqueKey: isUniqueKey,
-          name: actionData.name,
-          size: size,
-          type: type,
-
-          indexes: isPrimaryKey
-            ? [
-                {
-                  columnName: "", // 仅显示用,留空
-                  indexName: "", // 仅显示用,留空
-                  indexType: "", // 仅显示用,留空
-                  isPrimaryKey: isUniqueKey,
-                  isUniqueKey: isPrimaryKey,
-                },
-              ]
-            : undefined,
-        },
-      ]);
-
-      updateDataArr();
-    }
-
-    setShowDialogEdit(false);
-  }
-
-  /**
-   * 根据索引找到字段名
-   * @param index
-   * @returns
-   */
-  function findFieldNameByIndex(index: number) {
-    const tableDataPg = appState.currentTableStructure as unknown as FieldStructure[];
-    if (index <= tableDataPg.length) {
-      return tableDataPg[index].name;
-    }
-
-    return "";
-  }
+  // ========== 按钮 结束 ==========
 
   /**
    * 给每一行套上一个菜单
@@ -407,29 +431,6 @@ export function TableEditorStructure({
     });
     return () => unsubscribe();
   }, []);
-
-  const tooltipSectionData = [
-    {
-      trigger: <RotateCw color="var(--fvm-info-clr)" onClick={() => getData()} />,
-      content: <p>刷新</p>,
-    },
-    {
-      trigger: <CirclePlus color="var(--fvm-primary-clr)" onClick={handleAddField} />,
-      content: <p>添加字段</p>,
-    },
-    {
-      trigger: <CircleMinus color="var(--fvm-danger-clr)" onClick={handleDelSelectedField} />,
-      content: <p>删除字段</p>,
-    },
-    {
-      trigger: <CircleCheck color="var(--fvm-success-clr)" onClick={handleApply} />,
-      content: <p>应用</p>,
-    },
-    {
-      trigger: <CircleX color="var(--fvm-warning-clr)" onClick={handleCancel} />,
-      content: <p>取消</p>,
-    },
-  ];
 
   return (
     <div>
