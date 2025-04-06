@@ -91,9 +91,7 @@ In event handling, useEffect, and other logic, the original state object appStat
 - 添加连接要检查是否重复✅
 - 表结构里的字段类型可使用下拉框选择✅
 - 表格数据列表的 添加行的语句改为批量插入✅
-- 修复表结构里:
-  - 编辑字段类型会添加字段
-  
+
 ### v0.3 mysql
 
 - 支持 mysql
