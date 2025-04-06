@@ -1,20 +1,11 @@
 import { STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD, STR_TABLE } from "@/constants";
-import { UniqueConstraint } from "@/types/types";
 import {
-  FIELD,
-  FIELD_COMMENT,
-  FIELD_DEFAULT,
-  FIELD_INDEX_TYPE,
-  FIELD_NAME,
-  FIELD_NOT_NULL,
-  FIELD_TYPE,
   SSL_MODE_ALLOW,
   SSL_MODE_DISABLE,
   SSL_MODE_PREFER,
   SSL_MODE_REQUIRE,
   SSL_MODE_VERIFY_CA,
   SSL_MODE_VERIFY_FULL,
-  TABLE_COMMENT,
 } from "./constants";
 
 // rust 的 sqlx 在连接字符串中添加 sslmode 参数控制 TLS 行为
@@ -32,6 +23,7 @@ export interface DbConnectionParam {
   host: string;
   password: string;
   port: number;
+  filePath: string; // 数据库文件, 用于 SQLite | Database file, used for SQLite
   sslmode?: SslMode;
   user: string;
 }
@@ -60,7 +52,7 @@ export type DbCountRes = {
 /**
  * SQL通用数据类型（所有主流数据库支持的基础类型）
  */
-export type CommonSQLValue =
+export type SqlValueCommon =
   | string
   | number
   | boolean
@@ -69,55 +61,54 @@ export type CommonSQLValue =
   | undefined
   | bigint
   | ArrayBuffer // 二进制数据通用表示
-  | Array<CommonSQLValue>; // 数组类型（部分数据库支持）
+  | Array<SqlValueCommon>; // 数组类型（部分数据库支持）
 
-// 表结构列表的数据
-// 这是从数据库查询的结果
-//
-// 注意: 命名方式按照数据库的
-//
-export type TableStructure = {
-  has_check_conditions: any;
-  column_name: string;
-  data_type: string;
-  column_default: string;
+// 所有 SQL 数据库类性共有的字段属性
+export interface SqlFieldDefinitionCommon {
   comment: string;
-  size: string;
-  is_primary_key: boolean;
-  is_unique_key: boolean;
-  is_foreign_key: boolean;
-  is_not_null: boolean;
-  indexes?: ColumnIndex[];
+  defaultValue: string | null;
+  isNullable: boolean;
+  isPrimaryKey: boolean;
+  isUniqueKey: boolean;
+  name: string;
+  size: string | null;
+  type: string;
+  checkConstraint?: string | null; //CHECK 约束条件
+}
+
+// 所有 SQL 数据库类性共有的表格约束
+export type ReferentialAction = "NO ACTION" | "RESTRICT" | "SET NULL" | "SET DEFAULT" | "CASCADE";
+export interface SqlTableConstraintCommon {
+  type: "PRIMARY_KEY" | "UNIQUE" | "CHECK" | "FOREIGN_KEY"; // 约束类型
+  name: string | null; // 约束名称（允许匿名约束）
+  columns: string[] | null; // 作用列（CHECK约束可能不需要）
+  condition: string | null; // CHECK约束表达式
+
+  // 外键专用属性
+  referenceTable: string | null; // 引用表名
+  referenceColumns: string[] | null; // 引用表列
+  onDelete: ReferentialAction | null; // 级联删除策略
+  onUpdate: ReferentialAction | null; // 级联更新策略
+}
+
+// 表结构的字段数据
+export type FieldStructure = SqlFieldDefinitionCommon & {
+  isForeignKey: boolean;
+  hasCheckConditions: any;
+  indexes?: FieldIndex[]; // 这个字段的索引数据
 };
 
 // 字段的索引信息
-export interface ColumnIndex {
-  name: string; // 索引名称
-  type: string; // 索引类型 (如 btree, hash 等)
-  isUnique: boolean; // 是否唯一索引
-  isPrimary: boolean; // 是否主键索引
-}
-
-export interface IndexQueryResult {
-  index_name: string;
-  column_name: string;
-  index_type: string;
-  is_unique: boolean;
-  is_primary: boolean;
+export interface FieldIndex {
+  indexName: string; // 索引名称
+  columnName: string;
+  indexType: string; // 索引类型 (如 btree, hash 等)
+  isUniqueKey: boolean; // 是否唯一索引
+  isPrimaryKey: boolean; // 是否主键索引
 }
 
 // 变更表更表结构的动作类性
 export type AlterAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
-// 变更表更表结构的动作目标
-export type AlterActionTarget =
-  | typeof TABLE_COMMENT
-  | typeof FIELD_NAME
-  | typeof FIELD_TYPE
-  | typeof FIELD_INDEX_TYPE
-  | typeof FIELD_NOT_NULL
-  | typeof FIELD_DEFAULT
-  | typeof FIELD_COMMENT
-  | typeof FIELD;
 
 export type ActionTarget = typeof STR_FIELD | typeof STR_TABLE;
 
@@ -127,16 +118,29 @@ export type FieldAlterAction = {
   action: AlterAction;
   tableName: string;
 
-  fieldName: string;
-  fieldNameExt: string; // 改名时作为新字段名, 设置索引时作为作音的列名 TODO: 后续要支持复合索引
-  fieldType: string; // 字段类型
-  fieldSize: string; // 字段大小
-  fieldDefalut: string | null; // 字段默认值
-  fieldNotNull: boolean; // 字段非空
-  fieldIndexType: UniqueConstraint; // 字段索引类型
-  fieldIndexPkAutoIncrement: boolean; // 字段主键自增
-  fieldIndexName: string; // 字段索引名
-  fieldComment: string; // 字段备注
+  autoIncrement: boolean;
+  comment: string;
+  defaultValue: string | null;
+  indexName: string; // 索引名
+  isNullable: boolean; // 字段可以为空
+  isPrimaryKey: boolean;
+  isUniqueKey: boolean;
+  name: string;
+  size: string;
+  type: string;
+  nameNew: string; // 改名时的新字段名
+
+  // 原先的信息, 用于对比是否修改
+  autoIncrementOld: boolean;
+  commentOld: string;
+  defalutValueOld: string | null;
+  indexNameOld: string; // 索引名
+  isNullableOld: boolean;
+  isPrimaryKeyOld: boolean;
+  isUniqueKeyOld: boolean;
+  nameOld: string;
+  sizeOld: string;
+  typeOld: string;
 };
 
 // 对表的修改数据

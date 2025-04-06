@@ -2,8 +2,8 @@ import { TableDataChange } from "@/components/EditableTable";
 import { NEW_ROW_IS_ADDED_FIELD } from "@/constants";
 import { appState } from "@/store/valtio";
 import { RowData } from "@/types/types";
-import { genDeleteRowsCmd, genInsertRowsCmd, genUpdateFieldCmd } from "../adapter,";
-import { FieldWithValue } from "../types";
+import { genDeleteRowsCmd, genInsertRowsCmd, genUpdateFieldCmd } from "./adapter,";
+import { FieldWithValue } from "./types";
 
 export function modifyTableData(
   deletedSet: Set<number>,
@@ -30,7 +30,7 @@ export function modifyTableData(
   rowDataMap.forEach((changes, rowIndex) => {
     const uniqueField: FieldWithValue = {
       field: appState.uniqueFieldName,
-      value: rowIndex,
+      value: tableData[rowIndex][appState.uniqueFieldName],
     };
     const fieldArr: FieldWithValue[] = [];
     for (const c of changes) {

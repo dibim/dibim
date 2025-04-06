@@ -2,8 +2,8 @@ import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { subscribeKey } from "valtio/utils";
 import { HEDAER_H, NEW_ROW_IS_ADDED_FIELD } from "@/constants";
-import { modifyTableData } from "@/databases/PostgreSQL/modifyTableData";
 import { exec } from "@/databases/adapter,";
+import { modifyTableData } from "@/databases/modify_table_data";
 import { cn } from "@/lib/utils";
 import { appState } from "@/store/valtio";
 import { RowData } from "@/types/types";
@@ -16,14 +16,16 @@ import { TextNotification } from "./TextNotification";
 import { TooltipGroup } from "./TooltipGroup";
 
 export type TableSectionMethods = {
+  addChange: (val: TableDataChange) => void;
+  deleteRow: (val: number) => void;
   getCurrentPage: () => number;
   getTableData: () => RowData[];
   setCurrentPage: (val: number) => void;
-  setPageTotal: (val: number) => void;
-  setItemsTotal: (val: number) => void;
-  updateDataArr: (val: RowData[]) => void;
   setFieldNames: (val: string[]) => void;
+  setItemsTotal: (val: number) => void;
+  setPageTotal: (val: number) => void;
   setTableData: (val: RowData[]) => void;
+  updateDataArr: (val: RowData[]) => void;
 };
 
 export type TableSectionProp = {
@@ -61,7 +63,7 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
     if (appState.uniqueFieldName === "") return;
 
     const deletedSet = tableRef.current?.getMultiDeleteData() || new Set();
-    const addedRows = tableRef.current?.getAddedRow()||[]
+    const addedRows = tableRef.current?.getAddedRow() || [];
     const sqls = modifyTableData(deletedSet, changes, tableData, addedRows);
 
     setWillExecCmd(sqls.join(""));
@@ -72,13 +74,13 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
     setChanges([]);
 
     tableRef.current?.willRanderTable();
-    tableRef.current?.resetMultiSelectData();
+    tableRef.current?.resettData();
   }
 
   function handleAdd() {
     tableRef.current?.willRanderTable();
 
-    const fields = appState.currentTableStructure.map((item) => item.column_name);
+    const fields = appState.currentTableStructure.map((item) => item.name);
     const rowData = Object.fromEntries(fields.map((key) => [key, ""]));
     rowData[NEW_ROW_IS_ADDED_FIELD] = "true"; // 新添加的行的标记
     const newTableData = [...tableData, rowData]; // 为了避免和更新的行的索引有冲突, 添加到表格的最后
@@ -124,17 +126,23 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
   // ========== 按钮 结束 ==========
 
   useImperativeHandle(ref, () => ({
+    addChange: (val: TableDataChange) => {
+      tableRef.current?.addChange(val);
+    },
+    deleteRow: (val: number) => {
+      tableRef.current?.deleteRow(val);
+    },
     getCurrentPage: () => currentPage,
     getTableData: () => tableData,
     setCurrentPage: (val: number) => setCurrentPage(val),
-    setPageTotal: (val: number) => setPageTotal(val),
-    setItemsTotal: (val: number) => setItemsTotal(val),
-    updateDataArr: (val: RowData[]) => updateDataArr(val),
     setFieldNames: (val: string[]) => setFieldNames(val),
+    setItemsTotal: (val: number) => setItemsTotal(val),
+    setPageTotal: (val: number) => setPageTotal(val),
     setTableData: (val: RowData[]) => {
       updateDataArr(val);
       setTableData(val);
     },
+    updateDataArr: (val: RowData[]) => updateDataArr(val),
   }));
 
   useEffect(() => {

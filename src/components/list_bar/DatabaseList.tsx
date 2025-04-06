@@ -42,7 +42,9 @@ export function DatabaseList() {
 
   // 点击连接
   async function clickConn(conn: DbConnections) {
-    appState.setCurrentConnName(conn.name); // TODO: 先设置, 否则 connect 里获取不到
+    // 先设置这两项, 否则 connect 里获取不到
+    appState.setCurrentDbType(conn.dbType);
+    appState.setCurrentConnName(conn.name);
 
     const res = await connect({
       dbName: conn.dbName,
@@ -50,6 +52,7 @@ export function DatabaseList() {
       password: conn.password,
       port: conn.port,
       user: conn.user,
+      filePath: conn.filePath,
     });
 
     if (res) {
@@ -73,7 +76,7 @@ export function DatabaseList() {
       arr.push({
         id: item.name,
         content: (
-          <div className="flex cursor-pointer" style={{ borderBottom: `2px  solid ${item.color}` }}>
+          <div className="flex cursor-pointer p-1" style={{ borderBottom: `2px  solid ${item.color}` }}>
             <div className="pe-2">
               {item.dbType === DB_TYPE_MYSQL && <MysqlLogo className="w-6 h-6" />}
               {item.dbType === DB_TYPE_POSTGRESQL && <PostgresqlLogo className="w-6 h-6" />}
@@ -90,6 +93,7 @@ export function DatabaseList() {
           {
             label: "编辑",
             onClick: () => {
+              appState.setEditDbConnIndex(index);
               appState.setMainContenType(MAIN_CONTEN_TYPE_EDIT_CONNECTION);
             },
             icon: <Edit className="h-4 w-4" />,
@@ -122,7 +126,7 @@ export function DatabaseList() {
     getData();
 
     // 监听 store 的变化
-    const unsubscribe = subscribeKey(appState, "currentTableName", (_value: any) => {
+    const unsubscribe = subscribeKey(appState, "config", (_value: any) => {
       getData();
     });
     return () => unsubscribe();
@@ -130,11 +134,7 @@ export function DatabaseList() {
 
   return (
     <>
-      {!snap.config.dbConnections ? (
-        <EmptyList />
-      ) : (
-        <ListWithAction items={listData} itemClassName="py-2 cursor-pointer" />
-      )}
+      {!snap.config.dbConnections ? <EmptyList /> : <ListWithAction items={listData} itemClassName="py-2" />}
 
       <ConfirmDialog
         open={showDialog}

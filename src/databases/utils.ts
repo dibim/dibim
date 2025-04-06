@@ -1,5 +1,5 @@
 import { reIsSingletQuery, reWhereClause } from "@/constants";
-import { CommonSQLValue, TableStructure } from "./types";
+import { FieldStructure, SqlValueCommon } from "./types";
 
 /**
  * 类型守卫函数
@@ -7,7 +7,7 @@ import { CommonSQLValue, TableStructure } from "./types";
  * @param value
  * @returns
  */
-export function isCommonSQLValue(value: unknown): value is CommonSQLValue {
+export function isCommonSQLValue(value: unknown): value is SqlValueCommon {
   const type = typeof value;
   return (
     type === "string" ||
@@ -26,9 +26,12 @@ export function isCommonSQLValue(value: unknown): value is CommonSQLValue {
  * 格式化所有SQL数据库通用的数据类型
  * 类型和 isCommonSQLValue 一致
  */
-export function formatToSqlValueCommon(value: CommonSQLValue): string {
+export function formatToSqlValueCommon(value: SqlValueCommon): string {
   // 处理空值
   if (value == null) return "NULL";
+  // TODO: 好像有问题
+  if (value == `""`) return value;
+  if (value == "''") return value;
 
   // 处理基本类型
   switch (typeof value) {
@@ -65,15 +68,15 @@ export function formatToSqlValueCommon(value: CommonSQLValue): string {
  * @param tsa 表结构数据
  * @returns
  */
-export function getUniqueFieldName(tsa: TableStructure[]) {
+export function getUniqueFieldName(tsa: FieldStructure[]) {
   // 优先使用主键
   for (const f of tsa) {
-    if (f.is_primary_key) return f.column_name;
+    if (f.isPrimaryKey) return f.name;
   }
 
   // 其次唯一索引
   for (const f of tsa) {
-    if (f.is_unique_key) return f.column_name;
+    if (f.isUniqueKey) return f.name;
   }
 
   return "";
@@ -88,17 +91,17 @@ export function getUniqueFieldName(tsa: TableStructure[]) {
  *
  * @param tsa 表结构数据
  */
-export function getDefultOrderField(tsa: TableStructure[]) {
+export function getDefultOrderField(tsa: FieldStructure[]) {
   // 优先使用索引字段
   for (const f of tsa) {
     // 主键
-    if (f.is_primary_key) {
-      return f.column_name;
+    if (f.isPrimaryKey) {
+      return f.name;
     }
 
     // 唯一索引
-    if (f.is_unique_key) {
-      return f.column_name;
+    if (f.isUniqueKey) {
+      return f.name;
     }
   }
 
@@ -106,30 +109,30 @@ export function getDefultOrderField(tsa: TableStructure[]) {
   // 找数字字段
   for (const f of tsa) {
     if (
-      f.data_type.includes("int") ||
-      f.data_type.includes("float") ||
-      f.data_type.includes("serial") ||
-      f.data_type.includes("numeric") ||
-      f.data_type.includes("decimal") ||
-      f.data_type.includes("real") ||
-      f.data_type.includes("double") ||
-      f.data_type.includes("money")
+      f.type.includes("int") ||
+      f.type.includes("float") ||
+      f.type.includes("serial") ||
+      f.type.includes("numeric") ||
+      f.type.includes("decimal") ||
+      f.type.includes("real") ||
+      f.type.includes("double") ||
+      f.type.includes("money")
     ) {
-      return f.column_name;
+      return f.name;
     }
   }
   // 找时间字段
   for (const f of tsa) {
-    if (f.data_type.includes("time") || f.data_type.includes("date")) {
-      return f.column_name;
+    if (f.type.includes("time") || f.type.includes("date")) {
+      return f.name;
     }
   }
 
   // 找字符串字段
   // 找不到索引字段的, 也找数字或时间字段, 找字符串字段
   for (const f of tsa) {
-    if (f.data_type.includes("text") || f.data_type.includes("char")) {
-      return f.column_name;
+    if (f.type.includes("text") || f.type.includes("char")) {
+      return f.name;
     }
   }
 

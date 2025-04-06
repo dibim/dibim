@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useSnapshot } from "valtio";
+import { open } from "@tauri-apps/plugin-dialog";
 import MysqlLogo from "@/assets/db_logo/mysql.svg?react";
 import PostgresqlLogo from "@/assets/db_logo/postgresql.svg?react";
 import SqliteLogo from "@/assets/db_logo/sqlite.svg?react";
@@ -17,6 +19,7 @@ type ConnectionProp = {
 };
 
 export function Connection(props: ConnectionProp) {
+  const snap = useSnapshot(appState);
   const [name, setName] = useState<string>(""); // 连接名称
   const [dbType, setDbType] = useState<DbType>(DB_TYPE_POSTGRESQL); // 默认类型是 PostgreSQL
   const [host, setHost] = useState<string>("");
@@ -64,7 +67,7 @@ export function Connection(props: ConnectionProp) {
   }
 
   async function onSubmit() {
-    if (appState.config.dbConnections.some((item) => item.name === name)) {
+    if (props.action === STR_ADD && appState.config.dbConnections.some((item) => item.name === name)) {
       setErrorMessage(`该连接名称"${name}"已存在`);
       return;
     }
@@ -142,7 +145,7 @@ export function Connection(props: ConnectionProp) {
     );
   }
 
-  useEffect(() => {
+  function setEditingData() {
     // 编辑连接的要获取数据
     if (props.action === STR_EDIT) {
       const conn = appState.config.dbConnections[appState.editDbConnIndex];
@@ -156,6 +159,14 @@ export function Connection(props: ConnectionProp) {
       setPort(conn.port);
       setUser(conn.user);
     }
+  }
+
+  useEffect(() => {
+    setEditingData();
+  }, [snap.editDbConnIndex]);
+
+  useEffect(() => {
+    setEditingData();
   }, []);
 
   return (
@@ -201,6 +212,20 @@ export function Connection(props: ConnectionProp) {
           {dbType === DB_TYPE_SQLITE && (
             <LabeledDiv direction={DIR_H} label={"文件路径"} className="py-2">
               <Input value={filePath} onInput={onInputFilePath} />
+              <div className="py-1"></div>
+              <Button
+                variant={"outline"}
+                onClick={async () => {
+                  const file = await open({
+                    multiple: false,
+                    directory: false,
+                  });
+                  console.log(file);
+                  if (file) setFilePath(file);
+                }}
+              >
+                选择
+              </Button>
             </LabeledDiv>
           )}
 

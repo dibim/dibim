@@ -36,9 +36,10 @@ export function ConfirmDialog({
         <AlertDialogHeader>
           {title && <AlertDialogTitle>{title}</AlertDialogTitle>}
           {description && <AlertDialogDescription>{description}</AlertDialogDescription>}
-
-          {content && <div className="text-muted-foreground">{content}</div>}
         </AlertDialogHeader>
+
+        {content && <div className="text-muted-foreground">{content}</div>}
+
         <AlertDialogFooter>
           {cancelText && (
             <AlertDialogCancel
