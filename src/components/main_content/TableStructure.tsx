@@ -42,6 +42,9 @@ export function TableEditorStructure({
 }: MainContentStructureProp) {
   const tableRef = useRef<EditableTableMethods | null>(null);
 
+  // ========== 对话框 ==========
+
+  // 提示对话框
   const [dialogAction, setDialogAction] = useState<DialogAction>("");
   const [errorMessage, setErrorMessage] = useState<string>(""); // 错误消息
   const [okMessage, setOkMessage] = useState<string>(""); // 成功消息
@@ -51,12 +54,7 @@ export function TableEditorStructure({
   const [showDialogEdit, setShowDialogEdit] = useState<boolean>(false);
   const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
 
-  const [nameEditing, setNameEditing] = useState<string>(""); // 字段名, 编辑之前记录的原先的字段名
-  const [indexEditing, setIndexEditing] = useState<number>(-1); // 字段索引, 右键菜单点击删除时临时记录
-
-  // ========== 对话框 ==========
-
-  // 对话框里的数据
+  // 字段编辑对话框里的数据
   const [autoIncrement, setAutoIncrement] = useState<boolean>(false);
   const [comment, setComment] = useState<string>("");
   const [defalutValue, setDefaultValue] = useState<string>("");
@@ -64,7 +62,7 @@ export function TableEditorStructure({
   const [isNullable, setIsNullable] = useState<boolean>(false);
   const [isPrimaryKey, setIsPrimaryKey] = useState<boolean>(false);
   const [isUniqueKey, setIsUniqueKey] = useState<boolean>(false);
-  const [name, setdName] = useState<string>(""); // 字段名, 输入框里的
+  const [name, setName] = useState<string>(""); // 字段名, 输入框里的
   const [size, setSize] = useState<string>("");
   const [type, setType] = useState<string>("");
   // 备份原先的数据
@@ -73,12 +71,14 @@ export function TableEditorStructure({
   const [isPrimaryKeyOld, setIsPrimaryKeyOld] = useState<boolean>(false);
   const [isUniqueKeyOld, setIsUniqueKeyOld] = useState<boolean>(false);
   const [typeOld, setTypeOld] = useState<string>("");
+  const [nameOld, setNameOld] = useState<string>(""); // 字段名, 编辑之前记录的原先的字段名
+  const [indexEditing, setIndexEditing] = useState<number>(-1); // 字段索引, 右键菜单点击删除时临时记录
 
   function resetDialogData(faa: FieldAlterAction | null) {
     setAutoIncrement(faa?.autoIncrement || false);
     setComment(faa?.comment || "");
     setDefaultValue(faa?.defalutValue || "");
-    setdName(faa?.name || "");
+    setName(faa?.name || "");
     setIndexName(faa?.indexName || "");
     setIsNullable(faa?.isNullable || false);
     setIsPrimaryKey(faa?.isPrimaryKey || false);
@@ -91,19 +91,20 @@ export function TableEditorStructure({
     setIsPrimaryKeyOld(faa?.isPrimaryKeyOld || false);
     setIsUniqueKeyOld(faa?.isUniqueKeyOld || false);
     setTypeOld(faa?.typeOld || "");
+    setNameOld(faa?.name || "");
   }
 
   // 对话框提交变更
   async function onSubmit() {
     // 找到 alterData 里对应的字段的数据
-    let actionDataFindedIndex = -1;
+    let actionDataIndex = -1;
 
     for (let index = 0; index < alterData.length; index++) {
       const item = alterData[index];
       if (item.target === STR_FIELD) {
         const ad = item as FieldAlterAction;
         if (ad.name === name) {
-          actionDataFindedIndex = index;
+          actionDataIndex = index;
         }
       }
     }
@@ -120,7 +121,7 @@ export function TableEditorStructure({
       isNullable: isNullable,
       isPrimaryKey: isPrimaryKey,
       isUniqueKey: false,
-      name: dialogAction === STR_EDIT ? nameEditing : name, // 如果是编辑, 要记录编辑之前的字段名
+      name: dialogAction === STR_EDIT ? name : nameOld, // 如果是编辑, 要记录编辑之前的字段名
       nameExt: name, // 输入框里的字段名
       size: size,
       type: type,
@@ -132,45 +133,56 @@ export function TableEditorStructure({
       typeOld: typeOld,
     };
 
-    if (actionDataFindedIndex > -1) {
-      setAlterData(
-        alterData.map((item, index) => (index === actionDataFindedIndex ? { ...item, ...actionData } : item)),
-      );
+    if (actionDataIndex > -1) {
+      setAlterData(alterData.map((item, index) => (index === actionDataIndex ? { ...item, ...actionData } : item)));
     } else {
       setAlterData([...alterData, actionData]);
-
-      // 添加字段的还得在前端添加表结构数据
-      appState.setCurrentTableStructure([
-        ...appState.currentTableStructure,
-        {
-          comment: comment,
-          defaultValue: defalutValue,
-          hasCheckConditions: false,
-          isForeignKey: false,
-          isNullable: isNullable,
-          isPrimaryKey: isPrimaryKey,
-          isUniqueKey: isUniqueKey,
-          name: actionData.name,
-          size: size,
-          type: type,
-
-          indexes: isPrimaryKey
-            ? [
-                {
-                  columnName: "", // 仅显示用,留空
-                  indexName: "", // 仅显示用,留空
-                  indexType: "", // 仅显示用,留空
-                  isPrimaryKey: isUniqueKey,
-                  isUniqueKey: isPrimaryKey,
-                },
-              ]
-            : undefined,
-        },
-      ]);
-
-      updateDataArr();
     }
 
+    const newFieldData = {
+      comment: comment,
+      defaultValue: defalutValue,
+      hasCheckConditions: false,
+      isForeignKey: false,
+      isNullable: isNullable,
+      isPrimaryKey: isPrimaryKey,
+      isUniqueKey: isUniqueKey,
+      name: name,
+      size: size,
+      type: type,
+
+      indexes: isPrimaryKey
+        ? [
+            {
+              columnName: "", // 仅显示用,留空
+              indexName: "", // 仅显示用,留空
+              indexType: "", // 仅显示用,留空
+              isPrimaryKey: isUniqueKey,
+              isUniqueKey: isPrimaryKey,
+            },
+          ]
+        : undefined,
+    };
+
+    // 找到 alterData 里对应的字段的数据
+    let fieldDataIndex = -1;
+    appState.currentTableStructure.map((item, index) => {
+      if (item.name === nameOld) {
+        fieldDataIndex = index;
+      }
+    });
+
+    if (dialogAction === STR_ADD) {
+      // 添加字段的, 添加字段结构
+      appState.setCurrentTableStructure([...appState.currentTableStructure, newFieldData]);
+    } else if (dialogAction === STR_EDIT) {
+      // 更新字段的, 更新字段结构
+      appState.setCurrentTableStructure(
+        appState.currentTableStructure.map((field, index) => (index === fieldDataIndex ? newFieldData : field)),
+      );
+    }
+
+    updateDataArr();
     setShowDialogEdit(false);
   }
 
@@ -282,7 +294,6 @@ export function TableEditorStructure({
       isUniqueKeyOld: isUniqueKey,
       typeOld: field.type,
     });
-    setNameEditing(field.name);
     setShowDialogEdit(true);
     setDialogAction(STR_EDIT);
   }
@@ -358,6 +369,8 @@ export function TableEditorStructure({
 
   // ========== 按钮 结束 ==========
 
+  // ========== 表格处理 ==========
+
   /**
    * 给每一行套上一个菜单
    * @param index 行的索引
@@ -422,6 +435,8 @@ export function TableEditorStructure({
     setDataArr(dataArrTemp);
   }
 
+  // ========== 表格处理 结束 ==========
+
   useEffect(() => {
     updateDataArr();
 
@@ -477,7 +492,7 @@ export function TableEditorStructure({
           </DialogHeader>
 
           <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"字段名"}>
-            <Input value={name} onInput={(e) => setdName(e.currentTarget.value)} />
+            <Input value={name} onInput={(e) => setName(e.currentTarget.value)} />
           </LabeledDiv>
 
           <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"类型"}>
