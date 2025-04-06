@@ -46,6 +46,7 @@ function PaginationLink({ className, isActive, size = "icon", ...props }: Pagina
   );
 }
 
+// 添加了 text 属性
 function PaginationPrevious({
   className,
   text,
@@ -64,6 +65,7 @@ function PaginationPrevious({
   );
 }
 
+// 添加了 text 属性
 function PaginationNext({ className, text, ...props }: { text: string } & React.ComponentProps<typeof PaginationLink>) {
   return (
     <PaginationLink

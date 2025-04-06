@@ -9,8 +9,8 @@ import { cn } from "@/lib/utils";
 import { getRandomNegativeInt } from "@/utils/number";
 
 export interface ListCell {
-  render: (val: any) => JSX.Element; // 渲染 value, 可以添加其它元素
   value: any;
+  render: (val: any) => JSX.Element; // 渲染 value, 可以添加其它元素
 }
 
 export interface ListRow {
@@ -26,11 +26,13 @@ export interface TableDataChange {
 }
 
 export type EditableTableMethods = {
-  getAddedRow: () => ListRow[];
-  getMultiSelectData: () => Set<number>;
-  getMultiDeleteData: () => Set<number>;
-  resetMultiSelectData: () => void;
+  addChange: (val: TableDataChange) => void;
   deleteMultiSelectedRow: () => void;
+  deleteRow: (val: number) => void;
+  getAddedRow: () => ListRow[];
+  getMultiDeleteData: () => Set<number>;
+  getMultiSelectData: () => Set<number>;
+  resettData: () => void;
   willRanderTable: () => void;
 };
 
@@ -116,18 +118,18 @@ export function EditableTable({
   }
 
   // ========== 多选 =========
-  const [deletedFieldIndex, setDeletedFieldIndex] = useState<Set<number>>(new Set()); // 删除的字段的索引
-  const [selectedFieldIndex, setSelectedFieldIndex] = useState<Set<number>>(new Set()); // 选中的字段的索引
+  const [deletedRowIndex, setDeletedRowIndex] = useState<Set<number>>(new Set()); // 删除的行的索引
+  const [selectedRowIndex, setSelectedRowIndex] = useState<Set<number>>(new Set()); // 选中的行的索引
 
   // 选中行, 删除的时候使用
   function handleSelectRow(id: number) {
-    const newSelectedRows = new Set(selectedFieldIndex);
+    const newSelectedRows = new Set(selectedRowIndex);
     if (newSelectedRows.has(id)) {
       newSelectedRows.delete(id);
     } else {
       newSelectedRows.add(id);
     }
-    setSelectedFieldIndex(newSelectedRows);
+    setSelectedRowIndex(newSelectedRows);
   }
   // ========== 多选 结束 =========
 
@@ -157,15 +159,16 @@ export function EditableTable({
   // ========== 防止重新渲染滚动表格 结束 ==========
 
   useImperativeHandle(ref, () => ({
+    addChange: (val: TableDataChange) => setChanges([...changes, val]),
+    deleteMultiSelectedRow: () => setDeletedRowIndex(selectedRowIndex),
+    deleteRow: (val: number) => setDeletedRowIndex(new Set([...deletedRowIndex, val])),
     getAddedRow: () => data.filter((item) => item[NEW_ROW_IS_ADDED_FIELD]),
-    getMultiSelectData: () => selectedFieldIndex,
-    getMultiDeleteData: () => deletedFieldIndex,
-    resetMultiSelectData: () => {
-      setDeletedFieldIndex(new Set());
-      setSelectedFieldIndex(new Set());
-    },
-    deleteMultiSelectedRow: () => {
-      setDeletedFieldIndex(selectedFieldIndex);
+    getMultiDeleteData: () => deletedRowIndex,
+    getMultiSelectData: () => selectedRowIndex,
+    resettData: () => {
+      setChanges([]);
+      setDeletedRowIndex(new Set());
+      setSelectedRowIndex(new Set());
     },
     willRanderTable,
   }));
@@ -234,9 +237,9 @@ export function EditableTable({
   function renderBody() {
     function genClassName(index: number) {
       // 删除的样式
-      if (deletedFieldIndex.has(index)) return " bg-[var(--fvm-danger-clr)]";
+      if (deletedRowIndex.has(index)) return " bg-[var(--fvm-danger-clr)]";
       // 选中的样式
-      if (selectedFieldIndex.has(index)) return "text-[var(--fvm-primary-clr)] font-bold";
+      if (selectedRowIndex.has(index)) return "text-[var(--fvm-primary-clr)] font-bold";
       return "";
     }
 
@@ -251,7 +254,7 @@ export function EditableTable({
                 handleSelectRow(rowIndex);
               }}
             >
-              {selectedFieldIndex.has(rowIndex) ? <span>🔵</span> : <span>🔘</span>}
+              {selectedRowIndex.has(rowIndex) ? <span>🔵</span> : <span>🔘</span>}
             </TableCell>
           )}
           {/* 正常数据 */}

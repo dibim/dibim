@@ -1,18 +1,26 @@
+/**
+ *
+ * 注意:
+ * 查询 SQL 的返回值为了和 Javascript 的命名方式统一, 使用了 lowerCamelCase 命名方式, 因此也要修改 SQL 语句要输出的字段名,
+ * 但是:
+ * MySQL / MariaDB /  PostgreSQL / SQL Server / Oracle 需要使用引号把字段名套起来才能返回预期的字段名, 否则会变成全部小写.
+ * SQLite 可以保留大小写, 但为了统一, 字段名也都套上引号.
+ *
+ * 数据库	    引用符号	示例
+ * PostgreSQL	"	        SELECT "columnName"
+ * SQLite	    "       	SELECT "columnName"
+ * Oracle	    "	        SELECT "columnName"
+ * MySQL	    `       	SELECT `columnName`
+ * SQL Server	[]	      SELECT [columnName]
+ *
+ */
 import { invoker } from "@/invoker";
-import {
-  ColumnIndex,
-  DbConnectionParam,
-  DbCountRes,
-  FieldWithValue,
-  GetTableDataParam,
-  IndexQueryResult,
-  TableStructure,
-} from "../types";
+import { DbConnectionParam, DbCountRes, FieldIndex, FieldStructure, FieldWithValue, GetTableDataParam } from "../types";
 import { formatToSqlValuePg } from "./format";
 import "./types";
 
 /**
- * 连接到 postgre_sql
+ * 连接到 PostgreSQL
  *
  * "postgres://user:password@localhost:5432/mydb?sslmode=require";
  *
@@ -51,20 +59,20 @@ type getAllTableSizeRes = {
 export async function getAllTableSizePg(connName: string) {
   const sql = `
     SELECT
-        schemaname AS schema_name,
-        tablename AS table_name,
-        pg_size_pretty(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS total_size,
-        pg_size_pretty(pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS table_size,
-        pg_size_pretty(
-            pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)) - 
-            pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))
-        ) AS index_size
+      schemaname AS schema_name,
+      tablename AS table_name,
+      pg_size_pretty(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS total_size,
+      pg_size_pretty(pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS table_size,
+      pg_size_pretty(
+        pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)) - 
+        pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))
+      ) AS index_size
     FROM
-        pg_tables
+      pg_tables
     WHERE
-        schemaname NOT IN ('pg_catalog', 'information_schema')
+      schemaname NOT IN ('pg_catalog', 'information_schema')
     ORDER BY
-        pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)) DESC;
+      pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)) DESC;
     `;
 
   const dbRes = await invoker.querySql(connName, sql);
@@ -76,77 +84,77 @@ export async function getAllTableSizePg(connName: string) {
 
 // 获取表结构
 export async function getTableStructurePg(connName: string, tbName: string) {
-  // 基础列信息
+  // 基础字段信息
   const columnSql = `
     SELECT
-        a.attname AS column_name,
-        t.typname AS data_type,
-        CASE 
-            WHEN t.typname = 'varchar' THEN a.atttypmod - 4
-            WHEN t.typname = 'char' THEN a.atttypmod - 4
-            WHEN t.typname = 'numeric' THEN ((a.atttypmod - 4) >> 16) & 65535
-            ELSE NULL
-        END AS size,
-        EXISTS(
-            SELECT 1 
-            FROM pg_constraint 
-            WHERE conrelid = a.attrelid 
-              AND a.attnum = ANY(conkey) 
-              AND contype = 'p'
-        ) AS is_primary_key,
-        EXISTS(
-            SELECT 1 
-            FROM pg_constraint 
-            WHERE conrelid = a.attrelid 
-              AND a.attnum = ANY(conkey) 
-              AND contype = 'u'
-        ) AS is_unique_key,
-        EXISTS(
-            SELECT 1 
-            FROM pg_constraint 
-            WHERE conrelid = a.attrelid 
-              AND a.attnum = ANY(conkey) 
-              AND contype = 'f'
-        ) AS is_foreign_key,
-        pg_get_expr(ad.adbin, ad.adrelid) AS column_default,
-        a.attnotnull AS is_not_null,
-        d.description AS comment
+      a.attname AS "name",
+      t.typname AS "type",
+      CASE 
+        WHEN t.typname = 'varchar' THEN a.atttypmod - 4
+        WHEN t.typname = 'char' THEN a.atttypmod - 4
+        WHEN t.typname = 'numeric' THEN ((a.atttypmod - 4) >> 16) & 65535
+        ELSE NULL
+      END AS "size",
+      EXISTS(
+        SELECT 1 
+        FROM pg_constraint 
+        WHERE conrelid = a.attrelid 
+          AND a.attnum = ANY(conkey) 
+          AND contype = 'p'
+      ) AS "isPrimaryKey",
+      EXISTS(
+        SELECT 1 
+        FROM pg_constraint 
+        WHERE conrelid = a.attrelid 
+          AND a.attnum = ANY(conkey) 
+          AND contype = 'u'
+      ) AS "isUniqueKey",
+      EXISTS(
+        SELECT 1 
+        FROM pg_constraint 
+        WHERE conrelid = a.attrelid 
+          AND a.attnum = ANY(conkey) 
+          AND contype = 'f'
+      ) AS "isForeignKey",
+      pg_get_expr(ad.adbin, ad.adrelid) AS "defaultValue",
+      a.attnotnull AS "isNotNull",
+      d.description AS "comment"
     FROM
-        pg_attribute a
-        JOIN pg_type t ON a.atttypid = t.oid
-        LEFT JOIN pg_attrdef ad ON (a.attrelid = ad.adrelid AND a.attnum = ad.adnum)
-        LEFT JOIN pg_description d ON (a.attrelid = d.objoid AND a.attnum = d.objsubid)
-        JOIN pg_class c ON a.attrelid = c.oid
-        JOIN pg_namespace n ON c.relnamespace = n.oid
+      pg_attribute a
+      JOIN pg_type t ON a.atttypid = t.oid
+      LEFT JOIN pg_attrdef ad ON (a.attrelid = ad.adrelid AND a.attnum = ad.adnum)
+      LEFT JOIN pg_description d ON (a.attrelid = d.objoid AND a.attnum = d.objsubid)
+      JOIN pg_class c ON a.attrelid = c.oid
+      JOIN pg_namespace n ON c.relnamespace = n.oid
     WHERE
-        c.relname = '${tbName}'
-        AND n.nspname = 'public' -- TODO: 假设表在 public 模式
-        AND a.attnum > 0
-        AND NOT a.attisdropped
+      c.relname = '${tbName}'
+      AND n.nspname = 'public' -- TODO: 假设表在 public 模式
+      AND a.attnum > 0
+      AND NOT a.attisdropped
     ORDER BY
-        a.attnum;
+      a.attnum;
     `;
 
   // 索引信息查询
   const indexSql = `
     SELECT
-        i.relname AS index_name,
-        a.attname AS column_name,
-        am.amname AS index_type,
-        idx.indisunique AS is_unique,
-        idx.indisprimary AS is_primary
+      i.relname AS "indexName",
+      a.attname AS "columnName",
+      am.amname AS "indexType",
+      idx.indisunique AS "isUniqueKey",
+      idx.indisprimary AS "isPrimaryKey"
     FROM
-        pg_index idx
-        JOIN pg_class i ON i.oid = idx.indexrelid
-        JOIN pg_class t ON t.oid = idx.indrelid
-        JOIN pg_namespace n ON n.oid = t.relnamespace
-        JOIN pg_am am ON i.relam = am.oid
-        JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY(idx.indkey)
+      pg_index idx
+      JOIN pg_class i ON i.oid = idx.indexrelid
+      JOIN pg_class t ON t.oid = idx.indrelid
+      JOIN pg_namespace n ON n.oid = t.relnamespace
+      JOIN pg_am am ON i.relam = am.oid
+      JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY(idx.indkey)
     WHERE
-        t.relname = '${tbName}'
-        AND n.nspname = 'public'
+      t.relname = '${tbName}'
+      AND n.nspname = 'public'  -- TODO: 假设表在 public 模式
     ORDER BY
-        i.relname, array_position(idx.indkey, a.attnum);
+      i.relname, array_position(idx.indkey, a.attnum);
     `;
 
   // 执行查询
@@ -155,30 +163,25 @@ export async function getTableStructurePg(connName: string, tbName: string) {
     invoker.querySql(connName, indexSql),
   ]);
 
-  // 处理列信息
-  const columns = columnRes.data ? (JSON.parse(columnRes.data) as TableStructure[]) : [];
+  // 处理字段信息
+  const columns = columnRes.data ? (JSON.parse(columnRes.data) as FieldStructure[]) : [];
   // 处理索引信息
-  const indexes = indexRes.data ? (JSON.parse(indexRes.data) as IndexQueryResult[]) : [];
+  const indexes = indexRes.data ? (JSON.parse(indexRes.data) as FieldIndex[]) : [];
 
-  // 将索引信息合并到列信息中
-  const columnIndexMap: Record<string, ColumnIndex[]> = {};
-  indexes.forEach((index) => {
-    if (!columnIndexMap[index.column_name]) {
-      columnIndexMap[index.column_name] = [];
+  // 将索引信息合并到字段信息中
+  const columnIndexMap: Record<string, FieldIndex[]> = {};
+  indexes.forEach((item) => {
+    if (!columnIndexMap[item.columnName]) {
+      columnIndexMap[item.columnName] = [];
     }
-    columnIndexMap[index.column_name].push({
-      name: index.index_name,
-      type: index.index_type,
-      isUnique: index.is_unique,
-      isPrimary: index.is_primary,
-    });
+    columnIndexMap[item.columnName].push(item);
   });
 
   // 合并结果
   const result = columns.map((column) => ({
     ...column,
     size: column.size ? column.size : "",
-    indexes: columnIndexMap[column.column_name] || [],
+    indexes: columnIndexMap[column.name] || [],
   }));
 
   return {
@@ -192,98 +195,98 @@ export async function getTableDdlPg(connName: string, tbName: string) {
   const sql = `
     WITH 
     table_info AS (
-        SELECT 
-            c.oid,
-            n.nspname AS schema_name,
-            c.relname AS table_name
-        FROM 
-            pg_class c
-            JOIN pg_namespace n ON n.oid = c.relnamespace
-        WHERE 
-            c.relname = '${tbName}' AND n.nspname = 'public' AND c.relkind = 'r'
+      SELECT 
+        c.oid,
+        n.nspname AS schema_name,
+        c.relname AS table_name
+      FROM 
+        pg_class c
+        JOIN pg_namespace n ON n.oid = c.relnamespace
+      WHERE 
+        c.relname = '${tbName}' AND n.nspname = 'public' AND c.relkind = 'r'
     ),
     column_defs AS (
-        SELECT 
-            ti.oid,
-            string_agg(
-                '    "' || a.attname || '" ' || 
-                pg_catalog.format_type(a.atttypid, a.atttypmod) ||
-                CASE WHEN a.attnotnull THEN ' NOT NULL' ELSE '' END ||
-                CASE 
-                    WHEN a.attidentity = 'd' THEN ' GENERATED BY DEFAULT AS IDENTITY'
-                    WHEN a.attidentity = 'a' THEN ' GENERATED ALWAYS AS IDENTITY'
-                    ELSE ''
-                END ||
-                CASE 
-                    WHEN pg_catalog.pg_get_expr(ad.adbin, ad.adrelid) IS NOT NULL 
-                    THEN ' DEFAULT ' || pg_catalog.pg_get_expr(ad.adbin, ad.adrelid)
-                    ELSE ''
-                END,
-                E',\n'
-            ) AS columns
-        FROM 
-            table_info ti
-            JOIN pg_catalog.pg_attribute a ON a.attrelid = ti.oid
-            LEFT JOIN pg_catalog.pg_attrdef ad ON (a.attrelid = ad.adrelid AND a.attnum = ad.adnum)
-        WHERE 
-            a.attnum > 0 AND NOT a.attisdropped
-        GROUP BY 
-            ti.oid
+      SELECT 
+        ti.oid,
+        string_agg(
+          '    "' || a.attname || '" ' || 
+          pg_catalog.format_type(a.atttypid, a.atttypmod) ||
+          CASE WHEN a.attnotnull THEN ' NOT NULL' ELSE '' END ||
+          CASE 
+            WHEN a.attidentity = 'd' THEN ' GENERATED BY DEFAULT AS IDENTITY'
+            WHEN a.attidentity = 'a' THEN ' GENERATED ALWAYS AS IDENTITY'
+            ELSE ''
+          END ||
+          CASE 
+            WHEN pg_catalog.pg_get_expr(ad.adbin, ad.adrelid) IS NOT NULL 
+            THEN ' DEFAULT ' || pg_catalog.pg_get_expr(ad.adbin, ad.adrelid)
+            ELSE ''
+          END,
+          E',\n'
+        ) AS columns
+      FROM 
+        table_info ti
+        JOIN pg_catalog.pg_attribute a ON a.attrelid = ti.oid
+        LEFT JOIN pg_catalog.pg_attrdef ad ON (a.attrelid = ad.adrelid AND a.attnum = ad.adnum)
+      WHERE 
+        a.attnum > 0 AND NOT a.attisdropped
+      GROUP BY 
+        ti.oid
     ),
 
     constraint_defs AS (
-        SELECT 
-            ti.oid,
-            string_agg(
-                '    CONSTRAINT "' || con.conname || '" ' ||
-                CASE 
-                    -- 主键约束
-                    WHEN con.contype = 'p' THEN
-                        'PRIMARY KEY (' || 
-                        (SELECT string_agg('"' || a.attname || '"', ', ')
-                        FROM pg_attribute a
-                        WHERE a.attrelid = con.conrelid
-                        AND a.attnum = ANY(con.conkey)) || 
-                        ')'
-                    -- 外键约束
-                    WHEN con.contype = 'f' THEN
-                        'FOREIGN KEY (' || 
-                        (SELECT string_agg('"' || a.attname || '"', ', ')
-                        FROM pg_attribute a
-                        WHERE a.attrelid = con.conrelid
-                        AND a.attnum = ANY(con.conkey)) || 
-                        ') REFERENCES ' ||
-                        (SELECT n.nspname || '."' || c.relname || '"'
-                        FROM pg_class c
-                        JOIN pg_namespace n ON n.oid = c.relnamespace
-                        WHERE c.oid = con.confrelid) || 
-                        ' (' ||
-                        (SELECT string_agg('"' || a.attname || '"', ', ')
-                        FROM pg_attribute a
-                        WHERE a.attrelid = con.confrelid
-                        AND a.attnum = ANY(con.confkey)) ||
-                        ')'
-                    -- 其他约束原样输出
-                    ELSE pg_catalog.pg_get_constraintdef(con.oid)
-                END,
-                E',\n'
-            ) AS constraints
-        FROM 
-            table_info ti
-        JOIN pg_catalog.pg_constraint con ON con.conrelid = ti.oid
-        WHERE 
-            con.contype IN ('p','u','f','c')
-        GROUP BY 
-            ti.oid
+      SELECT 
+        ti.oid,
+        string_agg(
+          '    CONSTRAINT "' || con.conname || '" ' ||
+          CASE 
+            -- 主键约束
+            WHEN con.contype = 'p' THEN
+                'PRIMARY KEY (' || 
+                (SELECT string_agg('"' || a.attname || '"', ', ')
+                FROM pg_attribute a
+                WHERE a.attrelid = con.conrelid
+                AND a.attnum = ANY(con.conkey)) || 
+                ')'
+            -- 外键约束
+            WHEN con.contype = 'f' THEN
+                'FOREIGN KEY (' || 
+                (SELECT string_agg('"' || a.attname || '"', ', ')
+                FROM pg_attribute a
+                WHERE a.attrelid = con.conrelid
+                AND a.attnum = ANY(con.conkey)) || 
+                ') REFERENCES ' ||
+                (SELECT n.nspname || '."' || c.relname || '"'
+                FROM pg_class c
+                JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE c.oid = con.confrelid) || 
+                ' (' ||
+                (SELECT string_agg('"' || a.attname || '"', ', ')
+                FROM pg_attribute a
+                WHERE a.attrelid = con.confrelid
+                AND a.attnum = ANY(con.confkey)) ||
+                ')'
+              -- 其他约束原样输出
+              ELSE pg_catalog.pg_get_constraintdef(con.oid)
+          END,
+          E',\n'
+        ) AS constraints
+      FROM 
+        table_info ti
+      JOIN pg_catalog.pg_constraint con ON con.conrelid = ti.oid
+      WHERE 
+        con.contype IN ('p','u','f','c')
+      GROUP BY 
+        ti.oid
     )
 
     SELECT 
-        'CREATE TABLE "' || ti.schema_name || '"."' || ti.table_name || '" (\n' ||
-        cd.columns ||
-        CASE WHEN cts.constraints IS NOT NULL THEN E',\n' || cts.constraints ELSE '' END ||
-        E'\n);'
+      'CREATE TABLE "' || ti.schema_name || '"."' || ti.table_name || '" (\n' ||
+      cd.columns ||
+      CASE WHEN cts.constraints IS NOT NULL THEN E',\n' || cts.constraints ELSE '' END ||
+      E'\n);'
     FROM 
-        table_info ti
+      table_info ti
     JOIN column_defs cd ON cd.oid = ti.oid
     LEFT JOIN constraint_defs cts ON cts.oid = ti.oid;
     `;

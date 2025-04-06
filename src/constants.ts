@@ -55,49 +55,45 @@ export const DB_TYPE_SQLITE = "SQLite";
 
 // 数据库字段类型
 // Database field type
-export const FIELD_TYPE_NUMERIC = "NUMERIC";
-export const FIELD_TYPE_CHARACTER = "CHARACTER";
-export const FIELD_TYPE_BINARY = "BINARY";
-export const FIELD_TYPE_DATETIME = "DATETIME";
-export const FIELD_TYPE_BOOLEAN = "BOOLEAN";
-export const FIELD_TYPE_ENUM = "ENUM";
-export const FIELD_TYPE_GEOMETRIC = "GEOMETRIC";
-export const FIELD_TYPE_NETWORK = "NETWORK";
-export const FIELD_TYPE_TEXT_SEARCH = "TEXT_SEARCH";
-export const FIELD_TYPE_UUID = "UUID";
-export const FIELD_TYPE_JSON = "JSON";
 export const FIELD_TYPE_ARRAY = "ARRAY";
-export const FIELD_TYPE_COMPOSITE = "COMPOSITE";
-export const FIELD_TYPE_RANGE = "RANGE";
-export const FIELD_TYPE_DOMAIN = "DOMAIN";
+export const FIELD_TYPE_BINARY = "BINARY";
 export const FIELD_TYPE_BIT_STRING = "BIT_STRING";
-export const FIELD_TYPE_MONETARY = "MONETARY";
-export const FIELD_TYPE_PSEUDO = "PSEUDO";
+export const FIELD_TYPE_BOOLEAN = "BOOLEAN";
+export const FIELD_TYPE_CHARACTER = "CHARACTER";
+export const FIELD_TYPE_COMPOSITE = "COMPOSITE";
+export const FIELD_TYPE_DATETIME = "DATETIME";
+export const FIELD_TYPE_GEOMETRIC = "GEOMETRIC";
+export const FIELD_TYPE_JSON = "JSON";
+export const FIELD_TYPE_NETWORK = "NETWORK";
+export const FIELD_TYPE_NUMERIC = "NUMERIC";
+export const FIELD_TYPE_RANGE = "RANGE";
+export const FIELD_TYPE_TEXT_SEARCH = "TEXT_SEARCH";
+export const FIELD_TYPE_OTHER = "OTHER";
 
 // 列表栏的类型
 // Type of List Bar
 export const LIST_BAR_TYPE_DB_LIST = "dbList";
+export const LIST_BAR_TYPE_FUNC_LIST = "funcLst";
 export const LIST_BAR_TYPE_TABLE_LIST = "tableList";
 export const LIST_SUB_SIDEBAR_TYPE_VIEW_LIST = "viewList";
-export const LIST_BAR_TYPE_FUNC_LIST = "funcLst";
 
 // 主要区域的类型
 // Types of main content
-export const MAIN_CONTEN_TYPE_WELCOME = "welcome";
 export const MAIN_CONTEN_TYPE_ADD_CONNECTION = "addConnection";
 export const MAIN_CONTEN_TYPE_EDIT_CONNECTION = "editConnection";
-export const MAIN_CONTEN_TYPE_TABLE_EDITOR = "tableEditor";
 export const MAIN_CONTEN_TYPE_SETTINGS = "settings";
 export const MAIN_CONTEN_TYPE_SQL_EDITOR = "sqlEditor";
+export const MAIN_CONTEN_TYPE_TABLE_EDITOR = "tableEditor";
+export const MAIN_CONTEN_TYPE_WELCOME = "welcome";
 
 // 主要区域的标签页
 // Tabs for main content
-export const TAB_STRUCTURE = "TAB_STRUCTURE";
-export const TAB_DDL = "TAB_DDL";
 export const TAB_CONSTRAINT = "TAB_CONSTRAINT";
 export const TAB_DATA = "TAB_DATA";
-export const TAB_PARTITION = "TAB_PARTITION";
+export const TAB_DDL = "TAB_DDL";
 export const TAB_FOREIGN_KEY = "TAB_FOREIGN_KEY";
+export const TAB_PARTITION = "TAB_PARTITION";
+export const TAB_STRUCTURE = "TAB_STRUCTURE";
 
 // 方向
 // direction
@@ -106,12 +102,20 @@ export const DIR_V = "vertical";
 
 // 正则
 // Regular Expression
-export const reNumStr = /^\d+$/;
+//
 // 是单表查询
+// is Single-Table query
 export const reIsSingletQuery =
   /^select\b(?!(.*\bselect\b))(?!.*\b(join|inner\s+join|outer\s+join|left\s+join|right\s+join|cross\s+join|natural\s+join)\b)(?!.*\bfrom\b[^,]*(,[^,]+)+).*$/i;
+// 全部由数字组成的字符串
+// A string composed entirely of numbers
+export const reNumStr = /^\d+$/;
 // 正则表达式用于匹配 WHERE 之后的部分
 export const reWhereClause = /from\s+("[^"]+"|`[^`]+`|'[^']+'|\w+)(?:\s+(.*))?/i;
+// 一个单词
+export const reOneWord = /^\s*(\S+)\s*$/;
+// 两个单词, 中间使用任意空白分割
+export const reTwoWords = /^\s*(\S+)\s+(\S+)\s*$/;
 
 // 分页
 // pagination
@@ -119,4 +123,5 @@ export const DEFAULT_PAGE_SIZE = 50;
 
 //
 // 新添加的行的标记, 这是一个非法的 sql 字段名, 避免和已有的字段名重名
+// The tag for the newly added row is an invalid SQL field name, chosen to avoid conflicts with existing field names.
 export const NEW_ROW_IS_ADDED_FIELD = "; -- IS-NEW-ROW -- ;";

@@ -98,10 +98,10 @@ export function TableList() {
 
   // ========== 上下文按钮功能 ==========
   const [operateTableName, setOperateTableName] = useState<string>(""); // 现在操作的表名
-  const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
+  const [showDialogDelete, setShowDialogDelete] = useState<boolean>(false);
   const [showDialogRename, setShowDialogRename] = useState<boolean>(false);
   const [showDialogTruncate, setShowDialogTruncate] = useState<boolean>(false);
-  const [showDialogDelete, setShowDialogDelete] = useState<boolean>(false);
+  const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
 
   // 弹出确认重命名表
   async function handleRenamePopup(tableName: string) {
@@ -141,15 +141,15 @@ export function TableList() {
   // 弹出确认截断表
   function handleTruncatePopup(tableName: string) {
     setOperateTableName(tableName);
-    setWillExecCmd(genTruncateTableCmd(tableName) || "");
     setShowDialogTruncate(true);
+    setWillExecCmd(genTruncateTableCmd(tableName) || "");
   }
 
   // 弹出确认删除表
   function handleDeletePopup(tableName: string) {
     setOperateTableName(tableName);
-    setWillExecCmd(genDeleteTableCmd(tableName) || "");
     setShowDialogDelete(true);
+    setWillExecCmd(genDeleteTableCmd(tableName) || "");
   }
 
   // 确定执行语句
@@ -326,7 +326,7 @@ export function TableList() {
 
       <ConfirmDialog
         open={showDialogTruncate}
-        title={`确认要截断${operateTableName}吗?`}
+        title={`确认要截断表格"${operateTableName}"吗?`}
         description={`请确认将要执行的语句:`}
         content={<SqlCodeViewer ddl={willExecCmd} />}
         cancelText={"取消"}
@@ -338,7 +338,7 @@ export function TableList() {
       />
       <ConfirmDialog
         open={showDialogDelete}
-        title={`确认要删除表格${operateTableName}吗?`}
+        title={`确认要删除表格"${operateTableName}"吗?`}
         description={`请确认将要执行的语句:`}
         content={<SqlCodeViewer ddl={willExecCmd} />}
         cancelText={"取消"}
