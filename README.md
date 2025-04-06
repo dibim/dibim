@@ -7,14 +7,14 @@
 - ⚡ **基于 Tauri 框架**：安装包较小，内存占用较低。
 - 🖥️ **前端**：TypeScript + React + shadcn/ui。
 - ⚙️ **后端**：Rust + SQLx。
-- 🗄️ **数据库支持**：PostgreSQL / MySQL / MariaDB / SQLite。
+- 🗄️ **数据库支持**：PostgreSQL / SQLite / MySQL/MariaDB(Not Started)。
 
 **DIBIM** is a simple and easy-to-use cross platform database management software.
 
-- ⚡ **Based on Tauri framework**: small binary & low memory.
+- ⚡ **Based on Tauri framework**: small binary & low memory
 - 🖥️ **Frontend**: TypeScript + React + shadcn/ui
-- ⚙️ **Backend**: Rust + SQLx。
-- 🗄️ **Database support**: PostgreSQL / MySQL / MariaDB / SQLite。
+- ⚙️ **Backend**: Rust + SQLx
+- 🗄️ **Database support**: PostgreSQL / SQLite / MySQL/MariaDB(Not Started)
 
 官方仓库地址:
 
