@@ -93,8 +93,7 @@ In event handling, useEffect, and other logic, the original state object appStat
 - 表格数据列表的 添加行的语句改为批量插入✅
 - 修复表结构里:
   - 编辑字段类型会添加字段
-  - 编辑主键字段没选中
-
+  
 ### v0.3 mysql
 
 - 支持 mysql
