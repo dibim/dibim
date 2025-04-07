@@ -59,6 +59,12 @@ interface AppState {
   // 侧边栏的宽度
   sideBarWidth: number;
   setSideBarWidth: (val: number) => void;
+  // 大屏幕下侧边栏的宽度
+  sideBarWidthPc: string;
+  setSideBarWidthPc: (val: string) => void;
+  // 小屏幕下侧边栏的宽度
+  sideBarWidthMobile: string;
+  setSideBarWidthMobile: (val: string) => void;
 
   // 列表栏是否显示
   listBarOpen: boolean;
@@ -138,10 +144,14 @@ export const appState = proxy<AppState>({
   aboutOpen: false,
   setAboutOpen: (val: boolean) => (appState.aboutOpen = val),
 
-  sidebarOpen: true,
+  sidebarOpen: false,
   setSidebarOpen: (val: boolean) => (appState.sidebarOpen = val),
   sideBarWidth: 0,
   setSideBarWidth: (val: number) => (appState.sideBarWidth = val),
+  sideBarWidthPc: "10rem",
+  setSideBarWidthPc: (val: string) => (appState.sideBarWidthPc = val),
+  sideBarWidthMobile: "20rem",
+  setSideBarWidthMobile: (val: string) => (appState.sideBarWidthMobile = val),
 
   listBarOpen: true,
   setListBarOpen: (val: boolean) => (appState.listBarOpen = val),

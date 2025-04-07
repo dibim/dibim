@@ -11,6 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
+import { HANS, HANT } from "@/i18n";
 
 export function Settings() {
   const { t, i18n } = useTranslation();
@@ -135,10 +136,10 @@ export function Settings() {
             <Button className="m-2" onClick={() => changeLanguage("uk")}>
               Ukrainian (Українська)
             </Button>
-            <Button className="m-2" onClick={() => changeLanguage("zh_hans")}>
+            <Button className="m-2" onClick={() => changeLanguage(HANS)}>
               简体中文 (Simplified Chinese)
             </Button>
-            <Button className="m-2" onClick={() => changeLanguage("zh_hant")}>
+            <Button className="m-2" onClick={() => changeLanguage(HANT)}>
               繁體中文 (Traditional Chinese)
             </Button>
           </LabeledDiv>
