@@ -88,7 +88,7 @@ export function getProxyTarget<T>(proxy: T): T {
   return result as T;
 }
 
-// 极端布局百分比, 自动口建 gutter 的尺寸
+// 计算布局百分比, 自动扣减 gutter 的尺寸
 export function genPanelPercent(percent: number) {
   const pageW = getPageWidth();
   return (pageW * percent - GUTTER_SIZE) / pageW;
