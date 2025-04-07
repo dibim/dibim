@@ -6,7 +6,7 @@ import PostgresqlLogo from "@/assets/db_logo/postgresql.svg?react";
 import SqliteLogo from "@/assets/db_logo/sqlite.svg?react";
 import { LabeledDiv } from "@/components/LabeledDiv";
 import { Input } from "@/components/ui/input";
-import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE, DIR_H, STR_ADD, STR_EDIT } from "@/constants";
+import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE, DIR_H, STR_ADD, STR_EDIT } from "@/constants";
 import { appState } from "@/store/valtio";
 import { DbType, SvgComponentType } from "@/types/types";
 import { generateHexString } from "@/utils/util";
@@ -22,7 +22,7 @@ type ConnectionProp = {
 export function Connection(props: ConnectionProp) {
   const snap = useSnapshot(appState);
   const [name, setName] = useState<string>(""); // 连接名称
-  const [dbType, setDbType] = useState<DbType>(DB_TYPE_POSTGRESQL); // 默认类型是 PostgreSQL
+  const [dbType, setDbType] = useState<DbType>(DB_POSTGRESQL); // 默认类型是 PostgreSQL
   const [host, setHost] = useState<string>("");
   const [port, setPort] = useState<number>(5432); // 默认类型是 PostgreSQL
   const [user, setUser] = useState<string>("");
@@ -73,7 +73,7 @@ export function Connection(props: ConnectionProp) {
       return;
     }
 
-    if (dbType === DB_TYPE_MYSQL || dbType === DB_TYPE_POSTGRESQL) {
+    if (dbType === DB_MYSQL || dbType === DB_POSTGRESQL) {
       if (valueIsError(host === "", "主机地址")) return;
       if (valueIsError(port === 0, "端口")) return;
       if (valueIsError(user === "", "用户名")) return;
@@ -81,7 +81,7 @@ export function Connection(props: ConnectionProp) {
       if (valueIsError(dbName === "", "数据库名")) return;
     }
 
-    if (dbType === DB_TYPE_SQLITE) {
+    if (dbType === DB_SQLITE) {
       if (filePath === "") {
         setErrorMessage("请输入文件路径");
         return;
@@ -120,8 +120,8 @@ export function Connection(props: ConnectionProp) {
   }
 
   function handleClickDbLogo(dbType: DbType) {
-    if (dbType === DB_TYPE_MYSQL) setPort(3306);
-    if (dbType === DB_TYPE_POSTGRESQL) setPort(5432);
+    if (dbType === DB_MYSQL) setPort(3306);
+    if (dbType === DB_POSTGRESQL) setPort(5432);
 
     setDbType(dbType);
   }
@@ -186,9 +186,9 @@ export function Connection(props: ConnectionProp) {
         <CardContent>
           <LabeledDiv direction={DIR_H} label={"数据库类型"} className="py-2">
             <div className="flex gap-4 h-20 max-h-20">
-              {renderDbType(DB_TYPE_MYSQL, MysqlLogo)}
-              {renderDbType(DB_TYPE_POSTGRESQL, PostgresqlLogo)}
-              {renderDbType(DB_TYPE_SQLITE, SqliteLogo)}
+              {renderDbType(DB_MYSQL, MysqlLogo)}
+              {renderDbType(DB_POSTGRESQL, PostgresqlLogo)}
+              {renderDbType(DB_SQLITE, SqliteLogo)}
             </div>
           </LabeledDiv>
 
@@ -196,7 +196,7 @@ export function Connection(props: ConnectionProp) {
             <Input value={name} onInput={onInputName} />
           </LabeledDiv>
 
-          {(dbType === DB_TYPE_MYSQL || dbType === DB_TYPE_POSTGRESQL) && (
+          {(dbType === DB_MYSQL || dbType === DB_POSTGRESQL) && (
             <>
               <LabeledDiv direction={DIR_H} label={"主机地址"} className="py-2">
                 <Input value={host} onInput={onInputHost} />
@@ -216,7 +216,7 @@ export function Connection(props: ConnectionProp) {
             </>
           )}
 
-          {dbType === DB_TYPE_SQLITE && (
+          {dbType === DB_SQLITE && (
             <LabeledDiv direction={DIR_H} label={"文件路径"} className="py-2">
               <Input value={filePath} onInput={onInputFilePath} />
               <div className="py-1"></div>
