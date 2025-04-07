@@ -28,8 +28,7 @@ export function DatabaseList() {
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [itemIndex, setItemIndex] = useState<number>(-1);
 
-  // 删除
-  function delItem() {
+  function handleDelConn() {
     const newConfig = {
       ...appState.config,
       dbConnections: [
@@ -42,8 +41,7 @@ export function DatabaseList() {
     setShowDialog(false);
   }
 
-  // 点击连接
-  async function clickConn(conn: DbConnections) {
+  async function handleClickConn(conn: DbConnections) {
     // 先设置这两项, 否则 connect 里获取不到
     appState.setCurrentDbType(conn.dbType);
     appState.setCurrentConnName(conn.name);
@@ -89,7 +87,7 @@ export function DatabaseList() {
           </div>
         ),
         contentOnClick: async () => {
-          clickConn(item);
+          handleClickConn(item);
         },
         menuItems: [
           {
@@ -147,7 +145,7 @@ export function DatabaseList() {
           setShowDialog(false);
         }}
         okText={t("Confirm")}
-        okCb={delItem}
+        okCb={handleDelConn}
       />
     </>
   );

@@ -368,9 +368,14 @@ export function TableEditorStructure({
     tableRef.current?.deleteRow(index);
   }
 
-  function handleConfirm() {
-    exec(willExecCmd);
-    getData();
+  async function handleConfirm() {
+    const res = await exec(willExecCmd);
+    if (res.errorMessage === "") {
+      setShowDialogAlter(false);
+      getData();
+    } else {
+      setErrorMessage(res.errorMessage);
+    }
   }
 
   const tooltipSectionData = [
@@ -460,6 +465,7 @@ export function TableEditorStructure({
               </div>
             ),
           },
+          // 注意显示的是非空, 不是 isNullable 本身, 要取反
           isNotNull: { value: !(row.isNullable === true), render: (val: any) => <div>{val ? "✅" : ""}</div> },
           defaultValue: { value: row.defaultValue, render: (val: any) => <div>{val}</div> },
           isPrimaryKey: { value: row.isPrimaryKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
@@ -525,7 +531,7 @@ export function TableEditorStructure({
       <Dialog open={showDialogEdit} onOpenChange={setShowDialogEdit}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{dialogAction === STR_ADD ? t("Add") : t("Edit")}t("Field")</DialogTitle>
+            <DialogTitle>{dialogAction === STR_ADD ? t("Add field") : t("Edit field")}</DialogTitle>
           </DialogHeader>
 
           <LabeledDiv direction={DIR_H} labelWidth="6rem" label={t("Field name")}>
@@ -624,7 +630,13 @@ export function TableEditorStructure({
         open={showDialogAlter}
         title={t("Are you sure you want to save the changes?")}
         description={t("&confirmStatement")}
-        content={<SqlCodeViewer ddl={willExecCmd} />}
+        content={
+          <>
+            <SqlCodeViewer ddl={willExecCmd} />
+            {errorMessage && <TextNotification type="error" message={errorMessage}></TextNotification>}
+            {okMessage && <TextNotification type="success" message={okMessage}></TextNotification>}
+          </>
+        }
         cancelText={t("Cancel")}
         cancelCb={() => {
           setShowDialogAlter(false);

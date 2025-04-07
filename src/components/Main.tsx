@@ -9,7 +9,7 @@ import { TableList } from "@/components/list_bar/TableList";
 import { MainArea } from "@/components/main_area";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, useSidebar } from "@/components/ui/sidebar";
-import { APP_NAME, HEDAER_H, LIST_BAR_DB, LIST_BAR_DEFAULT_WIDTH, LIST_BAR_TABLE } from "@/constants";
+import { APP_NAME, DB_SQLITE, HEDAER_H, LIST_BAR_DB, LIST_BAR_DEFAULT_WIDTH, LIST_BAR_TABLE } from "@/constants";
 import { appState } from "@/store/valtio";
 import { getPageWidth } from "@/utils/ media_query";
 import { genPanelPercent } from "@/utils/util";
@@ -132,7 +132,7 @@ export function Main({ id, className }: { id: string; className: string }) {
           className="cursor-pointer"
           style={{ borderBottom: `0.25rem solid ${snap.currentConnColor || "rgba(0,0,0,0)"}` }}
         >
-          {snap.currentDbNme || t("No database connection")}
+          {(snap.currentDbType === DB_SQLITE ? snap.currentConnName : snap.currentDbNme) || t("No database connection")}
         </span>
       ),
       content: <p>{t("Current database connection")}</p>,

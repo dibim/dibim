@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { DbResult, ExecResult } from "./types/types";
+import { DbResult } from "./types/types";
 
 // AES-GCM 加密解密的结果 | The result of AES-GCM encryption and decryption
 export type AesRes = { result: string; errorMessage: string };
@@ -59,5 +59,5 @@ export const invoker = {
    * @param sql 要执行的语句 | Statement to be executed
    * @returns
    */
-  execSql: (connName: string, sql: string) => invoke<ExecResult>("sqlx_exec", { connName, sql }),
+  execSql: (connName: string, sql: string) => invoke<DbResult>("sqlx_exec", { connName, sql }),
 };
