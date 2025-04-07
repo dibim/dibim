@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertCircle, CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
+import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { subscribeKey } from "valtio/utils";
 import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
@@ -14,8 +14,8 @@ import { EditableTable, EditableTableMethods, ListRow } from "../EditableTable";
 import { LabeledDiv } from "../LabeledDiv";
 import { SearchableSelect } from "../SearchableSelect";
 import { SqlCodeViewer } from "../SqlCodeViewer";
+import { TextNotification } from "../TextNotification";
 import { TooltipGroup } from "../TooltipGroup";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu";
@@ -24,8 +24,8 @@ import { Input } from "../ui/input";
 
 type DialogAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
 
-export type MainContentStructureProp = {
-  getData: () => void;
+export type TableEditorStructureProps = {
+  getData: () => Promise<void>;
   alterData: AllAlterAction[];
   setAlterData: (val: AllAlterAction[]) => void;
   changeTable: () => void;
@@ -33,14 +33,14 @@ export type MainContentStructureProp = {
   setEditingTableComment: (val: string) => void;
 };
 
-export function TableEditorStructure({
+export function TableStructure({
   getData,
   alterData,
   setAlterData,
   changeTable,
   editingTableComment,
   setEditingTableComment,
-}: MainContentStructureProp) {
+}: TableEditorStructureProps) {
   const { t } = useTranslation();
   const tableRef = useRef<EditableTableMethods | null>(null);
 
@@ -48,11 +48,11 @@ export function TableEditorStructure({
 
   // 提示对话框
   const [dialogAction, setDialogAction] = useState<DialogAction>("");
-  const [errorMessage, setErrorMessage] = useState<string>(""); // 错误消息
-  const [okMessage, setOkMessage] = useState<string>(""); // 成功消息
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [okMessage, setOkMessage] = useState<string>("");
   const [showDialogAlter, setShowDialogAlter] = useState<boolean>(false);
   const [showDialogEdit, setShowDialogEdit] = useState<boolean>(false);
-  const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
+  const [willExecCmd, setWillExecCmd] = useState<string>("");
 
   // 字段编辑对话框里的数据
   const [autoIncrement, setAutoIncrement] = useState<boolean>(false);
@@ -226,14 +226,12 @@ export function TableEditorStructure({
 
   // ========== 按钮 ==========
 
-  // 点击添加字段
   function handleAddField() {
     resetDialogData(null);
     setDialogAction(STR_ADD);
     setShowDialogEdit(true);
   }
 
-  // 删除选中的字段
   function handleDelSelectedField() {
     const arr = tableRef.current?.getMultiSelectData() || [];
     for (const index of arr) {
@@ -266,7 +264,6 @@ export function TableEditorStructure({
     setAlterData(alterData);
   }
 
-  // 点击应用按钮, 弹出确认框, 确认之后才执行
   function handleApply() {
     if (alterData.length === 0) {
       toast(t("&selectFieldFirst"));
@@ -277,13 +274,11 @@ export function TableEditorStructure({
     setShowDialogAlter(true);
   }
 
-  // 点击取消按钮
   function handleCancel() {
     setAlterData([]);
-    tableRef.current?.resettData();
+    tableRef.current?.resetData();
   }
 
-  // 点击编辑按钮, 弹出编辑对话框
   function handleEditFieldPopup(index: number) {
     const field = appState.currentTableStructure[index];
 
@@ -339,7 +334,6 @@ export function TableEditorStructure({
     setDialogAction(STR_EDIT);
   }
 
-  // 复制字段名
   async function handleCopyFieldName(index: number) {
     const field = appState.currentTableStructure[index];
     try {
@@ -350,7 +344,6 @@ export function TableEditorStructure({
     }
   }
 
-  // 复制字段类型
   async function handleCopyFieldType(index: number) {
     const field = appState.currentTableStructure[index];
     try {
@@ -361,9 +354,8 @@ export function TableEditorStructure({
     }
   }
 
-  // 删除字段
   function handleDeleteField(index: number) {
-    const field = appState.currentTableStructure[index]; // 要删除的字段
+    const field = appState.currentTableStructure[index];
     const actionDataIndex = getActionDataIndex();
     const actionData = genActionData(STR_DELETE);
     actionData.name = field.name;
@@ -376,15 +368,22 @@ export function TableEditorStructure({
     tableRef.current?.deleteRow(index);
   }
 
-  // 确定执行语句
-  function handleConfirm() {
-    exec(willExecCmd);
-    getData();
+  async function handleConfirm() {
+    const res = await exec(willExecCmd);
+    if (res.errorMessage === "") {
+      setShowDialogAlter(false);
+      tableRef.current?.resetData();
+      setAlterData([]);
+      await getData();
+      updateDataArr();
+    } else {
+      setErrorMessage(res.errorMessage);
+    }
   }
 
   const tooltipSectionData = [
     {
-      trigger: <RotateCw color="var(--fvm-info-clr)" onClick={() => getData()} />,
+      trigger: <RotateCw color="var(--fvm-info-clr)" onClick={async () => await getData()} />,
       content: <p>{t("Refresh")}</p>,
     },
     {
@@ -410,9 +409,9 @@ export function TableEditorStructure({
   // ========== 表格处理 ==========
 
   /**
-   * 给每一行套上一个菜单
-   * @param index 行的索引
-   * @param node 行的节点
+   * 给每一行套上一个菜单 | Wrap each line with a right-click context menu
+   * @param index 行的索引 | Index of row
+   * @param node 行的节点 | Node of row
    * @returns
    */
   function renderRowContextMenu(index: number, node: React.ReactNode) {
@@ -469,6 +468,7 @@ export function TableEditorStructure({
               </div>
             ),
           },
+          // 注意显示的是非空, 不是 isNullable 本身, 要取反
           isNotNull: { value: !(row.isNullable === true), render: (val: any) => <div>{val ? "✅" : ""}</div> },
           defaultValue: { value: row.defaultValue, render: (val: any) => <div>{val}</div> },
           isPrimaryKey: { value: row.isPrimaryKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
@@ -488,7 +488,7 @@ export function TableEditorStructure({
   useEffect(() => {
     updateDataArr();
 
-    // 监听 store 的变化
+    // 监听 store 的变化 | Monitor changes in the store
     const unsubscribe = subscribeKey(appState, "currentTableName", (_value: any) => {
       updateDataArr();
     });
@@ -497,7 +497,6 @@ export function TableEditorStructure({
 
   return (
     <div>
-      {/* 按钮栏 */}
       <div className="flex pb-2">
         <div className={cn("gap-4 px-2 pb-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
           <TooltipGroup dataArr={tooltipSectionData} />
@@ -514,7 +513,6 @@ export function TableEditorStructure({
         </div>
       </div>
 
-      {/* 主体表格 */}
       <div className="flex-1 overflow-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})` }}>
         <EditableTable
           ref={tableRef}
@@ -536,7 +534,7 @@ export function TableEditorStructure({
       <Dialog open={showDialogEdit} onOpenChange={setShowDialogEdit}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{dialogAction === STR_ADD ? t("Add") : t("Edit")}t("Field")</DialogTitle>
+            <DialogTitle>{dialogAction === STR_ADD ? t("Add field") : t("Edit field")}</DialogTitle>
           </DialogHeader>
 
           <LabeledDiv direction={DIR_H} labelWidth="6rem" label={t("Field name")}>
@@ -620,21 +618,8 @@ export function TableEditorStructure({
             <Input value={comment} onInput={(e) => setComment(e.currentTarget.value)} />
           </LabeledDiv>
 
-          {errorMessage && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>{t("Error message")}</AlertTitle>
-              <AlertDescription>{errorMessage}</AlertDescription>
-            </Alert>
-          )}
-
-          {okMessage && (
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>{t("Tips")}</AlertTitle>
-              <AlertDescription>{okMessage}</AlertDescription>
-            </Alert>
-          )}
+          {errorMessage && <TextNotification type="error" message={errorMessage}></TextNotification>}
+          {okMessage && <TextNotification type="success" message={okMessage}></TextNotification>}
 
           <DialogFooter>
             <Button type="submit" onClick={onSubmit}>
@@ -644,12 +629,17 @@ export function TableEditorStructure({
         </DialogContent>
       </Dialog>
 
-      {/* 确认要执行的变更语句 */}
       <ConfirmDialog
         open={showDialogAlter}
         title={t("Are you sure you want to save the changes?")}
         description={t("&confirmStatement")}
-        content={<SqlCodeViewer ddl={willExecCmd} />}
+        content={
+          <>
+            <SqlCodeViewer ddl={willExecCmd} />
+            {errorMessage && <TextNotification type="error" message={errorMessage}></TextNotification>}
+            {okMessage && <TextNotification type="success" message={okMessage}></TextNotification>}
+          </>
+        }
         cancelText={t("Cancel")}
         cancelCb={() => {
           setShowDialogAlter(false);

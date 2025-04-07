@@ -10,10 +10,10 @@ import { appState } from "@/store/valtio";
 import { Card, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { TableEditorConstraint } from "./TableConstraint";
-import { TableEditorData } from "./TableData";
-import { TableEditorDdl } from "./TableDdl";
-import { TableEditorStructure } from "./TableStructure";
+import { TableConstraint } from "./TableConstraint";
+import { TableData } from "./TableData";
+import { TableDdl } from "./TableDdl";
+import { TableStructure } from "./TableStructure";
 
 export function TableEditor() {
   const { t } = useTranslation();
@@ -85,7 +85,7 @@ export function TableEditor() {
   useEffect(() => {
     getData();
 
-    // 监听 store 的变化
+    // 监听 store 的变化 | Monitor changes in the store
     const unsubscribe = subscribeKey(appState, "currentTableName", async (_value: any) => {
       setEditingTableName(_value);
       await getData();
@@ -167,7 +167,7 @@ export function TableEditor() {
       <TabsContent value={TAB_STRUCTURE}>
         <Card className="p-4">
           <CardContent className="p-0">
-            <TableEditorStructure
+            <TableStructure
               getData={getData}
               changeTable={changeTable}
               alterData={alterData}
@@ -181,21 +181,21 @@ export function TableEditor() {
       <TabsContent value={TAB_DDL}>
         <Card className="p-4">
           <CardContent className="p-0">
-            <TableEditorDdl />
+            <TableDdl />
           </CardContent>
         </Card>
       </TabsContent>
       <TabsContent value={TAB_CONSTRAINT}>
         <Card className="p-4">
           <CardContent className="p-0">
-            <TableEditorConstraint />
+            <TableConstraint />
           </CardContent>
         </Card>
       </TabsContent>
       <TabsContent value={TAB_DATA}>
         <Card className="p-4">
           <CardContent className="p-0">
-            <TableEditorData />
+            <TableData />
           </CardContent>
         </Card>
       </TabsContent>

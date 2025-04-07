@@ -99,6 +99,7 @@ In event handling, useEffect, and other logic, the original state object appStat
 ### v0.4 mysql
 
 - 使用中完善, 其他功能有时间再做
+- 优化对话框中的自增
 - 字段添加 COLLATE
 - 字段添加 CHECK 约束
 - 支持 mysql

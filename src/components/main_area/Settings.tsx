@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertCircle, Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { DIR_H, MAIN_PASSWORD_MIN_LEN } from "@/constants";
 import { getTableDdl } from "@/databases/adapter,";
 import { HANS, HANT } from "@/i18n";
@@ -8,8 +8,8 @@ import { invoker } from "@/invoker";
 import { appState } from "@/store/valtio";
 import { ConfigFileMain } from "@/types/conf_file";
 import { LabeledDiv } from "../LabeledDiv";
+import { TextNotification } from "../TextNotification";
 import { useTheme } from "../ThemeProvider";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
@@ -21,8 +21,8 @@ export function Settings() {
   const [colorScheme, setColorScheme] = useState<string>("");
   const [lang, setLang] = useState<string>("");
   const [timeFormat, setTimeFormat] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>(""); // 错误消息
-  const [okMessage, setOkMessage] = useState<string>(""); // 成功消息
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [okMessage, setOkMessage] = useState<string>("");
 
   async function onInputMainPassword(event: React.ChangeEvent<HTMLInputElement>) {
     setMainPassword(event.target.value || "");
@@ -39,14 +39,12 @@ export function Settings() {
   }
 
   async function onSubmit() {
-    // 检查密码
     if (mainPassword.length > 0 && mainPassword.length < MAIN_PASSWORD_MIN_LEN) {
       setErrorMessage(t("&minimumLengthOfMasterPassword", { len: MAIN_PASSWORD_MIN_LEN }));
       return;
     }
 
     if (mainPassword !== "") {
-      // 设置主密码了的, 先设置 sha256, 后 执行 setConfig
       const sha256 = await invoker.sha256(mainPassword);
       appState.setMainPasswordSha(sha256);
     }
@@ -172,21 +170,8 @@ export function Settings() {
             </Button>
           </LabeledDiv>
 
-          {errorMessage && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>{t("Error message")}</AlertTitle>
-              <AlertDescription>{errorMessage}</AlertDescription>
-            </Alert>
-          )}
-
-          {okMessage && (
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>{t("Tips")}</AlertTitle>
-              <AlertDescription>{okMessage}</AlertDescription>
-            </Alert>
-          )}
+          {errorMessage && <TextNotification type="error" message={errorMessage}></TextNotification>}
+          {okMessage && <TextNotification type="success" message={okMessage}></TextNotification>}
         </CardContent>
         <CardFooter className="flex justify-between">
           {/* <Button variant="outline">{t("Cancel")}</Button> */}

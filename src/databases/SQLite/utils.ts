@@ -146,7 +146,7 @@ function parseColumnDefinition(colDef: string): FieldDefinitionSqlite {
 
   // 提取列名（第一个有效token）
   if (typeParts.length > 0) {
-    column.name = typeParts[cursor++];
+    column.name = typeParts[cursor++].replaceAll(`"`, ``).replaceAll(`'`, ``).replaceAll("`", ""); // 删除匹配到的引号
   } else {
     console.warn(`无法解析列定义: ${colDef}`);
     return column; // 返回默认空列
@@ -346,14 +346,14 @@ export function genCreateTableDdl(table: TableStructure): string {
   const parts: string[] = [];
 
   // 基础建表语句
-  parts.push(`CREATE ${table.isTemporary ? "TEMPORARY" : ""} TABLE "${quoteIdentifier(table.tableName)}" (`);
+  parts.push(`CREATE ${table.isTemporary ? "TEMPORARY" : ""} TABLE "${table.tableName}" (`);
 
   // 处理列定义
   const columnDefinitions = table.columns.map((col) => {
     const tokens: string[] = [];
 
     // 列名和类型
-    tokens.push(`"${quoteIdentifier(col.name)}" ${col.type}`);
+    tokens.push(`"${col.name}" ${col.type}`);
 
     // 主键 (列级)
     if (col.isPrimaryKey) {

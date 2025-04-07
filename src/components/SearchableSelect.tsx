@@ -9,14 +9,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// 定义选项的类型
 export interface SelectOption {
   value: string;
   label: string;
-  group?: string; // 用于分组的可选字段
+  group?: string; // 分组名 | group name
 }
 
-// 定义组件的 props 类型
 interface SearchableSelectProps {
   value: string;
   optionsData: SelectOption[];
@@ -26,7 +24,7 @@ interface SearchableSelectProps {
 export function SearchableSelect({ value, optionsData, onChange }: SearchableSelectProps) {
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  // 根据搜索查询过滤选项，同时保留分组信息
+  // 根据搜索查询过滤选项 | Filter options based on search queries
   const filteredOptionsMap = optionsData.reduce(
     (map, option) => {
       if (option.label.toLowerCase().includes(searchQuery.toLowerCase())) {

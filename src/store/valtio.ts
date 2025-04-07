@@ -8,7 +8,7 @@ import {
 import { FieldStructure } from "@/databases/types";
 import { invoker } from "@/invoker";
 import { ConfigFileMain } from "@/types/conf_file";
-import { DbType, ListBarType, MainContenType, MainContentTab } from "@/types/types";
+import { DbType, ListBarType, MainAreaType, MainAreaTab } from "@/types/types";
 import { saveConfigFile } from "@/utils/config_file";
 
 interface AppState {
@@ -77,11 +77,11 @@ interface AppState {
   setListBarType: (val: ListBarType) => void;
 
   // 主要区域的类型
-  mainContenType: MainContenType;
-  setMainContenType: (val: MainContenType) => void;
+  mainContenType: MainAreaType;
+  setMainContenType: (val: MainAreaType) => void;
   // 主要区域的标签页
-  mainContenTab: MainContentTab;
-  setMainContenTab: (val: MainContentTab) => void;
+  mainContenTab: MainAreaTab;
+  setMainContenTab: (val: MainAreaTab) => void;
 
   // 编辑器里的内容
   sqlEditorContent: string;
@@ -161,9 +161,9 @@ export const appState = proxy<AppState>({
   setListBarType: (val: ListBarType) => (appState.listBarType = val),
 
   mainContenType: MAIN_AREA_WELCOME,
-  setMainContenType: (val: MainContenType) => (appState.mainContenType = val),
+  setMainContenType: (val: MainAreaType) => (appState.mainContenType = val),
   mainContenTab: "",
-  setMainContenTab: (val: MainContentTab) => (appState.mainContenTab = val),
+  setMainContenTab: (val: MainAreaTab) => (appState.mainContenTab = val),
 
   sqlEditorContent: "",
   setSqlEditorContent: (val: string) => (appState.sqlEditorContent = val),

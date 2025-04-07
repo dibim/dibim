@@ -14,7 +14,7 @@ hljs.registerLanguage("postgresql", pgsql);
 export function SqlCodeViewer({ ddl }: { ddl: string }) {
   const snap = useSnapshot(appState);
   const codeRef = useRef<HTMLElement>(null);
-  const [sql, setSql] = useState<string>(""); // 美化后的 sql
+  const [sql, setSql] = useState<string>("");
 
   // TODO: add support for SQLite, MySQ, Oracle
   function getLang() {

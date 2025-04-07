@@ -6,7 +6,7 @@ import { getDefultOrderField } from "@/databases/utils";
 import { appState } from "@/store/valtio";
 import { TableSection, TableSectionMethods } from "../TableSection";
 
-export function TableEditorData() {
+export function TableData() {
   const snap = useSnapshot(appState);
   const tableRef = useRef<TableSectionMethods | null>(null);
 

@@ -15,7 +15,7 @@ import { SqlEditor } from "./SqlEditor";
 import { TableEditor } from "./TableEditor";
 import { Welcome } from "./Welcome";
 
-export function MainContent() {
+export function MainArea() {
   const snap = useSnapshot(appState);
 
   return (

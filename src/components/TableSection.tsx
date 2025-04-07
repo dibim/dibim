@@ -29,20 +29,20 @@ export type TableSectionMethods = {
   updateDataArr: (val: RowData[]) => void;
 };
 
-export type TableSectionProp = {
+export type TableSectionProps = {
   width: string;
   getData: (val: number) => Promise<any>;
   initData: () => void;
   ref?: React.Ref<TableSectionMethods>;
 };
 
-export function TableSection({ width, getData, initData, ref }: TableSectionProp) {
+export function TableSection({ width, getData, initData, ref }: TableSectionProps) {
   const { t } = useTranslation();
   const tableRef = useRef<EditableTableMethods | null>(null);
 
-  const [tableData, setTableData] = useState<RowData[]>([]); // 表格数据
-  const [fieldNames, setFieldNames] = useState<string[]>([]); // 字段名
-  const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
+  const [tableData, setTableData] = useState<RowData[]>([]);
+  const [fieldNames, setFieldNames] = useState<string[]>([]);
+  const [willExecCmd, setWillExecCmd] = useState<string>("");
   const [showDialogAlter, setShowDialogAlter] = useState<boolean>(false);
 
   const [dataArr, setDataArr] = useState<ListRow[]>([]);
@@ -51,10 +51,12 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
   }
 
   // ========== 分页 ==========
-  const [currentPage, setCurrentPage] = useState<number>(1); // 当前页码
-  const [pageTotal, setPageTotal] = useState<number>(0); // 页数
-  const [itemsTotal, setItemsTotal] = useState<number>(0); // 数据总条数
-  const [changes, setChanges] = useState<TableDataChange[]>([]); // 所有的变化
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageTotal, setPageTotal] = useState<number>(0);
+  const [itemsTotal, setItemsTotal] = useState<number>(0);
+  // 修改已有数据的变更记录, 不含添加和删除
+  // Change logs for modifying existing data, excluding additions and deletions.
+  const [changes, setChanges] = useState<TableDataChange[]>([]);
   function onChange(val: TableDataChange[]) {
     setChanges(val);
   }
@@ -76,7 +78,7 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
     setChanges([]);
 
     tableRef.current?.willRanderTable();
-    tableRef.current?.resettData();
+    tableRef.current?.resetData();
   }
 
   function handleAdd() {
@@ -150,7 +152,7 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
   useEffect(() => {
     initData();
 
-    // 监听 store 的变化
+    // 监听 store 的变化 | Monitor changes in the store
     const unsubscribe = subscribeKey(appState, "currentTableName", (_value: any) => {
       initData();
     });

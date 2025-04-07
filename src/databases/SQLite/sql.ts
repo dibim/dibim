@@ -265,7 +265,7 @@ export async function getTableStructureSqlite(connName: string, tbName: string) 
     type: column.type,
     hasCheckConditions: column.checkConstraint,
     isForeignKey: column.fkColumn > 0,
-    isNullable: column.isNotNull > 0,
+    isNullable: column.isNotNull == 0,
     isPrimaryKey: column.isPrimaryKey === 1,
     isUniqueKey: column.isUnique === 1,
     size: `${column.typeSize}`,
@@ -291,8 +291,6 @@ export async function getTableDdlSqlite(connName: string, tbName: string) {
     const data = JSON.parse(dbRes.data) as { sql: string }[];
     res = data[0].sql;
   }
-
-  console.log("ddl  res::: ", res);
 
   return {
     columnName: [],

@@ -10,30 +10,31 @@ import { Input } from "@/components/ui/input";
 import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE, DIR_H, STR_ADD, STR_EDIT } from "@/constants";
 import { appState } from "@/store/valtio";
 import { DbType, SvgComponentType } from "@/types/types";
+import { generateHexString } from "@/utils/util";
 import { TextNotification } from "../TextNotification";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
-type ConnectionProp = {
+type ConnectionProps = {
   action: typeof STR_ADD | typeof STR_EDIT;
 };
 
-export function Connection(props: ConnectionProp) {
+export function Connection(props: ConnectionProps) {
   const { t } = useTranslation();
   const snap = useSnapshot(appState);
-  const [name, setName] = useState<string>(""); // 连接名称
-  const [dbType, setDbType] = useState<DbType>(DB_POSTGRESQL); // 默认类型是 PostgreSQL
+  const [name, setName] = useState<string>(""); // 连接名称 | Name of the connection
+  const [dbType, setDbType] = useState<DbType>(DB_POSTGRESQL);
   const [host, setHost] = useState<string>("");
-  const [port, setPort] = useState<number>(5432); // 默认类型是 PostgreSQL
+  const [port, setPort] = useState<number>(5432);
   const [user, setUser] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [dbName, setDbName] = useState<string>("");
-  const [filePath, setFilePath] = useState<string>(""); // 文件路径, 用于 sqite
+  const [filePath, setFilePath] = useState<string>("");
   const [color, setColor] = useState<string>("#33d17a");
 
-  const [errorMessage, setErrorMessage] = useState<string>(""); // 错误消息
-  const [okMessage, setOkMessage] = useState<string>(""); // 成功消息
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [okMessage, setOkMessage] = useState<string>("");
 
   function onInputName(event: React.ChangeEvent<HTMLInputElement>) {
     setName(event.target.value || "");
@@ -89,7 +90,7 @@ export function Connection(props: ConnectionProp) {
 
     if (dbType === DB_SQLITE) {
       if (filePath === "") {
-        setErrorMessage("请输入文件路径");
+        setErrorMessage(t("&Please enter", { name: t("File path").toLowerCase() }));
         return;
       }
     }
@@ -132,7 +133,7 @@ export function Connection(props: ConnectionProp) {
     setDbType(dbType);
   }
 
-  // TODO: sqlite 的文件拾取使用 rust 的 rfd, 先不管 hos
+  // TODO: sqlite 的文件拾取使用 rust 的 rfd, 先不管 HMOS
 
   function renderDbType(type: DbType, LogoComponent: SvgComponentType) {
     return (
@@ -153,7 +154,13 @@ export function Connection(props: ConnectionProp) {
   }
 
   function setEditingData() {
-    // 编辑连接的要获取数据
+    // 如果是添加连接, 随机生成颜色 | If adding connections, randomly generate colors
+    if (props.action === STR_ADD) {
+      const color = `#${generateHexString(6)}`;
+      setColor(color);
+    }
+
+    // 编辑连接的要获取数据 | Load data when editing connection
     if (props.action === STR_EDIT) {
       const conn = appState.config.dbConnections[appState.editDbConnIndex];
       setColor(conn.color);
