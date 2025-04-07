@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE, DIR_H, STR_ADD, STR_EDIT } from "@/constants";
 import { appState } from "@/store/valtio";
 import { DbType, SvgComponentType } from "@/types/types";
+import { generateHexString } from "@/utils/util";
 import { TextNotification } from "../TextNotification";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
@@ -146,6 +147,12 @@ export function Connection(props: ConnectionProp) {
   }
 
   function setEditingData() {
+    // 如果是添加连接, 随机生成颜色
+    if (props.action === STR_ADD) {
+      const color = `#${generateHexString(6)}`;
+      setColor(color);
+    }
+
     // 编辑连接的要获取数据
     if (props.action === STR_EDIT) {
       const conn = appState.config.dbConnections[appState.editDbConnIndex];
