@@ -1,4 +1,4 @@
-import { reOneWord, reTwoWords } from "@/constants";
+import { RE_ONE_WORD, RE_TWO_WORDS } from "@/constants";
 import { formatToSqlValueSqlite } from "./format";
 import { FieldDefinitionSqlite, SqlTableConstraintCommonSqlite } from "./types";
 
@@ -104,11 +104,11 @@ export function parseCreateTableDdl(sql: string): TableStructure {
         let firstWord = "";
         let secondWord = "";
 
-        if (reOneWord.test(c)) {
+        if (RE_ONE_WORD.test(c)) {
           firstWord = c.trim();
         }
 
-        const match = c.match(reTwoWords);
+        const match = c.match(RE_TWO_WORDS);
         if (match) {
           firstWord = match[1];
           if (match[2]) secondWord = match[2];

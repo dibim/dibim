@@ -1,14 +1,14 @@
 /**
  * 修改字段的功能
  */
-import { STR_ADD, STR_DELETE, STR_EDIT, STR_FIELD, STR_TABLE, reNumStr } from "@/constants";
+import { RE_NUM_STR, STR_ADD, STR_DELETE, STR_EDIT, STR_FIELD, STR_TABLE } from "@/constants";
 import { AllAlterAction, FieldAlterAction, TableAlterAction } from "../types";
 import { formatToSqlValuePg } from "./format";
 
 function genSizeStr(faa: FieldAlterAction) {
   if (faa.size === "") return "";
 
-  if (reNumStr.test(faa.size)) {
+  if (RE_NUM_STR.test(faa.size)) {
     const size = parseInt(faa.size) | 0;
     return size && size > 0 ? `(${size})` : "";
   }
@@ -24,7 +24,7 @@ function genFieldDefault(faa: FieldAlterAction) {
 
   // TODO: 支持以下类型:
   // 多维数组: 使用 ARRAY[[1,2],[3,4]]
-  let defalutValue = reNumStr.test(faa.defaultValue)
+  let defalutValue = RE_NUM_STR.test(faa.defaultValue)
     ? `${faa.defaultValue}`
     : formatToSqlValuePg(faa.defaultValue, true);
   return faa.defaultValue ? `DEFAULT ${defalutValue}` : "";

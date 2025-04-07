@@ -14,7 +14,3 @@ export const SSL_MODE_PREFER = "prefer";
 export const SSL_MODE_REQUIRE = "require";
 export const SSL_MODE_VERIFY_CA = "verify-ca";
 export const SSL_MODE_VERIFY_FULL = "verify-full";
-
-// 索引类型
-export const INDEX_PRIMARY_KEY = "PRIMARY KEY"; // 主键
-export const INDEX_UNIQUE = "UNIQUE"; // 唯一索引

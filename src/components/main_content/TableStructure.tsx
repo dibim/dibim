@@ -575,9 +575,9 @@ export function TableEditorStructure({
                   checked={isPrimaryKey}
                   onClick={() => setIsPrimaryKey(!isPrimaryKey)}
                   className="me-4"
-                  id="INDEX_PRIMARY_KEY"
+                  id="indexPrimaryKey"
                 />
-                <label htmlFor="INDEX_PRIMARY_KEY" className="text-sm font-medium">
+                <label htmlFor="indexPrimaryKey" className="text-sm font-medium">
                   {t("Primary key")}
                 </label>
               </div>
@@ -600,9 +600,9 @@ export function TableEditorStructure({
                   checked={isUniqueKey}
                   onClick={() => setIsUniqueKey(isUniqueKey)}
                   className="me-4"
-                  id="INDEX_UNIQUE"
+                  id="indexUniqueKey"
                 />
-                <label htmlFor="INDEX_UNIQUE" className="text-sm font-medium">
+                <label htmlFor="indexUniqueKey" className="text-sm font-medium">
                   {t("Unique key")}
                 </label>
               </div>
