@@ -93,3 +93,16 @@ export function genPanelPercent(percent: number) {
   const pageW = getPageWidth();
   return (pageW * percent - GUTTER_SIZE) / pageW;
 }
+
+// 随机生成16禁止字符串
+export function generateHexString(length: number = 16): string {
+  const characters = "0123456789abcdef";
+  let result = "";
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters[randomIndex];
+  }
+
+  return result;
+}
