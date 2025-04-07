@@ -7,11 +7,18 @@ export type DbConnections = DbConnectionParam & {
   color: string;
 };
 
-export type ConfigFile = {
+// 主配置文件
+export type ConfigFileMain = {
   dbConnections: DbConnections[];
   settings: {
     lang: string;
-    theme: string;
+    colorScheme: string;
     timeFormat: string;
   };
+};
+
+// 外观配置文件
+export type ConfigFileAppearance = {
+  lang: string;
+  colorScheme: string;
 };

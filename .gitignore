@@ -23,5 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# temp
+# dev
 src-tauri/dibim_config.bin
+src-tauri/dibim_appearance.json

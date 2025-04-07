@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AlertCircle, CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { subscribeKey } from "valtio/utils";
@@ -40,6 +41,7 @@ export function TableEditorStructure({
   editingTableComment,
   setEditingTableComment,
 }: MainContentStructureProp) {
+  const { t } = useTranslation();
   const tableRef = useRef<EditableTableMethods | null>(null);
 
   // ========== 对话框 ==========
@@ -267,7 +269,7 @@ export function TableEditorStructure({
   // 点击应用按钮, 弹出确认框, 确认之后才执行
   function handleApply() {
     if (alterData.length === 0) {
-      toast("请先选中要操作的字段");
+      toast(t("&selectFieldFirst"));
       return;
     }
 
@@ -342,9 +344,9 @@ export function TableEditorStructure({
     const field = appState.currentTableStructure[index];
     try {
       await navigator.clipboard.writeText(field.name);
-      toast("复制成功");
+      toast(t("Copied"));
     } catch (err) {
-      toast("复制失败");
+      toast(t("Copy failed"));
     }
   }
 
@@ -353,9 +355,9 @@ export function TableEditorStructure({
     const field = appState.currentTableStructure[index];
     try {
       await navigator.clipboard.writeText(field.type);
-      toast("复制成功");
+      toast(t("Copied"));
     } catch (err) {
-      toast("复制失败");
+      toast(t("Copy failed"));
     }
   }
 
@@ -383,23 +385,23 @@ export function TableEditorStructure({
   const tooltipSectionData = [
     {
       trigger: <RotateCw color="var(--fvm-info-clr)" onClick={() => getData()} />,
-      content: <p>刷新</p>,
+      content: <p>{t("Refresh")}</p>,
     },
     {
       trigger: <CirclePlus color="var(--fvm-primary-clr)" onClick={handleAddField} />,
-      content: <p>添加字段</p>,
+      content: <p>{t("Add field")}</p>,
     },
     {
       trigger: <CircleMinus color="var(--fvm-danger-clr)" onClick={handleDelSelectedField} />,
-      content: <p>删除字段</p>,
+      content: <p>{t("Delete field")}</p>,
     },
     {
       trigger: <CircleCheck color="var(--fvm-success-clr)" onClick={handleApply} />,
-      content: <p>应用</p>,
+      content: <p>{t("Apply")}</p>,
     },
     {
       trigger: <CircleX color="var(--fvm-warning-clr)" onClick={handleCancel} />,
-      content: <p>取消</p>,
+      content: <p>{t("Refresh")}</p>,
     },
   ];
 
@@ -418,12 +420,12 @@ export function TableEditorStructure({
       <ContextMenu key={index}>
         <ContextMenuTrigger asChild>{node}</ContextMenuTrigger>
         <ContextMenuContent>
-          <ContextMenuItem onClick={() => handleEditFieldPopup(index)}>编辑</ContextMenuItem>
-          <ContextMenuItem onClick={() => handleCopyFieldName(index)}>复制字段名</ContextMenuItem>
-          <ContextMenuItem onClick={() => handleCopyFieldType(index)}>复制类型</ContextMenuItem>
+          <ContextMenuItem onClick={() => handleEditFieldPopup(index)}>{t("Edit")}</ContextMenuItem>
+          <ContextMenuItem onClick={() => handleCopyFieldName(index)}>{t("Copy field name")}</ContextMenuItem>
+          <ContextMenuItem onClick={() => handleCopyFieldType(index)}>{t("Copy type")}</ContextMenuItem>
           <hr className="my-2" />
           <ContextMenuItem onClick={() => handleDeleteField(index)} className={`text-[var(--fvm-danger-clr)]`}>
-            删除
+            {t("Delete")}
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
@@ -441,7 +443,17 @@ export function TableEditorStructure({
     "hasCheckConditions",
     "comment",
   ];
-  const fieldNameTitle = ["字段名", "类型", "非空", "默认值", "主键", "外键", "唯一", "条件", "备注"];
+  const fieldNameTitle = [
+    t("Field name"),
+    t("Type"),
+    t("Not null"),
+    t("Default value"),
+    t("Primary key"),
+    t("Foreign key"),
+    t("Unique key"),
+    t("Check condition"),
+    t("Comment"),
+  ];
   const [dataArr, setDataArr] = useState<ListRow[]>([]);
 
   function updateDataArr() {
@@ -493,7 +505,7 @@ export function TableEditorStructure({
         <div className="flex-1">
           <Input
             defaultValue={editingTableComment}
-            placeholder={"请输入表注释"}
+            placeholder={t("Please enter table comments")}
             onChange={changeTable}
             onInput={(e) => {
               setEditingTableComment(e.currentTarget.value);
@@ -524,24 +536,24 @@ export function TableEditorStructure({
       <Dialog open={showDialogEdit} onOpenChange={setShowDialogEdit}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{dialogAction === STR_ADD ? "添加" : "编辑"}字段</DialogTitle>
+            <DialogTitle>{dialogAction === STR_ADD ? t("Add") : t("Edit")}t("Field")</DialogTitle>
           </DialogHeader>
 
-          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"字段名"}>
+          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={t("Field name")}>
             <Input value={name} onInput={(e) => setName(e.currentTarget.value)} />
           </LabeledDiv>
 
-          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"类型"}>
+          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={t("Type")}>
             <Input value={type} onInput={(e) => setType(e.currentTarget.value)} />
             <div className="py-1"></div>
             <SearchableSelect value={type} optionsData={fieldTypeOptions()} onChange={setType} />
           </LabeledDiv>
 
-          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"大小"}>
+          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={t("Size")}>
             <Input value={size} onInput={(e) => setSize(e.currentTarget.value)} />
           </LabeledDiv>
 
-          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"默认值"}>
+          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={t("Default value")}>
             <Input value={defalutValue} onInput={(e) => setDefaultValue(e.currentTarget.value)} />
             <div className="flex items-center pt-2">
               <Checkbox
@@ -551,12 +563,12 @@ export function TableEditorStructure({
                 id="fieldNotNull"
               />
               <label htmlFor="fieldNotNull" className="text-sm font-medium">
-                非空
+                {t("Not null")}
               </label>
             </div>
           </LabeledDiv>
 
-          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"索引"}>
+          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={t("Index")}>
             <div className="flex gap-4">
               <div className="flex items-center">
                 <Checkbox
@@ -566,7 +578,7 @@ export function TableEditorStructure({
                   id="INDEX_PRIMARY_KEY"
                 />
                 <label htmlFor="INDEX_PRIMARY_KEY" className="text-sm font-medium">
-                  主键
+                  {t("Primary key")}
                 </label>
               </div>
 
@@ -579,7 +591,7 @@ export function TableEditorStructure({
                   disabled={!isPrimaryKey}
                 />
                 <label htmlFor="fieldIndexAutoIncrement" className="text-sm font-medium">
-                  主键自增
+                  {t("Auto increment")}
                 </label>
               </div>
 
@@ -591,7 +603,7 @@ export function TableEditorStructure({
                   id="INDEX_UNIQUE"
                 />
                 <label htmlFor="INDEX_UNIQUE" className="text-sm font-medium">
-                  唯一
+                  {t("Unique key")}
                 </label>
               </div>
             </div>
@@ -599,19 +611,19 @@ export function TableEditorStructure({
               <Input
                 value={indexName}
                 onInput={(e) => setIndexName(e.currentTarget.value)}
-                placeholder="索引名"
+                placeholder={t("Index name")}
                 disabled={!(isPrimaryKey || isUniqueKey)}
               />
             </div>
           </LabeledDiv>
-          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={"备注"}>
+          <LabeledDiv direction={DIR_H} labelWidth="6rem" label={t("Comment")}>
             <Input value={comment} onInput={(e) => setComment(e.currentTarget.value)} />
           </LabeledDiv>
 
           {errorMessage && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>错误提示</AlertTitle>
+              <AlertTitle>{t("Error message")}</AlertTitle>
               <AlertDescription>{errorMessage}</AlertDescription>
             </Alert>
           )}
@@ -619,14 +631,14 @@ export function TableEditorStructure({
           {okMessage && (
             <Alert>
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>提示</AlertTitle>
+              <AlertTitle>{t("Tips")}</AlertTitle>
               <AlertDescription>{okMessage}</AlertDescription>
             </Alert>
           )}
 
           <DialogFooter>
             <Button type="submit" onClick={onSubmit}>
-              保存
+              {t("Save")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -635,14 +647,14 @@ export function TableEditorStructure({
       {/* 确认要执行的变更语句 */}
       <ConfirmDialog
         open={showDialogAlter}
-        title={`确认要保存变更吗?`}
-        description={`请确认将要执行的语句:`}
+        title={t("Are you sure you want to save the changes?")}
+        description={t("&confirmStatement")}
         content={<SqlCodeViewer ddl={willExecCmd} />}
-        cancelText={"取消"}
+        cancelText={t("Cancel")}
         cancelCb={() => {
           setShowDialogAlter(false);
         }}
-        okText={"确定"}
+        okText={t("Confirm")}
         okCb={handleConfirm}
       />
     </div>

@@ -37,6 +37,6 @@ export default defineConfig(async () => ({
     },
   },
   build: {
-    target: 'esnext' // 支持顶级 await
-  }
+    target: "esnext", // 支持顶级 await
+  },
 }));

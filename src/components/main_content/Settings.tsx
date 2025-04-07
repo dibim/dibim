@@ -1,19 +1,24 @@
 import { useEffect, useState } from "react";
-import { AlertCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { AlertCircle, Moon, Sun } from "lucide-react";
 import { DIR_H, MAIN_PASSWORD_MIN_LEN } from "@/constants";
 import { getTableDdl } from "@/databases/adapter,";
+import { HANS, HANT } from "@/i18n";
 import { invoker } from "@/invoker";
 import { appState } from "@/store/valtio";
-import { ConfigFile } from "@/types/conf_file";
+import { ConfigFileMain } from "@/types/conf_file";
 import { LabeledDiv } from "../LabeledDiv";
+import { useTheme } from "../ThemeProvider";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 
 export function Settings() {
+  const { t, i18n } = useTranslation();
+  const { setTheme } = useTheme();
   const [mainPassword, setMainPassword] = useState<string>("");
-  const [theme, setTheme] = useState<string>("");
+  const [colorScheme, setColorScheme] = useState<string>("");
   const [lang, setLang] = useState<string>("");
   const [timeFormat, setTimeFormat] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>(""); // 错误消息
@@ -23,33 +28,41 @@ export function Settings() {
     setMainPassword(event.target.value || "");
   }
 
-  function onInpuTheme(event: React.ChangeEvent<HTMLInputElement>) {
-    setTheme(event.target.value || "");
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    setLang(lng);
+  };
+
+  function changeTheme(theme: "dark" | "light") {
+    setColorScheme(theme);
+    setTheme(theme);
   }
 
   async function onSubmit() {
     // 检查密码
-    if (mainPassword.length < MAIN_PASSWORD_MIN_LEN) {
-      setErrorMessage(`主密码的长度不低于 ${MAIN_PASSWORD_MIN_LEN}`);
+    if (mainPassword.length > 0 && mainPassword.length < MAIN_PASSWORD_MIN_LEN) {
+      setErrorMessage(t("&minimumLengthOfMasterPassword", { len: MAIN_PASSWORD_MIN_LEN }));
       return;
     }
 
-    // 把数据写入配置文件, 先设置 sha256, 后 执行 setConfig
-    const sha256 = await invoker.sha256(mainPassword);
-    appState.setMainPasswordSha(sha256);
+    if (mainPassword !== "") {
+      // 设置主密码了的, 先设置 sha256, 后 执行 setConfig
+      const sha256 = await invoker.sha256(mainPassword);
+      appState.setMainPasswordSha(sha256);
+    }
 
     await appState.setConfig({
       ...appState.config,
       settings: {
         ...appState.config.settings,
         lang,
-        theme,
+        colorScheme,
         timeFormat,
       },
       dbConnections: [...appState.config.dbConnections],
-    } as ConfigFile);
+    } as ConfigFileMain);
 
-    setOkMessage("保存成功");
+    setOkMessage(t("Saved successfully"));
   }
 
   async function getData() {
@@ -67,7 +80,6 @@ export function Settings() {
     getData();
 
     // TODO: 这几行视为了编译不报错
-    setLang("");
     setTimeFormat("");
   }, []);
 
@@ -75,26 +87,79 @@ export function Settings() {
     <div className="flex items-center justify-center min-h-screen p-4">
       <Card className="w-200">
         <CardHeader>
-          <CardTitle>设置</CardTitle>
+          <CardTitle>{t("Settings")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <LabeledDiv direction={DIR_H} label={"主密码"} className="py-2">
+          <LabeledDiv direction={DIR_H} label={"🔑" + t("Master password")} className="py-2">
             <Input value={mainPassword} onInput={onInputMainPassword} />
 
             <div className="pt-2">
-              <CardDescription>为了您的数据安全, 强烈建议您设置一个健壮的主密码. </CardDescription>
-              <CardDescription>主密码将会用于使用 AES_GCM 算法加密您的所有配置文件.</CardDescription>
+              <CardDescription>{t("welcome.&p1")} </CardDescription>
+              <CardDescription>{t("welcome.&p2")}</CardDescription>
             </div>
           </LabeledDiv>
 
-          <LabeledDiv direction={DIR_H} label={"主题"} className="py-2">
-            <Input value={theme} onInput={onInpuTheme} />
+          <LabeledDiv direction={DIR_H} label={"🌐" + t("Language")} className="py-2">
+            <Button className="m-2" onClick={() => changeLanguage("ar")}>
+              العربية (Arabic)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("de")}>
+              Deutsch (German)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("en")}>
+              English
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("es")}>
+              Español (Spanish)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("fr")}>
+              Français (French)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("it")}>
+              Italian (Italiano)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("ja")}>
+              日本語 (Japanese)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("ko")}>
+              한국어 (Korean)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("nl")}>
+              Dutch (Nederlands)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("pl")}>
+              Polish (Polski)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("ru")}>
+              Русский (Russian)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("tr")}>
+              Turkish (Türkçe)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("uk")}>
+              Ukrainian (Українська)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage(HANS)}>
+              简体中文 (Simplified Chinese)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage(HANT)}>
+              繁體中文 (Traditional Chinese)
+            </Button>
+          </LabeledDiv>
+
+          <LabeledDiv direction={DIR_H} label={"🎨" + t("Theme")} className="py-2">
+            <Button className="m-2" onClick={() => changeTheme("light")}>
+              <Sun />
+            </Button>
+            <Button className="m-2" onClick={() => changeTheme("dark")}>
+              <Moon />
+            </Button>
           </LabeledDiv>
 
           {errorMessage && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>错误提示</AlertTitle>
+              <AlertTitle>{t("Error message")}</AlertTitle>
               <AlertDescription>{errorMessage}</AlertDescription>
             </Alert>
           )}
@@ -102,14 +167,14 @@ export function Settings() {
           {okMessage && (
             <Alert>
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>提示</AlertTitle>
+              <AlertTitle>{t("Tips")}</AlertTitle>
               <AlertDescription>{okMessage}</AlertDescription>
             </Alert>
           )}
         </CardContent>
         <CardFooter className="flex justify-between">
-          {/* <Button variant="outline">取消</Button> */}
-          <Button onClick={onSubmit}>确认</Button>
+          {/* <Button variant="outline">{t("Cancel")}</Button> */}
+          <Button onClick={onSubmit}>{t("Confirm")}</Button>
         </CardFooter>
       </Card>
     </div>

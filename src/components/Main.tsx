@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useTranslation } from "react-i18next";
 import Split from "react-split";
 import { PanelLeftDashed, PanelLeftIcon } from "lucide-react";
 import { useSnapshot } from "valtio";
@@ -23,6 +24,7 @@ import { Sidebar } from "./Sidebar";
 import { TooltipGroup } from "./TooltipGroup";
 
 export function Main({ id, className }: { id: string; className: string }) {
+  const { t } = useTranslation();
   const snap = useSnapshot(appState);
   const [mainWidth, setMainWidth] = useState("");
   const mainRef = useRef<HTMLDivElement | null>(null);
@@ -111,10 +113,10 @@ export function Main({ id, className }: { id: string; className: string }) {
       trigger: (
         <Button data-sidebar="trigger" variant="ghost" onClick={toggleSidebarOpen}>
           <PanelLeftIcon />
-          <span className="sr-only">切换侧边栏</span>
+          <span className="sr-only">{t("Toggle sidebar")}</span>
         </Button>
       ),
-      content: <p>切换侧边栏(F2)</p>,
+      content: <p>{t("Toggle sidebar")}(F2)</p>,
     },
     {
       trigger: (
@@ -125,10 +127,10 @@ export function Main({ id, className }: { id: string; className: string }) {
           }}
         >
           <PanelLeftDashed />
-          <span className="sr-only">切换列表栏</span>
+          <span className="sr-only">{t("toggle list bar")}</span>
         </Button>
       ),
-      content: <p>切换列表栏(F3)</p>,
+      content: <p>{t("toggle list bar")}(F3)</p>,
     },
     {
       trigger: (
@@ -136,10 +138,10 @@ export function Main({ id, className }: { id: string; className: string }) {
           className="cursor-pointer"
           style={{ borderBottom: `0.25rem solid ${snap.currentConnColor || "rgba(0,0,0,0)"}` }}
         >
-          {snap.currentDbNme || "无数据库连接"}
+          {snap.currentDbNme || t("No database connection")}
         </span>
       ),
-      content: <p>当前数据库连接</p>,
+      content: <p>{t("Current database connection")}</p>,
     },
   ];
 

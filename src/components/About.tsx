@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useSnapshot } from "valtio";
 import Logo from "@/assets/logo.svg?react";
 import { APP_NAME, APP_VERSION } from "@/constants";
@@ -13,13 +14,14 @@ import {
 } from "./ui/x_alert-dialog";
 
 export function About() {
+  const { t } = useTranslation();
   const snap = useSnapshot(appState);
 
   return (
     <AlertDialog open={snap.aboutOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>关于</AlertDialogTitle>
+          <AlertDialogTitle>{t("About")}</AlertDialogTitle>
           <AlertDialogDescription></AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -32,16 +34,16 @@ export function About() {
             </div>
           </div>
           <div className="pt-4">
-            本项目的官方仓库如下:
+            {t("&officialRepo")}
             <ul>
               <li>
                 <strong>GitHub</strong>: https://github.com/dibim/dibim
               </li>
               <li>
-                <strong>Gitee(中国)</strong>: https://gitee.com/dibim/dibim
+                <strong>Gitee({t("China")})</strong>: https://gitee.com/dibim/dibim
               </li>
               <li>
-                <strong>Codeberg(德国)</strong>: https://codeberg.org/dibim/dibim
+                <strong>Codeberg({t("Germany")})</strong>: https://codeberg.org/dibim/dibim
               </li>
             </ul>
           </div>
@@ -52,7 +54,7 @@ export function About() {
               appState.setAboutOpen(false);
             }}
           >
-            确定
+            {t("Confirm")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

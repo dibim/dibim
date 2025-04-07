@@ -1,16 +1,13 @@
 import { invoke } from "@tauri-apps/api/core";
 import { DbResult, ExecResult } from "./types/types";
 
-// AES-GCM 加密解密的结果
-// The result of AES-GCM encryption and decryption
+// AES-GCM 加密解密的结果 | The result of AES-GCM encryption and decryption
 export type AesRes = { result: string; errorMessage: string };
 
-// 读取文件的结果
-// The result of reading the file
+// 读取文件的结果 | The result of reading the file
 export type FileReadRes = { result: string; errorMessage: string };
 
-// 写入文件的结果
-// The result of writing to the file
+// 写入文件的结果 | The result of writing to the file
 export type FileWriteRes = { result: boolean; errorMessage: string };
 
 export const invoker = {
