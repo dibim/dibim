@@ -25,4 +25,4 @@ importOrder = [
 importOrderSortSpecifiers = true # 对导入的成员排序
 
 # 以下是和默认值不一样的配置
-printWidth = 120      # 每行最大字符数，超过会换行
+printWidth = 120 # 每行最大字符数，超过会换行

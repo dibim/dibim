@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import Split from "react-split";
 import { Grid3x3, NotebookText, Play, ShieldAlert } from "lucide-react";
 import * as Monaco from "monaco-editor";
@@ -41,6 +42,7 @@ const SQL_KEYWORDS = [
 ];
 
 export function SqlEditor() {
+  const { t } = useTranslation();
   const snap = useSnapshot(appState);
   const tableRef = useRef<TableSectionMethods | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -48,7 +50,7 @@ export function SqlEditor() {
   // ========== 执行语句 ==========
   async function queryPage(page: number) {
     if (appState.currentConnName === "") {
-      setErrorMessage("请先连接数据库");
+      setErrorMessage(t("Please connect to the database first"));
       return;
     }
 
@@ -100,7 +102,7 @@ export function SqlEditor() {
         const currentPage = tableRef.current ? tableRef.current.getCurrentPage() : 1;
         await queryPage(currentPage);
       } else {
-        console.log("不是单表查询");
+        console.log(t("Not a single-table query"));
       }
     } else {
       const res = await exec(code);
@@ -247,7 +249,7 @@ export function SqlEditor() {
   const [changes, setChanges] = useState<TableDataChange[]>([]); // 记录所有修改的变量
   function onChange(val: TableDataChange[]) {
     setChanges(val);
-    // TODO: 保存时生成语句
+    // FIXME: 保存时生成语句
   }
 
   async function getData(page: number) {
@@ -273,19 +275,19 @@ export function SqlEditor() {
   const tooltipSectionData = [
     {
       trigger: <Play className="mb-2" onClick={execCode} />,
-      content: <p>执行(F9)</p>,
+      content: <p>{t("Execute")}(F9)</p>,
     },
     {
       trigger: <NotebookText className="mb-2" onClick={formatCode} />,
-      content: <p>格式化(F8)</p>,
+      content: <p>{t("Format")}(F8)</p>,
     },
     {
       trigger: <Grid3x3 className="mb-2" onClick={() => setShowResultBar(!showResultBar)} />,
-      content: <p>显示结果集</p>,
+      content: <p>{t("Toggle result sets")}</p>,
     },
     {
       trigger: <ShieldAlert className="mb-2" onClick={() => setShowStatusBar(!showStatusBar)} />,
-      content: <p>显示状态栏</p>,
+      content: <p>{t("Toggle status bar")}</p>,
     },
   ];
 
