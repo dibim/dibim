@@ -1,4 +1,5 @@
 {
+  "&confirmStatement": "Please confirm the statement to be executed:",
   "&Go to page": "Go to page {{page}}",
   "&minimumLengthOfMasterPassword": "The master password must be at least {{len}} characters long.",
   "&notUniqueKeyTip": "Due to the lack of a primary key or unique index, this table cannot be edited to ensure that data is not mistakenly modified",
@@ -51,8 +52,7 @@
   "No DDL found": "No DDL found",
   "Not a single-table query": "Not a single-table query",
   "Not null": "Not Null",
-  "Partition": "Partition",
-  "Please confirm the statement to be executed:": "Please confirm the statement to be executed:",
+  "Partition": "Partition",  
   "Please connect to the database first": "Please connect to the database first",
   "Please enter table comments": "Please enter table comments",
   "Please enter the table name": "Please enter the table name",

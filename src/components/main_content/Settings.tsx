@@ -76,7 +76,6 @@ export function Settings() {
     getData();
 
     // TODO: 这几行视为了编译不报错
-    setLang("");
     setTimeFormat("");
   }, []);
 
@@ -87,7 +86,7 @@ export function Settings() {
           <CardTitle>{t("Settings")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <LabeledDiv direction={DIR_H} label={t("Master password")} className="py-2">
+          <LabeledDiv direction={DIR_H} label={"🔑" + t("Master password")} className="py-2">
             <Input value={mainPassword} onInput={onInputMainPassword} />
 
             <div className="pt-2">
@@ -96,16 +95,55 @@ export function Settings() {
             </div>
           </LabeledDiv>
 
-          <LabeledDiv direction={DIR_H} label={t("Language")} className="py-2">
-            <Button className="me-2" onClick={() => changeLanguage("en")}>
+          <LabeledDiv direction={DIR_H} label={"🌐" + t("Language")} className="py-2">
+            <Button className="m-2" onClick={() => changeLanguage("ar")}>
+              العربية (Arabic)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("de")}>
+              Deutsch (German)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("en")}>
               English
             </Button>
-            <Button className="me-2" onClick={() => changeLanguage("zh")}>
-              中文
+            <Button className="m-2" onClick={() => changeLanguage("es")}>
+              Español (Spanish)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("fr")}>
+              Français (French)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("it")}>
+              Italian (Italiano)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("ja")}>
+              日本語 (Japanese)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("ko")}>
+              한국어 (Korean)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("nl")}>
+              Dutch (Nederlands)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("pl")}>
+              Polish (Polski)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("ru")}>
+              Русский (Russian)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("tr")}>
+              Turkish (Türkçe)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("uk")}>
+              Ukrainian (Українська)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("zh_hans")}>
+              简体中文 (Simplified Chinese)
+            </Button>
+            <Button className="m-2" onClick={() => changeLanguage("zh_hant")}>
+              繁體中文 (Traditional Chinese)
             </Button>
           </LabeledDiv>
 
-          <LabeledDiv direction={DIR_H} label={t("Theme")} className="py-2">
+          <LabeledDiv direction={DIR_H} label={"🎨" + t("Theme")} className="py-2">
             <Input value={theme} onInput={onInpuTheme} />
           </LabeledDiv>
 
