@@ -6,16 +6,10 @@ import { PanelLeftDashed, PanelLeftIcon } from "lucide-react";
 import { useSnapshot } from "valtio";
 import { DatabaseList } from "@/components/list_bar/DatabaseList";
 import { TableList } from "@/components/list_bar/TableList";
-import { MainContent } from "@/components/main_content/MainContent";
+import { MainArea } from "@/components/main_area";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, useSidebar } from "@/components/ui/sidebar";
-import {
-  APP_NAME,
-  HEDAER_H,
-  LIST_BAR_DEFAULT_WIDTH,
-  LIST_BAR_DB,
-  LIST_BAR_TABLE,
-} from "@/constants";
+import { APP_NAME, HEDAER_H, LIST_BAR_DB, LIST_BAR_DEFAULT_WIDTH, LIST_BAR_TABLE } from "@/constants";
 import { appState } from "@/store/valtio";
 import { getPageWidth } from "@/utils/ media_query";
 import { genPanelPercent } from "@/utils/util";
@@ -111,6 +105,7 @@ export function Main({ id, className }: { id: string; className: string }) {
   const tooltipSectionData = [
     {
       trigger: (
+        // 复制 sidebar-trigger 过来, 这里添加了函数, 记录 sidebar 的状态
         <Button data-sidebar="trigger" variant="ghost" onClick={toggleSidebarOpen}>
           <PanelLeftIcon />
           <span className="sr-only">{t("Toggle sidebar")}</span>
@@ -154,7 +149,6 @@ export function Main({ id, className }: { id: string; className: string }) {
             <header className={`flex h-${HEDAER_H} shrink-0 items-center gap-2 border-b px-4`}>
               {!snap.sidebarOpen && <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>}
 
-              {/* 复制 sidebar-trigger 过来, 这里添加了函数, 记录 sidebar 的状态*/}
               <TooltipGroup dataArr={tooltipSectionData} />
             </header>
 
@@ -173,7 +167,7 @@ export function Main({ id, className }: { id: string; className: string }) {
               </div>
 
               <div ref={mainRef} className="p-2">
-                <MainContent />
+                <MainArea />
               </div>
             </Split>
 
