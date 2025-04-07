@@ -1,111 +1,111 @@
 import {
-  FIELD_TYPE_ARRAY,
-  FIELD_TYPE_BINARY,
-  FIELD_TYPE_BIT_STRING,
-  FIELD_TYPE_BOOLEAN,
-  FIELD_TYPE_CHARACTER,
-  FIELD_TYPE_DATETIME,
-  FIELD_TYPE_GEOMETRIC,
-  FIELD_TYPE_JSON,
-  FIELD_TYPE_NETWORK,
-  FIELD_TYPE_NUMERIC,
-  FIELD_TYPE_OTHER,
-  FIELD_TYPE_RANGE,
-  FIELD_TYPE_TEXT_SEARCH,
+  FIELD_ARRAY,
+  FIELD_BINARY,
+  FIELD_BIT_STRING,
+  FIELD_BOOLEAN,
+  FIELD_CHARACTER,
+  FIELD_DATETIME,
+  FIELD_GEOMETRIC,
+  FIELD_JSON,
+  FIELD_NETWORK,
+  FIELD_NUMERIC,
+  FIELD_OTHER,
+  FIELD_RANGE,
+  FIELD_TEXT_SEARCH,
 } from "@/constants";
 
 const typeCategoryMap: Record<string, string> = {
   // ================ 数值 | Numeric  ================
-  "double precision": FIELD_TYPE_NUMERIC,
-  bigint: FIELD_TYPE_NUMERIC,
-  bigserial: FIELD_TYPE_NUMERIC,
-  decimal: FIELD_TYPE_NUMERIC,
-  float4: FIELD_TYPE_NUMERIC,
-  float8: FIELD_TYPE_NUMERIC,
-  int2: FIELD_TYPE_NUMERIC,
-  int4: FIELD_TYPE_NUMERIC,
-  int8: FIELD_TYPE_NUMERIC,
-  int: FIELD_TYPE_NUMERIC,
-  integer: FIELD_TYPE_NUMERIC,
-  money: FIELD_TYPE_NUMERIC,
-  numeric: FIELD_TYPE_NUMERIC,
-  real: FIELD_TYPE_NUMERIC,
-  serial2: FIELD_TYPE_NUMERIC,
-  serial4: FIELD_TYPE_NUMERIC,
-  serial8: FIELD_TYPE_NUMERIC,
-  serial: FIELD_TYPE_NUMERIC,
-  smallint: FIELD_TYPE_NUMERIC,
-  smallserial: FIELD_TYPE_NUMERIC,
+  "double precision": FIELD_NUMERIC,
+  bigint: FIELD_NUMERIC,
+  bigserial: FIELD_NUMERIC,
+  decimal: FIELD_NUMERIC,
+  float4: FIELD_NUMERIC,
+  float8: FIELD_NUMERIC,
+  int2: FIELD_NUMERIC,
+  int4: FIELD_NUMERIC,
+  int8: FIELD_NUMERIC,
+  int: FIELD_NUMERIC,
+  integer: FIELD_NUMERIC,
+  money: FIELD_NUMERIC,
+  numeric: FIELD_NUMERIC,
+  real: FIELD_NUMERIC,
+  serial2: FIELD_NUMERIC,
+  serial4: FIELD_NUMERIC,
+  serial8: FIELD_NUMERIC,
+  serial: FIELD_NUMERIC,
+  smallint: FIELD_NUMERIC,
+  smallserial: FIELD_NUMERIC,
 
   // ================ 文本 | Text ================
-  "character varying": FIELD_TYPE_CHARACTER,
-  varchar: FIELD_TYPE_CHARACTER,
-  character: FIELD_TYPE_CHARACTER,
-  char: FIELD_TYPE_CHARACTER,
-  text: FIELD_TYPE_CHARACTER,
-  citext: FIELD_TYPE_CHARACTER, // 扩展类型（citext 模块）
+  "character varying": FIELD_CHARACTER,
+  varchar: FIELD_CHARACTER,
+  character: FIELD_CHARACTER,
+  char: FIELD_CHARACTER,
+  text: FIELD_CHARACTER,
+  citext: FIELD_CHARACTER, // 扩展类型（citext 模块）
 
   // ================ 日期/时间 | Date/Time ================
-  timestamp: FIELD_TYPE_DATETIME,
-  "timestamp without time zone": FIELD_TYPE_DATETIME,
-  timestamptz: FIELD_TYPE_DATETIME,
-  "timestamp with time zone": FIELD_TYPE_DATETIME,
-  date: FIELD_TYPE_DATETIME,
-  time: FIELD_TYPE_DATETIME,
-  "time without time zone": FIELD_TYPE_DATETIME,
-  timetz: FIELD_TYPE_DATETIME,
-  "time with time zone": FIELD_TYPE_DATETIME,
-  interval: FIELD_TYPE_DATETIME,
+  timestamp: FIELD_DATETIME,
+  "timestamp without time zone": FIELD_DATETIME,
+  timestamptz: FIELD_DATETIME,
+  "timestamp with time zone": FIELD_DATETIME,
+  date: FIELD_DATETIME,
+  time: FIELD_DATETIME,
+  "time without time zone": FIELD_DATETIME,
+  timetz: FIELD_DATETIME,
+  "time with time zone": FIELD_DATETIME,
+  interval: FIELD_DATETIME,
 
   // ================ 二进制 | Binary ================
-  bytea: FIELD_TYPE_BINARY,
+  bytea: FIELD_BINARY,
 
   // ====================== 几何类 | Geometric ======================
-  point: FIELD_TYPE_GEOMETRIC,
-  line: FIELD_TYPE_GEOMETRIC,
-  lseg: FIELD_TYPE_GEOMETRIC,
-  box: FIELD_TYPE_GEOMETRIC,
-  path: FIELD_TYPE_GEOMETRIC,
-  polygon: FIELD_TYPE_GEOMETRIC,
-  circle: FIELD_TYPE_GEOMETRIC,
+  point: FIELD_GEOMETRIC,
+  line: FIELD_GEOMETRIC,
+  lseg: FIELD_GEOMETRIC,
+  box: FIELD_GEOMETRIC,
+  path: FIELD_GEOMETRIC,
+  polygon: FIELD_GEOMETRIC,
+  circle: FIELD_GEOMETRIC,
 
   // ================ 布尔 | Boolean ================
-  boolean: FIELD_TYPE_BOOLEAN,
-  bool: FIELD_TYPE_BOOLEAN,
+  boolean: FIELD_BOOLEAN,
+  bool: FIELD_BOOLEAN,
 
   // ====================== 结构化数据 | Structured data ======================
-  json: FIELD_TYPE_JSON,
-  jsonb: FIELD_TYPE_JSON,
-  jsonpath: FIELD_TYPE_JSON,
-  xml: FIELD_TYPE_TEXT_SEARCH,
+  json: FIELD_JSON,
+  jsonb: FIELD_JSON,
+  jsonpath: FIELD_JSON,
+  xml: FIELD_TEXT_SEARCH,
 
   // ==================== 网络 | Network ====================
-  cidr: FIELD_TYPE_NETWORK,
-  inet: FIELD_TYPE_NETWORK,
-  macaddr: FIELD_TYPE_NETWORK,
-  macaddr8: FIELD_TYPE_NETWORK,
+  cidr: FIELD_NETWORK,
+  inet: FIELD_NETWORK,
+  macaddr: FIELD_NETWORK,
+  macaddr8: FIELD_NETWORK,
 
   // ====================== 位串 | Bit string ======================
-  bit: FIELD_TYPE_BIT_STRING,
-  "bit varying": FIELD_TYPE_BIT_STRING,
-  varbit: FIELD_TYPE_BIT_STRING,
+  bit: FIELD_BIT_STRING,
+  "bit varying": FIELD_BIT_STRING,
+  varbit: FIELD_BIT_STRING,
 
   // ====================== 文本搜索 | Text search ======================
-  tsvector: FIELD_TYPE_TEXT_SEARCH,
-  tsquery: FIELD_TYPE_TEXT_SEARCH,
+  tsvector: FIELD_TEXT_SEARCH,
+  tsquery: FIELD_TEXT_SEARCH,
 
   // ====================== 范围 | Range ======================
-  int4range: FIELD_TYPE_RANGE,
-  int8range: FIELD_TYPE_RANGE,
-  numrange: FIELD_TYPE_RANGE,
-  tsrange: FIELD_TYPE_RANGE,
-  tstzrange: FIELD_TYPE_RANGE,
-  daterange: FIELD_TYPE_RANGE,
+  int4range: FIELD_RANGE,
+  int8range: FIELD_RANGE,
+  numrange: FIELD_RANGE,
+  tsrange: FIELD_RANGE,
+  tstzrange: FIELD_RANGE,
+  daterange: FIELD_RANGE,
 
   // ================ 特殊 | Special ================
-  enum: FIELD_TYPE_OTHER,
-  uuid: FIELD_TYPE_OTHER,
-  domain: FIELD_TYPE_OTHER,
+  enum: FIELD_OTHER,
+  uuid: FIELD_OTHER,
+  domain: FIELD_OTHER,
 
   // 其它类型不应当在建表的时候使用
 };
@@ -133,7 +133,7 @@ export function getDataTypeCategoryPg(typeName: string): string | undefined {
   // 处理数组类型（如 `int4[]` -> `_int4`）
   if (normalized.endsWith("[]")) {
     const baseType = normalized.slice(0, -2);
-    return typeCategoryMap[baseType] || FIELD_TYPE_ARRAY;
+    return typeCategoryMap[baseType] || FIELD_ARRAY;
   }
 
   // 未找到匹配

@@ -15,11 +15,11 @@ import {
 } from "@/components/ui/sidebar";
 import {
   APP_NAME,
-  LIST_BAR_TYPE_DB_LIST,
-  LIST_BAR_TYPE_TABLE_LIST,
-  MAIN_CONTEN_TYPE_ADD_CONNECTION,
-  MAIN_CONTEN_TYPE_SETTINGS,
-  MAIN_CONTEN_TYPE_SQL_EDITOR,
+  LIST_BAR_DB,
+  LIST_BAR_TABLE,
+  MAIN_AREA_ADD_CONNECTION,
+  MAIN_AREA_SETTINGS,
+  MAIN_AREA_SQL_EDITOR,
 } from "@/constants";
 import { appState } from "@/store/valtio";
 
@@ -46,13 +46,13 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("Databases")}
               onClick={() => {
-                snap.setListBarType(LIST_BAR_TYPE_DB_LIST);
+                snap.setListBarType(LIST_BAR_DB);
                 snap.setListBarOpen(true);
               }}
             >
               <Database />
               <span
-                className={`${snap.listBarType === LIST_BAR_TYPE_DB_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
+                className={`${snap.listBarType === LIST_BAR_DB ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
               >
                 {t("Databases")}
               </span>
@@ -65,13 +65,13 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("Tables")}
               onClick={() => {
-                snap.setListBarType(LIST_BAR_TYPE_TABLE_LIST);
+                snap.setListBarType(LIST_BAR_TABLE);
                 snap.setListBarOpen(true);
               }}
             >
               <Table />
               <span
-                className={`${snap.listBarType === LIST_BAR_TYPE_TABLE_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
+                className={`${snap.listBarType === LIST_BAR_TABLE ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
               >
                 {t("Tables")}
               </span>
@@ -124,7 +124,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("Add database connection")}
               onClick={() => {
-                snap.setMainContenType(MAIN_CONTEN_TYPE_ADD_CONNECTION);
+                snap.setMainContenType(MAIN_AREA_ADD_CONNECTION);
                 snap.setListBarOpen(true);
               }}
             >
@@ -139,7 +139,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("SQL editor")}
               onClick={() => {
-                snap.setMainContenType(MAIN_CONTEN_TYPE_SQL_EDITOR);
+                snap.setMainContenType(MAIN_AREA_SQL_EDITOR);
                 snap.setListBarOpen(true);
               }}
             >
@@ -171,7 +171,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("Settings")}
               onClick={() => {
-                snap.setMainContenType(MAIN_CONTEN_TYPE_SETTINGS);
+                snap.setMainContenType(MAIN_AREA_SETTINGS);
                 snap.setListBarOpen(true);
               }}
             >

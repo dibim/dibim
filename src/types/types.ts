@@ -1,18 +1,18 @@
 import { FunctionComponent, SVGProps } from "react";
 import {
-  DB_TYPE_MYSQL,
-  DB_TYPE_POSTGRESQL,
-  DB_TYPE_SQLITE,
-  LIST_BAR_TYPE_DB_LIST,
-  LIST_BAR_TYPE_FUNC_LIST,
-  LIST_BAR_TYPE_TABLE_LIST,
-  LIST_SUB_SIDEBAR_TYPE_VIEW_LIST,
-  MAIN_CONTEN_TYPE_ADD_CONNECTION,
-  MAIN_CONTEN_TYPE_EDIT_CONNECTION,
-  MAIN_CONTEN_TYPE_SETTINGS,
-  MAIN_CONTEN_TYPE_SQL_EDITOR,
-  MAIN_CONTEN_TYPE_TABLE_EDITOR,
-  MAIN_CONTEN_TYPE_WELCOME,
+  DB_MYSQL,
+  DB_POSTGRESQL,
+  DB_SQLITE,
+  LIST_BAR_DB,
+  LIST_BAR_FUNC,
+  LIST_BAR_TABLE,
+  LIST_BAR_VIEW,
+  MAIN_AREA_ADD_CONNECTION,
+  MAIN_AREA_EDIT_CONNECTION,
+  MAIN_AREA_SETTINGS,
+  MAIN_AREA_SQL_EDITOR,
+  MAIN_AREA_TABLE_EDITOR,
+  MAIN_AREA_WELCOME,
   STR_EMPTY,
   TAB_CONSTRAINT,
   TAB_DATA,
@@ -21,7 +21,6 @@ import {
   TAB_PARTITION,
   TAB_STRUCTURE,
 } from "@/constants";
-import { INDEX_PRIMARY_KEY, INDEX_UNIQUE } from "@/databases/constants";
 
 // 数据库返回的数据
 // Data returned from the database
@@ -55,49 +54,41 @@ export type ExecResult = {
 
 // 数据库类型
 // Database type
-export type DbType = typeof DB_TYPE_MYSQL | typeof DB_TYPE_POSTGRESQL | typeof DB_TYPE_SQLITE;
-
-// 唯一约束, 主键或唯一索引
-// Unique constraint, primary key or unique index
-export type UniqueConstraint = typeof STR_EMPTY | typeof INDEX_PRIMARY_KEY | typeof INDEX_UNIQUE;
+export type DbType = typeof DB_MYSQL | typeof DB_POSTGRESQL | typeof DB_SQLITE;
 
 // 数据库里每一行的数据
 export type RowData = Record<string, any>;
 
 // 列表栏的类型
-export type ListBarType =
-  | typeof LIST_BAR_TYPE_DB_LIST
-  | typeof LIST_BAR_TYPE_TABLE_LIST
-  | typeof LIST_SUB_SIDEBAR_TYPE_VIEW_LIST
-  | typeof LIST_BAR_TYPE_FUNC_LIST;
+export type ListBarType = typeof LIST_BAR_DB | typeof LIST_BAR_TABLE | typeof LIST_BAR_VIEW | typeof LIST_BAR_FUNC;
 
 // 主要区域的类型
 // Types of main content
 export type MainContenType =
-  | typeof MAIN_CONTEN_TYPE_WELCOME
-  | typeof MAIN_CONTEN_TYPE_SETTINGS
-  | typeof MAIN_CONTEN_TYPE_ADD_CONNECTION
-  | typeof MAIN_CONTEN_TYPE_EDIT_CONNECTION
-  | typeof MAIN_CONTEN_TYPE_TABLE_EDITOR
-  | typeof MAIN_CONTEN_TYPE_SQL_EDITOR;
+  | typeof MAIN_AREA_ADD_CONNECTION
+  | typeof MAIN_AREA_EDIT_CONNECTION
+  | typeof MAIN_AREA_SETTINGS
+  | typeof MAIN_AREA_SQL_EDITOR
+  | typeof MAIN_AREA_TABLE_EDITOR
+  | typeof MAIN_AREA_WELCOME;
 
 // 主要区域的标签页
 // Tabs for main content
 export type MainContentTab =
   | typeof STR_EMPTY
-  | typeof TAB_DATA
-  | typeof TAB_STRUCTURE
-  | typeof TAB_DDL
   | typeof TAB_CONSTRAINT
+  | typeof TAB_DATA
+  | typeof TAB_DDL
   | typeof TAB_FOREIGN_KEY
-  | typeof TAB_PARTITION;
+  | typeof TAB_PARTITION
+  | typeof TAB_STRUCTURE;
 
 // 导入的 svg 的属性
 // Properties of imported SVG
 export type SvgComponentProps = SVGProps<SVGSVGElement> & {
-  title?: string;
-  titleId?: string;
   desc?: string;
   descId?: string;
+  title?: string;
+  titleId?: string;
 };
 export type SvgComponentType = FunctionComponent<SvgComponentProps>;

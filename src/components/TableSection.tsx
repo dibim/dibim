@@ -4,7 +4,7 @@ import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-
 import { subscribeKey } from "valtio/utils";
 import { HEDAER_H, NEW_ROW_IS_ADDED_FIELD } from "@/constants";
 import { exec } from "@/databases/adapter,";
-import { modifyTableData } from "@/databases/modify_table_data";
+import { modifyTableData } from "@/databases/utils";
 import { cn } from "@/lib/utils";
 import { appState } from "@/store/valtio";
 import { RowData } from "@/types/types";

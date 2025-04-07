@@ -7,7 +7,7 @@ import sqlWorker from "monaco-editor/esm/vs/basic-languages/sql/sql?worker";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import { useSnapshot } from "valtio";
 import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
-import { DEFAULT_PAGE_SIZE, reIsSingletQuery } from "@/constants";
+import { DEFAULT_PAGE_SIZE, RE_IS_SINGLET_QUERY } from "@/constants";
 import { getPageCount } from "@/databases/PostgreSQL/sql";
 import { exec, query } from "@/databases/adapter,";
 import { extractConditionClause } from "@/databases/utils";
@@ -98,7 +98,7 @@ export function SqlEditor() {
     // 检查前10个字符是否包含"select"
     const first10Chars = code.trim().substring(0, 10).toLowerCase();
     if (first10Chars.includes("select")) {
-      if (reIsSingletQuery.test(code)) {
+      if (RE_IS_SINGLET_QUERY.test(code)) {
         const currentPage = tableRef.current ? tableRef.current.getCurrentPage() : 1;
         await queryPage(currentPage);
       } else {

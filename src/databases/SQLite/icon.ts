@@ -1,33 +1,28 @@
-import {
-  FIELD_TYPE_BIT_STRING,
-  FIELD_TYPE_CHARACTER,
-  FIELD_TYPE_DATETIME,
-  FIELD_TYPE_NUMERIC,
-} from "@/constants";
+import { FIELD_BIT_STRING, FIELD_CHARACTER, FIELD_DATETIME, FIELD_NUMERIC } from "@/constants";
 
 const typeCategoryMap: Record<string, string> = {
   // ==================== 数值类型 ====================
-  integer: FIELD_TYPE_NUMERIC,
-  real: FIELD_TYPE_NUMERIC,
-  numeric: FIELD_TYPE_NUMERIC,
-  int: FIELD_TYPE_NUMERIC,
-  bigint: FIELD_TYPE_NUMERIC,
-  float: FIELD_TYPE_NUMERIC,
-  double: FIELD_TYPE_NUMERIC,
-  decimal: FIELD_TYPE_NUMERIC,
+  integer: FIELD_NUMERIC,
+  real: FIELD_NUMERIC,
+  numeric: FIELD_NUMERIC,
+  int: FIELD_NUMERIC,
+  bigint: FIELD_NUMERIC,
+  float: FIELD_NUMERIC,
+  double: FIELD_NUMERIC,
+  decimal: FIELD_NUMERIC,
 
   // ==================== 字符串类型 ====================
-  text: FIELD_TYPE_CHARACTER,
-  varchar: FIELD_TYPE_CHARACTER,
-  char: FIELD_TYPE_CHARACTER,
+  text: FIELD_CHARACTER,
+  varchar: FIELD_CHARACTER,
+  char: FIELD_CHARACTER,
 
   // ==================== 二进制类型 ====================
-  blob: FIELD_TYPE_BIT_STRING,
+  blob: FIELD_BIT_STRING,
 
   // ==================== 日期/时间类型 ====================
-  date: FIELD_TYPE_DATETIME,
-  datetime: FIELD_TYPE_DATETIME,
-  timestamp: FIELD_TYPE_DATETIME,
+  date: FIELD_DATETIME,
+  datetime: FIELD_DATETIME,
+  timestamp: FIELD_DATETIME,
 };
 
 /**
