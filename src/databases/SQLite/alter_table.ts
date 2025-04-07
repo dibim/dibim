@@ -60,11 +60,13 @@ function genFieldSql(faa: FieldAlterAction) {
  */
 function genRecreateTable(table: string, ddl: string, newTable: string, retainedFieldsNames: string[]) {
   const fields = `"${retainedFieldsNames.join('","')}"`;
+  // 这里开启事务会报错 cannot start a transaction within a transaction
+  // 临时注释掉
   return [
     `
     -- 需要重新建表
     PRAGMA foreign_keys = OFF;
-    BEGIN TRANSACTION;
+    -- BEGIN TRANSACTION;
     
     CREATE TEMPORARY TABLE "temp_backup" AS SELECT ${fields} FROM "${table}";
     ${ddl};
@@ -73,7 +75,7 @@ function genRecreateTable(table: string, ddl: string, newTable: string, retained
     ALTER TABLE "${newTable}" RENAME TO "${table}";
     DROP TABLE "temp_backup";
 
-    COMMIT;
+    -- COMMIT;
     PRAGMA foreign_keys = ON;
     `,
   ];
