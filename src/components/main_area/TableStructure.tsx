@@ -25,7 +25,7 @@ import { Input } from "../ui/input";
 type DialogAction = typeof STR_EMPTY | typeof STR_ADD | typeof STR_EDIT | typeof STR_DELETE;
 
 export type TableEditorStructureProps = {
-  getData: () => void;
+  getData: () => Promise<void>;
   alterData: AllAlterAction[];
   setAlterData: (val: AllAlterAction[]) => void;
   changeTable: () => void;
@@ -33,7 +33,7 @@ export type TableEditorStructureProps = {
   setEditingTableComment: (val: string) => void;
 };
 
-export function TableEditorStructure({
+export function TableStructure({
   getData,
   alterData,
   setAlterData,
@@ -276,7 +276,7 @@ export function TableEditorStructure({
 
   function handleCancel() {
     setAlterData([]);
-    tableRef.current?.resettData();
+    tableRef.current?.resetData();
   }
 
   function handleEditFieldPopup(index: number) {
@@ -372,7 +372,10 @@ export function TableEditorStructure({
     const res = await exec(willExecCmd);
     if (res.errorMessage === "") {
       setShowDialogAlter(false);
-      getData();
+      tableRef.current?.resetData();
+      setAlterData([]);
+      await getData();
+      updateDataArr();
     } else {
       setErrorMessage(res.errorMessage);
     }
@@ -380,7 +383,7 @@ export function TableEditorStructure({
 
   const tooltipSectionData = [
     {
-      trigger: <RotateCw color="var(--fvm-info-clr)" onClick={() => getData()} />,
+      trigger: <RotateCw color="var(--fvm-info-clr)" onClick={async () => await getData()} />,
       content: <p>{t("Refresh")}</p>,
     },
     {
