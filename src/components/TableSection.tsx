@@ -76,7 +76,7 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
     setChanges([]);
 
     tableRef.current?.willRanderTable();
-    tableRef.current?.resettData();
+    tableRef.current?.resetData();
   }
 
   function handleAdd() {
