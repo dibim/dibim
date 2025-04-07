@@ -6,12 +6,12 @@ import MysqlLogo from "@/assets/db_logo/mysql.svg?react";
 import PostgresqlLogo from "@/assets/db_logo/postgresql.svg?react";
 import SqliteLogo from "@/assets/db_logo/sqlite.svg?react";
 import {
-  DB_TYPE_MYSQL,
-  DB_TYPE_POSTGRESQL,
-  DB_TYPE_SQLITE,
-  LIST_BAR_TYPE_TABLE_LIST,
-  MAIN_CONTEN_TYPE_EDIT_CONNECTION,
-  MAIN_CONTEN_TYPE_TABLE_EDITOR,
+  DB_MYSQL,
+  DB_POSTGRESQL,
+  DB_SQLITE,
+  LIST_BAR_TABLE,
+  MAIN_AREA_EDIT_CONNECTION,
+  MAIN_AREA_TABLE_EDITOR,
 } from "@/constants";
 import { connect } from "@/databases/adapter,";
 import { invoker } from "@/invoker";
@@ -62,8 +62,8 @@ export function DatabaseList() {
       } else {
         appState.setCurrentDbName(conn.dbName);
         appState.setCurrentConnColor(conn.color);
-        appState.setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
-        appState.setListBarType(LIST_BAR_TYPE_TABLE_LIST);
+        appState.setMainContenType(MAIN_AREA_TABLE_EDITOR);
+        appState.setListBarType(LIST_BAR_TABLE);
       }
     }
   }
@@ -78,9 +78,9 @@ export function DatabaseList() {
         content: (
           <div className="flex cursor-pointer p-1" style={{ borderBottom: `2px  solid ${item.color}` }}>
             <div className="pe-2">
-              {item.dbType === DB_TYPE_MYSQL && <MysqlLogo className="w-6 h-6" />}
-              {item.dbType === DB_TYPE_POSTGRESQL && <PostgresqlLogo className="w-6 h-6" />}
-              {item.dbType === DB_TYPE_SQLITE && <SqliteLogo className="w-6 h-6" />}
+              {item.dbType === DB_MYSQL && <MysqlLogo className="w-6 h-6" />}
+              {item.dbType === DB_POSTGRESQL && <PostgresqlLogo className="w-6 h-6" />}
+              {item.dbType === DB_SQLITE && <SqliteLogo className="w-6 h-6" />}
             </div>
 
             <div>{item.name}</div>
@@ -94,7 +94,7 @@ export function DatabaseList() {
             label: "编辑",
             onClick: () => {
               appState.setEditDbConnIndex(index);
-              appState.setMainContenType(MAIN_CONTEN_TYPE_EDIT_CONNECTION);
+              appState.setMainContenType(MAIN_AREA_EDIT_CONNECTION);
             },
             icon: <Edit className="h-4 w-4" />,
           },

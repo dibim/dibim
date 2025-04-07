@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import { CirclePlus, Settings, Smile } from "lucide-react";
 import {
   APP_NAME,
-  MAIN_CONTEN_TYPE_ADD_CONNECTION,
-  MAIN_CONTEN_TYPE_SETTINGS,
+  MAIN_AREA_ADD_CONNECTION,
+  MAIN_AREA_SETTINGS,
   MAIN_PASSWORD_DEFAULT,
 } from "@/constants";
 import { invoker } from "@/invoker";
@@ -39,7 +39,7 @@ export function Welcome() {
             <div
               className="flex py-4 cursor-pointer"
               onClick={() => {
-                appState.setMainContenType(MAIN_CONTEN_TYPE_SETTINGS);
+                appState.setMainContenType(MAIN_AREA_SETTINGS);
               }}
             >
               <div className="pe-4">
@@ -57,7 +57,7 @@ export function Welcome() {
           <div
             className="flex py-4 cursor-pointer"
             onClick={() => {
-              appState.setMainContenType(MAIN_CONTEN_TYPE_ADD_CONNECTION);
+              appState.setMainContenType(MAIN_AREA_ADD_CONNECTION);
             }}
           >
             <div className="pe-4">

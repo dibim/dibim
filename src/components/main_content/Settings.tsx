@@ -100,51 +100,67 @@ export function Settings() {
           </LabeledDiv>
 
           <LabeledDiv direction={DIR_H} label={"🌐" + t("Language")} className="py-2">
-            <Button className="m-2" onClick={() => changeLanguage("ar")}>
-              العربية (Arabic)
-            </Button>
-            <Button className="m-2" onClick={() => changeLanguage("de")}>
-              Deutsch (German)
-            </Button>
-            <Button className="m-2" onClick={() => changeLanguage("en")}>
-              English
-            </Button>
-            <Button className="m-2" onClick={() => changeLanguage("es")}>
-              Español (Spanish)
-            </Button>
-            <Button className="m-2" onClick={() => changeLanguage("fr")}>
-              Français (French)
-            </Button>
-            <Button className="m-2" onClick={() => changeLanguage("it")}>
-              Italian (Italiano)
-            </Button>
-            <Button className="m-2" onClick={() => changeLanguage("ja")}>
-              日本語 (Japanese)
-            </Button>
-            <Button className="m-2" onClick={() => changeLanguage("ko")}>
-              한국어 (Korean)
-            </Button>
-            <Button className="m-2" onClick={() => changeLanguage("nl")}>
-              Dutch (Nederlands)
-            </Button>
-            <Button className="m-2" onClick={() => changeLanguage("pl")}>
-              Polish (Polski)
-            </Button>
-            <Button className="m-2" onClick={() => changeLanguage("ru")}>
-              Русский (Russian)
-            </Button>
-            <Button className="m-2" onClick={() => changeLanguage("tr")}>
-              Turkish (Türkçe)
-            </Button>
-            <Button className="m-2" onClick={() => changeLanguage("uk")}>
-              Ukrainian (Українська)
-            </Button>
-            <Button className="m-2" onClick={() => changeLanguage(HANS)}>
-              简体中文 (Simplified Chinese)
-            </Button>
-            <Button className="m-2" onClick={() => changeLanguage(HANT)}>
-              繁體中文 (Traditional Chinese)
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button className="bg-[#007A3D] hover:bg-[#006A34] text-white" onClick={() => changeLanguage("ar")}>
+                العربية (Arabic)
+              </Button>
+
+              <Button className="bg-[#000000] hover:bg-[#2D2D2D] text-[#FFCC00]" onClick={() => changeLanguage("de")}>
+                Deutsch (German)
+              </Button>
+
+              <Button className="bg-[#0A3161] hover:bg-[#07244E] text-white" onClick={() => changeLanguage("en")}>
+                English
+              </Button>
+
+              <Button className="bg-[#AA151B] hover:bg-[#8A1217] text-[#F1BF00]" onClick={() => changeLanguage("es")}>
+                Español (Spanish)
+              </Button>
+
+              <Button className="bg-[#0055A4] hover:bg-[#00448C] text-white" onClick={() => changeLanguage("fr")}>
+                Français (French)
+              </Button>
+
+              <Button className="bg-[#008C45] hover:bg-[#007339] text-white" onClick={() => changeLanguage("it")}>
+                Italiano (Italian)
+              </Button>
+
+              <Button className="bg-white hover:bg-gray-100 text-[#BC002D]" onClick={() => changeLanguage("ja")}>
+                日本語 (Japanese)
+              </Button>
+
+              <Button className="bg-white hover:bg-gray-100 text-[#003478]" onClick={() => changeLanguage("ko")}>
+                한국어 (Korean)
+              </Button>
+
+              <Button className="bg-[#21468B] hover:bg-[#1A3A75] text-white" onClick={() => changeLanguage("nl")}>
+                Nederlands (Dutch)
+              </Button>
+
+              <Button className="bg-[#DC143C] hover:bg-[#C01134] text-white" onClick={() => changeLanguage("pl")}>
+                Polski (Polish)
+              </Button>
+
+              <Button className="bg-[#0039A6] hover:bg-[#002D84] text-white" onClick={() => changeLanguage("ru")}>
+                Русский (Russian)
+              </Button>
+
+              <Button className="bg-[#E30A17] hover:bg-[#C00813] text-white" onClick={() => changeLanguage("tr")}>
+                Türkçe (Turkish)
+              </Button>
+
+              <Button className="bg-[#0057B8] hover:bg-[#0046A0] text-[#FFD700]" onClick={() => changeLanguage("uk")}>
+                Українська (Ukrainian)
+              </Button>
+
+              <Button className="bg-[#DE2910] hover:bg-[#C0240E] text-[#FFDE00]" onClick={() => changeLanguage(HANS)}>
+                简体中文 (Simplified Chinese)
+              </Button>
+
+              <Button className="bg-[#FFD700] hover:bg-[#E6C200] text-[#DE2910]" onClick={() => changeLanguage(HANT)}>
+                繁體中文 (Traditional Chinese)
+              </Button>
+            </div>
           </LabeledDiv>
 
           <LabeledDiv direction={DIR_H} label={"🎨" + t("Theme")} className="py-2">

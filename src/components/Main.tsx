@@ -13,8 +13,8 @@ import {
   APP_NAME,
   HEDAER_H,
   LIST_BAR_DEFAULT_WIDTH,
-  LIST_BAR_TYPE_DB_LIST,
-  LIST_BAR_TYPE_TABLE_LIST,
+  LIST_BAR_DB,
+  LIST_BAR_TABLE,
 } from "@/constants";
 import { appState } from "@/store/valtio";
 import { getPageWidth } from "@/utils/ media_query";
@@ -168,8 +168,8 @@ export function Main({ id, className }: { id: string; className: string }) {
               cursor="col-resize"
             >
               <div className="overflow-y-scroll">
-                {snap.listBarType === LIST_BAR_TYPE_DB_LIST && <DatabaseList />}
-                {snap.listBarType === LIST_BAR_TYPE_TABLE_LIST && <TableList />}
+                {snap.listBarType === LIST_BAR_DB && <DatabaseList />}
+                {snap.listBarType === LIST_BAR_TABLE && <TableList />}
               </div>
 
               <div ref={mainRef} className="p-2">

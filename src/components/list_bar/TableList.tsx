@@ -3,7 +3,7 @@ import bytes from "bytes";
 import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, CirclePlus, LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 import { subscribeKey } from "valtio/utils";
-import { MAIN_CONTEN_TYPE_TABLE_EDITOR, STR_EMPTY, TAB_STRUCTURE } from "@/constants";
+import { MAIN_AREA_TABLE_EDITOR, STR_EMPTY, TAB_STRUCTURE } from "@/constants";
 import {
   exec,
   genDeleteTableCmd,
@@ -44,7 +44,7 @@ export function TableList() {
 
   function clickTableName(item: ListItem) {
     appState.setCurrentTableName(item.id);
-    appState.setMainContenType(MAIN_CONTEN_TYPE_TABLE_EDITOR);
+    appState.setMainContenType(MAIN_AREA_TABLE_EDITOR);
   }
 
   function addTable() {

@@ -1,8 +1,8 @@
 import { proxy } from "valtio";
 import {
-  DB_TYPE_POSTGRESQL,
-  LIST_BAR_TYPE_DB_LIST,
-  MAIN_CONTEN_TYPE_WELCOME,
+  DB_POSTGRESQL,
+  LIST_BAR_DB,
+  MAIN_AREA_WELCOME,
   MAIN_PASSWORD_DEFAULT,
 } from "@/constants";
 import { FieldStructure } from "@/databases/types";
@@ -119,7 +119,7 @@ export const appState = proxy<AppState>({
   mainPasswordSha: defaultMainPasswordSha,
   setMainPasswordSha: (val: string) => (appState.mainPasswordSha = val),
 
-  currentDbType: DB_TYPE_POSTGRESQL,
+  currentDbType: DB_POSTGRESQL,
   setCurrentDbType: (val: DbType) => (appState.currentDbType = val),
 
   currentConnName: "",
@@ -157,10 +157,10 @@ export const appState = proxy<AppState>({
   setListBarOpen: (val: boolean) => (appState.listBarOpen = val),
   listBarWidth: 0,
   setListBarWidth: (val: number) => (appState.listBarWidth = val),
-  listBarType: LIST_BAR_TYPE_DB_LIST,
+  listBarType: LIST_BAR_DB,
   setListBarType: (val: ListBarType) => (appState.listBarType = val),
 
-  mainContenType: MAIN_CONTEN_TYPE_WELCOME,
+  mainContenType: MAIN_AREA_WELCOME,
   setMainContenType: (val: MainContenType) => (appState.mainContenType = val),
   mainContenTab: "",
   setMainContenTab: (val: MainContentTab) => (appState.mainContenTab = val),

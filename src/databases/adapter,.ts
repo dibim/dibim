@@ -1,4 +1,4 @@
-import { DB_TYPE_MYSQL, DB_TYPE_POSTGRESQL, DB_TYPE_SQLITE } from "@/constants";
+import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE } from "@/constants";
 import {
   connectPg,
   genDeleteFieldCmdPg,
@@ -46,9 +46,9 @@ import { AllAlterAction, DbConnectionParam, FieldWithValue, GetTableDataParam } 
 export async function connect(p: DbConnectionParam) {
   const { currentDbType, currentConnName } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return connectPg(currentConnName, p);
-  if (currentDbType === DB_TYPE_SQLITE) return connectSqlite(currentConnName, p);
+  if (currentDbType === DB_MYSQL) return; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return connectPg(currentConnName, p);
+  if (currentDbType === DB_SQLITE) return connectSqlite(currentConnName, p);
 }
 
 // 断开数据库
@@ -72,54 +72,54 @@ export async function exec(sql: string) {
 export async function getAllTableName() {
   const { currentDbType, currentConnName } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return getAllTableNamePg(currentConnName);
-  if (currentDbType === DB_TYPE_SQLITE) return getAllTableNameSqlite(currentConnName);
+  if (currentDbType === DB_MYSQL) return; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return getAllTableNamePg(currentConnName);
+  if (currentDbType === DB_SQLITE) return getAllTableNameSqlite(currentConnName);
 }
 
 // 获取所有表格的大小
 export async function getAllTableSize() {
   const { currentDbType, currentConnName } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return getAllTableSizePg(currentConnName);
-  if (currentDbType === DB_TYPE_SQLITE) return getAllTableSizeSqlite(currentConnName);
+  if (currentDbType === DB_MYSQL) return; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return getAllTableSizePg(currentConnName);
+  if (currentDbType === DB_SQLITE) return getAllTableSizeSqlite(currentConnName);
 }
 
 // 获取表格数据
 export async function getTableStructure(tbName: string) {
   const { currentDbType, currentConnName } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return getTableStructurePg(currentConnName, tbName);
-  if (currentDbType === DB_TYPE_SQLITE) return getTableStructureSqlite(currentConnName, tbName);
+  if (currentDbType === DB_MYSQL) return; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return getTableStructurePg(currentConnName, tbName);
+  if (currentDbType === DB_SQLITE) return getTableStructureSqlite(currentConnName, tbName);
 }
 
 // 获取表格的 DDL
 export async function getTableDdl(tbName: string) {
   const { currentDbType, currentConnName } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return getTableDdlPg(currentConnName, tbName);
-  if (currentDbType === DB_TYPE_SQLITE) return getTableDdlSqlite(currentConnName, tbName);
+  if (currentDbType === DB_MYSQL) return; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return getTableDdlPg(currentConnName, tbName);
+  if (currentDbType === DB_SQLITE) return getTableDdlSqlite(currentConnName, tbName);
 }
 
 // 获取表格数据
 export async function getTableData(params: GetTableDataParam) {
   const { currentDbType, currentConnName } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return getTableDataPg(currentConnName, params);
-  if (currentDbType === DB_TYPE_SQLITE) return getTableDataSqlite(currentConnName, params);
+  if (currentDbType === DB_MYSQL) return; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return getTableDataPg(currentConnName, params);
+  if (currentDbType === DB_SQLITE) return getTableDataSqlite(currentConnName, params);
 }
 
 // 生成重命名表格的语句
 export function genRenameTableCmd(oldName: string, newName: string) {
   const { currentDbType } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return genRenameTableCmdPg(oldName, newName);
-  if (currentDbType === DB_TYPE_SQLITE) return genRenameTableCmdSqlite(oldName, newName);
+  if (currentDbType === DB_MYSQL) return ""; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return genRenameTableCmdPg(oldName, newName);
+  if (currentDbType === DB_SQLITE) return genRenameTableCmdSqlite(oldName, newName);
 
   return "";
 }
@@ -128,9 +128,9 @@ export function genRenameTableCmd(oldName: string, newName: string) {
 export function genTruncateTableCmd(tbName: string) {
   const { currentDbType } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return genTruncateTableCmdPg(tbName);
-  if (currentDbType === DB_TYPE_SQLITE) return genTruncateTableCmdSqlite(tbName);
+  if (currentDbType === DB_MYSQL) return ""; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return genTruncateTableCmdPg(tbName);
+  if (currentDbType === DB_SQLITE) return genTruncateTableCmdSqlite(tbName);
 
   return "";
 }
@@ -139,9 +139,9 @@ export function genTruncateTableCmd(tbName: string) {
 export function genDeleteTableCmd(tbName: string) {
   const { currentDbType } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return genDeleteTableCmdPg(tbName);
-  if (currentDbType === DB_TYPE_SQLITE) return genDeleteTableCmdSqlite(tbName);
+  if (currentDbType === DB_MYSQL) return ""; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return genDeleteTableCmdPg(tbName);
+  if (currentDbType === DB_SQLITE) return genDeleteTableCmdSqlite(tbName);
 
   return "";
 }
@@ -150,9 +150,9 @@ export function genDeleteTableCmd(tbName: string) {
 export function genRenameFieldCmd(tbName: string, oldName: string, newName: string) {
   const { currentDbType } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return genRenameFieldCmdPg(tbName, oldName, newName);
-  if (currentDbType === DB_TYPE_SQLITE) return genRenameFieldCmdSqlite(tbName, oldName, newName);
+  if (currentDbType === DB_MYSQL) return ""; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return genRenameFieldCmdPg(tbName, oldName, newName);
+  if (currentDbType === DB_SQLITE) return genRenameFieldCmdSqlite(tbName, oldName, newName);
 
   return "";
 }
@@ -161,9 +161,9 @@ export function genRenameFieldCmd(tbName: string, oldName: string, newName: stri
 export function genDeleteFieldCmd(tbName: string, fieldName: string) {
   const { currentDbType } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return genDeleteFieldCmdPg(tbName, fieldName);
-  if (currentDbType === DB_TYPE_SQLITE) return genDeleteFieldCmdSqlite(tbName, fieldName);
+  if (currentDbType === DB_MYSQL) return ""; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return genDeleteFieldCmdPg(tbName, fieldName);
+  if (currentDbType === DB_SQLITE) return genDeleteFieldCmdSqlite(tbName, fieldName);
 
   return "";
 }
@@ -172,9 +172,9 @@ export function genDeleteFieldCmd(tbName: string, fieldName: string) {
 export function genAlterCmd(val: AllAlterAction[]) {
   const { currentDbType } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return genAlterCmdPg(val);
-  if (currentDbType === DB_TYPE_SQLITE) return genAlterCmdSqlite(val);
+  if (currentDbType === DB_MYSQL) return ""; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return genAlterCmdPg(val);
+  if (currentDbType === DB_SQLITE) return genAlterCmdSqlite(val);
 
   return "";
 }
@@ -183,9 +183,9 @@ export function genAlterCmd(val: AllAlterAction[]) {
 export function genUpdateFieldCmd(tbName: string, uniqueField: FieldWithValue, fieldArr: FieldWithValue[]) {
   const { currentDbType } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return genUpdateFieldCmdPg(tbName, uniqueField, fieldArr);
-  if (currentDbType === DB_TYPE_SQLITE) return genUpdateFieldCmdSqlite(tbName, uniqueField, fieldArr);
+  if (currentDbType === DB_MYSQL) return ""; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return genUpdateFieldCmdPg(tbName, uniqueField, fieldArr);
+  if (currentDbType === DB_SQLITE) return genUpdateFieldCmdSqlite(tbName, uniqueField, fieldArr);
 
   return "";
 }
@@ -194,9 +194,9 @@ export function genUpdateFieldCmd(tbName: string, uniqueField: FieldWithValue, f
 export function genDeleteRowsCmd(tbName: string, fieldName: string, fieldValues: any[]) {
   const { currentDbType } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return genDeleteRowsCmdPg(tbName, fieldName, fieldValues);
-  if (currentDbType === DB_TYPE_SQLITE) return genDeleteRowsCmdSqlite(tbName, fieldName, fieldValues);
+  if (currentDbType === DB_MYSQL) return ""; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return genDeleteRowsCmdPg(tbName, fieldName, fieldValues);
+  if (currentDbType === DB_SQLITE) return genDeleteRowsCmdSqlite(tbName, fieldName, fieldValues);
 
   return "";
 }
@@ -205,9 +205,9 @@ export function genDeleteRowsCmd(tbName: string, fieldName: string, fieldValues:
 export function genInsertRowsCmd(tbName: string, fieldNames: string[], fieldValues: any[]) {
   const { currentDbType } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return genInsertRowsCmdPg(tbName, fieldNames, fieldValues);
-  if (currentDbType === DB_TYPE_SQLITE) return genInsertRowsCmdSqlite(tbName, fieldNames, fieldValues);
+  if (currentDbType === DB_MYSQL) return ""; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return genInsertRowsCmdPg(tbName, fieldNames, fieldValues);
+  if (currentDbType === DB_SQLITE) return genInsertRowsCmdSqlite(tbName, fieldNames, fieldValues);
 
   return "";
 }
@@ -216,9 +216,9 @@ export function genInsertRowsCmd(tbName: string, fieldNames: string[], fieldValu
 export function getDataTypeCategory(val: string) {
   const { currentDbType } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return ""; // TODO:
-  if (currentDbType === DB_TYPE_POSTGRESQL) return getDataTypeCategoryPg(val);
-  if (currentDbType === DB_TYPE_SQLITE) return getDataTypeCategorySqlite(val);
+  if (currentDbType === DB_MYSQL) return ""; // TODO:
+  if (currentDbType === DB_POSTGRESQL) return getDataTypeCategoryPg(val);
+  if (currentDbType === DB_SQLITE) return getDataTypeCategorySqlite(val);
 
   return "";
 }
@@ -227,9 +227,9 @@ export function getDataTypeCategory(val: string) {
 export function fieldTypeOptions() {
   const { currentDbType } = appState;
 
-  if (currentDbType === DB_TYPE_MYSQL) return fieldTypeOptionsMysql;
-  if (currentDbType === DB_TYPE_POSTGRESQL) return fieldTypeOptionsPg;
-  if (currentDbType === DB_TYPE_SQLITE) return fieldTypeOptionsSqlite;
+  if (currentDbType === DB_MYSQL) return fieldTypeOptionsMysql;
+  if (currentDbType === DB_POSTGRESQL) return fieldTypeOptionsPg;
+  if (currentDbType === DB_SQLITE) return fieldTypeOptionsSqlite;
 
   return [];
 }
