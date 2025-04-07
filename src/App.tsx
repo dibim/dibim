@@ -33,12 +33,14 @@ export function App() {
   }
 
   // 使用主密码解锁配置文件并初始化 app 配置
+  // Unlock the configuration file with the master password and initialize the app configuration
   async function initConfFile(pwd: string, isDefultPwd: boolean) {
-    // 主配置文件
+    // 主配置文件 | main configuration file
     const conf = await readConfigFile(pwd);
     try {
       const config = JSON.parse(conf) as ConfigFileMain;
-      // 如果发现崇明的连接名, 自动添加后缀
+      // 如果发现重名的连接名, 自动添加后缀
+      // If duplicate connection names are found, automatically add suffixes
       const nameSet = new Set<string>();
       for (let index = 0; index < config.dbConnections.length; index++) {
         const conn = config.dbConnections[index];
@@ -47,7 +49,7 @@ export function App() {
         nameSet.add(conn.name);
       }
 
-      // 补充外观配置
+      // 补充外观配置 | Supplement appearance configuration
       const resA = await invoker.readFileText(CONFIG_FILE_APPEARANCE);
       try {
         if (resA.errorMessage === "") {
@@ -56,17 +58,16 @@ export function App() {
           config.settings.colorScheme = configA.colorScheme;
         }
       } catch (error) {
-        console.log(`读取外观配置出错 ${error}`);
+        console.log(`Error reading appearance configuration: ${error}`);
       }
 
       await appState.setConfig(config, true);
       return true;
     } catch (error) {
       console.log(
-        `
-          使用${isDefultPwd ? "默认" : "用户"} 的主密码解析配置文件出错,
-          文件路径为: ${CONFIG_FILE_MAIN},
-          文件内容为: ${conf}`,
+        `Error parsing config file using ${isDefultPwd ? "default" : "user"} master password,
+         File path: ${CONFIG_FILE_MAIN},
+         File content: ${conf}`,
       );
       return false;
     }
@@ -77,6 +78,7 @@ export function App() {
 
     if (res) {
       // 先尝试使用默认密码副去, 出错的再弹出主密码输入框
+      // First try to decrypt using the default password, then show the master password input dialog if it fails.
       const sha256 = await invoker.sha256(MAIN_PASSWORD_DEFAULT);
       const success = await initConfFile(sha256, true);
       if (success) setShowLock(false);
