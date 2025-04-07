@@ -1,6 +1,6 @@
 // APP 相关 | APP related
 export const APP_NAME = "DIBIM";
-export const APP_VERSION = "v0.3.0";
+export const APP_VERSION = "v0.3.1";
 
 // 常用字符串 | Common strings
 export const STR_EMPTY = "";
@@ -27,9 +27,9 @@ export const GUTTER_SIZE = 5; // 和 css 里的一致
 export const MAIN_PASSWORD_DEFAULT = "DIBIM@2025-03-22 08:41^c3dd4147ea11b63c2cd776a0602930692ba34c43$";
 // 主密码的最小长度 | Minimum length of master password
 export const MAIN_PASSWORD_MIN_LEN = 6;
-// 配置文件 | Configuration file
+// 主配置文件 | Main configuration file
 export const CONFIG_FILE_MAIN = "./dibim_config.bin";
-// 外观配置
+// 外观配置文件 | Appearance configuration file
 export const CONFIG_FILE_APPEARANCE = "./dibim_appearance.json";
 
 // 查询记录 | Query records
