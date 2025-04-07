@@ -9,7 +9,7 @@ import {
 } from "@/constants";
 import { invoker } from "@/invoker";
 import { appState } from "@/store/valtio";
-import { Card, CardContent, CardDescription, CardFooter } from "../ui/card";
+import { Card, CardContent, CardDescription } from "../ui/card";
 
 export function Welcome() {
   const { t } = useTranslation();
@@ -66,10 +66,6 @@ export function Welcome() {
             <div>{t("Add database connection")}</div>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between">
-          {/* <Button variant="outline">取消</Button> */}
-          {/* <Button onClick={onSubmit}>确认</Button> */}
-        </CardFooter>
       </Card>
     </div>
   );

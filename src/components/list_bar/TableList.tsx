@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import bytes from "bytes";
 import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, CirclePlus, LucideIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -39,6 +40,7 @@ type TableData = {
 };
 
 export function TableList() {
+  const { t } = useTranslation();
   const [sortBy, setSortBy] = useState<SortBy>(SORT_BY_NAME_ASC);
   const [tablData, setTableData] = useState<TableData[]>([]);
 
@@ -122,9 +124,9 @@ export function TableList() {
   async function handleCopy(tableName: string) {
     try {
       await navigator.clipboard.writeText(tableName);
-      toast("复制成功");
+      toast(t("Copied"));
     } catch (err) {
-      toast("复制失败");
+      toast(t("Copy failed"));
     }
   }
 
@@ -213,49 +215,49 @@ export function TableList() {
         },
         menuItems: [
           {
-            label: "重命名",
+            label: t("Rename"),
             onClick: () => {
               handleRenamePopup(item.tableName);
             },
           },
           {
-            label: "复制表名",
+            label: t("Copy table name"),
             onClick: () => {
               handleCopy(item.tableName);
             },
           },
           {
-            label: "分割线",
+            label: t("Divider"),
             onClick: () => {},
             isLine: true,
           },
           {
-            label: "导入",
+            label: t("Import"),
             onClick: () => {
               handleImport(item.tableName);
             },
           },
 
           {
-            label: "导出",
+            label: t("Export"),
             onClick: () => {
               handleExport(item.tableName);
             },
           },
           {
-            label: "分割线",
+            label: t("Divider"),
             onClick: () => {},
             isLine: true,
           },
           {
-            label: "截断",
+            label: t("Truncate"),
             className: "text-[var(--fvm-warning-clr)]",
             onClick: () => {
               handleTruncatePopup(item.tableName);
             },
           },
           {
-            label: "删除",
+            label: t("Delete"),
             className: "text-[var(--fvm-danger-clr)]",
             onClick: () => {
               handleDeletePopup(item.tableName);
@@ -285,11 +287,11 @@ export function TableList() {
   return (
     <div>
       <div className="flex justify-between p-2">
-        {renderSortBtn(SORT_BY_NAME_ASC, sortByNameAsc, ArrowDownAZ, "按表名正序排序")}
-        {renderSortBtn(SORT_BY_NAME_DESC, sortByNameDesc, ArrowDownZA, "按表名倒序排序")}
-        {renderSortBtn(SORT_BY_BYTES_ASC, sortByBytesAsc, ArrowDown01, "按表格大小正序排序")}
-        {renderSortBtn(SORT_BY_BYTES_DESC, sortByBytesDesc, ArrowUp01, "按表格大小倒序排序")}
-        {renderSortBtn(STR_EMPTY, addTable, CirclePlus, "添加表格")}
+        {renderSortBtn(SORT_BY_NAME_ASC, sortByNameAsc, ArrowDownAZ, t("&sortByNameAsc"))}
+        {renderSortBtn(SORT_BY_NAME_DESC, sortByNameDesc, ArrowDownZA, t("&sortByNameDesc"))}
+        {renderSortBtn(SORT_BY_BYTES_ASC, sortByBytesAsc, ArrowDown01, t("&sortByBytesAsc"))}
+        {renderSortBtn(SORT_BY_BYTES_DESC, sortByBytesDesc, ArrowUp01, t("&sortByBytesDesc"))}
+        {renderSortBtn(STR_EMPTY, addTable, CirclePlus, t("Add Table"))}
       </div>
       <hr />
 
@@ -301,51 +303,50 @@ export function TableList() {
 
       <ConfirmDialog
         open={showDialogRename}
-        title={`确认要重命名吗?`}
+        title={t("&confirmRename")}
         content={
           <>
             <div className="flex items-center">
-              <div className="pe-4">新名字</div>
+              <div className="pe-4">{t("New nmame")}</div>
               <div className="flex-1">
                 <Input onInput={handleRenameInput} />
               </div>
             </div>
             <div className="pt-4">
-              <div className="pb-4">将要执行的语句:</div>
-              <div>{willExecCmd}</div>
+              <SqlCodeViewer ddl={willExecCmd} />
             </div>
           </>
         }
-        cancelText={"取消"}
+        cancelText={t("Cancel")}
         cancelCb={() => {
           setShowDialogRename(false);
         }}
-        okText={"确定"}
+        okText={t("Confirm")}
         okCb={handleRename}
       />
 
       <ConfirmDialog
         open={showDialogTruncate}
-        title={`确认要截断表格"${operateTableName}"吗?`}
-        description={`请确认将要执行的语句:`}
+        title={t("&confirmTruncateTable", { name: operateTableName })}
+        description={t("&confirmStatement")}
         content={<SqlCodeViewer ddl={willExecCmd} />}
-        cancelText={"取消"}
+        cancelText={t("Cancel")}
         cancelCb={() => {
           setShowDialogTruncate(false);
         }}
-        okText={"确定"}
+        okText={t("Confirm")}
         okCb={handleConfirm}
       />
       <ConfirmDialog
         open={showDialogDelete}
-        title={`确认要删除表格"${operateTableName}"吗?`}
-        description={`请确认将要执行的语句:`}
+        title={t("&confirmDeleteTable", { name: operateTableName })}
+        description={t("&confirmStatement")}
         content={<SqlCodeViewer ddl={willExecCmd} />}
-        cancelText={"取消"}
+        cancelText={t("Cancel")}
         cancelCb={() => {
           setShowDialogDelete(false);
         }}
-        okText={"确定"}
+        okText={t("Confirm")}
         okCb={handleConfirm}
       />
     </div>
