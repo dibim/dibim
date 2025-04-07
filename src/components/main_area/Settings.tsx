@@ -173,7 +173,7 @@ export function Settings() {
           </LabeledDiv>
 
           {errorMessage && <TextNotification type="error" message={errorMessage}></TextNotification>}
-          {okMessage && <TextNotification type="error" message={okMessage}></TextNotification>}
+          {okMessage && <TextNotification type="success" message={okMessage}></TextNotification>}
         </CardContent>
         <CardFooter className="flex justify-between">
           {/* <Button variant="outline">{t("Cancel")}</Button> */}

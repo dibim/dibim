@@ -610,7 +610,7 @@ export function TableEditorStructure({
           </LabeledDiv>
 
           {errorMessage && <TextNotification type="error" message={errorMessage}></TextNotification>}
-          {okMessage && <TextNotification type="error" message={okMessage}></TextNotification>}
+          {okMessage && <TextNotification type="success" message={okMessage}></TextNotification>}
 
           <DialogFooter>
             <Button type="submit" onClick={onSubmit}>
