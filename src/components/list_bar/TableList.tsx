@@ -36,7 +36,7 @@ type SortBy =
 type TableData = {
   tableName: string;
   size: string;
-  bytes: number; // size 转成的 字节大小
+  bytes: number;
 };
 
 export function TableList() {
@@ -56,26 +56,26 @@ export function TableList() {
     appState.setCurrentTableStructure([]);
   }
 
-  // ========== 排序 ==========
-  // 按表名正序排序 (A-Z)
+  // ========== 排序 | Sort ==========
+  // 按表名正序排序 (A-Z) | Sort by table name in positive order (A-Z)
   function sortByNameAsc() {
     setTableData([...tablData].sort((a, b) => a.tableName.localeCompare(b.tableName)));
     setSortBy(SORT_BY_NAME_ASC);
   }
 
-  // 按表名倒序排序 (Z-A)
+  // 按表名倒序排序 (Z-A) | Sort by table name in reverse order (Z-A)
   function sortByNameDesc() {
     setTableData([...tablData].sort((a, b) => b.tableName.localeCompare(a.tableName)));
     setSortBy(SORT_BY_NAME_DESC);
   }
 
-  // 按大小正序排序 (小到大)
+  // 按大小正序排序 (小到大) | Sort by size in positive order (small to large)
   function sortByBytesAsc() {
     setTableData([...tablData].sort((a, b) => a.bytes - b.bytes));
     setSortBy(SORT_BY_BYTES_ASC);
   }
 
-  // 按大小倒序排序 (大到小)
+  // 按大小倒序排序 (大到小) | Sort by size in reverse order (large to small)
   function sortByBytesDesc() {
     setTableData([...tablData].sort((a, b) => b.bytes - a.bytes));
     setSortBy(SORT_BY_BYTES_DESC);
@@ -96,31 +96,29 @@ export function TableList() {
     );
   }
 
-  // ========== 排序 结束 ==========
+  // ========== 排序 结束 | Sort end ==========
 
-  // ========== 上下文按钮功能 ==========
-  const [operateTableName, setOperateTableName] = useState<string>(""); // 现在操作的表名
+  // ========== 上下文按钮 | Context button ==========
+  const [operateTableName, setOperateTableName] = useState<string>("");
   const [showDialogDelete, setShowDialogDelete] = useState<boolean>(false);
   const [showDialogRename, setShowDialogRename] = useState<boolean>(false);
   const [showDialogTruncate, setShowDialogTruncate] = useState<boolean>(false);
-  const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
+  const [willExecCmd, setWillExecCmd] = useState<string>("");
 
-  // 弹出确认重命名表
   async function handleRenamePopup(tableName: string) {
     setOperateTableName(tableName);
     setShowDialogRename(true);
   }
-  // 处理重命名表格的输入
+
   async function handleRenameInput(e: React.FormEvent<HTMLInputElement>) {
     setWillExecCmd(genRenameTableCmd(operateTableName, e.currentTarget.value) || "");
   }
-  // 执行重命名表
+
   async function handleRename() {
     exec(willExecCmd);
     getData();
   }
 
-  // 复制表名
   async function handleCopy(tableName: string) {
     try {
       await navigator.clipboard.writeText(tableName);
@@ -130,39 +128,33 @@ export function TableList() {
     }
   }
 
-  // 导入数据
   function handleImport(tableName: string) {
     // TODO:
   }
 
-  // 导出数据
   function handleExport(tableName: string) {
     // TODO:
   }
 
-  // 弹出确认截断表
   function handleTruncatePopup(tableName: string) {
     setOperateTableName(tableName);
     setShowDialogTruncate(true);
     setWillExecCmd(genTruncateTableCmd(tableName) || "");
   }
 
-  // 弹出确认删除表
   function handleDeletePopup(tableName: string) {
     setOperateTableName(tableName);
     setShowDialogDelete(true);
     setWillExecCmd(genDeleteTableCmd(tableName) || "");
   }
 
-  // 确定执行语句
   function handleConfirm() {
     exec(willExecCmd);
     getData();
   }
 
-  // ========== 上下文按钮功能 结束 ==========
+  // ========== 上下文按钮 结束 | Context button end ==========
 
-  // 列表数据
   const [listData, setListData] = useState<ListItem[]>([]);
 
   async function getData() {

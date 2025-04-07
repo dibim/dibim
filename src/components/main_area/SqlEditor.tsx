@@ -20,6 +20,7 @@ import { TableSection, TableSectionMethods } from "../TableSection";
 import { TooltipGroup } from "../TooltipGroup";
 
 // 初始化 Monaco 环境, 避免从 CDN 加载
+// Initialize Monaco environment to avoid loading from CDN
 self.MonacoEnvironment = {
   getWorker(_, label) {
     if (label === "sql") return new sqlWorker();
@@ -80,7 +81,6 @@ export function SqlEditor() {
     }
   }
 
-  // 格式化代码
   function formatCode() {
     const code = getEditorCode();
     const res = formatSql(appState.currentDbType, code);
@@ -91,11 +91,8 @@ export function SqlEditor() {
     }
   }
 
-  // 执行代码
   async function execCode() {
     const code = getEditorCode();
-
-    // 检查前10个字符是否包含"select"
     const first10Chars = code.trim().substring(0, 10).toLowerCase();
     if (first10Chars.includes("select")) {
       if (RE_IS_SINGLET_QUERY.test(code)) {
@@ -155,21 +152,19 @@ export function SqlEditor() {
 
   // ========== 面板控制 结束 ==========
 
-  // ========== 编辑器 ==========
+  // ========== 编辑器 | Editor ==========
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
 
-    // 恢复上次编辑的语句
+    // 恢复上次编辑的语句 | Restore the last edited statement
     editor.setValue(snap.sqlEditorContent);
 
-    // 添加快捷键
-    // 运行代码
+    // 添加快捷键 | Add shortcut keys
     editor.addCommand(monaco.KeyCode.F9, async () => {
       await execCode();
     });
-    // 格式化代码
     editor.addCommand(monaco.KeyCode.F8, async () => {
       formatCode();
     });
@@ -243,10 +238,11 @@ export function SqlEditor() {
       editorRef.current.layout();
     }
   }
-  // ========== 编辑器 结束 ==========
+  // ========== 编辑器 结束 | Editor end ==========
 
-  //  表格的变化
-  const [changes, setChanges] = useState<TableDataChange[]>([]); // 记录所有修改的变量
+  // 修改已有数据的变更记录, 不含添加和删除
+  // Change logs for modifying existing data, excluding additions and deletions.
+  const [changes, setChanges] = useState<TableDataChange[]>([]);
   function onChange(val: TableDataChange[]) {
     setChanges(val);
     // FIXME: 保存时生成语句
@@ -259,6 +255,7 @@ export function SqlEditor() {
   }
 
   // 监听 editorHeight 变化，强制更新编辑器布局
+  // Monitor changes in editorHeight and force updates to editor layout
   useEffect(() => {
     resizeEditor();
   }, [editorHeight]);
@@ -306,17 +303,17 @@ export function SqlEditor() {
             onMount={handleEditorDidMount}
             onChange={handleEditorChange}
             options={{
-              suggestOnTriggerCharacters: true, // 必须开启
+              suggestOnTriggerCharacters: true,
               quickSuggestions: {
-                other: true, // 非注释/字符串区域也显示建议
+                other: true,
                 comments: false,
                 strings: true,
               },
               autoClosingBrackets: "always",
               autoIndent: "full",
               formatOnType: true,
-              wordBasedSuggestions: "off", // 禁用默认单词补全（关键！）
-              acceptSuggestionOnEnter: "on", // 回车直接选中
+              wordBasedSuggestions: "off",
+              acceptSuggestionOnEnter: "on",
               automaticLayout: true,
             }}
           />
