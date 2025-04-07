@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { I18nextProvider, useTranslation } from "react-i18next";
 import { AlertCircle } from "lucide-react";
+import { useSnapshot } from "valtio";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import "@/styles/app.scss";
 import "@/styles/index.css";
@@ -22,6 +23,7 @@ import { readConfigFile } from "./utils/config_file";
 
 export function App() {
   const { t } = useTranslation();
+  const snap = useSnapshot(appState);
   const [showLock, setShowLock] = useState(true);
   const [mainPassword, setMainPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -119,8 +121,8 @@ export function App() {
         ) : (
           <SidebarProvider
             style={{
-              "--sidebar-width": "10rem",
-              "--sidebar-width-mobile": "20rem",
+              "--sidebar-width": snap.sideBarWidthPc,
+              "--sidebar-width-mobile": snap.sideBarWidthMobile,
             }}
           >
             <TooltipProvider>

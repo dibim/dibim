@@ -15,15 +15,17 @@ import tr from "./locales/tr/translation.json";
 import uk from "./locales/uk/translation.json";
 import zh_hans from "./locales/zh-hans/translation.json";
 import zh_hant from "./locales/zh-hant/translation.json";
+import { appState } from "./store/valtio";
+
+export const HANS = "zh_hans";
+export const HANT = "zh_hant";
 
 /**
  * 根据浏览器语言代码判断使用简体还是繁体
  * @returns {'zh-hans' | 'zh-hant'}
  */
 function detectChineseType() {
-  // 定义简体/繁体对应的语言代码
   const SIMPLIFIED_CODES = ["zh-cn", "zh-sg", "zh-my", "zh-hans", "zh-hans-cn", "zh-hans-sg"];
-
   const TRADITIONAL_CODES = ["zh-tw", "zh-hk", "zh-mo", "zh-hant", "zh-hant-tw", "zh-hant-hk", "zh-hant-mo"];
 
   // 检查每个语言代码
@@ -31,41 +33,42 @@ function detectChineseType() {
     const lowerLang = lang.toLowerCase();
 
     if (SIMPLIFIED_CODES.includes(lowerLang)) {
-      return "zh-hans";
+      return HANS;
     }
 
     if (TRADITIONAL_CODES.includes(lowerLang)) {
-      return "zh-hant";
+      return HANT;
     }
 
     // 如果只有通用zh代码，进一步检查时区
     if (lowerLang === "zh") {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       if (["Asia/Shanghai", "Asia/Singapore", "Asia/Kuala_Lumpur"].some((tz) => timezone.includes(tz))) {
-        return "simplified";
+        return HANS;
       }
 
       if (["Asia/Taipei", "Asia/Hong_Kong", "Asia/Macau"].some((tz) => timezone.includes(tz))) {
-        return "zh-hant";
+        return HANT;
       }
     }
   }
 
-  return "zh-hans"; // 无法确定
+  return HANS;
 }
 
 const getBrowserLanguage = () => {
+  let lang = "en";
   const userLanguage = navigator.language;
   if (userLanguage.startsWith("zh")) {
-    return detectChineseType();
+    lang = detectChineseType();
+  } else {
+    const language = userLanguage.split("-")[0]; // 简化为语言代码前两位（如 'zh-CN' → 'zh'）
+    if (["ar", "de", "en", "es", "fr", "it", "ja", "ko", "nl", "pl", "ru", "tr", "uk"].includes(language)) {
+      lang = language;
+    }
   }
 
-  const lang = userLanguage.split("-")[0]; // 简化为语言代码前两位（如 'zh-CN' → 'zh'）
-  if (["ar", "de", "en", "es", "fr", "it", "ja", "ko", "nl", "pl", "ru", "tr", "uk"].includes(lang)) {
-    return lang;
-  }
-
-  return "en";
+  return lang;
 };
 
 i18n.use(initReactI18next).init({
@@ -94,9 +97,22 @@ i18n.use(initReactI18next).init({
   },
 });
 
+function setWidth(pc: string, mobile: string) {
+  appState.setSideBarWidthPc(pc);
+  appState.setSideBarWidthMobile(mobile);
+}
+
 // 监听语言变化
-i18n.on("languageChanged", (lng) => {
-  // TODO:
+i18n.on("languageChanged", (lang) => {
+  if (["ar", "en", "ja"].includes(lang)) setWidth("14rem", "14rem");
+  if (["de", "it", "pl"].includes(lang)) setWidth("18rem", "18rem");
+  if (["es", "nl"].includes(lang)) setWidth("17rem", "17rem");
+  if (["fr"].includes(lang)) setWidth("22rem", "22rem");
+  if (["ko"].includes(lang)) setWidth("13rem", "13rem");
+  if (["ru"].includes(lang)) setWidth("21rem", "21rem");
+  if (["tr"].includes(lang)) setWidth("15rem", "15rem");
+  if (["uk"].includes(lang)) setWidth("19rem", "19rem");
+  if ([HANS, HANT].includes(lang)) setWidth("10rem", "10rem");
 });
 
 export default i18n;
