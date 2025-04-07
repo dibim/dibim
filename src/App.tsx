@@ -14,11 +14,11 @@ import { Input } from "./components/ui/input";
 import { SidebarProvider } from "./components/ui/sidebar";
 import { Toaster } from "./components/ui/sonner";
 import { TooltipProvider } from "./components/ui/tooltip";
-import { APP_NAME, CONFIG_FILE_MAIN, MAIN_PASSWORD_DEFAULT } from "./constants";
+import { APP_NAME, CONFIG_FILE_APPEARANCE, CONFIG_FILE_MAIN, MAIN_PASSWORD_DEFAULT } from "./constants";
 import i18n from "./i18n";
 import { invoker } from "./invoker";
 import { appState } from "./store/valtio";
-import { ConfigFile } from "./types/conf_file";
+import { ConfigFileAppearance, ConfigFileMain } from "./types/conf_file";
 import { readConfigFile } from "./utils/config_file";
 
 export function App() {
@@ -34,9 +34,10 @@ export function App() {
 
   // 使用主密码解锁配置文件并初始化 app 配置
   async function initConfFile(pwd: string, isDefultPwd: boolean) {
+    // 主配置文件
     const conf = await readConfigFile(pwd);
     try {
-      const config = JSON.parse(conf) as ConfigFile;
+      const config = JSON.parse(conf) as ConfigFileMain;
       // 如果发现崇明的连接名, 自动添加后缀
       const nameSet = new Set<string>();
       for (let index = 0; index < config.dbConnections.length; index++) {
@@ -44,6 +45,18 @@ export function App() {
 
         if (nameSet.has(conn.name)) config.dbConnections[index].name = `${conn.name}_${index}`;
         nameSet.add(conn.name);
+      }
+
+      // 补充外观配置
+      const resA = await invoker.readFileText(CONFIG_FILE_APPEARANCE);
+      try {
+        if (resA.errorMessage === "") {
+          const configA = JSON.parse(resA.result) as ConfigFileAppearance;
+          config.settings.lang = configA.lang;
+          config.settings.colorScheme = configA.colorScheme;
+        }
+      } catch (error) {
+        console.log(`读取外观配置出错 ${error}`);
       }
 
       await appState.setConfig(config, true);

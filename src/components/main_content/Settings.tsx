@@ -1,22 +1,24 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Moon, Sun } from "lucide-react";
 import { DIR_H, MAIN_PASSWORD_MIN_LEN } from "@/constants";
 import { getTableDdl } from "@/databases/adapter,";
+import { HANS, HANT } from "@/i18n";
 import { invoker } from "@/invoker";
 import { appState } from "@/store/valtio";
-import { ConfigFile } from "@/types/conf_file";
+import { ConfigFileMain } from "@/types/conf_file";
 import { LabeledDiv } from "../LabeledDiv";
+import { useTheme } from "../ThemeProvider";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
-import { HANS, HANT } from "@/i18n";
 
 export function Settings() {
   const { t, i18n } = useTranslation();
+  const { setTheme } = useTheme();
   const [mainPassword, setMainPassword] = useState<string>("");
-  const [theme, setTheme] = useState<string>("");
+  const [colorScheme, setColorScheme] = useState<string>("");
   const [lang, setLang] = useState<string>("");
   const [timeFormat, setTimeFormat] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>(""); // 错误消息
@@ -31,8 +33,9 @@ export function Settings() {
     setLang(lng);
   };
 
-  function onInpuTheme(event: React.ChangeEvent<HTMLInputElement>) {
-    setTheme(event.target.value || "");
+  function changeTheme(theme: "dark" | "light") {
+    setColorScheme(theme);
+    setTheme(theme);
   }
 
   async function onSubmit() {
@@ -53,11 +56,11 @@ export function Settings() {
       settings: {
         ...appState.config.settings,
         lang,
-        theme,
+        colorScheme,
         timeFormat,
       },
       dbConnections: [...appState.config.dbConnections],
-    } as ConfigFile);
+    } as ConfigFileMain);
 
     setOkMessage(t("Saved successfully"));
   }
@@ -145,7 +148,12 @@ export function Settings() {
           </LabeledDiv>
 
           <LabeledDiv direction={DIR_H} label={"🎨" + t("Theme")} className="py-2">
-            <Input value={theme} onInput={onInpuTheme} />
+            <Button className="m-2" onClick={() => changeTheme("light")}>
+              <Sun />
+            </Button>
+            <Button className="m-2" onClick={() => changeTheme("dark")}>
+              <Moon />
+            </Button>
           </LabeledDiv>
 
           {errorMessage && (

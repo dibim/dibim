@@ -90,30 +90,23 @@ In event handling, useEffect, and other logic, the original state object appStat
 - 表结构里的字段类型可使用下拉框选择✅
 - 表格数据列表的 添加行的语句改为批量插入✅
 
-### v0.2.1 国际化
+### v0.3 国际化✅
 
-- 国际化
-  - 语言和主题的配置应该使用明文
-  - 保存配置的时候检查: 不设置主密码的情况下保存为什么会加密配置文件
+- 国际化✅
+- 侧边栏宽度按语言自动适应✅
+- 外观配置文件用明文存储✅
+  
+### v0.4 mysql
 
-### v0.2.2  
-
-- 使用中完善
-- 下个版本有时间再做
-
-### v0.2.3
-
+- 使用中完善, 其他功能有时间再做
 - 字段添加 COLLATE
 - 字段添加 CHECK 约束
-
-### v0.3 mysql
-
 - 支持 mysql
 - 表格数据分页查询, 没有主键的待实现
 - 密码在内存中的存储方式要改一下, 使用类似 libsodium 的方式保存  
 - 优化确认框的尺寸控制
 
-### v0.4 优化 sql 语句功能
+### v0.5 优化 sql 语句功能
 
 - sql 编辑器
   - 记录到历史
@@ -121,7 +114,7 @@ In event handling, useEffect, and other logic, the original state object appStat
 - 大字符串查看器
 - 分区  
 
-### v0.5
+### v0.6
 
 - 表结构的对话框保存时添加检查
 - 优化表名列表的磁盘占用大小的样式

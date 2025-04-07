@@ -25,3 +25,4 @@ dist-ssr
 
 # dev
 src-tauri/dibim_config.bin
+src-tauri/dibim_appearance.json
