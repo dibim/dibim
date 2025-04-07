@@ -43,6 +43,7 @@ export function DatabaseList() {
 
   async function handleClickConn(conn: DbConnections) {
     // 先设置这两项, 否则 connect 里获取不到
+    // Set these two items first, otherwise they won't be available in the connect.
     appState.setCurrentDbType(conn.dbType);
     appState.setCurrentConnName(conn.name);
 
@@ -68,7 +69,6 @@ export function DatabaseList() {
     }
   }
 
-  // 列表数据
   const [listData, setListData] = useState<ListItem[]>([]);
   function getData() {
     const arr: ListItem[] = [];

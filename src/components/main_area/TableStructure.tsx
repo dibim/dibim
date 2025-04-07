@@ -48,11 +48,11 @@ export function TableStructure({
 
   // 提示对话框
   const [dialogAction, setDialogAction] = useState<DialogAction>("");
-  const [errorMessage, setErrorMessage] = useState<string>(""); // 错误消息
-  const [okMessage, setOkMessage] = useState<string>(""); // 成功消息
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [okMessage, setOkMessage] = useState<string>("");
   const [showDialogAlter, setShowDialogAlter] = useState<boolean>(false);
   const [showDialogEdit, setShowDialogEdit] = useState<boolean>(false);
-  const [willExecCmd, setWillExecCmd] = useState<string>(""); // 将要执行的命令(sql 语句)
+  const [willExecCmd, setWillExecCmd] = useState<string>("");
 
   // 字段编辑对话框里的数据
   const [autoIncrement, setAutoIncrement] = useState<boolean>(false);
