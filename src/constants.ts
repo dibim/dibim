@@ -1,6 +1,6 @@
 // APP 标志相关
 export const APP_NAME = "DIBIM";
-export const APP_VERSION = "v0.2.0";
+export const APP_VERSION = "v0.3.0";
 
 // 常用字符串
 // Common strings
@@ -43,6 +43,9 @@ export const MAIN_PASSWORD_MIN_LEN = 6;
 // 配置文件
 // Configuration file
 export const CONFIG_FILE_MAIN = "./dibim_config.bin";
+// 外观配置
+export const CONFIG_FILE_APPEARANCE = "./dibim_appearance.json";
+
 // 查询记录
 // Query records
 export const QUERY_HISTORY_FILE = "./dibim_query_history.bin";

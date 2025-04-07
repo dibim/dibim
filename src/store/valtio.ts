@@ -7,14 +7,14 @@ import {
 } from "@/constants";
 import { FieldStructure } from "@/databases/types";
 import { invoker } from "@/invoker";
-import { ConfigFile } from "@/types/conf_file";
+import { ConfigFileMain } from "@/types/conf_file";
 import { DbType, ListBarType, MainContenType, MainContentTab } from "@/types/types";
 import { saveConfigFile } from "@/utils/config_file";
 
 interface AppState {
   // 配置文件相关
-  config: ConfigFile;
-  setConfig: (val: ConfigFile, notWriteToFile?: boolean) => Promise<void>;
+  config: ConfigFileMain;
+  setConfig: (val: ConfigFileMain, notWriteToFile?: boolean) => Promise<void>;
   mainPasswordSha: string;
   setMainPasswordSha: (val: string) => void;
 
@@ -99,10 +99,10 @@ interface AppState {
 // 按照默认密码生成默认的 sha
 export const defaultMainPasswordSha = await invoker.sha256(MAIN_PASSWORD_DEFAULT);
 
-const emptyConfigFile: ConfigFile = {
+const emptyConfigFile: ConfigFileMain = {
   dbConnections: [],
   settings: {
-    theme: "",
+    colorScheme: "",
     timeFormat: "",
     lang: "",
   },
@@ -110,10 +110,10 @@ const emptyConfigFile: ConfigFile = {
 
 export const appState = proxy<AppState>({
   config: emptyConfigFile,
-  setConfig: async (val: ConfigFile, notWrite?: boolean) => {
+  setConfig: async (val: ConfigFileMain, notWrite?: boolean) => {
     appState.config = val;
     if (notWrite !== true) {
-      await saveConfigFile(JSON.stringify(val), appState.mainPasswordSha); // 保存到配置文件
+      await saveConfigFile(val, appState.mainPasswordSha); // 保存到配置文件
     }
   },
   mainPasswordSha: defaultMainPasswordSha,
