@@ -15,12 +15,12 @@ export interface ListItemItem {
   onClick: (item: ListItem) => void;
   icon?: React.ReactNode;
   disabled?: boolean;
-  isLine?: boolean; // 是分割线
+  isDivider?: boolean; // 是分割线
 }
 
 export interface ListItem {
   id: string;
-  content: React.ReactNode; // 主内容显示
+  content: React.ReactNode;
   contentOnClick: (item: ListItem) => void;
   menuItems: ListItemItem[];
 }
@@ -34,7 +34,7 @@ interface ReusableDropdownListProps {
   menuAlign?: "start" | "center" | "end";
   itemClassName?: string;
   menuItemClassName?: string;
-  triggerMethod?: typeof STR_BTN | typeof STR_RC; // 操作按钮的触发方式, 按钮或者右击, 或者留空自动判断
+  triggerMethod?: typeof STR_BTN | typeof STR_RC;
 }
 
 export function ListWithAction({
@@ -51,7 +51,7 @@ export function ListWithAction({
 
   return (
     <div className={`${className}`}>
-      {/* 按钮触发 */}
+      {/* 按钮触发 | Triggered by button */}
       {triggerMethod === STR_BTN &&
         items.map((item) => (
           <DropdownMenu key={item.id}>
@@ -72,7 +72,7 @@ export function ListWithAction({
 
             <DropdownMenuContent align={menuAlign}>
               {item.menuItems.map((menuItem, index) => {
-                return menuItem.isLine ? (
+                return menuItem.isDivider ? (
                   <hr className="my-2" key={index} />
                 ) : (
                   <DropdownMenuItem
@@ -92,7 +92,7 @@ export function ListWithAction({
           </DropdownMenu>
         ))}
 
-      {/* 右击触发 */}
+      {/* 右击触发 | Triggered by right clicking */}
       {triggerMethod === STR_RC &&
         items.map((item) => (
           <ContextMenu key={item.id}>
@@ -108,7 +108,7 @@ export function ListWithAction({
             </ContextMenuTrigger>
             <ContextMenuContent>
               {item.menuItems.map((menuItem, index) => {
-                return menuItem.isLine ? (
+                return menuItem.isDivider ? (
                   <hr className="my-2" key={index} />
                 ) : (
                   <ContextMenuItem

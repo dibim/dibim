@@ -85,7 +85,7 @@ export function TableEditor() {
   useEffect(() => {
     getData();
 
-    // 监听 store 的变化
+    // 监听 store 的变化 | Monitor changes in the store
     const unsubscribe = subscribeKey(appState, "currentTableName", async (_value: any) => {
       setEditingTableName(_value);
       await getData();

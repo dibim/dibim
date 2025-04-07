@@ -16,11 +16,11 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
-type ConnectionProp = {
+type ConnectionProps = {
   action: typeof STR_ADD | typeof STR_EDIT;
 };
 
-export function Connection(props: ConnectionProp) {
+export function Connection(props: ConnectionProps) {
   const { t } = useTranslation();
   const snap = useSnapshot(appState);
   const [name, setName] = useState<string>(""); // 连接名称

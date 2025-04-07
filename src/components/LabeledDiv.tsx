@@ -2,7 +2,7 @@ import { DIR_H, DIR_V } from "@/constants";
 
 interface LabeledDivProps {
   label: string;
-  labelWidth?: string; // 仅水平模式下有效
+  labelWidth?: string; // 仅水平模式下有效 | Effective only in horizontal mode
   children: React.ReactNode;
   className?: string;
   direction?: typeof DIR_H | typeof DIR_V;

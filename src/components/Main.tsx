@@ -26,7 +26,7 @@ export function Main({ id, className }: { id: string; className: string }) {
   const { toggleSidebar, setOpenMobile, setOpen } = useSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  // ========== 快捷键 ==========
+  // ========== 快捷键 | Shortcut keys ==========
   function toggleSidebarOpen() {
     setOpenMobile(!appState.sidebarOpen);
     setOpen(!appState.sidebarOpen);
@@ -38,9 +38,9 @@ export function Main({ id, className }: { id: string; className: string }) {
   useHotkeys("f1", () => toggleAboutOpen(), [appState.aboutOpen]);
   useHotkeys("f2", () => toggleSidebarOpen(), [appState.sidebarOpen]);
   useHotkeys("f3", () => appState.setListBarOpen(!appState.listBarOpen), [appState.listBarOpen]);
-  // ========== 快捷键 结束 ==========
+  // ========== 快捷键 结束 | Shortcut keys end==========
 
-  // ========== 控制列表栏 ==========
+  // ========== 控制列表栏 | Control list bar ==========
   const [defaultSizePercent, setDefaultSizePercent] = useState(20);
 
   const handleResize = (sizes: number[]) => {
@@ -61,9 +61,9 @@ export function Main({ id, className }: { id: string; className: string }) {
     window.addEventListener("resize", updateSize);
     return () => window.removeEventListener("resize", updateSize);
   }, []);
-  // ========== 控制列表栏 结束 ==========
+  // ========== 控制列表栏 结束 | Control list bar end ==========
 
-  // ========== 控制测表栏 ==========
+  // ========== 控制侧边栏 | Control sidebar ==========
   const timerRef = useRef<number>(0);
   // 动画结束后执行的操作
   const handleAfterAnimation = () => {
@@ -81,17 +81,17 @@ export function Main({ id, className }: { id: string; className: string }) {
     setMainWidth(`calc(100vw - ${snap.sideBarWidth}px - 10px)`); // TODO: 临时减 10px
   }, [snap.sideBarWidth]);
 
-  // ========== 控制测表栏 结束 ==========
+  // ========== 控制侧边栏 结束 | Control sidebar end ==========
 
   useEffect(() => {
     setOpenMobile(appState.sidebarOpen);
     setOpen(appState.sidebarOpen);
 
-    // 初始化涉及到布局的尺寸
+    // 初始化涉及到布局的尺寸 | Initialization involves the size of the layout
     handleAfterAnimation();
     resizeListBarWidth(defaultSizePercent);
 
-    // ========== 侧边栏 ==========
+    // ========== 侧边栏 | Sidebar ==========
     const sidebar = sidebarRef.current;
     if (!sidebar) return;
 
@@ -105,7 +105,6 @@ export function Main({ id, className }: { id: string; className: string }) {
   const tooltipSectionData = [
     {
       trigger: (
-        // 复制 sidebar-trigger 过来, 这里添加了函数, 记录 sidebar 的状态
         <Button data-sidebar="trigger" variant="ghost" onClick={toggleSidebarOpen}>
           <PanelLeftIcon />
           <span className="sr-only">{t("Toggle sidebar")}</span>

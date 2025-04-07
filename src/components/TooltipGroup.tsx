@@ -1,5 +1,3 @@
-"use client";
-
 import { ReactNode } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
@@ -8,11 +6,11 @@ export interface TooltipSectionItem {
   content: ReactNode;
 }
 
-export interface TooltipSectionProp {
+export interface TooltipSectionProps {
   dataArr: TooltipSectionItem[];
 }
 
-export function TooltipGroup({ dataArr: data }: TooltipSectionProp) {
+export function TooltipGroup({ dataArr: data }: TooltipSectionProps) {
   return (
     <>
       {data.map((item, index) => (

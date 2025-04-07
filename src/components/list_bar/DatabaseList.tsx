@@ -127,7 +127,7 @@ export function DatabaseList() {
   useEffect(() => {
     getData();
 
-    // 监听 store 的变化
+    // 监听 store 的变化 | Monitor changes in the store
     const unsubscribe = subscribeKey(appState, "config", (_value: any) => {
       getData();
     });
