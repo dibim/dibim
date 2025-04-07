@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertCircle, CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
+import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { subscribeKey } from "valtio/utils";
 import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
@@ -14,8 +14,8 @@ import { EditableTable, EditableTableMethods, ListRow } from "../EditableTable";
 import { LabeledDiv } from "../LabeledDiv";
 import { SearchableSelect } from "../SearchableSelect";
 import { SqlCodeViewer } from "../SqlCodeViewer";
+import { TextNotification } from "../TextNotification";
 import { TooltipGroup } from "../TooltipGroup";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu";
@@ -620,21 +620,8 @@ export function TableEditorStructure({
             <Input value={comment} onInput={(e) => setComment(e.currentTarget.value)} />
           </LabeledDiv>
 
-          {errorMessage && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>{t("Error message")}</AlertTitle>
-              <AlertDescription>{errorMessage}</AlertDescription>
-            </Alert>
-          )}
-
-          {okMessage && (
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>{t("Tips")}</AlertTitle>
-              <AlertDescription>{okMessage}</AlertDescription>
-            </Alert>
-          )}
+          {errorMessage && <TextNotification type="error" message={errorMessage}></TextNotification>}
+          {okMessage && <TextNotification type="error" message={okMessage}></TextNotification>}
 
           <DialogFooter>
             <Button type="submit" onClick={onSubmit}>
