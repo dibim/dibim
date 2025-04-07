@@ -648,7 +648,7 @@ export function TableEditorStructure({
       <ConfirmDialog
         open={showDialogAlter}
         title={t("Are you sure you want to save the changes?")}
-        description={t("Please confirm the statement to be executed:")}
+        description={t("&confirmStatement")}
         content={<SqlCodeViewer ddl={willExecCmd} />}
         cancelText={t("Cancel")}
         cancelCb={() => {

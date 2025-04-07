@@ -119,7 +119,7 @@ export function App() {
         ) : (
           <SidebarProvider
             style={{
-              "--sidebar-width": "8rem",
+              "--sidebar-width": "10rem",
               "--sidebar-width-mobile": "20rem",
             }}
           >
