@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Edit, Trash, Unlink } from "lucide-react";
 import { useSnapshot } from "valtio";
 import { subscribeKey } from "valtio/utils";
@@ -22,6 +23,7 @@ import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
 
 export function DatabaseList() {
+  const { t } = useTranslation();
   const snap = useSnapshot(appState);
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [itemIndex, setItemIndex] = useState<number>(-1);
@@ -91,7 +93,7 @@ export function DatabaseList() {
         },
         menuItems: [
           {
-            label: "编辑",
+            label: t("Edit"),
             onClick: () => {
               appState.setEditDbConnIndex(index);
               appState.setMainContenType(MAIN_AREA_EDIT_CONNECTION);
@@ -100,7 +102,7 @@ export function DatabaseList() {
           },
 
           {
-            label: "断开链接",
+            label: t("Disconnect"),
             onClick: () => {
               invoker.disconnectSql(appState.currentConnName);
             },
@@ -108,7 +110,7 @@ export function DatabaseList() {
           },
 
           {
-            label: "删除",
+            label: t("Delete"),
             onClick: () => {
               setItemIndex(index);
               setShowDialog(true);
@@ -138,13 +140,13 @@ export function DatabaseList() {
 
       <ConfirmDialog
         open={showDialog}
-        title={`确认要删除吗`}
+        title={t("&confirmDelete")}
         content={""}
-        cancelText={"取消"}
+        cancelText={t("Cancel")}
         cancelCb={() => {
           setShowDialog(false);
         }}
-        okText={"确定"}
+        okText={t("Confirm")}
         okCb={delItem}
       />
     </>

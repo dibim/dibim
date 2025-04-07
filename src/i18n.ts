@@ -21,7 +21,7 @@ export const HANS = "zh_hans";
 export const HANT = "zh_hant";
 
 /**
- * 根据浏览器语言代码判断使用简体还是繁体
+ * 根据浏览器语言代码和时区判断使用简体还是繁体
  * @returns {'zh-hans' | 'zh-hant'}
  */
 function detectChineseType() {
@@ -104,6 +104,7 @@ function setWidth(pc: string, mobile: string) {
 
 // 监听语言变化
 i18n.on("languageChanged", (lang) => {
+  // 根据语言设置侧边栏的宽度限制
   if (["ar", "en", "ja"].includes(lang)) setWidth("14rem", "14rem");
   if (["de", "it", "pl"].includes(lang)) setWidth("18rem", "18rem");
   if (["es", "nl"].includes(lang)) setWidth("17rem", "17rem");
