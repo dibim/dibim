@@ -229,7 +229,7 @@ export function TableList() {
           {
             label: t("Divider"),
             onClick: () => {},
-            isLine: true,
+            isDivider: true,
           },
           {
             label: t("Import"),
@@ -247,7 +247,7 @@ export function TableList() {
           {
             label: t("Divider"),
             onClick: () => {},
-            isLine: true,
+            isDivider: true,
           },
           {
             label: t("Truncate"),
@@ -277,7 +277,7 @@ export function TableList() {
   useEffect(() => {
     getData();
 
-    // 监听 store 的变化
+    // 监听 store 的变化 | Monitor changes in the store
     const unsubscribe = subscribeKey(appState, "currentDbNme", (_value: any) => {
       getData();
     });

@@ -29,14 +29,14 @@ export type TableSectionMethods = {
   updateDataArr: (val: RowData[]) => void;
 };
 
-export type TableSectionProp = {
+export type TableSectionProps = {
   width: string;
   getData: (val: number) => Promise<any>;
   initData: () => void;
   ref?: React.Ref<TableSectionMethods>;
 };
 
-export function TableSection({ width, getData, initData, ref }: TableSectionProp) {
+export function TableSection({ width, getData, initData, ref }: TableSectionProps) {
   const { t } = useTranslation();
   const tableRef = useRef<EditableTableMethods | null>(null);
 
@@ -150,7 +150,7 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
   useEffect(() => {
     initData();
 
-    // 监听 store 的变化
+    // 监听 store 的变化 | Monitor changes in the store
     const unsubscribe = subscribeKey(appState, "currentTableName", (_value: any) => {
       initData();
     });

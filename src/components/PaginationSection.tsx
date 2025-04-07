@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CornerDownLeft } from "lucide-react";
@@ -24,7 +22,7 @@ export interface PaginationProps {
 }
 export function PaginationSection({ currentPage, setCurrentPage, pageTotal, itemsTotal, getData }: PaginationProps) {
   const { t } = useTranslation();
-  const [inputedPage, setInputedPage] = useState<number>(1); // 输入的页码
+  const [inputedPage, setInputedPage] = useState<number>(1);
 
   const firstPage = () => {
     let page = 1;
@@ -64,6 +62,7 @@ export function PaginationSection({ currentPage, setCurrentPage, pageTotal, item
   };
 
   // 输入框里的页面跟随当前页码变化
+  // The page in the input box changes with the current page number
   useEffect(() => {
     setInputedPage(currentPage);
   }, [currentPage]);

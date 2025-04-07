@@ -9,15 +9,15 @@ import {
   AlertDialogTitle,
 } from "./ui/x_alert-dialog";
 
-export type ConfirmDialogProp = {
+export type ConfirmDialogProps = {
   open: boolean;
   title: string;
   description?: string;
   content: React.ReactNode;
-  cancelText: string; // 取消按钮的文字
-  cancelCb: () => void; // 点击编辑按钮的回调函数
-  okText: string; // 确认按钮的文字
-  okCb: () => void; // 点击确认按钮的回调函数
+  cancelText: string;
+  cancelCb: () => void;
+  okText: string;
+  okCb: () => void;
 };
 
 export function ConfirmDialog({
@@ -29,7 +29,7 @@ export function ConfirmDialog({
   cancelCb,
   okText,
   okCb,
-}: ConfirmDialogProp) {
+}: ConfirmDialogProps) {
   return (
     <AlertDialog open={open}>
       <AlertDialogContent>

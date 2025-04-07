@@ -1,5 +1,3 @@
-"use client";
-
 import { JSX, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { SquareCheckBig } from "lucide-react";
@@ -11,19 +9,20 @@ import { getRandomNegativeInt } from "@/utils/number";
 
 export interface ListCell {
   value: any;
-  render: (val: any) => JSX.Element; // 渲染 value, 可以添加其它元素
+  // 渲染 value 的函数, 可添加更复杂的控制
+  // The function of rendering value can add more complex controls
+  render: (val: any) => JSX.Element;
 }
 
 export interface ListRow {
   [key: string]: ListCell;
 }
 
-// 修改表格的数据
 export interface TableDataChange {
-  index: number; // 行的索引
-  field: string; // 字段名
-  old: any; // 原先的值
-  new: any; // 新的值
+  index: number; // 行的索引 | Index of rows
+  field: string; // 字段名| Field name
+  old: any; // 原先的值 | old value
+  new: any; // 新的值 | new value
 }
 
 export type EditableTableMethods = {
@@ -38,12 +37,14 @@ export type EditableTableMethods = {
 };
 
 interface EditableTableProps {
-  editable: boolean; // 是否可编辑
-  multiSelect: boolean; // 是否可编辑
-  fieldNames: string[]; // 字段名
-  fieldNamesTitle?: string[]; // 字段名的标题
-  fieldNamesUnique: string[]; // 是唯一的字段名
-  dataArr: ListRow[]; // 每行的数据
+  editable: boolean;
+  multiSelect: boolean;
+  fieldNames: string[];
+  fieldNamesTitle?: string[];
+  // 唯一的字段名(主键或唯一索引的)
+  // Unique field name (primary key or unique index)
+  fieldNamesUnique: string[];
+  dataArr: ListRow[];
   height: string;
   width: string;
   onChange: (val: TableDataChange[]) => void;
@@ -68,12 +69,13 @@ export function EditableTable({
 }: EditableTableProps) {
   const { t } = useTranslation();
   const [data, setData] = useState<ListRow[]>(dataArr);
-  const [editingRowIdndex, setEditingRowIndex] = useState<number>(-1); // 正在编辑的索引
-  const [editingFieldName, setEditingFieldName] = useState<string>(""); // 正在编辑的字段名
+  const [editingRowIdndex, setEditingRowIndex] = useState<number>(-1);
+  const [editingFieldName, setEditingFieldName] = useState<string>("");
   const [tempValue, setTempValue] = useState<string>("");
-  const [changes, setChanges] = useState<TableDataChange[]>([]); // 记录所有修改的变量
+  // 修改已有数据的变更记录, 不含添加和删除
+  // Change logs for modifying existing data, excluding additions and deletions.
+  const [changes, setChanges] = useState<TableDataChange[]>([]);
 
-  // 开始编辑
   function handleEditStart(rowIndex: number, fieldName: string, value: string) {
     setActiveIndex(rowIndex);
     setEditingRowIndex(rowIndex);
@@ -81,7 +83,6 @@ export function EditableTable({
     setTempValue(value);
   }
 
-  // 保存编辑
   function handleEditSave(rowIndex: number, fieldName: string) {
     setData(
       data.map((item, index) =>
@@ -90,7 +91,7 @@ export function EditableTable({
               ...item,
               [fieldName]: {
                 ...item[fieldName],
-                value: tempValue, // 只更新 value
+                value: tempValue,
               },
             }
           : item,
@@ -100,30 +101,28 @@ export function EditableTable({
     setEditingFieldName("");
 
     // 是新添加的行, 不记录修改
+    // This line was added and is not tracked for modifications.
     if (data[rowIndex][NEW_ROW_IS_ADDED_FIELD]) {
       return;
     }
 
-    // 记录修改
     const oldValue = getCellValue(data[rowIndex], fieldName);
     if (oldValue !== tempValue) {
       setChanges((prev) => [
-        ...prev.filter((item) => !(item.index === rowIndex && item.field === fieldName)), // 去重
+        ...prev.filter((item) => !(item.index === rowIndex && item.field === fieldName)),
         { index: rowIndex, field: fieldName, old: oldValue, new: tempValue },
       ]);
     }
   }
 
-  // 处理输入变化
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setTempValue(e.target.value);
   }
 
-  // ========== 多选 =========
-  const [deletedRowIndex, setDeletedRowIndex] = useState<Set<number>>(new Set()); // 删除的行的索引
-  const [selectedRowIndex, setSelectedRowIndex] = useState<Set<number>>(new Set()); // 选中的行的索引
+  // ========== 多选 | Multi-select =========
+  const [deletedRowIndex, setDeletedRowIndex] = useState<Set<number>>(new Set());
+  const [selectedRowIndex, setSelectedRowIndex] = useState<Set<number>>(new Set());
 
-  // 选中行, 删除的时候使用
   function handleSelectRow(id: number) {
     const newSelectedRows = new Set(selectedRowIndex);
     if (newSelectedRows.has(id)) {
@@ -133,15 +132,15 @@ export function EditableTable({
     }
     setSelectedRowIndex(newSelectedRows);
   }
-  // ========== 多选 结束 =========
+  // ========== 多选 结束 | Multi-select end =========
 
-  // ========== 防止重新渲染滚动表格 ==========
-  // 状态管理 (全部在return之外)
+  // ========== 防止重新渲染滚动表格 | Prevent re-rendering of a scrolling table ==========
   const [activeIndex, setActiveIndex] = useState<number>(-1);
   const containerRef = useRef<HTMLTableSectionElement | null>(null);
   const scrollPosRef = useRef(0);
 
-  // 要触发修改表格重新渲染之前调用, 本组件外部用
+  // 要触发修改表格重新渲染之前调用
+  // Call this before modifying the table to trigger a re-render.
   function willRanderTable() {
     setActiveIndex(getRandomNegativeInt());
   }
@@ -158,7 +157,7 @@ export function EditableTable({
 
     containerRef.current.scrollTop = scrollPosRef.current;
   }, [activeIndex]);
-  // ========== 防止重新渲染滚动表格 结束 ==========
+  // ========== 防止重新渲染滚动表格 结束 | Prevent re-rendering of a scrolling table end ==========
 
   useImperativeHandle(ref, () => ({
     addChange: (val: TableDataChange) => setChanges([...changes, val]),
@@ -207,13 +206,12 @@ export function EditableTable({
     return (
       <XTableHeader>
         <TableRow>
-          {/* 多选触发器 */}
           {multiSelect && (
             <TableHead>
               <SquareCheckBig />
             </TableHead>
           )}
-          {/* 正常表头 */}
+
           {fieldNamesTitle
             ? fieldNamesTitle.map((item, index) => <TableHead key={index}>{item}</TableHead>)
             : fieldNames.map((item, index) => <TableHead key={index}>{item}</TableHead>)}
@@ -222,14 +220,12 @@ export function EditableTable({
     );
   }
 
-  // 使用单元格的渲染函数渲染 value
   function renderCell(rowData: ListRow, field: string) {
     const cell = rowData[field as keyof ListRow];
     if (cell) return cell.render(cell.value);
     return <div></div>;
   }
 
-  // 获取单元格的值
   function getCellValue(rowData: ListRow, field: string) {
     const cell = rowData[field as keyof ListRow];
     if (cell) return cell.value;
@@ -238,9 +234,7 @@ export function EditableTable({
 
   function renderBody() {
     function genClassName(index: number) {
-      // 删除的样式
       if (deletedRowIndex.has(index)) return " bg-[var(--fvm-danger-clr)]";
-      // 选中的样式
       if (selectedRowIndex.has(index)) return "text-[var(--fvm-primary-clr)] font-bold";
       return "";
     }
@@ -248,7 +242,6 @@ export function EditableTable({
     return data.map((rowData, rowIndex) => {
       const node = (
         <TableRow key={rowIndex} className={genClassName(rowIndex)} onClick={() => handleClickRow(rowIndex)}>
-          {/* 多选触发器 */}
           {multiSelect && (
             <TableCell
               className="text-[var(--fvm-info-clr)] cursor-grab"
@@ -259,7 +252,7 @@ export function EditableTable({
               {selectedRowIndex.has(rowIndex) ? <span>🔵</span> : <span>🔘</span>}
             </TableCell>
           )}
-          {/* 正常数据 */}
+
           {fieldNames.map((field, index) => (
             <TableCell
               key={index}
