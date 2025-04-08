@@ -130,10 +130,12 @@ export function TableList() {
 
   function handleImport(tableName: string) {
     // TODO:
+    alert("not implemented")
   }
 
   function handleExport(tableName: string) {
     // TODO:
+    alert("not implemented")
   }
 
   function handleTruncatePopup(tableName: string) {
