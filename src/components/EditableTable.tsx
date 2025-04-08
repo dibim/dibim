@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { NEW_ROW_IS_ADDED_FIELD } from "@/constants";
 import { cn } from "@/lib/utils";
-import { getRandomNegativeInt } from "@/utils/number";
+import { getRandomInt } from "@/utils/number";
 
 export interface ListCell {
   value: any;
@@ -142,7 +142,7 @@ export function EditableTable({
   // 要触发修改表格重新渲染之前调用
   // Call this before modifying the table to trigger a re-render.
   function willRanderTable() {
-    setActiveIndex(getRandomNegativeInt());
+    setActiveIndex(-getRandomInt());
   }
 
   function handleClickRow(index: number) {

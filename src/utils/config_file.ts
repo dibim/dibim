@@ -2,8 +2,7 @@ import { CONFIG_FILE_APPEARANCE, CONFIG_FILE_MAIN } from "@/constants";
 import { invoker } from "@/invoker";
 import { ConfigFileAppearance, ConfigFileMain } from "@/types/conf_file";
 
-// 读取配置文件
-// Read configuration file
+// 读取配置文件 | Read configuration file
 export async function readConfigFile(key: string) {
   const res = await invoker.readFileBase64(CONFIG_FILE_MAIN);
 
@@ -22,10 +21,9 @@ export async function readConfigFile(key: string) {
   return "";
 }
 
-// 保存配置文件
-// Save configuration file
+// 保存配置文件 | Save configuration file
 export async function saveConfigFile(val: ConfigFileMain, key: string) {
-  // 记录主配置
+  // 记录主配置 | Record the main configuration
   const enc = await invoker.aesGcmEncryptString(JSON.stringify(val), key);
   if (enc.errorMessage === "") {
     const res = await invoker.writeFileBase64(CONFIG_FILE_MAIN, enc.result);
@@ -37,7 +35,7 @@ export async function saveConfigFile(val: ConfigFileMain, key: string) {
     console.log("aesGcmEncryptString error: ", enc.errorMessage);
   }
 
-  // 记录外观配置
+  // 记录外观配置 | Record appearance configuration
   const configA: ConfigFileAppearance = {
     lang: val.settings.lang,
     colorScheme: val.settings.colorScheme,

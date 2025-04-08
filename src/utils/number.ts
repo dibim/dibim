@@ -1,7 +1,7 @@
 /**
- * 生成随机负整数（无参数版本）
+ * 生成随机数 | Generate random numbers
  * @returns 随机生成的负整数，范围 (-∞, -1]
  */
-export function getRandomNegativeInt(): number {
-  return -Math.floor(Math.random() * Number.MAX_SAFE_INTEGER) - 1;
+export function getRandomInt(): number {
+  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER) + 1;
 }
