@@ -44,9 +44,8 @@ export function TableStructure({
   const { t } = useTranslation();
   const tableRef = useRef<EditableTableMethods | null>(null);
 
-  // ========== 对话框 ==========
+  // ========== 对话框 | Dialog ==========
 
-  // 提示对话框
   const [dialogAction, setDialogAction] = useState<DialogAction>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [okMessage, setOkMessage] = useState<string>("");
@@ -54,26 +53,26 @@ export function TableStructure({
   const [showDialogEdit, setShowDialogEdit] = useState<boolean>(false);
   const [willExecCmd, setWillExecCmd] = useState<string>("");
 
-  // 字段编辑对话框里的数据
+  // 字段编辑对话框里的数据 | Data in the field editing dialog
   const [autoIncrement, setAutoIncrement] = useState<boolean>(false);
   const [comment, setComment] = useState<string>("");
   const [defalutValue, setDefaultValue] = useState<string>("");
-  const [indexName, setIndexName] = useState<string>(""); // 字段索引名
+  const [indexName, setIndexName] = useState<string>(""); // 字段索引名 | Field index name
   const [isNullable, setIsNullable] = useState<boolean>(false);
   const [isPrimaryKey, setIsPrimaryKey] = useState<boolean>(false);
   const [isUniqueKey, setIsUniqueKey] = useState<boolean>(false);
-  const [name, setName] = useState<string>(""); // 字段名, 输入框里的
+  const [name, setName] = useState<string>("");
   const [size, setSize] = useState<string>("");
   const [type, setType] = useState<string>("");
-  // 备份原先的数据
+  // 备份原先的数据 | Backup original data
   const [autoIncrementOld, setAutoIncrementOld] = useState<boolean>(false);
   const [commentOld, setCommentOld] = useState<string>("");
   const [defalutValueOld, setDefaultValueOld] = useState<string>("");
-  const [indexNameOld, setIndexNameOld] = useState<string>(""); // 字段索引名
+  const [indexNameOld, setIndexNameOld] = useState<string>("");
   const [isNullableOld, setIsNullableOld] = useState<boolean>(false);
   const [isPrimaryKeyOld, setIsPrimaryKeyOld] = useState<boolean>(false);
   const [isUniqueKeyOld, setIsUniqueKeyOld] = useState<boolean>(false);
-  const [nameOld, setNameOld] = useState<string>(""); // 字段名, 编辑之前记录的原先的字段名
+  const [nameOld, setNameOld] = useState<string>("");
   const [sizeOld, setSizeOld] = useState<string>("");
   const [typeOld, setTypeOld] = useState<string>("");
 
@@ -88,7 +87,7 @@ export function TableStructure({
     setIsUniqueKey(faa?.isUniqueKey || false);
     setSize(faa?.size || "");
     setType(faa?.type || "");
-    // 备份原先的数据
+
     setAutoIncrementOld(faa?.autoIncrement || false);
     setCommentOld(faa?.comment || "");
     setDefaultValueOld(faa?.defaultValue || "");
@@ -101,7 +100,7 @@ export function TableStructure({
     setTypeOld(faa?.type || "");
   }
 
-  // 找到 alterData 里对应的字段的数据
+  // 找到 alterData 里对应的字段的数据 | Find the data corresponding to the field in alterData
   function getActionDataIndex() {
     let actionDataIndex = -1;
 
@@ -131,8 +130,8 @@ export function TableStructure({
       isNullable: isNullable,
       isPrimaryKey: isPrimaryKey,
       isUniqueKey: false,
-      name: dialogAction === STR_ADD ? name : nameOld, // 添加时, 使用新 name
-      nameNew: name, // 重命名时使用新 name
+      name: dialogAction === STR_ADD ? name : nameOld, // 添加时, 使用新 name | When adding, use a new name
+      nameNew: name, // 重命名时使用新 name | Use the new name when renaming
       size: size,
       type: type,
 
@@ -149,7 +148,6 @@ export function TableStructure({
     };
   }
 
-  // 对话框提交变更
   async function onSubmit() {
     const actionDataIndex = getActionDataIndex();
     const actionData = genActionData(dialogAction);
@@ -174,9 +172,9 @@ export function TableStructure({
       indexes: isPrimaryKey
         ? [
             {
-              columnName: "", // 仅显示用,留空
-              indexName: "", // 仅显示用,留空
-              indexType: "", // 仅显示用,留空
+              columnName: "", // 仅显示用,留空 | Display only, leave blank
+              indexName: "", // 仅显示用,留空 | Display only, leave blank
+              indexType: "", // 仅显示用,留空 | Display only, leave blank
               isPrimaryKey: isUniqueKey,
               isUniqueKey: isPrimaryKey,
             },
@@ -184,7 +182,7 @@ export function TableStructure({
         : undefined,
     };
 
-    // 找到 alterData 里对应的字段的数据
+    // 找到 alterData 里对应的字段的数据 | Find the data corresponding to the field in alterData
     let fieldDataIndex = -1;
     appState.currentTableStructure.map((item, index) => {
       if (item.name === nameOld) {
@@ -201,8 +199,9 @@ export function TableStructure({
         appState.currentTableStructure.map((field, index) => (index === fieldDataIndex ? newFieldData : field)),
       );
 
-      // 向 TableSection 内部添加变化
-      // if (autoIncrement != autoIncrementOld) addChange(fieldDataIndex, "", autoIncrementOld, autoIncrement); // FIXME: 添加支持
+      // 向 TableSection 内部添加变化 | Add changes to the inside of the TableSection
+      // FIXME: 添加对 autoIncrement 的支持
+      // if (autoIncrement != autoIncrementOld) addChange(fieldDataIndex, "", autoIncrementOld, autoIncrement);
       if (comment != commentOld) addChange(fieldDataIndex, "comment", commentOld, comment);
       if (defalutValue != defalutValueOld) addChange(fieldDataIndex, "defalutValue", defalutValueOld, defalutValue);
       if (indexName != indexNameOld) addChange(fieldDataIndex, "indexName", indexNameOld, indexName);
@@ -222,9 +221,9 @@ export function TableStructure({
     tableRef.current?.addChange({ index, field, old, new: newVal });
   }
 
-  // ========== 对话框 结束 ==========
+  // ========== 对话框 结束 | Dialog end ==========
 
-  // ========== 按钮 ==========
+  // ========== 按钮 |Button ==========
 
   function handleAddField() {
     resetDialogData(null);
@@ -238,6 +237,7 @@ export function TableStructure({
       const field = appState.currentTableStructure[index];
 
       // 创建表格时不需要记录字段的删除动作
+      // When creating a table, do not need to delete a record field
       if (!appState.isAddingTable) {
         const action = {
           target: STR_FIELD,
@@ -372,10 +372,8 @@ export function TableStructure({
     const res = await exec(willExecCmd);
     if (res.errorMessage === "") {
       setShowDialogAlter(false);
-      tableRef.current?.resetData();
-      setAlterData([]);
       await getData();
-      updateDataArr();
+      resetData();
     } else {
       setErrorMessage(res.errorMessage);
     }
@@ -404,9 +402,9 @@ export function TableStructure({
     },
   ];
 
-  // ========== 按钮 结束 ==========
+  // ========== 按钮 结束 | Button end ==========
 
-  // ========== 表格处理 ==========
+  // ========== 表格处理 | Table data processing ==========
 
   /**
    * 给每一行套上一个菜单 | Wrap each line with a right-click context menu
@@ -483,14 +481,20 @@ export function TableStructure({
     setDataArr(dataArrTemp);
   }
 
-  // ========== 表格处理 结束 ==========
+  // ========== 表格处理 结束 | Table data processing end ==========
+
+  function resetData() {
+    tableRef.current?.resetData();
+    setAlterData([]);
+    updateDataArr();
+  }
 
   useEffect(() => {
     updateDataArr();
 
     // 监听 store 的变化 | Monitor changes in the store
     const unsubscribe = subscribeKey(appState, "currentTableName", (_value: any) => {
-      updateDataArr();
+      resetData();
     });
     return () => unsubscribe();
   }, []);

@@ -1,6 +1,5 @@
 import {
   FIELD_BINARY,
-  FIELD_BIT_STRING,
   FIELD_BOOLEAN,
   FIELD_CHARACTER,
   FIELD_DATETIME,
@@ -46,7 +45,7 @@ const typeCategoryMap: Record<string, string> = {
 
   // ==================== 二进制 | Binary ====================
   binary: FIELD_BINARY,
-  bit: FIELD_BIT_STRING,
+  bit: FIELD_OTHER,
   blob: FIELD_BINARY,
   longblob: FIELD_BINARY,
   mediumblob: FIELD_BINARY,

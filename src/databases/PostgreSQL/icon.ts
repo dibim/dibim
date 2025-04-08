@@ -1,7 +1,6 @@
 import {
   FIELD_ARRAY,
   FIELD_BINARY,
-  FIELD_BIT_STRING,
   FIELD_BOOLEAN,
   FIELD_CHARACTER,
   FIELD_DATETIME,
@@ -11,7 +10,6 @@ import {
   FIELD_NUMERIC,
   FIELD_OTHER,
   FIELD_RANGE,
-  FIELD_TEXT_SEARCH,
 } from "@/constants";
 
 const typeCategoryMap: Record<string, string> = {
@@ -77,7 +75,7 @@ const typeCategoryMap: Record<string, string> = {
   json: FIELD_JSON,
   jsonb: FIELD_JSON,
   jsonpath: FIELD_JSON,
-  xml: FIELD_TEXT_SEARCH,
+  xml: FIELD_OTHER,
 
   // ==================== 网络 | Network ====================
   cidr: FIELD_NETWORK,
@@ -86,13 +84,13 @@ const typeCategoryMap: Record<string, string> = {
   macaddr8: FIELD_NETWORK,
 
   // ====================== 位串 | Bit string ======================
-  bit: FIELD_BIT_STRING,
-  "bit varying": FIELD_BIT_STRING,
-  varbit: FIELD_BIT_STRING,
+  bit: FIELD_OTHER,
+  "bit varying": FIELD_OTHER,
+  varbit: FIELD_OTHER,
 
   // ====================== 文本搜索 | Text search ======================
-  tsvector: FIELD_TEXT_SEARCH,
-  tsquery: FIELD_TEXT_SEARCH,
+  tsvector: FIELD_OTHER,
+  tsquery: FIELD_OTHER,
 
   // ====================== 范围 | Range ======================
   int4range: FIELD_RANGE,

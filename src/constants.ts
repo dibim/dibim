@@ -43,7 +43,6 @@ export const DB_SQLITE = "SQLite";
 // 数据库字段类型 | Database field type
 export const FIELD_ARRAY = "ARRAY";
 export const FIELD_BINARY = "BINARY";
-export const FIELD_BIT_STRING = "BIT_STRING";
 export const FIELD_BOOLEAN = "BOOLEAN";
 export const FIELD_CHARACTER = "CHARACTER";
 export const FIELD_DATETIME = "DATETIME";
@@ -52,7 +51,6 @@ export const FIELD_JSON = "JSON";
 export const FIELD_NETWORK = "NETWORK";
 export const FIELD_NUMERIC = "NUMERIC";
 export const FIELD_RANGE = "RANGE";
-export const FIELD_TEXT_SEARCH = "TEXT_SEARCH";
 export const FIELD_OTHER = "OTHER";
 
 // 列表栏的类型 | Type of List Bar

@@ -1,4 +1,4 @@
-import { FIELD_BIT_STRING, FIELD_CHARACTER, FIELD_DATETIME, FIELD_NUMERIC } from "@/constants";
+import { FIELD_CHARACTER, FIELD_DATETIME, FIELD_NUMERIC, FIELD_OTHER } from "@/constants";
 
 const typeCategoryMap: Record<string, string> = {
   // ==================== 数值类型 ====================
@@ -17,7 +17,7 @@ const typeCategoryMap: Record<string, string> = {
   char: FIELD_CHARACTER,
 
   // ==================== 二进制类型 ====================
-  blob: FIELD_BIT_STRING,
+  blob: FIELD_OTHER,
 
   // ==================== 日期/时间类型 ====================
   date: FIELD_DATETIME,

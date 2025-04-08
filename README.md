@@ -4,10 +4,18 @@
 
 **DIBIM** 是一个简单易用的跨平台数据库管理软件。
 
-- ⚡ **基于 Tauri 框架**：安装包较小，内存占用较低。
-- 🖥️ **前端**：TypeScript + React + shadcn/ui。
-- ⚙️ **后端**：Rust + SQLx。
-- 🗄️ **数据库支持**：PostgreSQL / SQLite / MySQL/MariaDB(Not Started)。
+- ⚡ **基于 Tauri 框架**：安装包较小，内存占用较低
+- 🖥️ **前端**：TypeScript + React + shadcn/ui
+- ⚙️ **后端**：Rust + SQLx
+- 🗄️ **数据库支持**：PostgreSQL / SQLite / MySQL/MariaDB(Not Started)
+
+官方仓库地址:
+
+- 🌍 GitHub: [https://github.com/dibim/dibim](https://github.com/dibim/dibim)
+- 🇨🇳 Gitee(中国): [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)
+- 🇩🇪 Codeberg(德国): [https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)
+
+## ✨ Introduction
 
 **DIBIM** is a simple and easy-to-use cross platform database management software.
 
@@ -16,17 +24,11 @@
 - ⚙️ **Backend**: Rust + SQLx
 - 🗄️ **Database support**: PostgreSQL / SQLite / MySQL/MariaDB(Not Started)
 
-官方仓库地址:
-
-- GitHub: [https://github.com/dibim/dibim](https://github.com/dibim/dibim)
-- Gitee(中国): [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)
-- Codeberg(德国): [https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)
-
 Official repository:
 
-- GitHub: [https://github.com/dibim/dibim](https://github.com/dibim/dibim)
-- Gitee(China): [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)
-- Codeberg(Germany): [https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)
+- 🌍 GitHub: [https://github.com/dibim/dibim](https://github.com/dibim/dibim)
+- 🇨🇳 Gitee(China): [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)
+- 🇩🇪 Codeberg(Germany): [https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)
 
 ## 🎯 核心特性
 
@@ -46,28 +48,40 @@ Official repository:
 
 ## ⌨️ 快捷键
 
-| 快捷键        | 功能描述                     |
+| 快捷键       | 功能描述                   |
 |--------------|----------------------------|
-| `F1`         | ℹ️ 关于                     |
-| `F2`         | 🗄️ 切换侧边栏               |
-| `F3`         | 📜 切换列表栏               |
-| `F8`         | 🧹 格式化SQL编辑器代码      |
-| `F9`         | ▶️ 执行SQL编辑器代码        |
+| `F1`         | ℹ️ 关于                    |
+| `F2`         | 🗄️ 切换侧边栏              |
+| `F3`         | 📜 切换列表栏              |
+| `F8`         | 🧹 格式化SQL编辑器代码     |
+| `F9`         | ▶️ 执行SQL编辑器代码       |
 
 ## ⌨️ Shortcut keys
 
-| Keys       |  function                    |
+| Keys         |  Function                  |
 |--------------|----------------------------|
-| `F1`         | ℹ️ About                    |
-| `F2`         | 🗄️ Switch sidebar               |
-| `F3`         | 📜 Switch list bar               |
-| `F8`         | 🧹 Format SQL Editor Code      |
-| `F9`         | ▶️ Execute SQL editor code        |
+| `F1`         | ℹ️ About                   |
+| `F2`         | 🗄️ Switch sidebar          |
+| `F3`         | 📜 Switch list bar         |
+| `F8`         | 🧹 Format SQL Editor Code  |
+| `F9`         | ▶️ Execute SQL editor code |
 
-## ⚛️ 状态管理（Valtio）
+## 🛠️ 开发
+
+### 📜 前置条件
+
+[🔗 Node.js](https://nodejs.org) [🔗 Rust](https://www.rust-lang.org/tools/install) [🔗 Tauri](https://tauri.app/start/prerequisites/) [🔗 Bun](https://bun.sh/)
+
+### ⚛️ 状态管理（Valtio）
 
 在组件中使用 Valtio 时，通过 `const snap = useSnapshot(appState)` 获取的状态快照（snap）应当用于组件的渲染输出（return 语句）中读取值。  
 在事件处理、useEffect等逻辑中，应当直接操作原始状态对象 appState 而不是快照对象 snap。
+
+## 🛠️ Develop
+
+### 📜 Prerequisites
+
+[🔗 Node.js](https://nodejs.org) [🔗 Rust](https://www.rust-lang.org/tools/install) [🔗 Tauri](https://tauri.app/start/prerequisites/) [🔗 Bun](https://bun.sh/)
 
 ## ⚛️ State Management (Valtio)
 
@@ -98,7 +112,7 @@ In event handling, useEffect, and other logic, the original state object appStat
   
 ### v0.4 mysql
 
-- 使用中完善, 其他功能有时间再做
+- 使用中完善, 其他功能有时间再做📌
 - 优化对话框中的自增
 - 字段添加 COLLATE
 - 字段添加 CHECK 约束
@@ -128,7 +142,7 @@ In event handling, useEffect, and other logic, the original state object appStat
 ## 更多功能
 
 - 实现表数据导入/导出
-- 支持符合主键
+- 支持复合主键
 - 支持外键
 - 支持触发器
 - 添加更多快捷键:
