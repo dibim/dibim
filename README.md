@@ -132,7 +132,6 @@ In event handling, useEffect, and other logic, the original state object appStat
 ### v0.6
 
 - 表结构的对话框保存时添加检查
-- 优化表名列表的磁盘占用大小的样式
 - 导出sql编辑器的结果集
 
 ### v1.0

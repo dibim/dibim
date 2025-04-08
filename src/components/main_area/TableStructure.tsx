@@ -493,7 +493,7 @@ export function TableStructure({
     updateDataArr();
 
     // 监听 store 的变化 | Monitor changes in the store
-    const unsubscribe = subscribeKey(appState, "currentTableName", (_value: any) => {
+    const unsubscribe = subscribeKey(appState, "currentTableStructure", (_value: any) => {
       resetData();
     });
     return () => unsubscribe();
