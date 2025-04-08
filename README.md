@@ -4,47 +4,47 @@
 
 **DIBIM** 是一个简单易用的跨平台数据库管理软件。
 
-- ⚡ **基于 Tauri 框架**：安装包较小，内存占用较低
+- ⚡ **基于 Tauri 框架**：安装包小，内存占用低
 - 🖥️ **前端**：TypeScript + React + shadcn/ui
 - ⚙️ **后端**：Rust + SQLx
-- 🗄️ **数据库支持**：PostgreSQL / SQLite / MySQL/MariaDB(Not Started)
+- 🗄️ **数据库支持**：PostgreSQL / SQLite / MySQL/MariaDB（尚未开始）
 
 官方仓库地址:
 
 - 🌍 GitHub: [https://github.com/dibim/dibim](https://github.com/dibim/dibim)
-- 🇨🇳 Gitee(中国): [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)
-- 🇩🇪 Codeberg(德国): [https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)
+- 🇨🇳 Gitee（中国）: [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)
+- 🇩🇪 Codeberg（德国）: [https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)
 
 ## ✨ Introduction
 
-**DIBIM** is a simple and easy-to-use cross platform database management software.
+**DIBIM** is a simple and easy-to-use cross-platform database management software.
 
-- ⚡ **Based on Tauri framework**: small binary & low memory
+- ⚡ **Based on Tauri framework**: Small binary size & low memory footprint
 - 🖥️ **Frontend**: TypeScript + React + shadcn/ui
 - ⚙️ **Backend**: Rust + SQLx
 - 🗄️ **Database support**: PostgreSQL / SQLite / MySQL/MariaDB(Not Started)
 
-Official repository:
+Official repositories:
 
 - 🌍 GitHub: [https://github.com/dibim/dibim](https://github.com/dibim/dibim)
-- 🇨🇳 Gitee(China): [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)
-- 🇩🇪 Codeberg(Germany): [https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)
+- 🇨🇳 Gitee (China): [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)
+- 🇩🇪 Codeberg (Germany): [https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)
 
 ## 🎯 核心特性
 
 - 🚀 轻量级跨平台应用，支持 Windows / macOS / Linux
-- 🔍 原生SQL操作体验，变更数据的操作均会显示要执行的语句
+- 🔍 原生SQL操作体验，数据变更操作均显示待执行语句
 - 💅 响应式用户界面
 - 🔄 多数据库统一管理
-- 💡 可通过 TypeScript 轻松扩展更多功能
+- 💡 可通过 TypeScript 轻松扩展功能
 
 ## 🎯 Core features
 
-- 🚀 Windows / macOS / Linux Lightweight cross platform application, supporting Windows/macOS/Linux
-- 🔍 Native SQL operation experience, all operations that change data will display the statements to be executed
-- 💅 Responsive User Interface
-- 🔄 Unified management of multiple databases
-- 💡 More features can be easily extended through TypeScript
+- 🚀 Lightweight cross-platform application (Windows/macOS/Linux)
+- 🔍 Native SQL operation experience with preview of pending execution statements
+- 💅 Responsive user interface
+- 🔄 Unified multi-database management
+- 💡 Easy feature extension via TypeScript
 
 ## ⌨️ 快捷键
 
@@ -58,61 +58,67 @@ Official repository:
 
 ## ⌨️ Shortcut keys
 
-| Keys         |  Function                  |
-|--------------|----------------------------|
-| `F1`         | ℹ️ About                   |
-| `F2`         | 🗄️ Switch sidebar          |
-| `F3`         | 📜 Switch list bar         |
-| `F8`         | 🧹 Format SQL Editor Code  |
-| `F9`         | ▶️ Execute SQL editor code |
+| Keys         | Function                  |
+|--------------|---------------------------|
+| `F1`         | ℹ️ About                  |
+| `F2`         | 🗄️ Toggle sidebar         |
+| `F3`         | 📜 Toggle list bar        |
+| `F8`         | 🧹 Format SQL editor code |
+| `F9`         | ▶️ Execute SQL code       |
 
 ## 🛠️ 开发
 
 ### 📜 前置条件
 
-[🔗 Node.js](https://nodejs.org) [🔗 Rust](https://www.rust-lang.org/tools/install) [🔗 Tauri](https://tauri.app/start/prerequisites/) [🔗 Bun](https://bun.sh/)
+[🔗 Node.js](https://nodejs.org)  
+[🔗 Rust](https://www.rust-lang.org/tools/install)  
+[🔗 Tauri](https://tauri.app/start/prerequisites/)  
+[🔗 Bun](https://bun.sh/)
 
 ### ⚛️ 状态管理（Valtio）
 
 在组件中使用 Valtio 时，通过 `const snap = useSnapshot(appState)` 获取的状态快照（snap）应当用于组件的渲染输出（return 语句）中读取值。  
 在事件处理、useEffect等逻辑中，应当直接操作原始状态对象 appState 而不是快照对象 snap。
 
-## 🛠️ Develop
+## 🛠️ Development
 
 ### 📜 Prerequisites
 
-[🔗 Node.js](https://nodejs.org) [🔗 Rust](https://www.rust-lang.org/tools/install) [🔗 Tauri](https://tauri.app/start/prerequisites/) [🔗 Bun](https://bun.sh/)
+[🔗 Node.js](https://nodejs.org)  
+[🔗 Rust](https://www.rust-lang.org/tools/install)  
+[🔗 Tauri](https://tauri.app/start/prerequisites/)  
+[🔗 Bun](https://bun.sh/)
 
-## ⚛️ State Management (Valtio)
+### ⚛️ State Management (Valtio)
 
 When using Valtio in a component, the state snapshot (snap) obtained through `const snap = useSnapshot(appState)` should be used to read values in the rendering output (return statement) of the component.
 In event handling, useEffect, and other logic, the original state object appState should be directly manipulated instead of the snapshot object snap.
 
 ## 📝 TODO
 
-### v0.1.0 pg✅
+### v0.1.0 PostgreSQL ✅
 
-- 支持 pg 的基本功能✅
+- 支持 PostgreSQL 基础功能 ✅
 - 优化表格数据的尺寸✅
-- sql 编辑器结果集分页✅
+- SQL 编辑器结果集分页 ✅
 - 表格数据列表的 添加行✅
-  
-### v0.2 sqlite✅
 
-- 支持 sqlite✅
-- 添加连接要检查是否重复✅
-- 表结构里的字段类型可使用下拉框选择✅
-- 表格数据列表的 添加行的语句改为批量插入✅
+### v0.2 SQLite ✅
 
-### v0.3 国际化✅
+- 支持 SQLite ✅
+- 添加连接要检查是否重复 ✅
+- 表结构里的字段类型可使用下拉框选择 ✅
+- 表格数据列表的 添加行的语句改为批量插入 ✅
 
-- 国际化✅
-- 侧边栏宽度按语言自动适应✅
-- 外观配置文件用明文存储✅
-  
-### v0.4 mysql
+### v0.3 国际化 ✅
 
-- 使用中完善, 其他功能有时间再做📌
+- 国际化 ✅
+- 侧边栏宽度按语言自动适应 ✅
+- 外观配置文件用明文存储 ✅
+
+### v0.4 MySQL
+
+- 在使用过程中逐步完善，其它功能后续有时间再开发📌
 - 优化对话框中的自增
 - 字段添加 COLLATE
 - 字段添加 CHECK 约束
@@ -121,9 +127,9 @@ In event handling, useEffect, and other logic, the original state object appStat
 - 密码在内存中的存储方式要改一下, 使用类似 libsodium 的方式保存  
 - 优化确认框的尺寸控制
 
-### v0.5 优化 sql 语句功能
+### v0.5 SQL 功能增强
 
-- sql 编辑器
+- SQL 编辑器
   - 记录到历史
   - 要实现代码提示(表名和字段名) 推迟
 - 大字符串查看器
@@ -170,10 +176,10 @@ In event handling, useEffect, and other logic, the original state object appStat
   
 ## 其它
 
-### oracle 和 mssql 的测试环境
+### Oracle 和 MSSQL 测试环境
 
 ```sh
-# Oracle XE (社区维护的镜像)
+# Oracle XE（社区维护镜像）
 docker pull gvenzl/oracle-xe:21
 docker run -d -p 1521:1521 -e ORACLE_PASSWORD=yourpw gvenzl/oracle-xe:21
 
