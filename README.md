@@ -134,9 +134,6 @@ In event handling, useEffect, and other logic, the original state object appStat
   - 要实现代码提示(表名和字段名) 推迟
 - 大字符串查看器
 - 分区  
-
-### v0.6
-
 - 表结构的对话框保存时添加检查
 - 导出sql编辑器的结果集
 
