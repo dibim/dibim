@@ -70,6 +70,9 @@ export function Connection(props: ConnectionProps) {
   }
 
   async function onSubmit() {
+    setErrorMessage("");
+    setOkMessage("");
+
     if (name === "") {
       setErrorMessage(t("The connection name cannot be empty"));
       return;

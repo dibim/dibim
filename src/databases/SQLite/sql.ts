@@ -15,7 +15,15 @@
  *
  */
 import { invoker } from "@/invoker";
-import { DbConnectionParam, DbCountRes, FieldIndex, FieldStructure, FieldWithValue, GetTableDataParam } from "../types";
+import {
+  DbConnectionParam,
+  DbCountRes,
+  FieldIndex,
+  FieldStructure,
+  FieldWithValue,
+  GetTableDataParam,
+  getAllTableSizeRes,
+} from "../types";
 import { formatToSqlValueSqlite } from "./format";
 import "./types";
 
@@ -43,11 +51,6 @@ export async function getAllTableNameSqlite(connName: string) {
   };
 }
 
-// 获取所有表格的大小
-type getAllTableSizeRes = {
-  table_name: string;
-  total_size: string;
-};
 export async function getAllTableSizeSqlite(connName: string) {
   const sql = `
     WITH storage_info AS (
@@ -68,10 +71,10 @@ export async function getAllTableSizeSqlite(connName: string) {
       )
     SELECT
       'main' AS schema_name,
-      table_name,
-      ROUND((table_bytes + index_bytes) / 1048576.0, 2) || ' MB' AS total_size,
-      ROUND(table_bytes / 1048576.0, 2) || ' MB' AS table_size,
-      ROUND(index_bytes / 1048576.0, 2) || ' MB' AS index_size
+      table_name as "tableName",
+      ROUND((table_bytes + index_bytes) / 1048576.0, 2) || ' MB' AS "totalSize",
+      ROUND(table_bytes / 1048576.0, 2) || ' MB' AS "tableSize",
+      ROUND(index_bytes / 1048576.0, 2) || ' MB' AS "indexSize"
     FROM storage_info
     ORDER BY (table_bytes + index_bytes) DESC;
   `;

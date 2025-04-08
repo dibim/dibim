@@ -133,7 +133,7 @@ export function DatabaseList() {
   }, []);
 
   return (
-    <>
+    <div className="p-2">
       {!snap.config.dbConnections ? <EmptyList /> : <ListWithAction items={listData} itemClassName="py-2" />}
 
       <ConfirmDialog
@@ -147,6 +147,6 @@ export function DatabaseList() {
         okText={t("Confirm")}
         okCb={handleDelConn}
       />
-    </>
+    </div>
   );
 }

@@ -49,6 +49,14 @@ export type DbCountRes = {
   total: number;
 };
 
+// 表格及其索引的大小
+export type getAllTableSizeRes = {
+  indexSize: string;
+  tableName: string;
+  tableSize: string;
+  totalSize: string;
+};
+
 /**
  * SQL通用数据类型（所有主流数据库支持的基础类型）
  */

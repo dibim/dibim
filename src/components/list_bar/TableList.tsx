@@ -34,9 +34,13 @@ type SortBy =
   | typeof SORT_BY_BYTES_DESC;
 
 type TableData = {
+  indexSize: string;
+  indexSizeByte: number;
   tableName: string;
-  size: string;
-  bytes: number;
+  tableSize: string;
+  tableSizeByte: number;
+  totalSize: string;
+  totalSizeByte: number;
 };
 
 export function TableList() {
@@ -71,13 +75,13 @@ export function TableList() {
 
   // 按大小正序排序 (小到大) | Sort by size in positive order (small to large)
   function sortByBytesAsc() {
-    setTableData([...tablData].sort((a, b) => a.bytes - b.bytes));
+    setTableData([...tablData].sort((a, b) => a.totalSizeByte - b.totalSizeByte));
     setSortBy(SORT_BY_BYTES_ASC);
   }
 
   // 按大小倒序排序 (大到小) | Sort by size in reverse order (large to small)
   function sortByBytesDesc() {
-    setTableData([...tablData].sort((a, b) => b.bytes - a.bytes));
+    setTableData([...tablData].sort((a, b) => b.totalSizeByte - a.totalSizeByte));
     setSortBy(SORT_BY_BYTES_DESC);
   }
 
@@ -130,12 +134,12 @@ export function TableList() {
 
   function handleImport(tableName: string) {
     // TODO:
-    alert("not implemented")
+    alert("not implemented");
   }
 
   function handleExport(tableName: string) {
     // TODO:
-    alert("not implemented")
+    alert("not implemented");
   }
 
   function handleTruncatePopup(tableName: string) {
@@ -171,11 +175,15 @@ export function TableList() {
         // 合并数据
         for (const tn of res.data.sort()) {
           for (const sr of sizeRes.data) {
-            if (sr.table_name == tn) {
+            if (sr.tableName == tn) {
               arrTb.push({
+                indexSize: sr.indexSize,
+                indexSizeByte: bytes(sr.totalSize) || 0,
                 tableName: tn,
-                size: sr.total_size,
-                bytes: bytes(sr.total_size) || 0,
+                tableSize: sr.tableSize,
+                tableSizeByte: bytes(sr.totalSize) || 0,
+                totalSize: sr.totalSize,
+                totalSizeByte: bytes(sr.totalSize) || 0,
               });
               break;
             }
@@ -189,79 +197,87 @@ export function TableList() {
 
   // 生成带按钮的列表数据
   function genListData() {
-    const arr: ListItem[] = [];
-    tablData.map((item, index) => {
-      arr.push({
-        id: item.tableName,
-        content: (
-          <div className="py-1 cursor-pointer flex justify-between items-center" key={index}>
-            {/* 表名部分 */}
-            <div className="flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" title={item.tableName}>
-              {item.tableName}
+    setListData(
+      tablData.map((item, index) => {
+        return {
+          id: item.tableName,
+          content: (
+            <div className="py-1 cursor-pointer flex justify-between items-center" key={index}>
+              {/* 表名 | Table name */}
+              <div className="flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" title={item.tableName}>
+                {item.tableName}
+              </div>
+
+              {/* 索引大小 | Index size */}
+              <div className="flex-shrink-0 bg-muted text-muted-foreground text-sm ">
+                <div className="relative" style={{ position: "relative" }}>
+                  <div className="absolute inset-0 bg-blue-500 z-0 opacity-25" />
+                  <div
+                    className={`absolute h-full  bg-blue-500 z-10 opacity-50`}
+                    style={{ width: `6${item.indexSizeByte / item.totalSizeByte}%` }}
+                  ></div>
+                  <div className="relative z-20">{item.totalSize}</div>
+                </div>
+              </div>
             </div>
+          ),
+          contentOnClick: async (item) => {
+            clickTableName(item);
+          },
+          menuItems: [
+            {
+              label: t("Rename"),
+              onClick: () => {
+                handleRenamePopup(item.tableName);
+              },
+            },
+            {
+              label: t("Copy table name"),
+              onClick: () => {
+                handleCopy(item.tableName);
+              },
+            },
+            {
+              label: t("Divider"),
+              onClick: () => {},
+              isDivider: true,
+            },
+            {
+              label: t("Import"),
+              onClick: () => {
+                handleImport(item.tableName);
+              },
+            },
 
-            {/* 占用磁盘大小部分 */}
-            <div className="flex-shrink-0 bg-muted">{item.size}</div>
-          </div>
-        ),
-        contentOnClick: async (item) => {
-          clickTableName(item);
-        },
-        menuItems: [
-          {
-            label: t("Rename"),
-            onClick: () => {
-              handleRenamePopup(item.tableName);
+            {
+              label: t("Export"),
+              onClick: () => {
+                handleExport(item.tableName);
+              },
             },
-          },
-          {
-            label: t("Copy table name"),
-            onClick: () => {
-              handleCopy(item.tableName);
+            {
+              label: t("Divider"),
+              onClick: () => {},
+              isDivider: true,
             },
-          },
-          {
-            label: t("Divider"),
-            onClick: () => {},
-            isDivider: true,
-          },
-          {
-            label: t("Import"),
-            onClick: () => {
-              handleImport(item.tableName);
+            {
+              label: t("Truncate"),
+              className: "text-[var(--fvm-warning-clr)]",
+              onClick: () => {
+                handleTruncatePopup(item.tableName);
+              },
             },
-          },
-
-          {
-            label: t("Export"),
-            onClick: () => {
-              handleExport(item.tableName);
+            {
+              label: t("Delete"),
+              className: "text-[var(--fvm-danger-clr)]",
+              onClick: () => {
+                handleDeletePopup(item.tableName);
+              },
             },
-          },
-          {
-            label: t("Divider"),
-            onClick: () => {},
-            isDivider: true,
-          },
-          {
-            label: t("Truncate"),
-            className: "text-[var(--fvm-warning-clr)]",
-            onClick: () => {
-              handleTruncatePopup(item.tableName);
-            },
-          },
-          {
-            label: t("Delete"),
-            className: "text-[var(--fvm-danger-clr)]",
-            onClick: () => {
-              handleDeletePopup(item.tableName);
-            },
-          },
-        ],
-      });
-    });
-
-    setListData(arr);
+          ],
+        };
+      }),
+    );
   }
 
   useEffect(() => {
@@ -292,7 +308,9 @@ export function TableList() {
       {!tablData || tablData.length === 0 ? (
         <EmptyList />
       ) : (
-        <ListWithAction items={listData} itemClassName="cursor-pointer" />
+        <div className="p-2">
+          <ListWithAction items={listData} itemClassName="cursor-pointer" />
+        </div>
       )}
 
       <ConfirmDialog

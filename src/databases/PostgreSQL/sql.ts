@@ -15,7 +15,15 @@
  *
  */
 import { invoker } from "@/invoker";
-import { DbConnectionParam, DbCountRes, FieldIndex, FieldStructure, FieldWithValue, GetTableDataParam } from "../types";
+import {
+  DbConnectionParam,
+  DbCountRes,
+  FieldIndex,
+  FieldStructure,
+  FieldWithValue,
+  GetTableDataParam,
+  getAllTableSizeRes,
+} from "../types";
 import { formatToSqlValuePg } from "./format";
 import "./types";
 
@@ -51,22 +59,17 @@ export async function getAllTableNamePg(connName: string) {
   };
 }
 
-// 获取所有表格的大小
-type getAllTableSizeRes = {
-  table_name: string;
-  total_size: string;
-};
 export async function getAllTableSizePg(connName: string) {
   const sql = `
     SELECT
       schemaname AS schema_name,
-      tablename AS table_name,
-      pg_size_pretty(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS total_size,
-      pg_size_pretty(pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS table_size,
+      tablename AS tableName,
+      pg_size_pretty(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS totalSize,
+      pg_size_pretty(pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS tableSize,
       pg_size_pretty(
         pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)) - 
         pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))
-      ) AS index_size
+      ) AS indexSize
     FROM
       pg_tables
     WHERE
