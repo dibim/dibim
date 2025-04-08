@@ -48,7 +48,7 @@ export function SqlEditor() {
   const tableRef = useRef<TableSectionMethods | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  // ========== 执行语句 ==========
+  // ========== 执行语句 | Execute statements ==========
   async function queryPage(page: number) {
     if (appState.currentConnName === "") {
       setErrorMessage(t("Please connect to the database first"));
@@ -115,9 +115,9 @@ export function SqlEditor() {
     }
   }
 
-  // ========== 执行语句 结束 ==========
+  // ========== 执行语句 结束 | Execute statements end ==========
 
-  // ========== 面板控制  ==========
+  // ========== 面板控制 | Panel control  ==========
   const [sizes, setSizes] = useState<number[]>([50, 30, 20]);
   const [editorHeight, setEditorHeight] = useState<string>("300px");
   const [showResultBar, setShowResultBar] = useState<boolean>(true);
@@ -150,7 +150,7 @@ export function SqlEditor() {
     setSizes(res);
   }
 
-  // ========== 面板控制 结束 ==========
+  // ========== 面板控制 结束 | Panel control end ==========
 
   // ========== 编辑器 | Editor ==========
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
@@ -174,7 +174,7 @@ export function SqlEditor() {
     () => (monacoInstance: typeof Monaco) => {
       monacoInstance.languages.register({ id: "sql" });
 
-      // 代码补全逻辑
+      // 代码补全 | Code completion
       monacoInstance.languages.registerCompletionItemProvider("sql", {
         triggerCharacters: SQL_KEYWORDS.map((k) => k[0].toLowerCase()),
         provideCompletionItems: (model, position) => {
@@ -212,7 +212,6 @@ export function SqlEditor() {
     [],
   );
 
-  // 获取编辑器里的代码
   function getEditorCode() {
     if (editorRef.current) {
       return editorRef.current.getValue();
@@ -220,7 +219,6 @@ export function SqlEditor() {
     return "";
   }
 
-  // 设置编辑器里的代码
   function setEditorCode(newCode: string) {
     if (editorRef.current) {
       editorRef.current.setValue(newCode);

@@ -133,8 +133,6 @@ export function Connection(props: ConnectionProps) {
     setDbType(dbType);
   }
 
-  // TODO: sqlite 的文件拾取使用 rust 的 rfd, 先不管 HMOS
-
   function renderDbType(type: DbType, LogoComponent: SvgComponentType) {
     return (
       <Tooltip>

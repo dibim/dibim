@@ -44,7 +44,7 @@ export function TableEditor() {
     }
   }
 
-  // 修改表格数据
+  // 修改表格数据 | Modify table data
   // 对表的操作包括: 重命名 / 注释 / 分区 / 约束 / 表字符集和排序规则 等
   function changeTable() {
     if (editingTableName === "") return;
@@ -78,6 +78,7 @@ export function TableEditor() {
   }
 
   // 对表格的修改, 要执行 changeTable
+  // To modify the table, execute changeTable.
   useEffect(() => {
     changeTable();
   }, [editingTableName, editingTableComment]);

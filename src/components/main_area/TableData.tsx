@@ -10,7 +10,6 @@ export function TableData() {
   const snap = useSnapshot(appState);
   const tableRef = useRef<TableSectionMethods | null>(null);
 
-  // 获取表格数据
   const getData = async (page: number) => {
     if (appState.currentTableName === "") {
       return [];
@@ -26,6 +25,7 @@ export function TableData() {
     const tableData = tableRef.current ? tableRef.current.getTableData() : null;
     const lastRow = tableData ? tableData[tableData.length - 1] : null;
     // 除了第一页都要根据已有的最后一条数据查询
+    // Query based on the last existing data for all pages except the first page.
     const lastOrderByValue = page > 1 && lastRow ? (lastRow as any)[orderBy] : null;
 
     const res = await getTableData({

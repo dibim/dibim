@@ -20,7 +20,6 @@ export function Settings() {
   const [mainPassword, setMainPassword] = useState<string>("");
   const [colorScheme, setColorScheme] = useState<string>("");
   const [lang, setLang] = useState<string>("");
-  const [timeFormat, setTimeFormat] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [okMessage, setOkMessage] = useState<string>("");
 
@@ -55,7 +54,6 @@ export function Settings() {
         ...appState.config.settings,
         lang,
         colorScheme,
-        timeFormat,
       },
       dbConnections: [...appState.config.dbConnections],
     } as ConfigFileMain);
@@ -76,9 +74,6 @@ export function Settings() {
 
   useEffect(() => {
     getData();
-
-    // TODO: 这几行视为了编译不报错
-    setTimeFormat("");
   }, []);
 
   return (
