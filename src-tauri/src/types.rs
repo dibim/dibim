@@ -37,12 +37,6 @@ pub struct QueryResult {
     pub data: String,
 }
 
-impl QueryResult {
-    pub fn new() -> Self {
-        Self::default()
-    }
-}
-
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct ExecResult {
     #[serde(rename = "affectedRows")]
@@ -50,12 +44,6 @@ pub struct ExecResult {
 
     #[serde(rename = "lastInsertId")]
     pub last_insert_id: u64,
-}
-
-impl ExecResult {
-    pub fn new() -> Self {
-        Self::default()
-    }
 }
 
 // AES-GCM 加密解密的结果, 第一项为结果, 第二项为错误消息

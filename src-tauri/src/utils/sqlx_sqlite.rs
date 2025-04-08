@@ -20,7 +20,7 @@ pub async fn query_sqlite(
     page: Option<usize>,
     page_size: Option<usize>,
 ) -> Result<QueryResult, Box<dyn std::error::Error>> {
-    // TODO: 实现六四 pg 的流式查询
+    // TODO: 实现流式查询
 
     let query = sqlx::query(sql);
     #[cfg(debug_assertions)]
