@@ -63,7 +63,12 @@ export function Connection(props: ConnectionProps) {
 
   function valueIsError(condition: boolean, msg: string) {
     if (condition) {
-      setErrorMessage(t("&Please enter", { name: msg }));
+      const message = t("&Please enter", { name: msg });
+      setErrorMessage(message);
+      appState.addTextNotification({
+        message: message,
+        type: "error",
+      });
       return true;
     }
     return false;

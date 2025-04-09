@@ -58,8 +58,10 @@ export function DatabaseList() {
 
     if (res) {
       if (res.errorMessage !== "" && !res.errorMessage.includes("Duplicate connection name")) {
-        // TODO: 优化一下报错
-        console.log("打开数据库连接出错: ", res && res.errorMessage);
+        appState.addTextNotification({
+          message: res.errorMessage, // TODO: 添加翻译
+          type: "error",
+        });
       } else {
         appState.setCurrentDbName(conn.dbName);
         appState.setCurrentConnColor(conn.color);

@@ -134,12 +134,18 @@ export function TableList() {
 
   function handleImport(tableName: string) {
     // TODO:
-    alert("not implemented");
+    appState.addTextNotification({
+      message: "not implemented",
+      type: "error",
+    });
   }
 
   function handleExport(tableName: string) {
     // TODO:
-    alert("not implemented");
+    appState.addTextNotification({
+      message: "not implemented",
+      type: "error",
+    });
   }
 
   function handleTruncatePopup(tableName: string) {
@@ -154,9 +160,16 @@ export function TableList() {
     setWillExecCmd(genDeleteTableCmd(tableName) || "");
   }
 
-  function handleConfirm() {
-    exec(willExecCmd);
-    getData();
+  async function handleConfirm() {
+    const res = await exec(willExecCmd);
+    if (res.errorMessage !== "") {
+      appState.addTextNotification({
+        message: res.errorMessage, // TODO: 添加翻译
+        type: "error",
+      });
+    } else {
+      getData();
+    }
   }
 
   // ========== 上下文按钮 结束 | Context button end ==========
@@ -191,9 +204,17 @@ export function TableList() {
         }
 
         setTableData(arrTb);
+      } else {
+        appState.addTextNotification({
+          message: "Data size is none", // TODO: 添加翻译
+          type: "warning",
+        });
       }
     } else {
-      // TODO: 报错
+      appState.addTextNotification({
+        message: "Data list is none", // TODO: 添加翻译
+        type: "warning",
+      });
     }
   }
 

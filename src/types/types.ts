@@ -78,6 +78,12 @@ export type MainAreaTab =
   | typeof TAB_PARTITION
   | typeof TAB_STRUCTURE;
 
+  // 通知文字的类型
+export type TextNotificationType = {
+  message: string;
+  type?: "error" | "warning" | "success";
+};
+
 // 导入的 svg 的属性 | Properties of imported SVG
 export type SvgComponentProps = SVGProps<SVGSVGElement> & {
   desc?: string;

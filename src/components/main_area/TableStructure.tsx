@@ -374,8 +374,13 @@ export function TableStructure({
       setShowDialogAlter(false);
       await getData();
       resetData();
+      setOkMessage("OK");
     } else {
       setErrorMessage(res.errorMessage);
+      appState.addTextNotification({
+        message: res.errorMessage,
+        type: "success",
+      });
     }
   }
 

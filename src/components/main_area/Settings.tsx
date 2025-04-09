@@ -39,7 +39,12 @@ export function Settings() {
 
   async function onSubmit() {
     if (mainPassword.length > 0 && mainPassword.length < MAIN_PASSWORD_MIN_LEN) {
-      setErrorMessage(t("&minimumLengthOfMasterPassword", { len: MAIN_PASSWORD_MIN_LEN }));
+      const message = t("&minimumLengthOfMasterPassword", { len: MAIN_PASSWORD_MIN_LEN });
+      setErrorMessage(message);
+      appState.addTextNotification({
+        message: message,
+        type: "error",
+      });
       return;
     }
 
@@ -57,8 +62,12 @@ export function Settings() {
       },
       dbConnections: [...appState.config.dbConnections],
     } as ConfigFileMain);
-
-    setOkMessage(t("Saved successfully"));
+    const message = t("Saved successfully");
+    setOkMessage(message);
+    appState.addTextNotification({
+      message: message,
+      type: "success",
+    });
   }
 
   async function getData() {

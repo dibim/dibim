@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useTranslation } from "react-i18next";
 import Split from "react-split";
-import { PanelLeftDashed, PanelLeftIcon } from "lucide-react";
+import { EllipsisVertical, PanelLeftDashed, PanelLeftIcon } from "lucide-react";
 import { useSnapshot } from "valtio";
+import { subscribeKey } from "valtio/utils";
 import { DatabaseList } from "@/components/list_bar/DatabaseList";
 import { TableList } from "@/components/list_bar/TableList";
 import { MainArea } from "@/components/main_area";
@@ -11,11 +12,20 @@ import { Button } from "@/components/ui/button";
 import { SidebarInset, useSidebar } from "@/components/ui/sidebar";
 import { APP_NAME, DB_SQLITE, HEDAER_H, LIST_BAR_DB, LIST_BAR_DEFAULT_WIDTH, LIST_BAR_TABLE } from "@/constants";
 import { appState } from "@/store/valtio";
+import { TextNotificationType } from "@/types/types";
 import { getPageWidth } from "@/utils/ media_query";
 import { genPanelPercent } from "@/utils/util";
 import { About } from "./About";
 import { Sidebar } from "./Sidebar";
+import { TextNotification } from "./TextNotification";
 import { TooltipGroup } from "./TooltipGroup";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 export function Main({ id, className }: { id: string; className: string }) {
   const { t } = useTranslation();
@@ -102,6 +112,7 @@ export function Main({ id, className }: { id: string; className: string }) {
     };
   }, []);
 
+  // ========== 按钮 | Button ==========
   const tooltipSectionData = [
     {
       trigger: (
@@ -139,16 +150,63 @@ export function Main({ id, className }: { id: string; className: string }) {
     },
   ];
 
+  // ========== 通知 | Notification ==========
+  const [textNotification, setTextNotification] = useState<TextNotificationType | null>(null);
+  function setTextNotificationData() {
+    setTextNotification(appState.textNotificationArr.at(-1) || null);
+
+    setTimeout(() => {
+      setTextNotification(null);
+    }, 5000);
+  }
+
+  useEffect(() => {
+    setTextNotificationData();
+
+    // 监听 store 的变化 | Monitor changes in the store
+    const unsubscribe = subscribeKey(appState, "textNotificationArr", (_val: TextNotificationType[]) => {
+      setTextNotificationData();
+    });
+    return () => unsubscribe();
+  }, []);
+
   return (
     <>
       <Sidebar id="sidebar" ref={sidebarRef} />
       <SidebarInset>
         <main>
           <div id={id} className={className} style={{ width: mainWidth }}>
-            <header className={`flex h-${HEDAER_H} shrink-0 items-center gap-2 border-b px-4`}>
-              {!snap.sidebarOpen && <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>}
+            <header className={`flex justify-between h-${HEDAER_H}  items-center  border-b px-4`}>
+              <div className="shrink-0 gap-2">
+                {!snap.sidebarOpen && <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>}
+                <TooltipGroup dataArr={tooltipSectionData} />
+              </div>
 
-              <TooltipGroup dataArr={tooltipSectionData} />
+              <div className="flex-1 flex justify-end ps-8 text-end">
+                {textNotification && (
+                  <>
+                    <TextNotification message={textNotification.message} type={textNotification.type} />
+                  </>
+                )}
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <EllipsisVertical />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    {snap.textNotificationArr.map((item, index) => {
+                      return (
+                        <>
+                          <DropdownMenuItem key={index}>
+                            <TextNotification message={item.message} type={item.type} />
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                        </>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </header>
 
             <Split
