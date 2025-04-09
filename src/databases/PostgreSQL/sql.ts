@@ -41,7 +41,7 @@ export async function connectPg(connName: string, p: DbConnectionParam) {
 export async function getAllTableNamePg(connName: string) {
   const sql = `
     SELECT 
-        tablename 
+        tablename as "tableName"
     FROM 
         pg_catalog.pg_tables 
     WHERE 
@@ -51,25 +51,25 @@ export async function getAllTableNamePg(connName: string) {
   const dbRes = await invoker.querySql(connName, sql);
 
   // 把表名整理成一维数组
-  const dataArr = dbRes.data ? (JSON.parse(dbRes.data) as { tablename: string }[]) : [];
+  const dataArr = dbRes.data ? (JSON.parse(dbRes.data) as { tableName: string }[]) : [];
 
   return {
     columnName: dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : [],
-    data: dataArr.map((item) => item.tablename),
+    data: dataArr.map((item) => item.tableName),
   };
 }
 
 export async function getAllTableSizePg(connName: string) {
   const sql = `
     SELECT
-      schemaname AS schema_name,
-      tablename AS tableName,
-      pg_size_pretty(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS totalSize,
-      pg_size_pretty(pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS tableSize,
+      schemaname AS "schemaName",
+      tablename AS "tableName",
+      pg_size_pretty(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS "totalSize",
+      pg_size_pretty(pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS "tableSize",
       pg_size_pretty(
         pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)) - 
         pg_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))
-      ) AS indexSize
+      ) AS "indexSize"
     FROM
       pg_tables
     WHERE
@@ -373,9 +373,9 @@ export async function execTransactionPg(connName: string, sqls: string[]) {
   `;
 
   try {
-    return await invoker.execSql(connName, transactionSQL);
+    return await invoker.execManySql(connName, transactionSQL);
   } catch (err) {
-    await invoker.execSql(connName, "ROLLBACK;").catch(() => {});
+    await invoker.execManySql(connName, "ROLLBACK;").catch(() => {});
     throw err;
   }
 }

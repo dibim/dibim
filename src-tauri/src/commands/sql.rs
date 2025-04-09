@@ -74,3 +74,23 @@ pub async fn sqlx_exec(conn_name: String, sql: String) -> DbResult {
 
     res
 }
+
+#[tauri::command]
+pub async fn sqlx_exec_many(conn_name: String, sql: String) -> DbResult {
+    let mut res = DbResult::new();
+
+    match sqlx_public::execute_many(&conn_name, &sql).await {
+        Ok(o) => {
+            res.data = match serde_json::to_string(&o) {
+                Ok(oo) => oo,
+                Err(_) => "".to_string(),
+            };
+        }
+        Err(e) => {
+            eprintln!("Error occurred in sqlx_exec_many: {:?}", e);
+            res.error_message = e.to_string()
+        }
+    }
+
+    res
+}

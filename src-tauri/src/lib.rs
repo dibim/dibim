@@ -23,6 +23,7 @@ pub fn run() {
             commands::sql::sqlx_connect,
             commands::sql::sqlx_disconnect,
             commands::sql::sqlx_exec,
+            commands::sql::sqlx_exec_many,
             commands::sql::sqlx_query,
         ])
         .run(tauri::generate_context!())

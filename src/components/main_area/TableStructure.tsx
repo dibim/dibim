@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
-import { toast } from "sonner";
 import { subscribeKey } from "valtio/utils";
 import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
-import { exec, fieldTypeOptions, genAlterCmd } from "@/databases/adapter,";
+import { exec, execMany, fieldTypeOptions, genAlterCmd } from "@/databases/adapter,";
 import { AllAlterAction, AlterAction, FieldAlterAction } from "@/databases/types";
 import { cn } from "@/lib/utils";
-import { appState } from "@/store/valtio";
+import { addNotification, appState } from "@/store/valtio";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { DataTypeIcon } from "../DataTypeIcon";
 import { EditableTable, EditableTableMethods, ListRow } from "../EditableTable";
@@ -266,7 +265,7 @@ export function TableStructure({
 
   function handleApply() {
     if (alterData.length === 0) {
-      toast(t("&selectFieldFirst"));
+      addNotification(t("&selectFieldFirst"), "warning");
       return;
     }
 
@@ -338,9 +337,9 @@ export function TableStructure({
     const field = appState.currentTableStructure[index];
     try {
       await navigator.clipboard.writeText(field.name);
-      toast(t("Copied"));
+      addNotification(t("Copied"), "success");
     } catch (err) {
-      toast(t("Copy failed"));
+      addNotification(t("Copy failed"), "error");
     }
   }
 
@@ -348,9 +347,9 @@ export function TableStructure({
     const field = appState.currentTableStructure[index];
     try {
       await navigator.clipboard.writeText(field.type);
-      toast(t("Copied"));
+      addNotification(t("Copied"), "success");
     } catch (err) {
-      toast(t("Copy failed"));
+      addNotification(t("Copy failed"), "error");
     }
   }
 
@@ -369,13 +368,16 @@ export function TableStructure({
   }
 
   async function handleConfirm() {
-    const res = await exec(willExecCmd);
+    const res = await execMany(willExecCmd);
     if (res.errorMessage === "") {
       setShowDialogAlter(false);
       await getData();
-      resetData();
+      resetData(true);
+      setOkMessage("OK");
+      addNotification("OK", "success");
     } else {
       setErrorMessage(res.errorMessage);
+      addNotification(res.errorMessage, "error");
     }
   }
 
@@ -483,9 +485,10 @@ export function TableStructure({
 
   // ========== 表格处理 结束 | Table data processing end ==========
 
-  function resetData() {
+  function resetData(resetAlterData: boolean) {
+    // 监听 currentTableStructure 变化后不可以执行 setAlterData, 否则应用表结构变化的数据会被清空
+    if (resetAlterData) setAlterData([]);
     tableRef.current?.resetData();
-    setAlterData([]);
     updateDataArr();
   }
 
@@ -494,7 +497,7 @@ export function TableStructure({
 
     // 监听 store 的变化 | Monitor changes in the store
     const unsubscribe = subscribeKey(appState, "currentTableStructure", (_value: any) => {
-      resetData();
+      resetData(false);
     });
     return () => unsubscribe();
   }, []);

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import bytes from "bytes";
 import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, CirclePlus, LucideIcon } from "lucide-react";
-import { toast } from "sonner";
 import { subscribeKey } from "valtio/utils";
 import { MAIN_AREA_TABLE_EDITOR, STR_EMPTY, TAB_STRUCTURE } from "@/constants";
 import {
@@ -13,7 +12,7 @@ import {
   getAllTableName,
   getAllTableSize,
 } from "@/databases/adapter,";
-import { appState } from "@/store/valtio";
+import { addNotification, appState } from "@/store/valtio";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
@@ -126,20 +125,20 @@ export function TableList() {
   async function handleCopy(tableName: string) {
     try {
       await navigator.clipboard.writeText(tableName);
-      toast(t("Copied"));
+      addNotification(t("Copied"), "success");
     } catch (err) {
-      toast(t("Copy failed"));
+      addNotification(t("Copy failed"), "error");
     }
   }
 
   function handleImport(tableName: string) {
     // TODO:
-    alert("not implemented");
+    addNotification("not implemented", "error");
   }
 
   function handleExport(tableName: string) {
     // TODO:
-    alert("not implemented");
+    addNotification("not implemented", "error");
   }
 
   function handleTruncatePopup(tableName: string) {
@@ -154,9 +153,13 @@ export function TableList() {
     setWillExecCmd(genDeleteTableCmd(tableName) || "");
   }
 
-  function handleConfirm() {
-    exec(willExecCmd);
-    getData();
+  async function handleConfirm() {
+    const res = await exec(willExecCmd);
+    if (res.errorMessage !== "") {
+      addNotification(res.errorMessage, "error");
+    } else {
+      getData();
+    }
   }
 
   // ========== 上下文按钮 结束 | Context button end ==========
@@ -191,7 +194,11 @@ export function TableList() {
         }
 
         setTableData(arrTb);
+      } else {
+        addNotification("Data size is none", "warning");
       }
+    } else {
+      addNotification("Data list is none", "warning");
     }
   }
 
@@ -214,7 +221,7 @@ export function TableList() {
                   <div className="absolute inset-0 bg-blue-500 z-0 opacity-25" />
                   <div
                     className={`absolute h-full  bg-blue-500 z-10 opacity-50`}
-                    style={{ width: `6${item.indexSizeByte / item.totalSizeByte}%` }}
+                    style={{ width: `${item.indexSizeByte / item.totalSizeByte}%` }}
                   ></div>
                   <div className="relative z-20">{item.totalSize}</div>
                 </div>

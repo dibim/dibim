@@ -105,7 +105,7 @@ async fn stream_pagination(
             let query = sqlx::query(&*sql_clone);
             #[cfg(debug_assertions)]
             {
-                print_sql(query.sql());
+                print_sql(query.sql(),7);
             }
 
             let mut stream = query
@@ -164,7 +164,7 @@ async fn fetch_all_data(
     let query = sqlx::query(sql);
     #[cfg(debug_assertions)]
     {
-        print_sql(query.sql());
+        print_sql(query.sql(), 7);
     }
 
     let rows = query.fetch_all(pool).await?;

@@ -25,7 +25,7 @@ pub async fn query_sqlite(
     let query = sqlx::query(sql);
     #[cfg(debug_assertions)]
     {
-        print_sql(query.sql());
+        print_sql(query.sql(), 7);
     }
 
     let rows = query.fetch_all(pool).await?;

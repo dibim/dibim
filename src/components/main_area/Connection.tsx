@@ -8,7 +8,7 @@ import SqliteLogo from "@/assets/db_logo/sqlite.svg?react";
 import { LabeledDiv } from "@/components/LabeledDiv";
 import { Input } from "@/components/ui/input";
 import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE, DIR_H, STR_ADD, STR_EDIT } from "@/constants";
-import { appState } from "@/store/valtio";
+import { addNotification, appState } from "@/store/valtio";
 import { DbType, SvgComponentType } from "@/types/types";
 import { generateHexString } from "@/utils/util";
 import { TextNotification } from "../TextNotification";
@@ -63,7 +63,9 @@ export function Connection(props: ConnectionProps) {
 
   function valueIsError(condition: boolean, msg: string) {
     if (condition) {
-      setErrorMessage(t("&Please enter", { name: msg }));
+      const message = t("&Please enter", { name: msg });
+      setErrorMessage(message);
+      addNotification(message, "error");
       return true;
     }
     return false;
