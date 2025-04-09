@@ -58,7 +58,7 @@ const typeCategoryMap: Record<string, string> = {
   // ================ 二进制 | Binary ================
   bytea: FIELD_BINARY,
 
-  // ====================== 几何类 | Geometric ======================
+  // ====================== 几何 | Geometric ======================
   point: FIELD_GEOMETRIC,
   line: FIELD_GEOMETRIC,
   lseg: FIELD_GEOMETRIC,
