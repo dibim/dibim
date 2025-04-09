@@ -194,16 +194,11 @@ export function Main({ id, className }: { id: string; className: string }) {
                     <EllipsisVertical />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56">
-                    {snap.textNotificationArr.map((item, index) => {
-                      return (
-                        <>
-                          <DropdownMenuItem key={index}>
-                            <TextNotification message={item.message} type={item.type} />
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                        </>
-                      );
-                    })}
+                    {snap.textNotificationArr.map((item, index) => (
+                      <DropdownMenuItem key={index}>
+                        <TextNotification message={item.message} type={item.type} />
+                      </DropdownMenuItem>
+                    ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>

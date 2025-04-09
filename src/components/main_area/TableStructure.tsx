@@ -266,7 +266,10 @@ export function TableStructure({
 
   function handleApply() {
     if (alterData.length === 0) {
-      toast(t("&selectFieldFirst"));
+      appState.addTextNotification({
+        message: t("&selectFieldFirst"),
+        type: "warning",
+      });
       return;
     }
 
@@ -373,7 +376,7 @@ export function TableStructure({
     if (res.errorMessage === "") {
       setShowDialogAlter(false);
       await getData();
-      resetData();
+      resetData(true);
       setOkMessage("OK");
     } else {
       setErrorMessage(res.errorMessage);
@@ -488,9 +491,10 @@ export function TableStructure({
 
   // ========== 表格处理 结束 | Table data processing end ==========
 
-  function resetData() {
+  function resetData(resetAlterData: boolean) {
+    // 监听 currentTableStructure 变化后不可以执行 setAlterData, 否则应用表结构变化的数据会被清空
+    if (resetAlterData) setAlterData([]);
     tableRef.current?.resetData();
-    setAlterData([]);
     updateDataArr();
   }
 
@@ -499,7 +503,7 @@ export function TableStructure({
 
     // 监听 store 的变化 | Monitor changes in the store
     const unsubscribe = subscribeKey(appState, "currentTableStructure", (_value: any) => {
-      resetData();
+      resetData(false);
     });
     return () => unsubscribe();
   }, []);
