@@ -337,23 +337,9 @@ export async function getPageCount(connName: string, tableName: string, pageSize
 export async function getTableDataPg(connName: string, p: GetTableDataParam) {
   const { itemsTotal, pageTotal } = await getPageCount(connName, p.tableName, p.pageSize, "");
 
-  // 如果没有主键, 且没有指定排序字段
-  // TODO: 实现逻辑
-  // const sqlNoPkey = `
-  //   WITH numbered_rows AS (
-  //       SELECT
-  //           *,
-  //           ROW_NUMBER() OVER (ORDER BY created_at) AS row_num
-  //       FROM products
-  //   )
-  //   SELECT *
-  //   FROM numbered_rows
-  //   WHERE row_num BETWEEN 11 AND 20; -- 第二页，每页 10 条数据
-  // `;
-
-  // 有指定排序数据的
-  const where = p.lastOrderByValue === null ? "" : `WHERE ${p.sortField} > ${p.lastOrderByValue}`;
-  const sqlHasPkey = `SELECT * FROM "${p.tableName}" ${where} ORDER BY ${p.sortField} ${p.sortOrder} LIMIT ${p.pageSize};`;
+  let offset = p.pageSize * (p.currentPage - 1);
+  if (offset < 0) offset = 0;
+  const sqlHasPkey = `SELECT * FROM "${p.tableName}" ${p.where} LIMIT ${p.pageSize} OFFSET ${offset};`;
   const dbRes = await invoker.querySql(connName, sqlHasPkey);
 
   return {
@@ -362,22 +348,6 @@ export async function getTableDataPg(connName: string, p: GetTableDataParam) {
     columnName: dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : [],
     data: dbRes.data ? (JSON.parse(dbRes.data) as object[]) : [],
   };
-}
-
-// 执行事务语句
-export async function execTransactionPg(connName: string, sqls: string[]) {
-  const transactionSQL = `
-    BEGIN;
-      ${sqls.join(";\n")};
-    COMMIT;
-  `;
-
-  try {
-    return await invoker.execManySql(connName, transactionSQL);
-  } catch (err) {
-    await invoker.execManySql(connName, "ROLLBACK;").catch(() => {});
-    throw err;
-  }
 }
 
 // 生成重命名表格的语句

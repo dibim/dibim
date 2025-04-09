@@ -30,10 +30,8 @@ export interface DbConnectionParam {
 
 export type GetTableDataParam = {
   currentPage: number; // 当前页码
-  lastOrderByValue: any; // 上一次查询的结果集里最后一条数据里的和 orderBy 对应的字段的值
   pageSize: number; // 每页的数据条数
-  sortField: string; // 排序字段
-  sortOrder: "ASC" | "DESC"; // 排序顺序
+  where: string;
   tableName: string;
 };
 

@@ -89,6 +89,8 @@ export function getUniqueFieldName(tsa: FieldStructure[]) {
 }
 
 /**
+ * 目前已弃用
+ *
  * 查询表格数据的时候, 必须使用一个排序字段
  *
  * 优先级: 主键 > 唯一索引 > 索引 > 普通字段
