@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import bytes from "bytes";
 import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, CirclePlus, LucideIcon } from "lucide-react";
 import { subscribeKey } from "valtio/utils";
-import { MAIN_AREA_TABLE_EDITOR, STR_EMPTY, TAB_STRUCTURE } from "@/constants";
+import { MAIN_AREA_TABLE_EDITOR, MAIN_AREA_TAB_STRUCTURE, STR_EMPTY } from "@/constants";
 import {
   exec,
   genDeleteTableCmd,
@@ -55,7 +55,7 @@ export function TableList() {
   function addTable() {
     appState.setIsAddingTable(true);
     appState.setCurrentTableName("");
-    appState.setMainContenTab(TAB_STRUCTURE);
+    appState.setMainContenTab(MAIN_AREA_TAB_STRUCTURE);
     appState.setCurrentTableStructure([]);
   }
 

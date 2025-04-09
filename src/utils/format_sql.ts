@@ -1,6 +1,6 @@
 import { SqlLanguage, format } from "sql-formatter";
-import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE } from "@/constants";
-import { DbType } from "@/types/types";
+import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE } from "@/databases/constants";
+import { DbType } from "@/databases/types";
 
 export function getDbTypeLowerCase(dbType: DbType) {
   if (dbType === DB_MYSQL) return "mysql";

@@ -1,5 +1,5 @@
 import { ListRow } from "@/components/EditableTable";
-import { RowData } from "@/types/types";
+import { RowData } from "@/databases/types";
 
 export function rawRow2EtRow(data: RowData[]) {
   const dataArrTemp: ListRow[] = [];

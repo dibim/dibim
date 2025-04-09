@@ -35,45 +35,27 @@ export const CONFIG_FILE_APPEARANCE = "./dibim_appearance.json";
 // 查询记录 | Query records
 export const QUERY_HISTORY_FILE = "./dibim_query_history.bin";
 
-// 数据库类型 | Database type
-export const DB_MYSQL = "MySQL";
-export const DB_POSTGRESQL = "PostgreSQL";
-export const DB_SQLITE = "SQLite";
-
-// 数据库字段类型 | Database field type
-export const FIELD_ARRAY = "ARRAY";
-export const FIELD_BINARY = "BINARY";
-export const FIELD_BOOLEAN = "BOOLEAN";
-export const FIELD_CHARACTER = "CHARACTER";
-export const FIELD_DATETIME = "DATETIME";
-export const FIELD_GEOMETRIC = "GEOMETRIC";
-export const FIELD_JSON = "JSON";
-export const FIELD_NETWORK = "NETWORK";
-export const FIELD_NUMERIC = "NUMERIC";
-export const FIELD_RANGE = "RANGE";
-export const FIELD_OTHER = "OTHER";
-
 // 列表栏的类型 | Type of List Bar
-export const LIST_BAR_DB = "dbList";
-export const LIST_BAR_FUNC = "funcLst";
-export const LIST_BAR_TABLE = "tableList";
-export const LIST_BAR_VIEW = "viewList";
+export const LIST_BAR_DB = "listBarDb";
+export const LIST_BAR_FUNC = "listBarFunc";
+export const LIST_BAR_TABLE = "listBarTable";
+export const LIST_BAR_VIEW = "listBarView";
 
 // 主要区域的类型 | Types of main area
-export const MAIN_AREA_ADD_CONNECTION = "addConnection";
-export const MAIN_AREA_EDIT_CONNECTION = "editConnection";
-export const MAIN_AREA_SETTINGS = "settings";
-export const MAIN_AREA_SQL_EDITOR = "sqlEditor";
-export const MAIN_AREA_TABLE_EDITOR = "tableEditor";
-export const MAIN_AREA_WELCOME = "welcome";
+export const MAIN_AREA_ADD_CONNECTION = "mainAreaAddConnection";
+export const MAIN_AREA_EDIT_CONNECTION = "mainAreaEditConnection";
+export const MAIN_AREA_SETTINGS = "mainAreaSettings";
+export const MAIN_AREA_SQL_EDITOR = "mainAreaSqlEditor";
+export const MAIN_AREA_TABLE_EDITOR = "mainAreaTableEditor";
+export const MAIN_AREA_WELCOME = "mainAreaWelcome";
 
 // 主要区域的标签页 | Tabs for main area
-export const TAB_CONSTRAINT = "TAB_CONSTRAINT";
-export const TAB_DATA = "TAB_DATA";
-export const TAB_DDL = "TAB_DDL";
-export const TAB_FOREIGN_KEY = "TAB_FOREIGN_KEY";
-export const TAB_PARTITION = "TAB_PARTITION";
-export const TAB_STRUCTURE = "TAB_STRUCTURE";
+export const MAIN_AREA_TAB_CONSTRAINT = "mainAreaTabConstraint";
+export const MAIN_AREA_TAB_DATA = "mainAreaTabData";
+export const MAIN_AREA_TAB_DDL = "mainAreaTabDdl";
+export const MAIN_AREA_TAB_FOREIGN_KEY = "mainAreaTabForeignKey";
+export const MAIN_AREA_TAB_PARTITION = "mainAreaTabPartition";
+export const MAIN_AREA_TAB_STRUCTURE = "mainAreaTabStructure";
 
 // 方向 | Direction
 export const DIR_H = "horizontal";

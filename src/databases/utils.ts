@@ -2,9 +2,8 @@ import { TableDataChange } from "@/components/EditableTable";
 import { RE_IS_SINGLET_QUERY, RE_WHERE_CLAUSE } from "@/constants";
 import { NEW_ROW_IS_ADDED_FIELD } from "@/constants";
 import { appState } from "@/store/valtio";
-import { RowData } from "@/types/types";
 import { genDeleteRowsCmd, genInsertRowsCmd, genUpdateFieldCmd } from "./adapter,";
-import { FieldStructure, SqlValueCommon } from "./types";
+import { FieldStructure, RowData, SqlValueCommon } from "./types";
 import { FieldWithValue } from "./types";
 
 /**

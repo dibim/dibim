@@ -6,10 +6,9 @@ import {
   FIELD_DATETIME,
   FIELD_GEOMETRIC,
   FIELD_JSON,
-  FIELD_NETWORK,
   FIELD_NUMERIC,
   FIELD_OTHER,
-} from "@/constants";
+} from "../constants";
 
 const typeCategoryMap: Record<string, string> = {
   // ================ 数值 | Numeric  ================

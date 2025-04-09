@@ -1,16 +1,10 @@
 import { proxy } from "valtio";
-import { DB_POSTGRESQL, LIST_BAR_DB, MAIN_AREA_WELCOME, MAIN_PASSWORD_DEFAULT } from "@/constants";
-import { FieldStructure } from "@/databases/types";
+import { LIST_BAR_DB, MAIN_AREA_WELCOME, MAIN_PASSWORD_DEFAULT } from "@/constants";
+import { DB_POSTGRESQL } from "@/databases/constants";
+import { DbType, FieldStructure } from "@/databases/types";
 import { invoker } from "@/invoker";
 import { ConfigFileMain } from "@/types/conf_file";
-import {
-  DbType,
-  ListBarType,
-  MainAreaTab,
-  MainAreaType,
-  TextNotificationData,
-  TextNotificationType,
-} from "@/types/types";
+import { ListBarType, MainAreaTab, MainAreaType, TextNotificationData, TextNotificationType } from "@/types/types";
 import { saveConfigFile } from "@/utils/config_file";
 
 interface AppState {

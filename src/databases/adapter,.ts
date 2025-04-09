@@ -1,4 +1,3 @@
-import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE } from "@/constants";
 import {
   connectPg,
   genDeleteFieldCmdPg,
@@ -17,6 +16,7 @@ import {
 } from "@/databases/postgresql/sql";
 import { invoker } from "@/invoker";
 import { appState } from "@/store/valtio";
+import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE } from "./constants";
 import { fieldTypeOptionsMysql } from "./mysql/select_options";
 import { genAlterCmdPg } from "./postgresql/alter_table";
 import { getDataTypeCategoryPg } from "./postgresql/icon";

@@ -1,5 +1,4 @@
-import { DbConnectionParam } from "@/databases/types";
-import { DbType } from "./types";
+import { DbConnectionParam, DbType } from "@/databases/types";
 
 export type DbConnections = DbConnectionParam & {
   dbType: DbType;

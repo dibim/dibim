@@ -8,7 +8,7 @@ import {
   FIELD_JSON,
   FIELD_NUMERIC,
   FIELD_OTHER,
-} from "@/constants";
+} from "../constants";
 
 const typeCategoryMap: Record<string, string> = {
   // ================ 数值 | Numeric  ================

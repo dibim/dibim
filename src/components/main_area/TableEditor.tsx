@@ -2,7 +2,16 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSnapshot } from "valtio";
 import { subscribeKey } from "valtio/utils";
-import { STR_ADD, STR_EDIT, STR_EMPTY, STR_TABLE, TAB_CONSTRAINT, TAB_DATA, TAB_DDL, TAB_STRUCTURE } from "@/constants";
+import {
+  MAIN_AREA_TAB_CONSTRAINT,
+  MAIN_AREA_TAB_DATA,
+  MAIN_AREA_TAB_DDL,
+  MAIN_AREA_TAB_STRUCTURE,
+  STR_ADD,
+  STR_EDIT,
+  STR_EMPTY,
+  STR_TABLE,
+} from "@/constants";
 import { getTableDdl, getTableStructure } from "@/databases/adapter,";
 import { AllAlterAction, TableAlterAction } from "@/databases/types";
 import { getUniqueFieldName } from "@/databases/utils";
@@ -32,7 +41,7 @@ export function TableEditor() {
     if (res && res.data) {
       appState.setCurrentTableStructure(res.data);
       appState.setUniqueFieldName(getUniqueFieldName(res.data));
-      if (appState.mainContenTab === STR_EMPTY) appState.setMainContenTab(TAB_DATA);
+      if (appState.mainContenTab === STR_EMPTY) appState.setMainContenTab(MAIN_AREA_TAB_DATA);
     }
     // 获取建表语句, 会在多个地方用, 在这里记录到 store
     const resDdl = await getTableDdl(appState.currentTableName);
@@ -109,18 +118,18 @@ export function TableEditor() {
         </div>
         <TabsList className="grid grid-cols-3">
           <TabsTrigger
-            value={TAB_STRUCTURE}
+            value={MAIN_AREA_TAB_STRUCTURE}
             onClick={() => {
-              appState.setMainContenTab(TAB_STRUCTURE);
+              appState.setMainContenTab(MAIN_AREA_TAB_STRUCTURE);
             }}
           >
             {t("Table structure")}
           </TabsTrigger>
 
           <TabsTrigger
-            value={TAB_DDL}
+            value={MAIN_AREA_TAB_DDL}
             onClick={() => {
-              appState.setMainContenTab(TAB_DDL);
+              appState.setMainContenTab(MAIN_AREA_TAB_DDL);
             }}
           >
             DDL
@@ -156,16 +165,16 @@ export function TableEditor() {
           */}
 
           <TabsTrigger
-            value={TAB_DATA}
+            value={MAIN_AREA_TAB_DATA}
             onClick={() => {
-              appState.setMainContenTab(TAB_DATA);
+              appState.setMainContenTab(MAIN_AREA_TAB_DATA);
             }}
           >
             {t("Data")}
           </TabsTrigger>
         </TabsList>
       </div>
-      <TabsContent value={TAB_STRUCTURE}>
+      <TabsContent value={MAIN_AREA_TAB_STRUCTURE}>
         <Card className="p-4">
           <CardContent className="p-0">
             <TableStructure
@@ -179,21 +188,21 @@ export function TableEditor() {
           </CardContent>
         </Card>
       </TabsContent>
-      <TabsContent value={TAB_DDL}>
+      <TabsContent value={MAIN_AREA_TAB_DDL}>
         <Card className="p-4">
           <CardContent className="p-0">
             <TableDdl />
           </CardContent>
         </Card>
       </TabsContent>
-      <TabsContent value={TAB_CONSTRAINT}>
+      <TabsContent value={MAIN_AREA_TAB_CONSTRAINT}>
         <Card className="p-4">
           <CardContent className="p-0">
             <TableConstraint />
           </CardContent>
         </Card>
       </TabsContent>
-      <TabsContent value={TAB_DATA}>
+      <TabsContent value={MAIN_AREA_TAB_DATA}>
         <Card className="p-4">
           <CardContent className="p-0">
             <TableData />
