@@ -14,16 +14,16 @@ import {
   getTableDataPg,
   getTableDdlPg,
   getTableStructurePg,
-} from "@/databases/PostgreSQL/sql";
+} from "@/databases/postgresql/sql";
 import { invoker } from "@/invoker";
 import { appState } from "@/store/valtio";
-import { fieldTypeOptionsMysql } from "./MySQL/select_options";
-import { genAlterCmdPg } from "./PostgreSQL/alter_table";
-import { getDataTypeCategoryPg } from "./PostgreSQL/icon";
-import { fieldTypeOptionsPg } from "./PostgreSQL/select_options";
-import { genAlterCmdSqlite } from "./SQLite/alter_table";
-import { getDataTypeCategorySqlite } from "./SQLite/icon";
-import { fieldTypeOptionsSqlite } from "./SQLite/select_options";
+import { fieldTypeOptionsMysql } from "./mysql/select_options";
+import { genAlterCmdPg } from "./postgresql/alter_table";
+import { getDataTypeCategoryPg } from "./postgresql/icon";
+import { fieldTypeOptionsPg } from "./postgresql/select_options";
+import { genAlterCmdSqlite } from "./sqlite/alter_table";
+import { getDataTypeCategorySqlite } from "./sqlite/icon";
+import { fieldTypeOptionsSqlite } from "./sqlite/select_options";
 import {
   connectSqlite,
   genDeleteFieldCmdSqlite,
@@ -39,7 +39,7 @@ import {
   getTableDataSqlite,
   getTableDdlSqlite,
   getTableStructureSqlite,
-} from "./SQLite/sql";
+} from "./sqlite/sql";
 import { AllAlterAction, DbConnectionParam, FieldWithValue, GetTableDataParam } from "./types";
 
 // 连接数据库

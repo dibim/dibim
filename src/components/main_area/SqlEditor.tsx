@@ -8,7 +8,7 @@ import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import { useSnapshot } from "valtio";
 import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
 import { DEFAULT_PAGE_SIZE, RE_IS_SINGLET_QUERY } from "@/constants";
-import { getPageCount } from "@/databases/PostgreSQL/sql";
+import { getPageCount } from "@/databases/postgresql/sql";
 import { exec, query } from "@/databases/adapter,";
 import { extractConditionClause } from "@/databases/utils";
 import { appState } from "@/store/valtio";
