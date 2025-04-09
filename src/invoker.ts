@@ -60,4 +60,5 @@ export const invoker = {
    * @returns
    */
   execSql: (connName: string, sql: string) => invoke<DbResult>("sqlx_exec", { connName, sql }),
+  execManySql: (connName: string, sql: string) => invoke<DbResult>("sqlx_exec_many", { connName, sql }),
 };

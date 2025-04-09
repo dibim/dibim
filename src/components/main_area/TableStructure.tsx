@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { subscribeKey } from "valtio/utils";
 import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
-import { exec, fieldTypeOptions, genAlterCmd } from "@/databases/adapter,";
+import { exec, execMany, fieldTypeOptions, genAlterCmd } from "@/databases/adapter,";
 import { AllAlterAction, AlterAction, FieldAlterAction } from "@/databases/types";
 import { cn } from "@/lib/utils";
 import { addNotification, appState } from "@/store/valtio";
@@ -368,15 +368,16 @@ export function TableStructure({
   }
 
   async function handleConfirm() {
-    const res = await exec(willExecCmd);
+    const res = await execMany(willExecCmd);
     if (res.errorMessage === "") {
       setShowDialogAlter(false);
       await getData();
       resetData(true);
       setOkMessage("OK");
+      addNotification("OK", "success");
     } else {
       setErrorMessage(res.errorMessage);
-      addNotification(res.errorMessage, "success");
+      addNotification(res.errorMessage, "error");
     }
   }
 

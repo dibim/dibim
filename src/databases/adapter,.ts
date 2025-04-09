@@ -68,6 +68,12 @@ export async function exec(sql: string) {
   return await invoker.execSql(currentConnName, sql);
 }
 
+// 执行语句
+export async function execMany(sql: string) {
+  const { currentConnName } = appState;
+  return await invoker.execManySql(currentConnName, sql);
+}
+
 // 获取所有表名
 export async function getAllTableName() {
   const { currentDbType, currentConnName } = appState;

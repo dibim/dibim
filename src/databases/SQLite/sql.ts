@@ -369,9 +369,9 @@ export async function execTransactionSqlite(connName: string, sqls: string[]) {
   `;
 
   try {
-    return await invoker.execSql(connName, transactionSQL);
+    return await invoker.execManySql(connName, transactionSQL);
   } catch (err) {
-    await invoker.execSql(connName, "ROLLBACK;").catch(() => {});
+    await invoker.execManySql(connName, "ROLLBACK;").catch(() => {});
     throw err;
   }
 }

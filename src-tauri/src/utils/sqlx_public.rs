@@ -56,8 +56,8 @@ pub async fn query(
     }
 }
 
-// 执行非查询语句
-// Execute non query statements
+// 执行单条非查询语句
+// Execute a single non query statement
 pub async fn exec(conn_name: &str, sql: &str) -> Result<ExecResult, Box<dyn std::error::Error>> {
     let db_conn = DbPool::global()
         .get(conn_name)
@@ -70,7 +70,7 @@ pub async fn exec(conn_name: &str, sql: &str) -> Result<ExecResult, Box<dyn std:
 
             #[cfg(debug_assertions)]
             {
-                print_sql(query.sql());
+                print_sql(query.sql(), 7);
             }
 
             let result = query.execute(&pool).await?;
@@ -84,7 +84,7 @@ pub async fn exec(conn_name: &str, sql: &str) -> Result<ExecResult, Box<dyn std:
 
             #[cfg(debug_assertions)]
             {
-                print_sql(query.sql());
+                print_sql(query.sql(), 7);
             }
 
             let result = query.execute(&pool).await?;
@@ -98,13 +98,118 @@ pub async fn exec(conn_name: &str, sql: &str) -> Result<ExecResult, Box<dyn std:
 
             #[cfg(debug_assertions)]
             {
-                print_sql(query.sql());
+                print_sql(query.sql(), 7);
             }
 
             let result = query.execute(&pool).await?;
             Ok(ExecResult {
                 affected_rows: result.rows_affected(),
                 last_insert_id: result.last_insert_rowid() as u64,
+            })
+        }
+    }
+}
+
+// 执行多条非查询语句
+// Execute multiple non query statements
+pub async fn execute_many(
+    conn_name: &str,
+    sql: &str,
+) -> Result<ExecResult, Box<dyn std::error::Error>> {
+    let db_conn = DbPool::global()
+        .get(conn_name)
+        .await
+        .ok_or_else(|| format!("Connection '{}' not found", conn_name))?;
+
+    match db_conn {
+        DbConnection::Postgres(pool) => {
+            let mut tx = pool.begin().await?;
+
+            #[cfg(debug_assertions)]
+            {
+                print_sql("Transaction start", 1);
+            }
+
+            for stmt in sql.split(';').map(|s| s.trim()).filter(|s| !s.is_empty()) {
+                let query = sqlx::query(stmt);
+
+                #[cfg(debug_assertions)]
+                {
+                    print_sql(query.sql(), 2);
+                }
+                query.execute(&mut *tx).await?;
+            }
+
+            tx.commit().await?;
+
+            #[cfg(debug_assertions)]
+            {
+                print_sql("Transaction end", 4);
+            }
+
+            Ok(ExecResult {
+                affected_rows: 0,
+                last_insert_id: 0, // PostgreSQL 需要 RETURNING 子句
+            })
+        }
+        DbConnection::MySql(pool) => {
+            let mut tx = pool.begin().await?;
+
+            #[cfg(debug_assertions)]
+            {
+                print_sql("Transaction start", 1);
+            }
+
+            for stmt in sql.split(';').map(|s| s.trim()).filter(|s| !s.is_empty()) {
+                let query = sqlx::query(stmt);
+
+                #[cfg(debug_assertions)]
+                {
+                    print_sql(query.sql(), 2);
+                }
+                query.execute(&mut *tx).await?;
+            }
+
+            tx.commit().await?;
+
+            #[cfg(debug_assertions)]
+            {
+                print_sql("Transaction end", 4);
+            }
+
+            Ok(ExecResult {
+                affected_rows: 0,
+                last_insert_id: 0,
+            })
+        }
+        DbConnection::Sqlite(pool) => {
+            let mut tx = pool.begin().await?;
+
+            #[cfg(debug_assertions)]
+            {
+                print_sql("Transaction start", 1);
+            }
+
+            for stmt in sql.split(';').map(|s| s.trim()).filter(|s| !s.is_empty()) {
+                let query = sqlx::query(stmt);
+
+                #[cfg(debug_assertions)]
+                {
+                    print_sql(query.sql(), 2);
+                }
+                query.execute(&mut *tx).await?;
+            }
+
+            tx.commit().await?;
+
+            #[cfg(debug_assertions)]
+            {
+                print_sql("Transaction end", 4);
+            }
+
+            Ok(ExecResult {
+                affected_rows: 0,
+                last_insert_id: 0,
             })
         }
     }
