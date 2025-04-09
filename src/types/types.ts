@@ -79,7 +79,7 @@ export type MainAreaTab =
   | typeof TAB_STRUCTURE;
 
 // 通知文字的类型
-export type TextNotificationType = "error" | "warning" | "success";
+export type TextNotificationType = "error" | "warning" | "success" | "info";
 export type TextNotificationData = {
   message: string;
   type?: TextNotificationType;
