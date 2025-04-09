@@ -1,5 +1,5 @@
 /**
- * 官方文档: Oracle 数据库数据类型
+ * 官方文档: https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/Data-Types.html
  */
 import { SelectOption } from "@/components/SearchableSelect";
 
@@ -9,13 +9,13 @@ export const fieldTypeOptionsOracle: SelectOption[] = [
   { value: "BINARY_FLOAT", label: "BINARY_FLOAT", group: "Numeric" },
   { value: "DECIMAL", label: "DECIMAL (NUMBER)", group: "Numeric" },
   { value: "FLOAT", label: "FLOAT", group: "Numeric" },
-  { value: "INT", label: "INT (NUMBER)", group: "Numeric" },
-  { value: "INTEGER", label: "INTEGER (NUMBER)", group: "Numeric" },
+  { value: "INT", label: "INT (NUMBER(38))", group: "Numeric" },
+  { value: "INTEGER", label: "INTEGER (NUMBER(38))", group: "Numeric" },
   { value: "MONEY", label: "MONEY (NUMBER)", group: "Numeric" },
   { value: "NUMBER", label: "NUMBER", group: "Numeric" },
   { value: "NUMERIC", label: "NUMERIC (NUMBER)", group: "Numeric" },
   { value: "REAL", label: "REAL (BINARY_FLOAT)", group: "Numeric" },
-  { value: "SMALLINT", label: "SMALLINT (NUMBER)", group: "Numeric" },
+  { value: "SMALLINT", label: "SMALLINT (NUMBER(38))", group: "Numeric" },
 
   // ================ 文本 | Character ================
   { value: "CHAR", label: "CHAR", group: "Character" },
@@ -66,4 +66,5 @@ export const fieldTypeOptionsOracle: SelectOption[] = [
   { value: "ROWID", label: "ROWID", group: "Special" },
   { value: "UROWID", label: "UROWID", group: "Special" },
   { value: "URTYPE", label: "URTYPE", group: "Special" },
+  { value: "VECTOR", label: "VECTOR", group: "Special" },
 ];
