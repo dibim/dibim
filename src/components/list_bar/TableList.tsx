@@ -237,7 +237,7 @@ export function TableList() {
                   <div className="absolute inset-0 bg-blue-500 z-0 opacity-25" />
                   <div
                     className={`absolute h-full  bg-blue-500 z-10 opacity-50`}
-                    style={{ width: `6${item.indexSizeByte / item.totalSizeByte}%` }}
+                    style={{ width: `${item.indexSizeByte / item.totalSizeByte}%` }}
                   ></div>
                   <div className="relative z-20">{item.totalSize}</div>
                 </div>
