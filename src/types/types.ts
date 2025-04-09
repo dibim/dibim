@@ -1,8 +1,5 @@
 import { FunctionComponent, SVGProps } from "react";
 import {
-  DB_MYSQL,
-  DB_POSTGRESQL,
-  DB_SQLITE,
   LIST_BAR_DB,
   LIST_BAR_FUNC,
   LIST_BAR_TABLE,
@@ -12,14 +9,14 @@ import {
   MAIN_AREA_SETTINGS,
   MAIN_AREA_SQL_EDITOR,
   MAIN_AREA_TABLE_EDITOR,
+  MAIN_AREA_TAB_CONSTRAINT,
+  MAIN_AREA_TAB_DATA,
+  MAIN_AREA_TAB_DDL,
+  MAIN_AREA_TAB_FOREIGN_KEY,
+  MAIN_AREA_TAB_PARTITION,
+  MAIN_AREA_TAB_STRUCTURE,
   MAIN_AREA_WELCOME,
   STR_EMPTY,
-  TAB_CONSTRAINT,
-  TAB_DATA,
-  TAB_DDL,
-  TAB_FOREIGN_KEY,
-  TAB_PARTITION,
-  TAB_STRUCTURE,
 } from "@/constants";
 
 // 数据库返回的数据 | Data returned from the database
@@ -49,12 +46,6 @@ export type ExecResult = {
   lastInsertId: number;
 };
 
-// 数据库类型 | Database type
-export type DbType = typeof DB_MYSQL | typeof DB_POSTGRESQL | typeof DB_SQLITE;
-
-// 数据库里每一行的数据
-export type RowData = Record<string, any>;
-
 // 列表栏的类型
 export type ListBarType = typeof LIST_BAR_DB | typeof LIST_BAR_TABLE | typeof LIST_BAR_VIEW | typeof LIST_BAR_FUNC;
 
@@ -71,15 +62,15 @@ export type MainAreaType =
 // 主要区域的标签页 | Tabs for main area
 export type MainAreaTab =
   | typeof STR_EMPTY
-  | typeof TAB_CONSTRAINT
-  | typeof TAB_DATA
-  | typeof TAB_DDL
-  | typeof TAB_FOREIGN_KEY
-  | typeof TAB_PARTITION
-  | typeof TAB_STRUCTURE;
+  | typeof MAIN_AREA_TAB_CONSTRAINT
+  | typeof MAIN_AREA_TAB_DATA
+  | typeof MAIN_AREA_TAB_DDL
+  | typeof MAIN_AREA_TAB_FOREIGN_KEY
+  | typeof MAIN_AREA_TAB_PARTITION
+  | typeof MAIN_AREA_TAB_STRUCTURE;
 
 // 通知文字的类型
-export type TextNotificationType = "error" | "warning" | "success";
+export type TextNotificationType = "error" | "warning" | "success" | "info";
 export type TextNotificationData = {
   message: string;
   type?: TextNotificationType;

@@ -6,15 +6,9 @@ import { subscribeKey } from "valtio/utils";
 import MysqlLogo from "@/assets/db_logo/mysql.svg?react";
 import PostgresqlLogo from "@/assets/db_logo/postgresql.svg?react";
 import SqliteLogo from "@/assets/db_logo/sqlite.svg?react";
-import {
-  DB_MYSQL,
-  DB_POSTGRESQL,
-  DB_SQLITE,
-  LIST_BAR_TABLE,
-  MAIN_AREA_EDIT_CONNECTION,
-  MAIN_AREA_TABLE_EDITOR,
-} from "@/constants";
+import { LIST_BAR_TABLE, MAIN_AREA_EDIT_CONNECTION, MAIN_AREA_TABLE_EDITOR } from "@/constants";
 import { connect } from "@/databases/adapter,";
+import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE } from "@/databases/constants";
 import { invoker } from "@/invoker";
 import { addNotification, appState } from "@/store/valtio";
 import { DbConnections } from "@/types/conf_file";

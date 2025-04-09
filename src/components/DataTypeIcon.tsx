@@ -2,6 +2,7 @@ import { Binary, Box, Braces, Brackets, Clock, DraftingCompass, Network, Type } 
 import LogoNum from "@/assets/field_type/123.svg?react";
 import LogoRange from "@/assets/field_type/range.svg?react";
 import LogoTf from "@/assets/field_type/tf.svg?react";
+import { getDataTypeCategory } from "@/databases/adapter,";
 import {
   FIELD_ARRAY,
   FIELD_BINARY,
@@ -13,8 +14,7 @@ import {
   FIELD_NETWORK,
   FIELD_NUMERIC,
   FIELD_RANGE,
-} from "@/constants";
-import { getDataTypeCategory } from "@/databases/adapter,";
+} from "@/databases/constants";
 
 export function DataTypeIcon(dataType: string) {
   const cate = getDataTypeCategory(dataType);

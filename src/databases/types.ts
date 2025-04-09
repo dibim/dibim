@@ -1,5 +1,8 @@
 import { STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD, STR_TABLE } from "@/constants";
 import {
+  DB_MYSQL,
+  DB_POSTGRESQL,
+  DB_SQLITE,
   SSL_MODE_ALLOW,
   SSL_MODE_DISABLE,
   SSL_MODE_PREFER,
@@ -7,6 +10,12 @@ import {
   SSL_MODE_VERIFY_CA,
   SSL_MODE_VERIFY_FULL,
 } from "./constants";
+
+// 数据库类型 | Database type
+export type DbType = typeof DB_MYSQL | typeof DB_POSTGRESQL | typeof DB_SQLITE;
+
+// 数据库里每一行的数据
+export type RowData = Record<string, any>;
 
 // rust 的 sqlx 在连接字符串中添加 sslmode 参数控制 TLS 行为
 export type SslMode =
@@ -30,10 +39,8 @@ export interface DbConnectionParam {
 
 export type GetTableDataParam = {
   currentPage: number; // 当前页码
-  lastOrderByValue: any; // 上一次查询的结果集里最后一条数据里的和 orderBy 对应的字段的值
   pageSize: number; // 每页的数据条数
-  sortField: string; // 排序字段
-  sortOrder: "ASC" | "DESC"; // 排序顺序
+  where: string;
   tableName: string;
 };
 

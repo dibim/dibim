@@ -4,7 +4,7 @@ import pgsql from "highlight.js/lib/languages/pgsql";
 import sql from "highlight.js/lib/languages/sql";
 import "highlight.js/styles/tokyo-night-dark.css";
 import { useSnapshot } from "valtio";
-import { DB_POSTGRESQL } from "@/constants";
+import { DB_POSTGRESQL } from "@/databases/constants";
 import { appState } from "@/store/valtio";
 import { formatSql } from "@/utils/format_sql";
 

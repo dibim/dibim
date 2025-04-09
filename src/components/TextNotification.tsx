@@ -4,6 +4,7 @@ const typeColorMap = {
   error: `text-[var(--fvm-danger-clr)]`,
   success: `text-[var(--fvm-success-clr)]`,
   warning: `text-[var(--fvm-warning-clr)]`,
+  info: `text-[var(--fvm-info-clr)]`,
 };
 
 export function TextNotification({ message, type = "warning" }: TextNotificationData) {

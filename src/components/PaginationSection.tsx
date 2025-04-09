@@ -25,15 +25,13 @@ export function PaginationSection({ currentPage, setCurrentPage, pageTotal, item
   const [inputedPage, setInputedPage] = useState<number>(1);
 
   const firstPage = () => {
-    let page = 1;
-    getData(page);
-    setCurrentPage(page);
+    getData(1);
+    setCurrentPage(1);
   };
 
   const lastPage = () => {
-    let page = pageTotal;
-    getData(page);
-    setCurrentPage(page);
+    getData(pageTotal);
+    setCurrentPage(pageTotal);
   };
 
   const prevPage = () => {

@@ -4,10 +4,10 @@ import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-
 import { subscribeKey } from "valtio/utils";
 import { HEDAER_H, NEW_ROW_IS_ADDED_FIELD } from "@/constants";
 import { exec } from "@/databases/adapter,";
+import { RowData } from "@/databases/types";
 import { modifyTableData } from "@/databases/utils";
 import { cn } from "@/lib/utils";
 import { appState } from "@/store/valtio";
-import { RowData } from "@/types/types";
 import { rawRow2EtRow } from "@/utils/render";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { EditableTable, EditableTableMethods, ListRow, TableDataChange } from "./EditableTable";

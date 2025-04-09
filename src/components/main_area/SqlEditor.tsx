@@ -8,15 +8,17 @@ import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import { useSnapshot } from "valtio";
 import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
 import { DEFAULT_PAGE_SIZE, RE_IS_SINGLET_QUERY } from "@/constants";
-import { getPageCount } from "@/databases/PostgreSQL/sql";
 import { exec, query } from "@/databases/adapter,";
+import { getPageCount } from "@/databases/postgresql/sql";
+import { RowData } from "@/databases/types";
 import { extractConditionClause } from "@/databases/utils";
 import { appState } from "@/store/valtio";
-import { DbResult, RowData } from "@/types/types";
+import { DbResult, TextNotificationData } from "@/types/types";
 import { formatSql } from "@/utils/format_sql";
 import { genPanelPercent } from "@/utils/util";
 import { TableDataChange } from "../EditableTable";
 import { TableSection, TableSectionMethods } from "../TableSection";
+import { TextNotification } from "../TextNotification";
 import { TooltipGroup } from "../TooltipGroup";
 
 // 初始化 Monaco 环境, 避免从 CDN 加载
@@ -46,12 +48,15 @@ export function SqlEditor() {
   const { t } = useTranslation();
   const snap = useSnapshot(appState);
   const tableRef = useRef<TableSectionMethods | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [messageData, setMessageData] = useState<TextNotificationData | null>(null);
 
   // ========== 执行语句 | Execute statements ==========
   async function queryPage(page: number) {
     if (appState.currentConnName === "") {
-      setErrorMessage(t("Please connect to the database first"));
+      setMessageData({
+        message: t("Please connect to the database first"),
+        type: "error",
+      });
       return;
     }
 
@@ -76,8 +81,23 @@ export function SqlEditor() {
       }
 
       if (dbRes.errorMessage !== "") {
-        setErrorMessage(dbRes.errorMessage.replace("error returned from database: ", " "));
+        if (dbRes.errorMessage.startsWith("error returned from database: ")) {
+          setMessageData({
+            message: dbRes.errorMessage.replace("error returned from database: ", " "),
+            type: "error",
+          });
+        } else {
+          setMessageData({
+            message: dbRes.errorMessage,
+            type: "info",
+          });
+        }
       }
+    } else {
+      setMessageData({
+        message: "The query returned null.", // TODO: 添加翻译
+        type: "info",
+      });
     }
   }
 
@@ -85,7 +105,7 @@ export function SqlEditor() {
     const code = getEditorCode();
     const res = formatSql(appState.currentDbType, code);
     if (res.errorMessage !== "") {
-      setErrorMessage(res.errorMessage);
+      setMessageData({ message: res.errorMessage, type: "error" });
     } else {
       setEditorCode(res.result);
     }
@@ -107,10 +127,24 @@ export function SqlEditor() {
       if (res) {
         const resData = res as unknown as DbResult;
         if (resData.errorMessage !== "") {
-          setErrorMessage(resData.errorMessage.replace("error returned from database: ", " "));
+          if (resData.errorMessage.startsWith("error returned from database: ")) {
+            setMessageData({
+              message: resData.errorMessage.replace("error returned from database: ", " "),
+              type: "error",
+            });
+          }
+          setMessageData({
+            message: resData.errorMessage,
+            type: "info",
+          });
         } else {
           //  TODO: 显示影响的行数
         }
+      } else {
+        setMessageData({
+          message: "The query returned null.", // TODO: 添加翻译
+          type: "error",
+        });
       }
     }
   }
@@ -340,7 +374,7 @@ export function SqlEditor() {
           />
         </div>
         <div>
-          <div>{errorMessage}</div>
+          <TextNotification message={messageData?.message || ""} type={messageData?.type}></TextNotification>
         </div>
       </Split>
     </div>

@@ -1,4 +1,4 @@
-import { FIELD_CHARACTER, FIELD_DATETIME, FIELD_NUMERIC, FIELD_OTHER } from "@/constants";
+import { FIELD_CHARACTER, FIELD_DATETIME, FIELD_NUMERIC, FIELD_OTHER } from "../constants";
 
 const typeCategoryMap: Record<string, string> = {
   // ==================== 数值类型 ====================

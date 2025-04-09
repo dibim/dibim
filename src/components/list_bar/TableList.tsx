@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import bytes from "bytes";
 import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, CirclePlus, LucideIcon } from "lucide-react";
 import { subscribeKey } from "valtio/utils";
-import { MAIN_AREA_TABLE_EDITOR, STR_EMPTY, TAB_STRUCTURE } from "@/constants";
+import { MAIN_AREA_TABLE_EDITOR, MAIN_AREA_TAB_STRUCTURE, STR_EMPTY } from "@/constants";
 import {
   exec,
   genDeleteTableCmd,
@@ -55,7 +55,7 @@ export function TableList() {
   function addTable() {
     appState.setIsAddingTable(true);
     appState.setCurrentTableName("");
-    appState.setMainContenTab(TAB_STRUCTURE);
+    appState.setMainContenTab(MAIN_AREA_TAB_STRUCTURE);
     appState.setCurrentTableStructure([]);
   }
 
@@ -181,10 +181,10 @@ export function TableList() {
             if (sr.tableName == tn) {
               arrTb.push({
                 indexSize: sr.indexSize,
-                indexSizeByte: bytes(sr.totalSize) || 0,
+                indexSizeByte: bytes(sr.indexSize) || 0,
                 tableName: tn,
                 tableSize: sr.tableSize,
-                tableSizeByte: bytes(sr.totalSize) || 0,
+                tableSizeByte: bytes(sr.tableSize) || 0,
                 totalSize: sr.totalSize,
                 totalSizeByte: bytes(sr.totalSize) || 0,
               });
@@ -221,7 +221,7 @@ export function TableList() {
                   <div className="absolute inset-0 bg-blue-500 z-0 opacity-25" />
                   <div
                     className={`absolute h-full  bg-blue-500 z-10 opacity-50`}
-                    style={{ width: `${item.indexSizeByte / item.totalSizeByte}%` }}
+                    style={{ width: `${(item.indexSizeByte / item.totalSizeByte) * 100}%` }}
                   ></div>
                   <div className="relative z-20">{item.totalSize}</div>
                 </div>

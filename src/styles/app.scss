@@ -9,6 +9,9 @@ table {
   td {
     border-left: 1px solid #666;
     border-right: 1px solid #666;
+    min-width: 5vw;
+    max-width: 50vw;
+    overflow: hidden;
   }
 }
 

@@ -60,5 +60,13 @@ export const invoker = {
    * @returns
    */
   execSql: (connName: string, sql: string) => invoke<DbResult>("sqlx_exec", { connName, sql }),
+  /**
+   * 执行多条语句 | Execute multiple statements
+   * 后端会开启事务, 直接传入语句即可
+   * The backend will start the transaction, just pass in the statement directly
+   * @param connName 数据库连接的名字 | Name of database connection
+   * @param sql 要执行的语句 | Statements to be executed
+   * @returns
+   */
   execManySql: (connName: string, sql: string) => invoke<DbResult>("sqlx_exec_many", { connName, sql }),
 };

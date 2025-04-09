@@ -49,7 +49,7 @@ export const fieldTypeOptionsPg: SelectOption[] = [
   // ================ 二进制 | Binary ================
   { value: "bytea", label: "BYTEA", group: "Binary" },
 
-  // ====================== 几何类 | Geometric ======================
+  // ====================== 几何 | Geometric ======================
   { value: "point", label: "POINT", group: "Geometric" },
   { value: "line", label: "LINE", group: "Geometric" },
   { value: "lseg", label: "LSEG", group: "Geometric" },
@@ -95,44 +95,4 @@ export const fieldTypeOptionsPg: SelectOption[] = [
   { value: "enum", label: "ENUM", group: "Special" },
   { value: "uuid", label: "UUID", group: "Special" },
   { value: "domain", label: "Domain", group: "Special" },
-
-  //
-  //
-  // 以下类型不应当在建表的时候使用
-  // The following types should not be used when creating tables
-  //
-  //
-
-  // ====================== 对象标识符类型 | Object identifier ======================
-  // { value: "oid", label: "OID", group: "Object identifier" },
-  // { value: "regproc", label: "REGPROC", group: "Object identifier" },
-  // { value: "regprocedure", label: "REGPROCEDURE", group: "Object identifier" },
-  // { value: "regoper", label: "REGOPER", group: "Object identifier" },
-  // { value: "regoperator", label: "REGOPERATOR", group: "Object identifier" },
-  // { value: "regclass", label: "REGCLASS", group: "Object identifier" },
-  // { value: "regtype", label: "REGTYPE", group: "Object identifier" },
-  // { value: "regrole", label: "REGROLE", group: "Object identifier" },
-  // { value: "regnamespace", label: "REGNAMESPACE", group: "Object identifier" },
-  // { value: "regconfig", label: "REGCONFIG", group: "Object identifier" },
-  // { value: "regdictionary", label: "REGDICTIONARY", group: "Object identifier" },
-
-  // ====================== 伪类型 | Pseudo ======================
-  // { value: "any", label: "ANY", group: "Pseudo" },
-  // { value: "anyelement", label: "ANYELEMENT", group: "Pseudo" },
-  // { value: "anyarray", label: "ANYARRAY", group: "Pseudo" },
-  // { value: "anynonarray", label: "ANYNONARRAY", group: "Pseudo" },
-  // { value: "anyenum", label: "ANYENUM", group: "Pseudo" },
-  // { value: "anyrange", label: "ANYRANGE", group: "Pseudo" },
-  // { value: "record", label: "RECORD", group: "Pseudo" },
-  // { value: "trigger", label: "TRIGGER", group: "Pseudo" },
-  // { value: "void", label: "VOID", group: "Pseudo" },
-  // { value: "language_handler", label: "LANGUAGE_HANDLER", group: "Pseudo" },
-
-  // ====================== 内部系统 | Internal ======================
-  // { value: "pg_lsn", label: "PG_LSN", group: "Internal" },
-  // { value: "txid_snapshot", label: "TXID_SNAPSHOT", group: "Internal" },
-  // { value: "pg_snapshot", label: "PG_SNAPSHOT", group: "Internal" },
-  // { value: "xid", label: "XID", group: "Internal" },
-  // { value: "cid", label: "CID", group: "Internal" },
-  // { value: "xid8", label: "XID8", group: "Internal" },
 ];

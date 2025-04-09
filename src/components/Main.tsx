@@ -10,7 +10,8 @@ import { TableList } from "@/components/list_bar/TableList";
 import { MainArea } from "@/components/main_area";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, useSidebar } from "@/components/ui/sidebar";
-import { APP_NAME, DB_SQLITE, HEDAER_H, LIST_BAR_DB, LIST_BAR_DEFAULT_WIDTH, LIST_BAR_TABLE } from "@/constants";
+import { APP_NAME, HEDAER_H, LIST_BAR_DB, LIST_BAR_DEFAULT_WIDTH, LIST_BAR_TABLE } from "@/constants";
+import { DB_SQLITE } from "@/databases/constants";
 import { appState } from "@/store/valtio";
 import { TextNotificationData } from "@/types/types";
 import { getPageWidth } from "@/utils/ media_query";
@@ -19,12 +20,7 @@ import { About } from "./About";
 import { Sidebar } from "./Sidebar";
 import { TextNotification } from "./TextNotification";
 import { TooltipGroup } from "./TooltipGroup";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 export function Main({ id, className }: { id: string; className: string }) {
   const { t } = useTranslation();

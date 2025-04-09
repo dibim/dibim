@@ -1,3 +1,21 @@
+// 数据库类型 | Database type
+export const DB_MYSQL = "MySQL";
+export const DB_POSTGRESQL = "PostgreSQL";
+export const DB_SQLITE = "SQLite";
+
+// 数据库字段类型 | Database field type
+export const FIELD_ARRAY = "ARRAY";
+export const FIELD_BINARY = "BINARY";
+export const FIELD_BOOLEAN = "BOOLEAN";
+export const FIELD_CHARACTER = "CHARACTER";
+export const FIELD_DATETIME = "DATETIME";
+export const FIELD_GEOMETRIC = "GEOMETRIC";
+export const FIELD_JSON = "JSON";
+export const FIELD_NETWORK = "NETWORK";
+export const FIELD_NUMERIC = "NUMERIC";
+export const FIELD_RANGE = "RANGE";
+export const FIELD_OTHER = "OTHER";
+
 /**
  * rust 的 sqlx 在连接字符串中添加 sslmode 参数控制 TLS 行为
  * sslmode 值	行为描述
