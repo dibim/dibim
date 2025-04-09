@@ -5,7 +5,7 @@ import { DIR_H, MAIN_PASSWORD_MIN_LEN } from "@/constants";
 import { getTableDdl } from "@/databases/adapter,";
 import { HANS, HANT } from "@/i18n";
 import { invoker } from "@/invoker";
-import { appState } from "@/store/valtio";
+import { addNotification, appState } from "@/store/valtio";
 import { ConfigFileMain } from "@/types/conf_file";
 import { LabeledDiv } from "../LabeledDiv";
 import { TextNotification } from "../TextNotification";
@@ -41,10 +41,7 @@ export function Settings() {
     if (mainPassword.length > 0 && mainPassword.length < MAIN_PASSWORD_MIN_LEN) {
       const message = t("&minimumLengthOfMasterPassword", { len: MAIN_PASSWORD_MIN_LEN });
       setErrorMessage(message);
-      appState.addTextNotification({
-        message: message,
-        type: "error",
-      });
+      addNotification(message, "error");
       return;
     }
 
@@ -64,10 +61,7 @@ export function Settings() {
     } as ConfigFileMain);
     const message = t("Saved successfully");
     setOkMessage(message);
-    appState.addTextNotification({
-      message: message,
-      type: "success",
-    });
+    addNotification(message, "success");
   }
 
   async function getData() {

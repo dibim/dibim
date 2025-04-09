@@ -16,7 +16,7 @@ import {
 } from "@/constants";
 import { connect } from "@/databases/adapter,";
 import { invoker } from "@/invoker";
-import { appState } from "@/store/valtio";
+import { addNotification, appState } from "@/store/valtio";
 import { DbConnections } from "@/types/conf_file";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
@@ -58,10 +58,7 @@ export function DatabaseList() {
 
     if (res) {
       if (res.errorMessage !== "" && !res.errorMessage.includes("Duplicate connection name")) {
-        appState.addTextNotification({
-          message: res.errorMessage, // TODO: 添加翻译
-          type: "error",
-        });
+        addNotification(res.errorMessage, "error");
       } else {
         appState.setCurrentDbName(conn.dbName);
         appState.setCurrentConnColor(conn.color);

@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { SidebarInset, useSidebar } from "@/components/ui/sidebar";
 import { APP_NAME, DB_SQLITE, HEDAER_H, LIST_BAR_DB, LIST_BAR_DEFAULT_WIDTH, LIST_BAR_TABLE } from "@/constants";
 import { appState } from "@/store/valtio";
-import { TextNotificationType } from "@/types/types";
+import { TextNotificationData } from "@/types/types";
 import { getPageWidth } from "@/utils/ media_query";
 import { genPanelPercent } from "@/utils/util";
 import { About } from "./About";
@@ -23,7 +23,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
@@ -151,7 +150,7 @@ export function Main({ id, className }: { id: string; className: string }) {
   ];
 
   // ========== 通知 | Notification ==========
-  const [textNotification, setTextNotification] = useState<TextNotificationType | null>(null);
+  const [textNotification, setTextNotification] = useState<TextNotificationData | null>(null);
   function setTextNotificationData() {
     setTextNotification(appState.textNotificationArr.at(-1) || null);
 
@@ -164,7 +163,7 @@ export function Main({ id, className }: { id: string; className: string }) {
     setTextNotificationData();
 
     // 监听 store 的变化 | Monitor changes in the store
-    const unsubscribe = subscribeKey(appState, "textNotificationArr", (_val: TextNotificationType[]) => {
+    const unsubscribe = subscribeKey(appState, "textNotificationArr", (_val: TextNotificationData[]) => {
       setTextNotificationData();
     });
     return () => unsubscribe();

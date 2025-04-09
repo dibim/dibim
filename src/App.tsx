@@ -12,7 +12,6 @@ import { Button } from "./components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./components/ui/card";
 import { Input } from "./components/ui/input";
 import { SidebarProvider } from "./components/ui/sidebar";
-import { Toaster } from "./components/ui/sonner";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { APP_NAME, CONFIG_FILE_APPEARANCE, CONFIG_FILE_MAIN, MAIN_PASSWORD_DEFAULT } from "./constants";
 import i18n from "./i18n";
@@ -145,8 +144,6 @@ export function App() {
             </TooltipProvider>
           </SidebarProvider>
         )}
-
-        <Toaster />
       </I18nextProvider>
     </ThemeProvider>
   );

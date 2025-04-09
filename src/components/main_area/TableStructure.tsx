@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
-import { toast } from "sonner";
 import { subscribeKey } from "valtio/utils";
 import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
 import { exec, fieldTypeOptions, genAlterCmd } from "@/databases/adapter,";
 import { AllAlterAction, AlterAction, FieldAlterAction } from "@/databases/types";
 import { cn } from "@/lib/utils";
-import { appState } from "@/store/valtio";
+import { addNotification, appState } from "@/store/valtio";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { DataTypeIcon } from "../DataTypeIcon";
 import { EditableTable, EditableTableMethods, ListRow } from "../EditableTable";
@@ -266,10 +265,7 @@ export function TableStructure({
 
   function handleApply() {
     if (alterData.length === 0) {
-      appState.addTextNotification({
-        message: t("&selectFieldFirst"),
-        type: "warning",
-      });
+      addNotification(t("&selectFieldFirst"), "warning");
       return;
     }
 
@@ -341,9 +337,9 @@ export function TableStructure({
     const field = appState.currentTableStructure[index];
     try {
       await navigator.clipboard.writeText(field.name);
-      toast(t("Copied"));
+      addNotification(t("Copied"), "success");
     } catch (err) {
-      toast(t("Copy failed"));
+      addNotification(t("Copy failed"), "error");
     }
   }
 
@@ -351,9 +347,9 @@ export function TableStructure({
     const field = appState.currentTableStructure[index];
     try {
       await navigator.clipboard.writeText(field.type);
-      toast(t("Copied"));
+      addNotification(t("Copied"), "success");
     } catch (err) {
-      toast(t("Copy failed"));
+      addNotification(t("Copy failed"), "error");
     }
   }
 
@@ -380,10 +376,7 @@ export function TableStructure({
       setOkMessage("OK");
     } else {
       setErrorMessage(res.errorMessage);
-      appState.addTextNotification({
-        message: res.errorMessage,
-        type: "success",
-      });
+      addNotification(res.errorMessage, "success");
     }
   }
 

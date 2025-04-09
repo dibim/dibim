@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import bytes from "bytes";
 import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, CirclePlus, LucideIcon } from "lucide-react";
-import { toast } from "sonner";
 import { subscribeKey } from "valtio/utils";
 import { MAIN_AREA_TABLE_EDITOR, STR_EMPTY, TAB_STRUCTURE } from "@/constants";
 import {
@@ -13,7 +12,7 @@ import {
   getAllTableName,
   getAllTableSize,
 } from "@/databases/adapter,";
-import { appState } from "@/store/valtio";
+import { addNotification, appState } from "@/store/valtio";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
@@ -126,26 +125,20 @@ export function TableList() {
   async function handleCopy(tableName: string) {
     try {
       await navigator.clipboard.writeText(tableName);
-      toast(t("Copied"));
+      addNotification(t("Copied"), "success");
     } catch (err) {
-      toast(t("Copy failed"));
+      addNotification(t("Copy failed"), "error");
     }
   }
 
   function handleImport(tableName: string) {
     // TODO:
-    appState.addTextNotification({
-      message: "not implemented",
-      type: "error",
-    });
+    addNotification("not implemented", "error");
   }
 
   function handleExport(tableName: string) {
     // TODO:
-    appState.addTextNotification({
-      message: "not implemented",
-      type: "error",
-    });
+    addNotification("not implemented", "error");
   }
 
   function handleTruncatePopup(tableName: string) {
@@ -163,10 +156,7 @@ export function TableList() {
   async function handleConfirm() {
     const res = await exec(willExecCmd);
     if (res.errorMessage !== "") {
-      appState.addTextNotification({
-        message: res.errorMessage, // TODO: 添加翻译
-        type: "error",
-      });
+      addNotification(res.errorMessage, "error");
     } else {
       getData();
     }
@@ -205,16 +195,10 @@ export function TableList() {
 
         setTableData(arrTb);
       } else {
-        appState.addTextNotification({
-          message: "Data size is none", // TODO: 添加翻译
-          type: "warning",
-        });
+        addNotification("Data size is none", "warning");
       }
     } else {
-      appState.addTextNotification({
-        message: "Data list is none", // TODO: 添加翻译
-        type: "warning",
-      });
+      addNotification("Data list is none", "warning");
     }
   }
 

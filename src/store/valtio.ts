@@ -3,7 +3,14 @@ import { DB_POSTGRESQL, LIST_BAR_DB, MAIN_AREA_WELCOME, MAIN_PASSWORD_DEFAULT } 
 import { FieldStructure } from "@/databases/types";
 import { invoker } from "@/invoker";
 import { ConfigFileMain } from "@/types/conf_file";
-import { DbType, ListBarType, MainAreaTab, MainAreaType, TextNotificationType } from "@/types/types";
+import {
+  DbType,
+  ListBarType,
+  MainAreaTab,
+  MainAreaType,
+  TextNotificationData,
+  TextNotificationType,
+} from "@/types/types";
 import { saveConfigFile } from "@/utils/config_file";
 
 interface AppState {
@@ -91,8 +98,8 @@ interface AppState {
   setEditDbConnIndex: (val: number) => void;
 
   // 通知
-  textNotificationArr: TextNotificationType[];
-  addTextNotification: (val: TextNotificationType) => void;
+  textNotificationArr: TextNotificationData[];
+  addTextNotification: (val: TextNotificationData) => void;
 }
 
 // 按照默认密码生成默认的 sha
@@ -174,6 +181,13 @@ export const appState = proxy<AppState>({
   setEditDbConnIndex: (val: number) => (appState.editDbConnIndex = val),
 
   textNotificationArr: [],
-  addTextNotification: (val: TextNotificationType) =>
+  addTextNotification: (val: TextNotificationData) =>
     (appState.textNotificationArr = [...appState.textNotificationArr, val]),
 }) as AppState;
+
+export function addNotification(message: string, type: TextNotificationType) {
+  appState.addTextNotification({
+    message,
+    type,
+  });
+}
