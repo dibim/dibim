@@ -87,7 +87,7 @@ export function Settings() {
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4">
-      <Card className="w-200">
+      <Card className="w-220">
         <CardHeader>
           <CardTitle>{t("Settings")}</CardTitle>
         </CardHeader>
@@ -107,20 +107,28 @@ export function Settings() {
                 العربية (Arabic)
               </Button>
 
-              <Button className="bg-[#000000] hover:bg-[#2D2D2D] text-[#FFCC00]" onClick={() => changeLanguage("de")}>
-                Deutsch (German)
+              <Button className="bg-[#DE2910] hover:bg-[#C0240E] text-[#FFDE00]" onClick={() => changeLanguage(HANS)}>
+                简体中文 (Simplified Chinese)
+              </Button>
+
+              <Button className="bg-[#FFD700] hover:bg-[#E6C200] text-[#DE2910]" onClick={() => changeLanguage(HANT)}>
+                繁體中文 (Traditional Chinese)
+              </Button>
+
+              <Button className="bg-[#21468B] hover:bg-[#1A3A75] text-white" onClick={() => changeLanguage("nl")}>
+                Nederlands (Dutch)
               </Button>
 
               <Button className="bg-[#0A3161] hover:bg-[#07244E] text-white" onClick={() => changeLanguage("en")}>
                 English
               </Button>
 
-              <Button className="bg-[#AA151B] hover:bg-[#8A1217] text-[#F1BF00]" onClick={() => changeLanguage("es")}>
-                Español (Spanish)
-              </Button>
-
               <Button className="bg-[#0055A4] hover:bg-[#00448C] text-white" onClick={() => changeLanguage("fr")}>
                 Français (French)
+              </Button>
+
+              <Button className="bg-[#000000] hover:bg-[#2D2D2D] text-[#FFCC00]" onClick={() => changeLanguage("de")}>
+                Deutsch (German)
               </Button>
 
               <Button className="bg-[#008C45] hover:bg-[#007339] text-white" onClick={() => changeLanguage("it")}>
@@ -135,10 +143,6 @@ export function Settings() {
                 한국어 (Korean)
               </Button>
 
-              <Button className="bg-[#21468B] hover:bg-[#1A3A75] text-white" onClick={() => changeLanguage("nl")}>
-                Nederlands (Dutch)
-              </Button>
-
               <Button className="bg-[#DC143C] hover:bg-[#C01134] text-white" onClick={() => changeLanguage("pl")}>
                 Polski (Polish)
               </Button>
@@ -147,20 +151,16 @@ export function Settings() {
                 Русский (Russian)
               </Button>
 
+              <Button className="bg-[#AA151B] hover:bg-[#8A1217] text-[#F1BF00]" onClick={() => changeLanguage("es")}>
+                Español (Spanish)
+              </Button>
+
               <Button className="bg-[#E30A17] hover:bg-[#C00813] text-white" onClick={() => changeLanguage("tr")}>
                 Türkçe (Turkish)
               </Button>
 
               <Button className="bg-[#0057B8] hover:bg-[#0046A0] text-[#FFD700]" onClick={() => changeLanguage("uk")}>
                 Українська (Ukrainian)
-              </Button>
-
-              <Button className="bg-[#DE2910] hover:bg-[#C0240E] text-[#FFDE00]" onClick={() => changeLanguage(HANS)}>
-                简体中文 (Simplified Chinese)
-              </Button>
-
-              <Button className="bg-[#FFD700] hover:bg-[#E6C200] text-[#DE2910]" onClick={() => changeLanguage(HANT)}>
-                繁體中文 (Traditional Chinese)
               </Button>
             </div>
           </LabeledDiv>
