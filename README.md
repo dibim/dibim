@@ -28,7 +28,7 @@
 - 🇨🇳 Gitee（中国）: [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)
 - 🇩🇪 Codeberg（德国）: [https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)
 
-## fficial repositories
+## Official repositories
 
 - 🌍 GitHub: [https://github.com/dibim/dibim](https://github.com/dibim/dibim)
 - 🇨🇳 Gitee (China): [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)
