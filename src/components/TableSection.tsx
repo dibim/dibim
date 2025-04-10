@@ -14,7 +14,7 @@ import { EditableTable, EditableTableMethods, ListRow, TableDataChange } from ".
 import { PaginationSection } from "./PaginationSection";
 import { SqlCodeViewer } from "./SqlCodeViewer";
 import { TextNotification } from "./TextNotification";
-import { TooltipGroup } from "./TooltipGroup";
+import { TooltipGroup, TooltipSectionItem } from "./TooltipGroup";
 
 export type TableSectionMethods = {
   addChange: (val: TableDataChange) => void;
@@ -33,10 +33,11 @@ export type TableSectionProps = {
   width: string;
   getData: (val: number) => Promise<any>;
   initData: () => void;
+  btnExt?: TooltipSectionItem[];
   ref?: React.Ref<TableSectionMethods>;
 };
 
-export function TableSection({ width, getData, initData, ref }: TableSectionProps) {
+export function TableSection({ width, getData, initData, btnExt, ref }: TableSectionProps) {
   const { t } = useTranslation();
   const tableRef = useRef<EditableTableMethods | null>(null);
 
@@ -105,7 +106,7 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
     initData();
   }
 
-  const tooltipSectionData = [
+  const tooltipSectionData: TooltipSectionItem[] = [
     {
       trigger: <RotateCw color="var(--fvm-info-clr)" onClick={() => getData(currentPage)} />,
       content: <p>{t("Refresh")}</p>,
@@ -126,6 +127,8 @@ export function TableSection({ width, getData, initData, ref }: TableSectionProp
       trigger: <CircleX color="var(--fvm-warning-clr)" onClick={handleCancel} />,
       content: <p>{t("Cancel")}</p>,
     },
+
+    ...(btnExt ? btnExt : []),
   ];
   // ========== 按钮 结束 ==========
 

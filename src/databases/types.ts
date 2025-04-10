@@ -39,9 +39,10 @@ export interface DbConnectionParam {
 
 export type GetTableDataParam = {
   currentPage: number; // 当前页码
+  fields: string[];
   pageSize: number; // 每页的数据条数
-  where: string;
   tableName: string;
+  where: string;
 };
 
 export type GetTableDataRes = {

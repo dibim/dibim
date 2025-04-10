@@ -224,8 +224,9 @@ export async function getTableDataOracle(connName: string, p: GetTableDataParam)
 
   let offset = p.pageSize * (p.currentPage - 1);
   if (offset < 0) offset = 0;
-  const sqlHasPkey = `SELECT * FROM "${p.tableName}" ${p.where} OFFSET ${offset} ROWS FETCH NEXT ${p.pageSize} ROWS ONLY;`;
-  const dbRes = await invoker.querySql(connName, sqlHasPkey);
+  let fields = p.fields.length === 1 && p.fields[0] === "*" ? "*" : `"${p.fields.join('","')}"`;
+  const sql = `SELECT ${fields} FROM "${p.tableName}" ${p.where} OFFSET ${offset} ROWS FETCH NEXT ${p.pageSize} ROWS ONLY;`;
+  const dbRes = await invoker.querySql(connName, sql);
 
   return {
     itemsTotal,
