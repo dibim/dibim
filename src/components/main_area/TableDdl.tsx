@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { HEDAER_H } from "@/constants";
 import { appState } from "@/store/valtio";
 import { SqlCodeViewer } from "../SqlCodeViewer";
 
@@ -17,5 +18,9 @@ export function TableDdl() {
     getData();
   }, []);
 
-  return <SqlCodeViewer ddl={ddl} />;
+  return (
+    <div className="overflow-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H * 4})` }}>
+      <SqlCodeViewer ddl={ddl} />
+    </div>
+  );
 }
