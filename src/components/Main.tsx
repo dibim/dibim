@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useTranslation } from "react-i18next";
 import Split from "react-split";
-import { EllipsisVertical, PanelLeftDashed, PanelLeftIcon } from "lucide-react";
+import { EllipsisVertical, PanelLeftIcon } from "lucide-react";
 import { useSnapshot } from "valtio";
 import { subscribeKey } from "valtio/utils";
 import { DatabaseList } from "@/components/list_bar/DatabaseList";
 import { TableList } from "@/components/list_bar/TableList";
 import { MainArea } from "@/components/main_area";
 import { Button } from "@/components/ui/button";
-import { SidebarInset, useSidebar } from "@/components/ui/sidebar";
+import { SidebarInset } from "@/components/ui/sidebar";
 import { APP_NAME, HEDAER_H, LIST_BAR_DB, LIST_BAR_DEFAULT_WIDTH, LIST_BAR_TABLE } from "@/constants";
 import { DB_SQLITE } from "@/databases/constants";
 import { appState } from "@/store/valtio";
@@ -28,20 +28,13 @@ export function Main({ id, className }: { id: string; className: string }) {
   const [mainWidth, setMainWidth] = useState("");
   const mainRef = useRef<HTMLDivElement | null>(null);
 
-  const { setOpenMobile, setOpen } = useSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   // ========== 快捷键 | Shortcut keys ==========
-  function toggleSidebarOpen() {
-    setOpenMobile(!appState.sidebarOpen);
-    setOpen(!appState.sidebarOpen);
-    appState.setSidebarOpen(!appState.sidebarOpen);
-  }
   const toggleAboutOpen = () => appState.setAboutOpen(!appState.aboutOpen);
 
   useHotkeys("f1", () => toggleAboutOpen(), [appState.aboutOpen]);
-  useHotkeys("f2", () => toggleSidebarOpen(), [appState.sidebarOpen]);
-  useHotkeys("f3", () => appState.setListBarOpen(!appState.listBarOpen), [appState.listBarOpen]);
+  useHotkeys("f2", () => appState.setListBarOpen(!appState.listBarOpen), [appState.listBarOpen]);
   // ========== 快捷键 结束 | Shortcut keys end==========
 
   // ========== 控制列表栏 | Control list bar ==========
@@ -68,17 +61,9 @@ export function Main({ id, className }: { id: string; className: string }) {
   // ========== 控制列表栏 结束 | Control list bar end ==========
 
   // ========== 控制侧边栏 | Control sidebar ==========
-  const timerRef = useRef<number>(0);
   // 动画结束后执行的操作
   const handleAfterAnimation = () => {
     if (sidebarRef.current) appState.setSideBarWidth(sidebarRef.current.clientWidth);
-  };
-
-  const handleTransitionEnd = (e: TransitionEvent) => {
-    if (e.propertyName === "width") {
-      window.clearTimeout(timerRef.current);
-      timerRef.current = window.setTimeout(handleAfterAnimation, 200);
-    }
   };
 
   useEffect(() => {
@@ -88,35 +73,13 @@ export function Main({ id, className }: { id: string; className: string }) {
   // ========== 控制侧边栏 结束 | Control sidebar end ==========
 
   useEffect(() => {
-    setOpenMobile(appState.sidebarOpen);
-    setOpen(appState.sidebarOpen);
-
     // 初始化涉及到布局的尺寸 | Initialization involves the size of the layout
     handleAfterAnimation();
     resizeListBarWidth(defaultSizePercent);
-
-    // ========== 侧边栏 | Sidebar ==========
-    const sidebar = sidebarRef.current;
-    if (!sidebar) return;
-
-    sidebar.addEventListener("transitionend", handleTransitionEnd);
-
-    return () => {
-      sidebar.removeEventListener("transitionend", handleTransitionEnd);
-    };
   }, []);
 
   // ========== 按钮 | Button ==========
   const tooltipSectionData = [
-    {
-      trigger: (
-        <Button data-sidebar="trigger" variant="ghost" onClick={toggleSidebarOpen}>
-          <PanelLeftIcon />
-          <span className="sr-only">{t("Toggle sidebar")}</span>
-        </Button>
-      ),
-      content: <p>{t("Toggle sidebar")}(F2)</p>,
-    },
     {
       trigger: (
         <Button
@@ -125,7 +88,7 @@ export function Main({ id, className }: { id: string; className: string }) {
             snap.setListBarOpen(!snap.listBarOpen);
           }}
         >
-          <PanelLeftDashed />
+          <PanelLeftIcon />
           <span className="sr-only">{t("toggle list bar")}</span>
         </Button>
       ),
@@ -172,7 +135,7 @@ export function Main({ id, className }: { id: string; className: string }) {
           <div id={id} className={className} style={{ width: mainWidth }}>
             <header className={`flex justify-between h-${HEDAER_H}  items-center  border-b px-4`}>
               <div className="shrink-0 gap-2">
-                {!snap.sidebarOpen && <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>}
+                <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>
                 <TooltipGroup dataArr={tooltipSectionData} />
               </div>
 

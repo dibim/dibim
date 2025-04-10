@@ -49,13 +49,13 @@ export function TableList() {
 
   function clickTableName(item: ListItem) {
     appState.setCurrentTableName(item.id);
-    appState.setMainContenType(MAIN_AREA_TABLE_EDITOR);
+    appState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
   }
 
   function addTable() {
     appState.setIsAddingTable(true);
     appState.setCurrentTableName("");
-    appState.setMainContenTab(MAIN_AREA_TAB_STRUCTURE);
+    appState.setMainAreaTab(MAIN_AREA_TAB_STRUCTURE);
     appState.setCurrentTableStructure([]);
   }
 

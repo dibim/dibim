@@ -39,7 +39,7 @@ export function Welcome() {
             <div
               className="flex py-4 cursor-pointer"
               onClick={() => {
-                appState.setMainContenType(MAIN_AREA_SETTINGS);
+                appState.setMainAreaType(MAIN_AREA_SETTINGS);
               }}
             >
               <div className="pe-4">
@@ -57,7 +57,7 @@ export function Welcome() {
           <div
             className="flex py-4 cursor-pointer"
             onClick={() => {
-              appState.setMainContenType(MAIN_AREA_ADD_CONNECTION);
+              appState.setMainAreaType(MAIN_AREA_ADD_CONNECTION);
             }}
           >
             <div className="pe-4">
