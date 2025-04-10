@@ -183,5 +183,6 @@ export function addNotification(message: string, type: TextNotificationType) {
   appState.addTextNotification({
     message,
     type,
+    time: new Date(),
   });
 }

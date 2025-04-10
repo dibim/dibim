@@ -74,6 +74,7 @@ export type TextNotificationType = "error" | "warning" | "success" | "info";
 export type TextNotificationData = {
   message: string;
   type?: TextNotificationType;
+  time?: Date;
 };
 
 // 导入的 svg 的属性 | Properties of imported SVG

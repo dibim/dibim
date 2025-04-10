@@ -7,7 +7,6 @@ import { DEFAULT_PAGE_SIZE } from "@/constants";
 import { getTableData } from "@/databases/adapter,";
 import { addNotification, appState } from "@/store/valtio";
 import { TableSection, TableSectionMethods } from "../TableSection";
-import { TooltipSectionItem } from "../TooltipGroup";
 import { Checkbox } from "../ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
@@ -20,96 +19,92 @@ export function TableData() {
   const [checkedField, setCheckedField] = useState<string[]>(["*"]);
 
   function changeCheckedField(val: string, checked: boolean) {
-    setCheckedField((prev) => {
-      const prevVal = prev.filter((item) => item !== "*");
-      let res = checked ? [...prevVal, val] : prevVal.filter((item) => item !== val);
+    const prevVal = checkedField.filter((item) => item !== "*");
+    let res = checked ? [...prevVal, val] : prevVal.filter((item) => item !== val);
 
-      // 确保必须有一个唯一字段
-      const pks = appState.currentTableStructure.filter((item) => item.isPrimaryKey);
-      const uks = appState.currentTableStructure.filter((item) => item.isUniqueKey);
-      let hasUk = false;
-      pks.map((item) => {
-        if (!hasUk && !res.includes(item.name)) {
-          res = [item.name, ...res];
-          hasUk = true;
-        }
-      });
-      uks.map((item) => {
-        if (!hasUk && !res.includes(item.name)) {
-          res = [item.name, ...res];
-          hasUk = true;
-        }
-      });
+    // 确保必须有一个唯一字段
+    const pks = appState.currentTableStructure.filter((item) => item.isPrimaryKey);
+    const uks = appState.currentTableStructure.filter((item) => item.isUniqueKey);
+    let hasUk = false;
+    pks.map((item) => {
+      if (res.includes(item.name)) hasUk = true;
 
-      // TODO: 添加翻译
-      addNotification("获取表格数据必须有一个主键字段或唯一约束字段, 已自动添加", "warning");
-
-      return res;
+      if (!hasUk && !res.includes(item.name)) {
+        res = [item.name, ...res];
+        hasUk = true;
+      }
     });
+    uks.map((item) => {
+      if (!hasUk && !res.includes(item.name)) {
+        res = [item.name, ...res];
+        hasUk = true;
+      }
+    });
+
+    // TODO: 添加翻译
+    addNotification("获取表格数据必须有一个主键字段或唯一约束字段, 已自动添加", "warning");
+
+    setCheckedField(res);
   }
 
-  // TooltipSectionItem
-  const [btnExt, setBtnExt] = useState<TooltipSectionItem[]>([]);
-  function genBtnExt() {
-    setBtnExt([
-      {
-        trigger: (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <ListChecks />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
+  const btnExt = [
+    {
+      trigger: (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <ListChecks />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault(); // 阻止默认行为
+              }}
+            >
+              <Checkbox
+                checked={checkedField.length === 1 && checkedField[0] === "*"}
+                id="check-all"
+                onCheckedChange={(checked) => {
+                  setCheckedField(checked ? ["*"] : []);
+                }}
+              />
+              <label
+                htmlFor="check-all"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {t("Check all")} {/* TODO: 添加翻译 */}
+              </label>
+            </DropdownMenuItem>
+
+            {appState.currentTableStructure.map((item, index) => (
               <DropdownMenuItem
+                key={index}
                 onSelect={(e) => {
                   e.preventDefault(); // 阻止默认行为
                 }}
               >
                 <Checkbox
-                  checked={checkedField.length === 1 && checkedField[0] === "*"}
-                  id="check-all"
+                  checked={checkedField.includes(item.name)}
+                  id={`${index}___${item}`}
                   onCheckedChange={(checked) => {
-                    setCheckedField(checked ? ["*"] : []);
+                    changeCheckedField(item.name, checked === true);
                   }}
                 />
                 <label
-                  htmlFor="check-all"
+                  htmlFor={`${index}___${item}`}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  {t("Check all")} {/* TODO: 添加翻译 */}
+                  {item.name}
+                  {item.isPrimaryKey ? ` (${t("Primary key")})` : ""}
+                  {item.isUniqueKey ? ` (${t("Unique key")})` : ""}
                 </label>
               </DropdownMenuItem>
-
-              {appState.currentTableStructure.map((item, index) => (
-                <DropdownMenuItem
-                  key={index}
-                  onSelect={(e) => {
-                    e.preventDefault(); // 阻止默认行为
-                  }}
-                >
-                  <Checkbox
-                    checked={checkedField.includes(item.name)}
-                    id={`${index}___${item}`}
-                    onCheckedChange={(checked) => {
-                      changeCheckedField(item.name, checked === true);
-                    }}
-                  />
-                  <label
-                    htmlFor={`${index}___${item}`}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {item.name}
-                    {item.isPrimaryKey ? ` (${t("Primary key")})` : ""}
-                    {item.isUniqueKey ? ` (${t("Unique key")})` : ""}
-                  </label>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ),
-        content: <p>{t("Select Fields")}</p>, // TODO: 添加翻译
-      },
-    ]);
-  }
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+      content: <p>{t("Select Fields")}</p>, // 这里不会触发, 在 trigger 里添加一个 Tooltip
+    },
+  ];
 
   // ========== 多选字段 结束 ==========
 
@@ -146,11 +141,11 @@ export function TableData() {
   }
 
   useEffect(() => {
-    genBtnExt();
+    setCheckedField(["*"]);
 
     // 监听 store 的变化 | Monitor changes in the store
     const unsubscribe = subscribeKey(appState, "currentTableStructure", (_val: any) => {
-      genBtnExt();
+      setCheckedField(["*"]);
     });
     return () => unsubscribe();
   }, []);
