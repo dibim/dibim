@@ -9,7 +9,6 @@ import { addNotification, appState } from "@/store/valtio";
 import { TableSection, TableSectionMethods } from "../TableSection";
 import { Checkbox } from "../ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export function TableData() {
   const { t } = useTranslation();
@@ -20,34 +19,32 @@ export function TableData() {
   const [checkedField, setCheckedField] = useState<string[]>(["*"]);
 
   function changeCheckedField(val: string, checked: boolean) {
-    setCheckedField((prev) => {
-      const prevVal = prev.filter((item) => item !== "*");
-      let res = checked ? [...prevVal, val] : prevVal.filter((item) => item !== val);
+    const prevVal = checkedField.filter((item) => item !== "*");
+    let res = checked ? [...prevVal, val] : prevVal.filter((item) => item !== val);
 
-      // 确保必须有一个唯一字段
-      const pks = appState.currentTableStructure.filter((item) => item.isPrimaryKey);
-      const uks = appState.currentTableStructure.filter((item) => item.isUniqueKey);
-      let hasUk = false;
-      pks.map((item) => {
-        if (res.includes(item.name)) hasUk = true;
+    // 确保必须有一个唯一字段
+    const pks = appState.currentTableStructure.filter((item) => item.isPrimaryKey);
+    const uks = appState.currentTableStructure.filter((item) => item.isUniqueKey);
+    let hasUk = false;
+    pks.map((item) => {
+      if (res.includes(item.name)) hasUk = true;
 
-        if (!hasUk && !res.includes(item.name)) {
-          res = [item.name, ...res];
-          hasUk = true;
-        }
-      });
-      uks.map((item) => {
-        if (!hasUk && !res.includes(item.name)) {
-          res = [item.name, ...res];
-          hasUk = true;
-        }
-      });
-
-      // TODO: 添加翻译
-      addNotification("获取表格数据必须有一个主键字段或唯一约束字段, 已自动添加", "warning");
-
-      return res;
+      if (!hasUk && !res.includes(item.name)) {
+        res = [item.name, ...res];
+        hasUk = true;
+      }
     });
+    uks.map((item) => {
+      if (!hasUk && !res.includes(item.name)) {
+        res = [item.name, ...res];
+        hasUk = true;
+      }
+    });
+
+    // TODO: 添加翻译
+    addNotification("获取表格数据必须有一个主键字段或唯一约束字段, 已自动添加", "warning");
+
+    setCheckedField(res);
   }
 
   const btnExt = [
@@ -55,15 +52,7 @@ export function TableData() {
       trigger: (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <ListChecks />
-              </TooltipTrigger>
-              <TooltipContent>
-                {/* TODO: 添加翻译 */}
-                <p>{t("Select Fields")}</p>
-              </TooltipContent>
-            </Tooltip>
+            <ListChecks />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
             <DropdownMenuItem

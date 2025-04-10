@@ -28,7 +28,7 @@ export function Main({ id, className }: { id: string; className: string }) {
   const [mainWidth, setMainWidth] = useState("");
   const mainRef = useRef<HTMLDivElement | null>(null);
 
-  const { toggleSidebar, setOpenMobile, setOpen } = useSidebar();
+  const { setOpenMobile, setOpen } = useSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   // ========== 快捷键 | Shortcut keys ==========
@@ -36,7 +36,6 @@ export function Main({ id, className }: { id: string; className: string }) {
     setOpenMobile(!appState.sidebarOpen);
     setOpen(!appState.sidebarOpen);
     appState.setSidebarOpen(!appState.sidebarOpen);
-    toggleSidebar();
   }
   const toggleAboutOpen = () => appState.setAboutOpen(!appState.aboutOpen);
 
@@ -189,10 +188,13 @@ export function Main({ id, className }: { id: string; className: string }) {
                     <DropdownMenuTrigger asChild>
                       <EllipsisVertical />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56">
+                    <DropdownMenuContent className="min-w-[10vw] max-w-[80vw]">
                       {snap.textNotificationArr.map((item, index) => (
                         <DropdownMenuItem key={index}>
-                          <TextNotification message={item.message} type={item.type} />
+                          <TextNotification
+                            message={`${item.time ? item.time.toLocaleString() + " " : ""}${item.message}`}
+                            type={item.type}
+                          />
                         </DropdownMenuItem>
                       ))}
                     </DropdownMenuContent>
