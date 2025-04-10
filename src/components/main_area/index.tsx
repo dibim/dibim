@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Plus, Settings, SquareX } from "lucide-react";
+import { Plus, SquareX } from "lucide-react";
 import { useSnapshot } from "valtio";
 import {
   HEDAER_H,
@@ -14,6 +14,7 @@ import { TabStateContext, useTabState } from "@/context";
 import { TabState } from "@/store/tabs";
 import { addTab, appState, delTab } from "@/store/valtio";
 import { Connection } from "./Connection";
+import { Settings } from "./Settings";
 import { SqlEditor } from "./SqlEditor";
 import { TableEditor } from "./TableEditor";
 import { Welcome } from "./Welcome";

@@ -18,7 +18,7 @@ import { Input } from "../ui/input";
 
 export function Settings() {
   const tab = getTab();
-  if (tab === null) return;
+  if (tab === null) return <p>No tab found</p>;
   const store = tab.store;
 
   const { t, i18n } = useTranslation();
