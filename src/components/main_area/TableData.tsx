@@ -9,6 +9,7 @@ import { addNotification, appState } from "@/store/valtio";
 import { TableSection, TableSectionMethods } from "../TableSection";
 import { Checkbox } from "../ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export function TableData() {
   const { t } = useTranslation();
@@ -28,6 +29,8 @@ export function TableData() {
       const uks = appState.currentTableStructure.filter((item) => item.isUniqueKey);
       let hasUk = false;
       pks.map((item) => {
+        if (res.includes(item.name)) hasUk = true;
+
         if (!hasUk && !res.includes(item.name)) {
           res = [item.name, ...res];
           hasUk = true;
@@ -52,7 +55,15 @@ export function TableData() {
       trigger: (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <ListChecks />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ListChecks />
+              </TooltipTrigger>
+              <TooltipContent>
+                {/* TODO: 添加翻译 */}
+                <p>{t("Select Fields")}</p>
+              </TooltipContent>
+            </Tooltip>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
             <DropdownMenuItem
@@ -102,7 +113,7 @@ export function TableData() {
           </DropdownMenuContent>
         </DropdownMenu>
       ),
-      content: <p>{t("Select Fields")}</p>, // TODO: 添加翻译
+      content: <p>{t("Select Fields")}</p>, // 这里不会触发, 在 trigger 里添加一个 Tooltip
     },
   ];
 
