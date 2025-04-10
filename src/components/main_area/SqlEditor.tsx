@@ -8,6 +8,7 @@ import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import { useSnapshot } from "valtio";
 import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
 import { DEFAULT_PAGE_SIZE, RE_IS_SINGLET_QUERY } from "@/constants";
+import { getTab } from "@/context";
 import { exec, query } from "@/databases/adapter,";
 import { getPageCount } from "@/databases/postgresql/sql";
 import { RowData } from "@/databases/types";
@@ -20,7 +21,6 @@ import { TableDataChange } from "../EditableTable";
 import { TableSection, TableSectionMethods } from "../TableSection";
 import { TextNotification } from "../TextNotification";
 import { TooltipGroup } from "../TooltipGroup";
-import { getTab } from "@/context";
 
 // 初始化 Monaco 环境, 避免从 CDN 加载
 // Initialize Monaco environment to avoid loading from CDN
@@ -57,7 +57,7 @@ export function SqlEditor() {
 
   // ========== 执行语句 | Execute statements ==========
   async function queryPage(page: number) {
-    if (store.currentConnName === "") {
+    if (appState.currentConnName === "") {
       setMessageData({
         message: t("Please connect to the database first"),
         type: "error",
@@ -72,7 +72,7 @@ export function SqlEditor() {
 
       const condition = extractConditionClause(code);
       const res = await getPageCount(
-        store.currentConnName,
+        appState.currentConnName,
         condition.tableName,
         DEFAULT_PAGE_SIZE,
         condition.condition,
@@ -108,7 +108,7 @@ export function SqlEditor() {
 
   function formatCode() {
     const code = getEditorCode();
-    const res = formatSql(store.currentDbType, code);
+    const res = formatSql(appState.currentConnType, code);
     if (res.errorMessage !== "") {
       setMessageData({ message: res.errorMessage, type: "error" });
     } else {

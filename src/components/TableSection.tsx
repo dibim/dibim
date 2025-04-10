@@ -9,6 +9,7 @@ import { RowData } from "@/databases/types";
 import { modifyTableData } from "@/databases/utils";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
 import { cn } from "@/lib/utils";
+import { appState } from "@/store/valtio";
 import { rawRow2EtRow } from "@/utils/render";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { EditableTable, EditableTableMethods, ListRow, TableDataChange } from "./EditableTable";
@@ -159,7 +160,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
   }));
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore("currentTableName", (_val: any) => {
+  useActiveTabStore(appState.activeTabId, "currentTableName", (_val: any) => {
     initData();
   });
 

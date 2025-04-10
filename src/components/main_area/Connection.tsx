@@ -185,7 +185,7 @@ export function Connection(props: ConnectionProps) {
   }
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore("editDbConnIndex", (_value: any) => {
+  useActiveTabStore(appState.activeTabId, "editDbConnIndex", (_value: any) => {
     setEditingData();
   });
 

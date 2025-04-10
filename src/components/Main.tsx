@@ -88,9 +88,9 @@ export function Main({ id, className }: { id: string; className: string }) {
     return (
       <span
         className="cursor-pointer"
-        style={{ borderBottom: `0.25rem solid ${store.currentConnColor || "rgba(0,0,0,0)"}` }}
+        style={{ borderBottom: `0.25rem solid ${snap.currentConnColor || "rgba(0,0,0,0)"}` }}
       >
-        {(store.currentDbType === DB_SQLITE ? store.currentConnName : store.currentDbNme) ||
+        {(snap.currentConnType === DB_SQLITE ? snap.currentConnName : store.currentDbNme) ||
           t("No database connection")}
       </span>
     );

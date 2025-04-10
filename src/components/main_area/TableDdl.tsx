@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { HEDAER_H } from "@/constants";
 import { getTab } from "@/context";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
+import { appState } from "@/store/valtio";
 import { SqlCodeViewer } from "../SqlCodeViewer";
 
 export function TableDdl() {
@@ -16,7 +17,7 @@ export function TableDdl() {
   }
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore("currentTableName", (_val: any) => {
+  useActiveTabStore(appState.activeTabId, "currentTableName", (_val: any) => {
     getData();
   });
 

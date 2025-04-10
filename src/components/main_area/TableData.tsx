@@ -147,7 +147,7 @@ export function TableData() {
   }
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore("currentDbNme", (_val: any) => {
+  useActiveTabStore(appState.activeTabId, "currentDbNme", (_val: any) => {
     setCheckedField(["*"]);
   });
 

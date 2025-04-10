@@ -1,21 +1,9 @@
 import { proxy } from "valtio";
 import { MAIN_AREA_WELCOME } from "@/constants";
-import { DB_POSTGRESQL } from "@/databases/constants";
-import { DbType, FieldStructure } from "@/databases/types";
+import { FieldStructure } from "@/databases/types";
 import { MainAreaTab, MainAreaType } from "@/types/types";
 
 export interface TabStore {
-  // 当前数据库类型
-  currentDbType: DbType;
-  setCurrentDbType: (val: DbType) => void;
-
-  // 当前连接名
-  currentConnName: string;
-  setCurrentConnName: (val: string) => void;
-  // 当前连接颜色
-  currentConnColor: string;
-  setCurrentConnColor: (val: string) => void;
-
   // 当前数据库名
   currentDbNme: string;
   setCurrentDbName: (val: string) => void;
@@ -59,21 +47,6 @@ export interface TabStore {
 // 状态工厂函数
 export const createTabState = () => {
   return proxy({
-    // 当前数据库类型
-    currentDbType: DB_POSTGRESQL,
-    setCurrentDbType(val: DbType) {
-      this.currentDbType = val;
-    },
-    // 当前连接名
-    currentConnName: "",
-    setCurrentConnName(val: string) {
-      this.currentConnName = val;
-    },
-    // 当前连接颜色
-    currentConnColor: "",
-    setCurrentConnColor(val: string) {
-      this.currentConnColor = val;
-    },
     // 当前数据库名
     currentDbNme: "",
     setCurrentDbName(val: string) {

@@ -78,7 +78,7 @@ export function Settings() {
   }
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore("currentTableName", (_value: any) => {
+  useActiveTabStore(appState.activeTabId, "currentTableName", (_value: any) => {
     getData();
   });
 

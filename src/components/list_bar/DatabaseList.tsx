@@ -45,8 +45,9 @@ export function DatabaseList() {
 
     // 先设置这两项, 否则 connect 里获取不到
     // Set these two items first, otherwise they won't be available in the connect.
-    store.setCurrentDbType(conn.dbType);
-    store.setCurrentConnName(conn.name);
+    appState.setCurrentConnType(conn.dbType);
+    appState.setCurrentConnName(conn.name);
+    appState.setCurrentConnColor(conn.color);
 
     const res = await connect({
       dbName: conn.dbName,
@@ -63,7 +64,6 @@ export function DatabaseList() {
       addNotification(res.errorMessage, "error");
     } else {
       store.setCurrentDbName(conn.dbName);
-      store.setCurrentConnColor(conn.color);
       store.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
 
       appState.setListBarType(LIST_BAR_TABLE);
@@ -107,11 +107,7 @@ export function DatabaseList() {
           {
             label: t("Disconnect"),
             onClick: () => {
-              const tab = getTab();
-              if (tab === null) return;
-              const store = tab.store;
-
-              invoker.disconnectSql(store.currentConnName);
+              invoker.disconnectSql(appState.currentConnName);
             },
             icon: <Unlink className="h-4 w-4" color="var(--fvm-warning-clr)" />,
           },

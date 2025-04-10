@@ -41,11 +41,7 @@ const MainAreaComponent = () => {
 };
 
 const TabContainer = ({ state, children }: TabContainerProps) => {
-  return (
-    <TabStateContext.Provider value={state}>
-      <div className="tab-content">{children}</div>
-    </TabStateContext.Provider>
-  );
+  return <TabStateContext.Provider value={state}>{children}</TabStateContext.Provider>;
 };
 
 export const MainArea = () => {
@@ -53,13 +49,13 @@ export const MainArea = () => {
 
   return (
     <>
-      <div className="tab-header w-full flex gap-2">
+      <div className="w-full flex gap-2">
         {snap.tabs.map((tab) => (
           <div
             key={tab.id}
             className={`flex px-2 ${snap.activeTabId === tab.id ? "text-muted bg-muted-foreground" : ""}`}
           >
-            <button onClick={() => snap.setActiveTabId(tab.id)}>{tab.title}</button>
+            <button onClick={() => appState.setActiveTabId(tab.id)}>{tab.title}</button>
             <div
               className="ps-2"
               onClick={() => {
@@ -71,12 +67,12 @@ export const MainArea = () => {
           </div>
         ))}
 
-        <button className="add-tab" onClick={addTab}>
+        <button onClick={addTab}>
           <Plus />
         </button>
       </div>
 
-      <div className="p-2">
+      <div className="p-2 border-t">
         {snap.tabs.map((tab, index) => (
           <div key={tab.id} style={{ display: snap.activeTabId === tab.id ? "block" : "none" }}>
             <TabContainer state={appState.tabs[index].store}>

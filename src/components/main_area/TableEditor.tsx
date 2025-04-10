@@ -16,6 +16,7 @@ import { getTableDdl, getTableStructure } from "@/databases/adapter,";
 import { AllAlterAction, TableAlterAction } from "@/databases/types";
 import { getUniqueFieldName } from "@/databases/utils";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
+import { appState } from "@/store/valtio";
 import { Card, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
@@ -97,8 +98,10 @@ export function TableEditor() {
   }, [editingTableName, editingTableComment]);
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore("currentTableName", (_value: any) => {
-    setEditingTableName(_value);
+  useActiveTabStore(appState.activeTabId, "currentTableName", (value: string) => {
+    console.log("表名表话  ::: ", appState.activeTabId, value);
+
+    setEditingTableName(value);
     getData();
   });
 

@@ -8,7 +8,7 @@ import { execMany, fieldTypeOptions, genAlterCmd } from "@/databases/adapter,";
 import { AllAlterAction, AlterAction, FieldAlterAction } from "@/databases/types";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
 import { cn } from "@/lib/utils";
-import { addNotification } from "@/store/valtio";
+import { addNotification, appState } from "@/store/valtio";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { DataTypeIcon } from "../DataTypeIcon";
 import { EditableTable, EditableTableMethods, ListRow } from "../EditableTable";
@@ -502,7 +502,7 @@ export function TableStructure({
   }
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore("currentTableStructure", (_value: any) => {
+  useActiveTabStore(appState.activeTabId, "currentTableStructure", (_value: any) => {
     resetData(false);
   });
 

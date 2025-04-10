@@ -1,5 +1,7 @@
 import { proxy } from "valtio";
 import { LIST_BAR_DB, MAIN_PASSWORD_DEFAULT } from "@/constants";
+import { DB_POSTGRESQL } from "@/databases/constants";
+import { DbType } from "@/databases/types";
 import { invoker } from "@/invoker";
 import { ConfigFileMain } from "@/types/conf_file";
 import { ListBarType, TextNotificationData, TextNotificationType } from "@/types/types";
@@ -47,6 +49,17 @@ interface AppState {
   addTabs: (val: AppTab) => void;
   activeTabId: string;
   setActiveTabId: (val: string) => void;
+
+  //
+  // 当前连接类型
+  currentConnType: DbType;
+  setCurrentConnType: (val: DbType) => void;
+  // 当前连接名
+  currentConnName: string;
+  setCurrentConnName: (val: string) => void;
+  // 当前连接颜色
+  currentConnColor: string;
+  setCurrentConnColor: (val: string) => void;
 }
 
 // 按照默认密码生成默认的 sha
@@ -120,7 +133,24 @@ export const appState = proxy<AppState>({
   },
   activeTabId: "",
   setActiveTabId(val: string): void {
+    // console.log("设置标签页  ::: ", val);
     appState.activeTabId = val;
+  },
+
+  // 当前连接类型
+  currentConnType: DB_POSTGRESQL,
+  setCurrentConnType(val: DbType) {
+    this.currentConnType = val;
+  },
+  // 当前连接名
+  currentConnName: "",
+  setCurrentConnName(val: string) {
+    this.currentConnName = val;
+  },
+  // 当前连接颜色
+  currentConnColor: "",
+  setCurrentConnColor(val: string) {
+    this.currentConnColor = val;
   },
 }) as AppState;
 

@@ -13,7 +13,7 @@ import {
   getAllTableSize,
 } from "@/databases/adapter,";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
-import { addNotification } from "@/store/valtio";
+import { addNotification, appState } from "@/store/valtio";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
@@ -96,12 +96,7 @@ export function TableList() {
 
   function renderSortBtn(sortMethod: SortBy, sortByNameAsc: () => void, Icon: LucideIcon, text: string) {
     let color = `var(--foreground")`;
-
-    const tab = getTab();
-    if (tab !== null) {
-      const store = tab.store;
-      color = store.currentConnColor;
-    }
+    color = appState.currentConnColor;
 
     return (
       <div onClick={sortByNameAsc}>
@@ -310,7 +305,7 @@ export function TableList() {
   }, [tablData]);
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore("currentDbNme", (_val: any) => {
+  useActiveTabStore(appState.activeTabId, "currentDbNme", (_val: any) => {
     getData();
   });
 
