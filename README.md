@@ -7,7 +7,7 @@
 - ⚡ **基于 Tauri 框架**：安装包小，内存占用低
 - 🖥️ **前端**：TypeScript + React + shadcn/ui
 - ⚙️ **后端**：Rust + SQLx
-- 🗄️ **数据库支持**：PostgreSQL / SQLite / MySQL/MariaDB（尚未开始）
+- 🗄️ **数据库支持**：PostgreSQL / SQLite（MySQL/MariaDB - 进行中）
 
 [TODO](./TODO.md)
 
@@ -18,7 +18,7 @@
 - ⚡ **Based on Tauri framework**: Small binary size & low memory footprint
 - 🖥️ **Frontend**: TypeScript + React + shadcn/ui
 - ⚙️ **Backend**: Rust + SQLx
-- 🗄️ **Database support**: PostgreSQL / SQLite / MySQL/MariaDB(Not Started)
+- 🗄️ **Database support**: PostgreSQL / SQLite (MySQL/MariaDB - In Progress)
 
 [TODO](./TODO.md)
 
