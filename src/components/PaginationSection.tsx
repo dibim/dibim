@@ -59,6 +59,12 @@ export function PaginationSection({ currentPage, setCurrentPage, pageTotal, item
     setCurrentPage(page);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      goToPage();
+    }
+  };
+
   // 输入框里的页面跟随当前页码变化
   // The page in the input box changes with the current page number
   useEffect(() => {
@@ -104,6 +110,7 @@ export function PaginationSection({ currentPage, setCurrentPage, pageTotal, item
                     console.log("解析要跳转额页码出错: ", error);
                   }
                 }}
+                onKeyDown={handleKeyDown}
               />
             </div>
             <Tooltip>
