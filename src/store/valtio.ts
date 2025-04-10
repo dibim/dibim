@@ -49,16 +49,13 @@ interface AppState {
   aboutOpen: boolean;
   setAboutOpen: (val: boolean) => void;
 
-  // 侧边栏
-  sidebarOpen: boolean;
-  setSidebarOpen: (val: boolean) => void;
   // 侧边栏的宽度
   sideBarWidth: number;
   setSideBarWidth: (val: number) => void;
-  // 大屏幕下侧边栏的宽度
+  // 大屏幕下侧边栏的宽度, 传递给 SidebarProvider
   sideBarWidthPc: string;
   setSideBarWidthPc: (val: string) => void;
-  // 小屏幕下侧边栏的宽度
+  // 小屏幕下侧边栏的宽度, 传递给 SidebarProvider
   sideBarWidthMobile: string;
   setSideBarWidthMobile: (val: string) => void;
 
@@ -73,11 +70,11 @@ interface AppState {
   setListBarType: (val: ListBarType) => void;
 
   // 主要区域的类型
-  mainContenType: MainAreaType;
-  setMainContenType: (val: MainAreaType) => void;
+  mainAreaType: MainAreaType;
+  setMainAreaType: (val: MainAreaType) => void;
   // 主要区域的标签页
-  mainContenTab: MainAreaTab;
-  setMainContenTab: (val: MainAreaTab) => void;
+  mainAreaTab: MainAreaTab;
+  setMainAreaTab: (val: MainAreaTab) => void;
 
   // 编辑器里的内容
   sqlEditorContent: string;
@@ -144,8 +141,6 @@ export const appState = proxy<AppState>({
   aboutOpen: false,
   setAboutOpen: (val: boolean) => (appState.aboutOpen = val),
 
-  sidebarOpen: false,
-  setSidebarOpen: (val: boolean) => (appState.sidebarOpen = val),
   sideBarWidth: 0,
   setSideBarWidth: (val: number) => (appState.sideBarWidth = val),
   sideBarWidthPc: "10rem",
@@ -160,10 +155,10 @@ export const appState = proxy<AppState>({
   listBarType: LIST_BAR_DB,
   setListBarType: (val: ListBarType) => (appState.listBarType = val),
 
-  mainContenType: MAIN_AREA_WELCOME,
-  setMainContenType: (val: MainAreaType) => (appState.mainContenType = val),
-  mainContenTab: "",
-  setMainContenTab: (val: MainAreaTab) => (appState.mainContenTab = val),
+  mainAreaType: MAIN_AREA_WELCOME,
+  setMainAreaType: (val: MainAreaType) => (appState.mainAreaType = val),
+  mainAreaTab: "",
+  setMainAreaTab: (val: MainAreaTab) => (appState.mainAreaTab = val),
 
   sqlEditorContent: "",
   setSqlEditorContent: (val: string) => (appState.sqlEditorContent = val),

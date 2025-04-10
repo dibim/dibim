@@ -56,7 +56,7 @@ export function DatabaseList() {
       } else {
         appState.setCurrentDbName(conn.dbName);
         appState.setCurrentConnColor(conn.color);
-        appState.setMainContenType(MAIN_AREA_TABLE_EDITOR);
+        appState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
         appState.setListBarType(LIST_BAR_TABLE);
       }
     }
@@ -87,7 +87,7 @@ export function DatabaseList() {
             label: t("Edit"),
             onClick: () => {
               appState.setEditDbConnIndex(index);
-              appState.setMainContenType(MAIN_AREA_EDIT_CONNECTION);
+              appState.setMainAreaType(MAIN_AREA_EDIT_CONNECTION);
             },
             icon: <Edit className="h-4 w-4" />,
           },

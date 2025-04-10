@@ -134,6 +134,7 @@ export function App() {
           </div>
         ) : (
           <SidebarProvider
+            defaultOpen={false}
             style={{
               "--sidebar-width": snap.sideBarWidthPc,
               "--sidebar-width-mobile": snap.sideBarWidthMobile,

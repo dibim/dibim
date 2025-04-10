@@ -41,7 +41,7 @@ export function TableEditor() {
     if (res && res.data) {
       appState.setCurrentTableStructure(res.data);
       appState.setUniqueFieldName(getUniqueFieldName(res.data));
-      if (appState.mainContenTab === STR_EMPTY) appState.setMainContenTab(MAIN_AREA_TAB_DATA);
+      if (appState.mainAreaTab === STR_EMPTY) appState.setMainAreaTab(MAIN_AREA_TAB_DATA);
     }
     // 获取建表语句, 会在多个地方用, 在这里记录到 store
     const resDdl = await getTableDdl(appState.currentTableName);
@@ -105,7 +105,7 @@ export function TableEditor() {
 
   return (
     // 注意: 使用 value 控制 Tabs 组件的显示, TabsTrigger 要添加 onClick 修改 mainContenTab
-    <Tabs value={snap.mainContenTab} className="w-full">
+    <Tabs value={snap.mainAreaTab} className="w-full">
       <div className="flex">
         <div className="flex items-center pe-4">
           <Input
@@ -120,7 +120,7 @@ export function TableEditor() {
           <TabsTrigger
             value={MAIN_AREA_TAB_STRUCTURE}
             onClick={() => {
-              appState.setMainContenTab(MAIN_AREA_TAB_STRUCTURE);
+              appState.setMainAreaTab(MAIN_AREA_TAB_STRUCTURE);
             }}
           >
             {t("Table structure")}
@@ -129,7 +129,7 @@ export function TableEditor() {
           <TabsTrigger
             value={MAIN_AREA_TAB_DDL}
             onClick={() => {
-              appState.setMainContenTab(MAIN_AREA_TAB_DDL);
+              appState.setMainAreaTab(MAIN_AREA_TAB_DDL);
             }}
           >
             DDL
@@ -167,7 +167,7 @@ export function TableEditor() {
           <TabsTrigger
             value={MAIN_AREA_TAB_DATA}
             onClick={() => {
-              appState.setMainContenTab(MAIN_AREA_TAB_DATA);
+              appState.setMainAreaTab(MAIN_AREA_TAB_DATA);
             }}
           >
             {t("Data")}

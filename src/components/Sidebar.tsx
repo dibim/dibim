@@ -14,7 +14,6 @@ import {
   Sidebar as SidebarSc,
 } from "@/components/ui/sidebar";
 import {
-  APP_NAME,
   LIST_BAR_DB,
   LIST_BAR_TABLE,
   MAIN_AREA_ADD_CONNECTION,
@@ -33,8 +32,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton>
-              <Logo className="-p-2 -m-2 me-2" />
-              {snap.sidebarOpen && <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>}
+              <Logo className="-p-2 -m-2 me-2 !size-8" />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -50,12 +48,10 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
                 snap.setListBarOpen(true);
               }}
             >
-              <Database />
-              <span
-                className={`${snap.listBarType === LIST_BAR_DB ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
-              >
-                {t("Databases")}
-              </span>
+              <Database
+                className="ms-2"
+                color={`var(${snap.listBarType === LIST_BAR_DB ? "--fvm-primary-clr" : "--foreground"})`}
+              />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -69,12 +65,10 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
                 snap.setListBarOpen(true);
               }}
             >
-              <Table />
-              <span
-                className={`${snap.listBarType === LIST_BAR_TABLE ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
-              >
-                {t("Tables")}
-              </span>
+              <Table
+                className="ms-2"
+                color={`var(${snap.listBarType === LIST_BAR_TABLE ? "--fvm-primary-clr" : "--foreground"})`}
+              />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -88,12 +82,10 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
                 snap.setListBarOpen(true);
               }}
             >
-              <SquareFunction />
-              <span
-                className={`${snap.listBarType === LIST_BAR_TYPE_FUNC_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
-              >
-                {t("Functions")}
-              </span>
+              <SquareFunction
+                className="ms-2"
+                color={`var(${snap.listBarType === LIST_BAR_TYPE_FUNC_LIST ? "--fvm-primary-clr" : "--foreground"})`} 
+              />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -107,12 +99,10 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
                 snap.setListBarOpen(true);
               }}
             >
-              <View />
-              <span
-                className={`${snap.listBarType === LIST_SUB_SIDEBAR_TYPE_VIEW_LIST ? "font-bold text-[var(--fvm-primary-clr)]" : ""}`}
-              >
-              {t("Views")}
-              </span>
+              <View 
+                className="ms-2"
+                color={`var(${snap.listBarType === LIST_SUB_SIDEBAR_TYPE_VIEW_LIST ? "--fvm-primary-clr" : "--foreground"})`} 
+              />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -124,12 +114,13 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("Add database connection")}
               onClick={() => {
-                snap.setMainContenType(MAIN_AREA_ADD_CONNECTION);
+                snap.setMainAreaType(MAIN_AREA_ADD_CONNECTION);
                 snap.setListBarOpen(true);
               }}
             >
-              <Link color="var(--fvm-info-clr)" />
-              <span>{t("Add database connection")}</span>
+              <Link
+                color={`var(${snap.mainAreaType === MAIN_AREA_ADD_CONNECTION ? "--fvm-primary-clr" : "--foreground"})`}
+              />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -139,12 +130,13 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("SQL editor")}
               onClick={() => {
-                snap.setMainContenType(MAIN_AREA_SQL_EDITOR);
+                snap.setMainAreaType(MAIN_AREA_SQL_EDITOR);
                 snap.setListBarOpen(true);
               }}
             >
-              <FilePenLine color="var(--fvm-info-clr)" />
-              <span>{t("SQL editor")}</span>
+              <FilePenLine
+                color={`var(${snap.mainAreaType === MAIN_AREA_SQL_EDITOR ? "--fvm-primary-clr" : "--foreground"})`}
+              />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -159,8 +151,7 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
                 snap.setListBarOpen(true);
               }}
             >
-              <DatabaseBackup color="var(--fvm-info-clr)" />
-              <span>{t("Backup")}</span>
+              <DatabaseBackup color={`var(${snap.mainContenType === LIST_SUB_SIDEBAR_TYPE_VIEW_LIST ? "--fvm-primary-clr" : "--foreground"})`} />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu> 
@@ -171,12 +162,13 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("Settings")}
               onClick={() => {
-                snap.setMainContenType(MAIN_AREA_SETTINGS);
+                snap.setMainAreaType(MAIN_AREA_SETTINGS);
                 snap.setListBarOpen(true);
               }}
             >
-              <Settings color="var(--fvm-info-clr)" />
-              <span>{t("Settings")}</span>
+              <Settings
+                color={`var(${snap.mainAreaType === MAIN_AREA_SETTINGS ? "--fvm-primary-clr" : "--foreground"})`}
+              />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
