@@ -1,10 +1,14 @@
 import { useEffect } from "react";
+import { getTab } from "@/context";
 import { getTableStructure } from "@/databases/adapter,";
-import { appState } from "@/store/valtio";
 
 export function TableConstraint() {
+  const tab = getTab();
+  if (tab === null) return;
+  const store = tab.store;
+
   async function getData() {
-    await getTableStructure(appState.currentTableName);
+    await getTableStructure(store.currentTableName);
   }
 
   useEffect(() => {

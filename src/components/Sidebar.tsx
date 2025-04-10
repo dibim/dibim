@@ -20,11 +20,23 @@ import {
   MAIN_AREA_SETTINGS,
   MAIN_AREA_SQL_EDITOR,
 } from "@/constants";
+import { getTab } from "@/context";
 import { appState } from "@/store/valtio";
+import { MainAreaType } from "@/types/types";
 
 export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
   const { t } = useTranslation();
   const snap = useSnapshot(appState);
+
+  function setMainAreaType(val: MainAreaType) {
+    snap.setListBarOpen(true);
+
+    const tab = getTab();
+    if (tab !== null) {
+      const store = tab.store;
+      store.setMainAreaType(val);
+    }
+  }
 
   return (
     <SidebarSc collapsible="icon" {...props}>
@@ -114,13 +126,10 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("Add database connection")}
               onClick={() => {
-                snap.setMainAreaType(MAIN_AREA_ADD_CONNECTION);
-                snap.setListBarOpen(true);
+                setMainAreaType(MAIN_AREA_ADD_CONNECTION);
               }}
             >
-              <Link
-                color={`var(${snap.mainAreaType === MAIN_AREA_ADD_CONNECTION ? "--fvm-primary-clr" : "--foreground"})`}
-              />
+              <Link />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -130,13 +139,10 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("SQL editor")}
               onClick={() => {
-                snap.setMainAreaType(MAIN_AREA_SQL_EDITOR);
-                snap.setListBarOpen(true);
+                setMainAreaType(MAIN_AREA_SQL_EDITOR);
               }}
             >
-              <FilePenLine
-                color={`var(${snap.mainAreaType === MAIN_AREA_SQL_EDITOR ? "--fvm-primary-clr" : "--foreground"})`}
-              />
+              <FilePenLine />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -147,11 +153,10 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("Backup")}
               onClick={() => {
-                snap.setMainContenType(MAIN_CONTEN_TYPE_SETTINGS);
-                snap.setListBarOpen(true);
+                setMainAreaType(MAIN_CONTEN_TYPE_SETTINGS);
               }}
             >
-              <DatabaseBackup color={`var(${snap.mainContenType === LIST_SUB_SIDEBAR_TYPE_VIEW_LIST ? "--fvm-primary-clr" : "--foreground"})`} />
+              <DatabaseBackup/>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu> 
@@ -162,13 +167,10 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("Settings")}
               onClick={() => {
-                snap.setMainAreaType(MAIN_AREA_SETTINGS);
-                snap.setListBarOpen(true);
+                setMainAreaType(MAIN_AREA_SETTINGS);
               }}
             >
-              <Settings
-                color={`var(${snap.mainAreaType === MAIN_AREA_SETTINGS ? "--fvm-primary-clr" : "--foreground"})`}
-              />
+              <Settings />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

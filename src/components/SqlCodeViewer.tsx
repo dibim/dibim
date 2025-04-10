@@ -3,22 +3,24 @@ import hljs from "highlight.js/lib/core";
 import pgsql from "highlight.js/lib/languages/pgsql";
 import sql from "highlight.js/lib/languages/sql";
 import "highlight.js/styles/tokyo-night-dark.css";
-import { useSnapshot } from "valtio";
+import { getTab } from "@/context";
 import { DB_POSTGRESQL } from "@/databases/constants";
-import { appState } from "@/store/valtio";
 import { formatSql } from "@/utils/format_sql";
 
 hljs.registerLanguage("sql", sql);
 hljs.registerLanguage("postgresql", pgsql);
 
 export function SqlCodeViewer({ ddl }: { ddl: string }) {
-  const snap = useSnapshot(appState);
+  const tab = getTab();
+  if (tab === null) return <p>No tab found</p>;
+  const store = tab.store;
+
   const codeRef = useRef<HTMLElement>(null);
   const [sql, setSql] = useState<string>("");
 
   // TODO: add support for SQLite, MySQ, Oracle
   function getLang() {
-    if (appState.currentDbType === DB_POSTGRESQL) return "postgresql";
+    if (store.currentDbType === DB_POSTGRESQL) return "postgresql";
 
     return "sql";
   }
@@ -31,7 +33,7 @@ export function SqlCodeViewer({ ddl }: { ddl: string }) {
   }, [sql]);
 
   useEffect(() => {
-    const res = formatSql(snap.currentDbType, ddl);
+    const res = formatSql(store.currentDbType, ddl);
     if (res.errorMessage === "") {
       setSql(res.result);
     } else {

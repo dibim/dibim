@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import bytes from "bytes";
 import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, CirclePlus, LucideIcon } from "lucide-react";
-import { subscribeKey } from "valtio/utils";
 import { MAIN_AREA_TABLE_EDITOR, MAIN_AREA_TAB_STRUCTURE, STR_EMPTY } from "@/constants";
+import { getTab } from "@/context";
 import {
   exec,
   genDeleteTableCmd,
@@ -12,7 +12,8 @@ import {
   getAllTableName,
   getAllTableSize,
 } from "@/databases/adapter,";
-import { addNotification, appState } from "@/store/valtio";
+import { useActiveTabStore } from "@/hooks/useActiveTabStore";
+import { addNotification } from "@/store/valtio";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
@@ -44,19 +45,28 @@ type TableData = {
 
 export function TableList() {
   const { t } = useTranslation();
+
   const [sortBy, setSortBy] = useState<SortBy>(SORT_BY_NAME_ASC);
   const [tablData, setTableData] = useState<TableData[]>([]);
 
   function clickTableName(item: ListItem) {
-    appState.setCurrentTableName(item.id);
-    appState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
+    const tab = getTab();
+    if (tab === null) return;
+    const store = tab.store;
+
+    store.setCurrentTableName(item.id);
+    store.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
   }
 
   function addTable() {
-    appState.setIsAddingTable(true);
-    appState.setCurrentTableName("");
-    appState.setMainAreaTab(MAIN_AREA_TAB_STRUCTURE);
-    appState.setCurrentTableStructure([]);
+    const tab = getTab();
+    if (tab === null) return;
+    const store = tab.store;
+
+    store.setIsAddingTable(true);
+    store.setCurrentTableName("");
+    store.setMainAreaTab(MAIN_AREA_TAB_STRUCTURE);
+    store.setCurrentTableStructure([]);
   }
 
   // ========== 排序 | Sort ==========
@@ -85,12 +95,18 @@ export function TableList() {
   }
 
   function renderSortBtn(sortMethod: SortBy, sortByNameAsc: () => void, Icon: LucideIcon, text: string) {
+    let color = `var(--foreground")`;
+
+    const tab = getTab();
+    if (tab !== null) {
+      const store = tab.store;
+      color = store.currentConnColor;
+    }
+
     return (
       <div onClick={sortByNameAsc}>
         <Tooltip>
-          <TooltipTrigger asChild>
-            {sortBy === sortMethod ? <Icon color={appState.currentConnColor} /> : <Icon />}
-          </TooltipTrigger>
+          <TooltipTrigger asChild>{sortBy === sortMethod ? <Icon color={color} /> : <Icon />}</TooltipTrigger>
           <TooltipContent>
             <p>{text}</p>
           </TooltipContent>
@@ -155,7 +171,9 @@ export function TableList() {
 
   async function handleConfirm() {
     const res = await exec(willExecCmd);
-    if (res.errorMessage !== "") {
+    if (!res) {
+      addNotification("The result of exec is null", "error");
+    } else if (res.errorMessage !== "") {
       addNotification(res.errorMessage, "error");
     } else {
       getData();
@@ -291,14 +309,13 @@ export function TableList() {
     genListData();
   }, [tablData]);
 
+  // 监听 store 的变化 | Monitor changes in the store
+  useActiveTabStore("currentDbNme", (_val: any) => {
+    getData();
+  });
+
   useEffect(() => {
     getData();
-
-    // 监听 store 的变化 | Monitor changes in the store
-    const unsubscribe = subscribeKey(appState, "currentDbNme", (_value: any) => {
-      getData();
-    });
-    return () => unsubscribe();
   }, []);
 
   return (

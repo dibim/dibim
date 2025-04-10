@@ -1,13 +1,14 @@
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
-import { subscribeKey } from "valtio/utils";
+import { useSnapshot } from "valtio";
 import { HEDAER_H, NEW_ROW_IS_ADDED_FIELD } from "@/constants";
+import { getTab } from "@/context";
 import { exec } from "@/databases/adapter,";
 import { RowData } from "@/databases/types";
 import { modifyTableData } from "@/databases/utils";
+import { useActiveTabStore } from "@/hooks/useActiveTabStore";
 import { cn } from "@/lib/utils";
-import { appState } from "@/store/valtio";
 import { rawRow2EtRow } from "@/utils/render";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { EditableTable, EditableTableMethods, ListRow, TableDataChange } from "./EditableTable";
@@ -38,6 +39,11 @@ export type TableSectionProps = {
 };
 
 export function TableSection({ width, getData, initData, btnExt, ref }: TableSectionProps) {
+  const tab = getTab();
+  if (tab === null) return <p>No tab found</p>;
+  const store = tab.store;
+  const snapTab = useSnapshot(store);
+
   const { t } = useTranslation();
   const tableRef = useRef<EditableTableMethods | null>(null);
 
@@ -65,7 +71,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
 
   // ========== 按钮 ==========
   function handleApply() {
-    if (appState.uniqueFieldName === "") return;
+    if (store.uniqueFieldName === "") return;
 
     const deletedSet = tableRef.current?.getMultiDeleteData() || new Set();
     const addedRows = tableRef.current?.getAddedRow() || [];
@@ -85,7 +91,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
   function handleAdd() {
     tableRef.current?.willRanderTable();
 
-    const fields = appState.currentTableStructure.map((item) => item.name);
+    const fields = store.currentTableStructure.map((item) => item.name);
     const rowData = Object.fromEntries(fields.map((key) => [key, ""]));
     rowData[NEW_ROW_IS_ADDED_FIELD] = "true"; // 新添加的行的标记
     const newTableData = [...tableData, rowData]; // 为了避免和更新的行的索引有冲突, 添加到表格的最后
@@ -94,7 +100,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
   }
 
   function handleDelete() {
-    if (appState.uniqueFieldName === "") return;
+    if (store.uniqueFieldName === "") return;
 
     tableRef.current?.willRanderTable();
     tableRef.current?.deleteMultiSelectedRow();
@@ -152,14 +158,13 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
     updateDataArr: (val: RowData[]) => updateDataArr(val),
   }));
 
+  // 监听 store 的变化 | Monitor changes in the store
+  useActiveTabStore("currentTableName", (_val: any) => {
+    initData();
+  });
+
   useEffect(() => {
     initData();
-
-    // 监听 store 的变化 | Monitor changes in the store
-    const unsubscribe = subscribeKey(appState, "currentTableName", (_value: any) => {
-      initData();
-    });
-    return () => unsubscribe();
   }, []);
 
   return (
@@ -177,7 +182,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
             itemsTotal={itemsTotal}
             getData={getData}
           />
-          {dataArr.length > 0 && appState.uniqueFieldName === "" && (
+          {dataArr.length > 0 && snapTab.uniqueFieldName === "" && (
             <TextNotification type="error" message={t("&notUniqueKeyTip")}></TextNotification>
           )}
         </div>
@@ -187,10 +192,10 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
       <EditableTable
         ref={tableRef}
         fieldNames={fieldNames}
-        fieldNamesUnique={[appState.uniqueFieldName]}
+        fieldNamesUnique={[snapTab.uniqueFieldName]}
         dataArr={dataArr}
         onChange={onChange}
-        editable={appState.uniqueFieldName !== ""}
+        editable={snapTab.uniqueFieldName !== ""}
         multiSelect={true}
         height={`calc(100vh - var(--spacing) * ${HEDAER_H * 4})`}
         width={width}

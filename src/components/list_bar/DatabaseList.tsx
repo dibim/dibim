@@ -7,6 +7,7 @@ import MysqlLogo from "@/assets/db_logo/mysql.svg?react";
 import PostgresqlLogo from "@/assets/db_logo/postgresql.svg?react";
 import SqliteLogo from "@/assets/db_logo/sqlite.svg?react";
 import { LIST_BAR_TABLE, MAIN_AREA_EDIT_CONNECTION, MAIN_AREA_TABLE_EDITOR } from "@/constants";
+import { getTab } from "@/context";
 import { connect } from "@/databases/adapter,";
 import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE } from "@/databases/constants";
 import { invoker } from "@/invoker";
@@ -18,7 +19,9 @@ import { ListItem, ListWithAction } from "../ListWithAction";
 
 export function DatabaseList() {
   const { t } = useTranslation();
+
   const snap = useSnapshot(appState);
+
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [itemIndex, setItemIndex] = useState<number>(-1);
 
@@ -36,10 +39,14 @@ export function DatabaseList() {
   }
 
   async function handleClickConn(conn: DbConnections) {
+    const tab = getTab();
+    if (tab === null) return;
+    const store = tab.store;
+
     // 先设置这两项, 否则 connect 里获取不到
     // Set these two items first, otherwise they won't be available in the connect.
-    appState.setCurrentDbType(conn.dbType);
-    appState.setCurrentConnName(conn.name);
+    store.setCurrentDbType(conn.dbType);
+    store.setCurrentConnName(conn.name);
 
     const res = await connect({
       dbName: conn.dbName,
@@ -50,15 +57,16 @@ export function DatabaseList() {
       filePath: conn.filePath,
     });
 
-    if (res) {
-      if (res.errorMessage !== "" && !res.errorMessage.includes("Duplicate connection name")) {
-        addNotification(res.errorMessage, "error");
-      } else {
-        appState.setCurrentDbName(conn.dbName);
-        appState.setCurrentConnColor(conn.color);
-        appState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
-        appState.setListBarType(LIST_BAR_TABLE);
-      }
+    if (!res) {
+      addNotification("The result of connect is null", "error");
+    } else if (res.errorMessage !== "" && !res.errorMessage.includes("Duplicate connection name")) {
+      addNotification(res.errorMessage, "error");
+    } else {
+      store.setCurrentDbName(conn.dbName);
+      store.setCurrentConnColor(conn.color);
+      store.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
+
+      appState.setListBarType(LIST_BAR_TABLE);
     }
   }
 
@@ -86,8 +94,12 @@ export function DatabaseList() {
           {
             label: t("Edit"),
             onClick: () => {
-              appState.setEditDbConnIndex(index);
-              appState.setMainAreaType(MAIN_AREA_EDIT_CONNECTION);
+              const tab = getTab();
+              if (tab === null) return;
+              const store = tab.store;
+
+              store.setEditDbConnIndex(index);
+              store.setMainAreaType(MAIN_AREA_EDIT_CONNECTION);
             },
             icon: <Edit className="h-4 w-4" />,
           },
@@ -95,7 +107,11 @@ export function DatabaseList() {
           {
             label: t("Disconnect"),
             onClick: () => {
-              invoker.disconnectSql(appState.currentConnName);
+              const tab = getTab();
+              if (tab === null) return;
+              const store = tab.store;
+
+              invoker.disconnectSql(store.currentConnName);
             },
             icon: <Unlink className="h-4 w-4" color="var(--fvm-warning-clr)" />,
           },

@@ -11,8 +11,9 @@ import { MainArea } from "@/components/main_area";
 import { Button } from "@/components/ui/button";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { APP_NAME, HEDAER_H, LIST_BAR_DB, LIST_BAR_DEFAULT_WIDTH, LIST_BAR_TABLE } from "@/constants";
+import { getTab } from "@/context";
 import { DB_SQLITE } from "@/databases/constants";
-import { appState } from "@/store/valtio";
+import { addTab, appState } from "@/store/valtio";
 import { TextNotificationData } from "@/types/types";
 import { getPageWidth } from "@/utils/ media_query";
 import { genPanelPercent } from "@/utils/util";
@@ -79,6 +80,21 @@ export function Main({ id, className }: { id: string; className: string }) {
   }, []);
 
   // ========== 按钮 | Button ==========
+  function renderConnName() {
+    const tab = getTab();
+    if (tab === null) return <span></span>;
+    const store = tab.store;
+
+    return (
+      <span
+        className="cursor-pointer"
+        style={{ borderBottom: `0.25rem solid ${store.currentConnColor || "rgba(0,0,0,0)"}` }}
+      >
+        {(store.currentDbType === DB_SQLITE ? store.currentConnName : store.currentDbNme) ||
+          t("No database connection")}
+      </span>
+    );
+  }
   const tooltipSectionData = [
     {
       trigger: (
@@ -95,14 +111,7 @@ export function Main({ id, className }: { id: string; className: string }) {
       content: <p>{t("toggle list bar")}(F3)</p>,
     },
     {
-      trigger: (
-        <span
-          className="cursor-pointer"
-          style={{ borderBottom: `0.25rem solid ${snap.currentConnColor || "rgba(0,0,0,0)"}` }}
-        >
-          {(snap.currentDbType === DB_SQLITE ? snap.currentConnName : snap.currentDbNme) || t("No database connection")}
-        </span>
-      ),
+      trigger: renderConnName(),
       content: <p>{t("Current database connection")}</p>,
     },
   ];
@@ -118,6 +127,7 @@ export function Main({ id, className }: { id: string; className: string }) {
   }
 
   useEffect(() => {
+    addTab(); // 添加默认的一个标签页
     setTextNotificationData();
 
     // 监听 store 的变化 | Monitor changes in the store

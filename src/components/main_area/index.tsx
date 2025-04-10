@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+import { Plus, Settings, SquareX } from "lucide-react";
 import { useSnapshot } from "valtio";
 import {
   HEDAER_H,
@@ -8,15 +10,22 @@ import {
   MAIN_AREA_TABLE_EDITOR,
   MAIN_AREA_WELCOME,
 } from "@/constants";
-import { appState } from "@/store/valtio";
+import { TabStateContext, useTabState } from "@/context";
+import { TabState } from "@/store/tabs";
+import { addTab, appState, delTab } from "@/store/valtio";
 import { Connection } from "./Connection";
-import { Settings } from "./Settings";
 import { SqlEditor } from "./SqlEditor";
 import { TableEditor } from "./TableEditor";
 import { Welcome } from "./Welcome";
 
-export function MainArea() {
-  const snap = useSnapshot(appState);
+interface TabContainerProps {
+  state: TabState;
+  children?: ReactNode;
+}
+
+const MainAreaComponent = () => {
+  const state = useTabState();
+  const snap = useSnapshot(state);
 
   return (
     <div style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}>
@@ -28,4 +37,53 @@ export function MainArea() {
       {snap.mainAreaType === MAIN_AREA_WELCOME && <Welcome />}
     </div>
   );
-}
+};
+
+const TabContainer = ({ state, children }: TabContainerProps) => {
+  return (
+    <TabStateContext.Provider value={state}>
+      <div className="tab-content">{children}</div>
+    </TabStateContext.Provider>
+  );
+};
+
+export const MainArea = () => {
+  const snap = useSnapshot(appState);
+
+  return (
+    <>
+      <div className="tab-header w-full flex gap-2">
+        {snap.tabs.map((tab) => (
+          <div
+            key={tab.id}
+            className={`flex px-2 ${snap.activeTabId === tab.id ? "text-muted bg-muted-foreground" : ""}`}
+          >
+            <button onClick={() => snap.setActiveTabId(tab.id)}>{tab.title}</button>
+            <div
+              className="ps-2"
+              onClick={() => {
+                delTab(tab.id);
+              }}
+            >
+              <SquareX />
+            </div>
+          </div>
+        ))}
+
+        <button className="add-tab" onClick={addTab}>
+          <Plus />
+        </button>
+      </div>
+
+      <div className="p-2">
+        {snap.tabs.map((tab, index) => (
+          <div key={tab.id} style={{ display: snap.activeTabId === tab.id ? "block" : "none" }}>
+            <TabContainer state={appState.tabs[index].store}>
+              <MainAreaComponent />
+            </TabContainer>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+};

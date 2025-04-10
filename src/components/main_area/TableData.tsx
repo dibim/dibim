@@ -2,15 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ListChecks } from "lucide-react";
 import { useSnapshot } from "valtio";
-import { subscribeKey } from "valtio/utils";
 import { DEFAULT_PAGE_SIZE } from "@/constants";
+import { getTab } from "@/context";
 import { getTableData } from "@/databases/adapter,";
+import { useActiveTabStore } from "@/hooks/useActiveTabStore";
 import { addNotification, appState } from "@/store/valtio";
 import { TableSection, TableSectionMethods } from "../TableSection";
 import { Checkbox } from "../ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
 export function TableData() {
+  const tab = getTab();
+  if (tab === null) return <p>No tab found</p>;
+  const store = tab.store;
+  const snapTab = useSnapshot(store);
+
   const { t } = useTranslation();
   const snap = useSnapshot(appState);
   const tableRef = useRef<TableSectionMethods | null>(null);
@@ -23,8 +29,8 @@ export function TableData() {
     let res = checked ? [...prevVal, val] : prevVal.filter((item) => item !== val);
 
     // 确保必须有一个唯一字段
-    const pks = appState.currentTableStructure.filter((item) => item.isPrimaryKey);
-    const uks = appState.currentTableStructure.filter((item) => item.isUniqueKey);
+    const pks = store.currentTableStructure.filter((item) => item.isPrimaryKey);
+    const uks = store.currentTableStructure.filter((item) => item.isUniqueKey);
     let hasUk = false;
     pks.map((item) => {
       if (res.includes(item.name)) hasUk = true;
@@ -75,7 +81,7 @@ export function TableData() {
               </label>
             </DropdownMenuItem>
 
-            {appState.currentTableStructure.map((item, index) => (
+            {snapTab.currentTableStructure.map((item, index) => (
               <DropdownMenuItem
                 key={index}
                 onSelect={(e) => {
@@ -109,12 +115,12 @@ export function TableData() {
   // ========== 多选字段 结束 ==========
 
   const getData = async (page: number) => {
-    if (appState.currentTableName === "") {
+    if (store.currentTableName === "") {
       return [];
     }
 
     const res = await getTableData({
-      tableName: appState.currentTableName,
+      tableName: store.currentTableName,
       currentPage: page,
       fields: checkedField,
       pageSize: DEFAULT_PAGE_SIZE,
@@ -140,14 +146,13 @@ export function TableData() {
     tableRef.current?.setCurrentPage(1);
   }
 
+  // 监听 store 的变化 | Monitor changes in the store
+  useActiveTabStore("currentDbNme", (_val: any) => {
+    setCheckedField(["*"]);
+  });
+
   useEffect(() => {
     setCheckedField(["*"]);
-
-    // 监听 store 的变化 | Monitor changes in the store
-    const unsubscribe = subscribeKey(appState, "currentTableStructure", (_val: any) => {
-      setCheckedField(["*"]);
-    });
-    return () => unsubscribe();
   }, []);
 
   return (

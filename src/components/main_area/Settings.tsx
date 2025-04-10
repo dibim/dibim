@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Moon, Sun } from "lucide-react";
 import { DIR_H, MAIN_PASSWORD_MIN_LEN } from "@/constants";
+import { getTab } from "@/context";
 import { getTableDdl } from "@/databases/adapter,";
+import { useActiveTabStore } from "@/hooks/useActiveTabStore";
 import { HANS, HANT } from "@/i18n";
 import { invoker } from "@/invoker";
 import { addNotification, appState } from "@/store/valtio";
@@ -15,6 +17,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "../ui/input";
 
 export function Settings() {
+  const tab = getTab();
+  if (tab === null) return;
+  const store = tab.store;
+
   const { t, i18n } = useTranslation();
   const { setTheme } = useTheme();
   const [mainPassword, setMainPassword] = useState<string>("");
@@ -65,15 +71,16 @@ export function Settings() {
   }
 
   async function getData() {
-    const res = await getTableDdl(appState.currentTableName);
+    const res = await getTableDdl(store.currentTableName);
     if (res && res.data) {
       // setTableData(res.data);
     }
   }
 
-  useEffect(() => {
+  // 监听 store 的变化 | Monitor changes in the store
+  useActiveTabStore("currentTableName", (_value: any) => {
     getData();
-  }, [appState.currentTableName]);
+  });
 
   useEffect(() => {
     getData();
