@@ -21,20 +21,19 @@ import {
   MAIN_AREA_SQL_EDITOR,
 } from "@/constants";
 import { getTab } from "@/context";
-import { appState } from "@/store/valtio";
+import { coreState } from "@/store/valtio";
 import { MainAreaType } from "@/types/types";
 
 export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
   const { t } = useTranslation();
-  const snap = useSnapshot(appState);
+  const coreSnap = useSnapshot(coreState);
 
   function setMainAreaType(val: MainAreaType) {
-    snap.setListBarOpen(true);
+    coreSnap.setListBarOpen(true);
 
     const tab = getTab();
     if (tab !== null) {
-      const store = tab.store;
-      store.setMainAreaType(val);
+      tab.state.setMainAreaType(val);
     }
   }
 
@@ -56,13 +55,13 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("Databases")}
               onClick={() => {
-                snap.setListBarType(LIST_BAR_DB);
-                snap.setListBarOpen(true);
+                coreSnap.setListBarType(LIST_BAR_DB);
+                coreSnap.setListBarOpen(true);
               }}
             >
               <Database
                 className="ms-2"
-                color={`var(${snap.listBarType === LIST_BAR_DB ? "--fvm-primary-clr" : "--foreground"})`}
+                color={`var(${coreSnap.listBarType === LIST_BAR_DB ? "--fvm-primary-clr" : "--foreground"})`}
               />
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -73,13 +72,13 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("Tables")}
               onClick={() => {
-                snap.setListBarType(LIST_BAR_TABLE);
-                snap.setListBarOpen(true);
+                coreSnap.setListBarType(LIST_BAR_TABLE);
+                coreSnap.setListBarOpen(true);
               }}
             >
               <Table
                 className="ms-2"
-                color={`var(${snap.listBarType === LIST_BAR_TABLE ? "--fvm-primary-clr" : "--foreground"})`}
+                color={`var(${coreSnap.listBarType === LIST_BAR_TABLE ? "--fvm-primary-clr" : "--foreground"})`}
               />
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -90,13 +89,13 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("Functions")}
               onClick={() => {
-                snap.setListBarType(LIST_BAR_TYPE_FUNC_LIST);
-                snap.setListBarOpen(true);
+                coreSnap.setListBarType(LIST_BAR_TYPE_FUNC_LIST);
+                coreSnap.setListBarOpen(true);
               }}
             >
               <SquareFunction
                 className="ms-2"
-                color={`var(${snap.listBarType === LIST_BAR_TYPE_FUNC_LIST ? "--fvm-primary-clr" : "--foreground"})`} 
+                color={`var(${coreSnap.listBarType === LIST_BAR_TYPE_FUNC_LIST ? "--fvm-primary-clr" : "--foreground"})`} 
               />
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -107,13 +106,13 @@ export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
             <SidebarMenuButton
               tooltip={t("Views")}
               onClick={() => {
-                snap.setListBarType(LIST_SUB_SIDEBAR_TYPE_VIEW_LIST);
-                snap.setListBarOpen(true);
+                coreSnap.setListBarType(LIST_SUB_SIDEBAR_TYPE_VIEW_LIST);
+                coreSnap.setListBarOpen(true);
               }}
             >
               <View 
                 className="ms-2"
-                color={`var(${snap.listBarType === LIST_SUB_SIDEBAR_TYPE_VIEW_LIST ? "--fvm-primary-clr" : "--foreground"})`} 
+                color={`var(${coreSnap.listBarType === LIST_SUB_SIDEBAR_TYPE_VIEW_LIST ? "--fvm-primary-clr" : "--foreground"})`} 
               />
             </SidebarMenuButton>
           </SidebarMenuItem>

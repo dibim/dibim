@@ -11,7 +11,7 @@ import { getTab } from "@/context";
 import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE } from "@/databases/constants";
 import { DbType } from "@/databases/types";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
-import { addNotification, appState } from "@/store/valtio";
+import { addNotification, coreState } from "@/store/valtio";
 import { SvgComponentType } from "@/types/types";
 import { generateHexString } from "@/utils/util";
 import { TextNotification } from "../TextNotification";
@@ -26,7 +26,7 @@ type ConnectionProps = {
 export function Connection(props: ConnectionProps) {
   const tab = getTab();
   if (tab === null) return;
-  const store = tab.store;
+  const tabState = tab.state;
 
   const { t } = useTranslation();
   const [name, setName] = useState<string>(""); // 连接名称 | Name of the connection
@@ -86,7 +86,7 @@ export function Connection(props: ConnectionProps) {
       return;
     }
 
-    if (props.action === STR_ADD && appState.config.dbConnections.some((item) => item.name === name)) {
+    if (props.action === STR_ADD && coreState.config.dbConnections.some((item) => item.name === name)) {
       setErrorMessage(t("&connectionNameExists", { name: name }));
       return;
     }
@@ -119,18 +119,18 @@ export function Connection(props: ConnectionProps) {
     };
 
     if (props.action === STR_ADD) {
-      await appState.setConfig({
-        ...appState.config,
-        dbConnections: [...appState.config.dbConnections, ...(Array.isArray(dbConf) ? dbConf : [dbConf])],
+      await coreState.setConfig({
+        ...coreState.config,
+        dbConnections: [...coreState.config.dbConnections, ...(Array.isArray(dbConf) ? dbConf : [dbConf])],
       });
       setOkMessage(t("Added"));
     }
 
     if (props.action === STR_EDIT) {
-      await appState.setConfig({
-        ...appState.config,
-        dbConnections: appState.config.dbConnections.map((item, index) =>
-          index === store.editDbConnIndex ? dbConf : item,
+      await coreState.setConfig({
+        ...coreState.config,
+        dbConnections: coreState.config.dbConnections.map((item, index) =>
+          index === tabState.editDbConnIndex ? dbConf : item,
         ),
       });
       setOkMessage(t("Edited"));
@@ -171,7 +171,7 @@ export function Connection(props: ConnectionProps) {
 
     // 编辑连接的要获取数据 | Load data when editing connection
     if (props.action === STR_EDIT) {
-      const conn = appState.config.dbConnections[store.editDbConnIndex];
+      const conn = coreState.config.dbConnections[tabState.editDbConnIndex];
       setColor(conn.color);
       setDbName(conn.dbName);
       setDbType(conn.dbType);
@@ -185,7 +185,7 @@ export function Connection(props: ConnectionProps) {
   }
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(appState.activeTabId, "editDbConnIndex", (_value: any) => {
+  useActiveTabStore(coreState.activeTabId, "editDbConnIndex", (_value: any) => {
     setEditingData();
   });
 

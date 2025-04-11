@@ -8,7 +8,7 @@ import { execMany, fieldTypeOptions, genAlterCmd } from "@/databases/adapter,";
 import { AllAlterAction, AlterAction, FieldAlterAction } from "@/databases/types";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
 import { cn } from "@/lib/utils";
-import { addNotification, appState } from "@/store/valtio";
+import { addNotification, coreState } from "@/store/valtio";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { DataTypeIcon } from "../DataTypeIcon";
 import { EditableTable, EditableTableMethods, ListRow } from "../EditableTable";
@@ -44,8 +44,8 @@ export function TableStructure({
 }: TableEditorStructureProps) {
   const tab = getTab();
   if (tab === null) return <p>No tab found</p>;
-  const store = tab.store;
-  const snapTab = useSnapshot(store);
+  const tabState = tab.state;
+  const tabSnap = useSnapshot(tabState);
 
   const { t } = useTranslation();
   const tableRef = useRef<EditableTableMethods | null>(null);
@@ -127,7 +127,7 @@ export function TableStructure({
     return {
       target: STR_FIELD,
       action,
-      tableName: store.currentTableName,
+      tableName: tabState.currentTableName,
 
       autoIncrement: autoIncrement,
       comment: comment,
@@ -190,19 +190,19 @@ export function TableStructure({
 
     // 找到 alterData 里对应的字段的数据 | Find the data corresponding to the field in alterData
     let fieldDataIndex = -1;
-    store.currentTableStructure.map((item, index) => {
+    tabState.currentTableStructure.map((item, index) => {
       if (item.name === nameOld) {
         fieldDataIndex = index;
       }
     });
 
     if (dialogAction === STR_ADD) {
-      store.setCurrentTableStructure([...store.currentTableStructure, newFieldData]);
+      tabState.setCurrentTableStructure([...tabState.currentTableStructure, newFieldData]);
     }
 
     if (dialogAction === STR_EDIT) {
-      store.setCurrentTableStructure(
-        store.currentTableStructure.map((field, index) => (index === fieldDataIndex ? newFieldData : field)),
+      tabState.setCurrentTableStructure(
+        tabState.currentTableStructure.map((field, index) => (index === fieldDataIndex ? newFieldData : field)),
       );
 
       // 向 TableSection 内部添加变化 | Add changes to the inside of the TableSection
@@ -240,15 +240,15 @@ export function TableStructure({
   function handleDelSelectedField() {
     const arr = tableRef.current?.getMultiSelectData() || [];
     for (const index of arr) {
-      const field = store.currentTableStructure[index];
+      const field = tabState.currentTableStructure[index];
 
       // 创建表格时不需要记录字段的删除动作
       // When creating a table, do not need to delete a record field
-      if (!store.isAddingTable) {
+      if (!tabState.isAddingTable) {
         const action = {
           target: STR_FIELD,
           action: STR_DELETE,
-          tableName: store.currentTableName,
+          tableName: tabState.currentTableName,
 
           comment: "",
           defaultValue: "",
@@ -286,7 +286,7 @@ export function TableStructure({
   }
 
   function handleEditFieldPopup(index: number) {
-    const field = store.currentTableStructure[index];
+    const field = tabState.currentTableStructure[index];
 
     let isPrimaryKey = field.isPrimaryKey;
     let isUniqueKey = field.isUniqueKey;
@@ -311,7 +311,7 @@ export function TableStructure({
     resetDialogData({
       target: STR_FIELD,
       action: STR_EDIT,
-      tableName: store.currentTableName,
+      tableName: tabState.currentTableName,
 
       autoIncrement: false, // FIXME: 添加支持
       comment: field.comment,
@@ -341,7 +341,7 @@ export function TableStructure({
   }
 
   async function handleCopyFieldName(index: number) {
-    const field = store.currentTableStructure[index];
+    const field = tabState.currentTableStructure[index];
     try {
       await navigator.clipboard.writeText(field.name);
       addNotification(t("Copied"), "success");
@@ -351,7 +351,7 @@ export function TableStructure({
   }
 
   async function handleCopyFieldType(index: number) {
-    const field = store.currentTableStructure[index];
+    const field = tabState.currentTableStructure[index];
     try {
       await navigator.clipboard.writeText(field.type);
       addNotification(t("Copied"), "success");
@@ -361,7 +361,7 @@ export function TableStructure({
   }
 
   function handleDeleteField(index: number) {
-    const field = store.currentTableStructure[index];
+    const field = tabState.currentTableStructure[index];
     const actionDataIndex = getActionDataIndex();
     const actionData = genActionData(STR_DELETE);
     actionData.name = field.name;
@@ -465,7 +465,7 @@ export function TableStructure({
   const [dataArr, setDataArr] = useState<ListRow[]>([]);
 
   function updateDataArr() {
-    const dataArrTemp = store.currentTableStructure.map(
+    const dataArrTemp = tabState.currentTableStructure.map(
       (row) =>
         ({
           name: { value: row.name, render: (val: any) => <div>{val}</div> },
@@ -502,7 +502,7 @@ export function TableStructure({
   }
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(appState.activeTabId, "currentTableStructure", (_value: any) => {
+  useActiveTabStore(coreState.activeTabId, "currentTableStructure", (_value: any) => {
     resetData(false);
   });
 
@@ -531,11 +531,11 @@ export function TableStructure({
       <div className="flex-1 overflow-scroll" style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H * 5})` }}>
         <EditableTable
           ref={tableRef}
-          editable={snapTab.uniqueFieldName !== ""}
+          editable={tabSnap.uniqueFieldName !== ""}
           multiSelect={true}
           fieldNames={fieldNames}
           fieldNamesTitle={fieldNameTitle}
-          fieldNamesUnique={[snapTab.uniqueFieldName]}
+          fieldNamesUnique={[tabSnap.uniqueFieldName]}
           dataArr={dataArr}
           onChange={() => {
             // TODO: 快捷修改字段名等

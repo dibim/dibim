@@ -2,7 +2,7 @@
  * 修改字段的功能 - SQLite版本
  */
 import { STR_ADD, STR_DELETE, STR_EDIT, STR_FIELD, STR_TABLE } from "@/constants";
-import { appState } from "@/store/valtio";
+import { coreState } from "@/store/valtio";
 import { AllAlterAction, FieldAlterAction, TableAlterAction } from "../types";
 import { formatToSqlValueSqlite } from "./format";
 import { TableStructure, genCreateTableDdl, parseCreateTableDdl } from "./utils";
@@ -280,7 +280,7 @@ export function genAlterCmdSqlite(val: AllAlterAction[]) {
   }
   // 有导致要重新建表的操作, 先重新建表, 其它修改再执行
   if (NeedToRecreateTableCmds.length > 0) {
-    const sql = appState.currentTableDdl;
+    const sql = coreState.currentTableDdl;
     try {
       const sd = parseCreateTableDdl(sql);
       res = res.concat(recreateTable(sd, NeedToRecreateTableCmds));

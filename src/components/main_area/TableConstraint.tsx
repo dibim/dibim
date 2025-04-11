@@ -5,10 +5,10 @@ import { getTableStructure } from "@/databases/adapter,";
 export function TableConstraint() {
   const tab = getTab();
   if (tab === null) return;
-  const store = tab.store;
+  const tabState = tab.state;
 
   async function getData() {
-    await getTableStructure(store.currentTableName);
+    await getTableStructure(tabState.currentTableName);
   }
 
   useEffect(() => {

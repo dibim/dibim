@@ -13,7 +13,7 @@ import {
   getAllTableSize,
 } from "@/databases/adapter,";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
-import { addNotification, appState } from "@/store/valtio";
+import { addNotification, coreState } from "@/store/valtio";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
@@ -52,21 +52,21 @@ export function TableList() {
   function clickTableName(item: ListItem) {
     const tab = getTab();
     if (tab === null) return;
-    const store = tab.store;
+    const tabState = tab.state;
 
-    store.setCurrentTableName(item.id);
-    store.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
+    tabState.setCurrentTableName(item.id);
+    tabState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
   }
 
   function addTable() {
     const tab = getTab();
     if (tab === null) return;
-    const store = tab.store;
+    const tabState = tab.state;
 
-    store.setIsAddingTable(true);
-    store.setCurrentTableName("");
-    store.setMainAreaTab(MAIN_AREA_TAB_STRUCTURE);
-    store.setCurrentTableStructure([]);
+    tabState.setIsAddingTable(true);
+    tabState.setCurrentTableName("");
+    tabState.setMainAreaTab(MAIN_AREA_TAB_STRUCTURE);
+    tabState.setCurrentTableStructure([]);
   }
 
   // ========== 排序 | Sort ==========
@@ -96,7 +96,7 @@ export function TableList() {
 
   function renderSortBtn(sortMethod: SortBy, sortByNameAsc: () => void, Icon: LucideIcon, text: string) {
     let color = `var(--foreground")`;
-    color = appState.currentConnColor;
+    if (coreState.currentConnColor) color = coreState.currentConnColor;
 
     return (
       <div onClick={sortByNameAsc}>
@@ -305,7 +305,7 @@ export function TableList() {
   }, [tablData]);
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(appState.activeTabId, "currentDbNme", (_val: any) => {
+  useActiveTabStore(coreState.activeTabId, "currentDbNme", (_val: any) => {
     getData();
   });
 

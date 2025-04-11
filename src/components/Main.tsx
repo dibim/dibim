@@ -13,7 +13,7 @@ import { SidebarInset } from "@/components/ui/sidebar";
 import { APP_NAME, HEDAER_H, LIST_BAR_DB, LIST_BAR_DEFAULT_WIDTH, LIST_BAR_TABLE } from "@/constants";
 import { getTab } from "@/context";
 import { DB_SQLITE } from "@/databases/constants";
-import { addTab, appState } from "@/store/valtio";
+import { addTab, coreState } from "@/store/valtio";
 import { TextNotificationData } from "@/types/types";
 import { getPageWidth } from "@/utils/ media_query";
 import { genPanelPercent } from "@/utils/util";
@@ -25,17 +25,17 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 export function Main({ id, className }: { id: string; className: string }) {
   const { t } = useTranslation();
-  const snap = useSnapshot(appState);
+  const coreSnap = useSnapshot(coreState);
   const [mainWidth, setMainWidth] = useState("");
   const mainRef = useRef<HTMLDivElement | null>(null);
 
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   // ========== 快捷键 | Shortcut keys ==========
-  const toggleAboutOpen = () => appState.setAboutOpen(!appState.aboutOpen);
+  const toggleAboutOpen = () => coreState.setAboutOpen(!coreState.aboutOpen);
 
-  useHotkeys("f1", () => toggleAboutOpen(), [appState.aboutOpen]);
-  useHotkeys("f2", () => appState.setListBarOpen(!appState.listBarOpen), [appState.listBarOpen]);
+  useHotkeys("f1", () => toggleAboutOpen(), [coreState.aboutOpen]);
+  useHotkeys("f2", () => coreState.setListBarOpen(!coreState.listBarOpen), [coreState.listBarOpen]);
   // ========== 快捷键 结束 | Shortcut keys end==========
 
   // ========== 控制列表栏 | Control list bar ==========
@@ -46,8 +46,8 @@ export function Main({ id, className }: { id: string; className: string }) {
   };
 
   const resizeListBarWidth = (size: number) => {
-    const w = ((getPageWidth() - appState.sideBarWidth) * size) / 100;
-    appState.setListBarWidth(w);
+    const w = ((getPageWidth() - coreState.sideBarWidth) * size) / 100;
+    coreState.setListBarWidth(w);
   };
 
   useEffect(() => {
@@ -64,12 +64,12 @@ export function Main({ id, className }: { id: string; className: string }) {
   // ========== 控制侧边栏 | Control sidebar ==========
   // 动画结束后执行的操作
   const handleAfterAnimation = () => {
-    if (sidebarRef.current) appState.setSideBarWidth(sidebarRef.current.clientWidth);
+    if (sidebarRef.current) coreState.setSideBarWidth(sidebarRef.current.clientWidth);
   };
 
   useEffect(() => {
-    setMainWidth(`calc(100vw - ${snap.sideBarWidth}px - 10px)`); // TODO: 临时减 10px
-  }, [snap.sideBarWidth]);
+    setMainWidth(`calc(100vw - ${coreSnap.sideBarWidth}px - 10px)`); // TODO: 临时减 10px
+  }, [coreSnap.sideBarWidth]);
 
   // ========== 控制侧边栏 结束 | Control sidebar end ==========
 
@@ -83,14 +83,14 @@ export function Main({ id, className }: { id: string; className: string }) {
   function renderConnName() {
     const tab = getTab();
     if (tab === null) return <span></span>;
-    const store = tab.store;
+    const state = tab.state;
 
     return (
       <span
         className="cursor-pointer"
-        style={{ borderBottom: `0.25rem solid ${snap.currentConnColor || "rgba(0,0,0,0)"}` }}
+        style={{ borderBottom: `0.25rem solid ${coreSnap.currentConnColor || "rgba(0,0,0,0)"}` }}
       >
-        {(snap.currentConnType === DB_SQLITE ? snap.currentConnName : store.currentDbNme) ||
+        {(coreSnap.currentConnType === DB_SQLITE ? coreSnap.currentConnName : state.currentDbNme) ||
           t("No database connection")}
       </span>
     );
@@ -101,7 +101,7 @@ export function Main({ id, className }: { id: string; className: string }) {
         <Button
           variant="ghost"
           onClick={() => {
-            snap.setListBarOpen(!snap.listBarOpen);
+            coreSnap.setListBarOpen(!coreSnap.listBarOpen);
           }}
         >
           <PanelLeftIcon />
@@ -119,7 +119,7 @@ export function Main({ id, className }: { id: string; className: string }) {
   // ========== 通知 | Notification ==========
   const [textNotification, setTextNotification] = useState<TextNotificationData | null>(null);
   function setTextNotificationData() {
-    setTextNotification(appState.textNotificationArr.at(-1) || null);
+    setTextNotification(coreState.textNotificationArr.at(-1) || null);
 
     setTimeout(() => {
       setTextNotification(null);
@@ -131,7 +131,7 @@ export function Main({ id, className }: { id: string; className: string }) {
     setTextNotificationData();
 
     // 监听 store 的变化 | Monitor changes in the store
-    const unsubscribe = subscribeKey(appState, "textNotificationArr", (_val: TextNotificationData[]) => {
+    const unsubscribe = subscribeKey(coreState, "textNotificationArr", (_val: TextNotificationData[]) => {
       setTextNotificationData();
     });
     return () => unsubscribe();
@@ -156,13 +156,13 @@ export function Main({ id, className }: { id: string; className: string }) {
                   </>
                 )}
 
-                {snap.textNotificationArr.length > 0 && (
+                {coreSnap.textNotificationArr.length > 0 && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <EllipsisVertical />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="min-w-[10vw] max-w-[80vw]">
-                      {snap.textNotificationArr.map((item, index) => (
+                      {coreSnap.textNotificationArr.map((item, index) => (
                         <DropdownMenuItem key={index}>
                           <TextNotification
                             message={`${item.time ? item.time.toLocaleString() + " " : ""}${item.message}`}
@@ -177,7 +177,7 @@ export function Main({ id, className }: { id: string; className: string }) {
             </header>
 
             <Split
-              sizes={snap.listBarOpen ? [defaultSizePercent, genPanelPercent(100 - defaultSizePercent)] : [0, 100]}
+              sizes={coreSnap.listBarOpen ? [defaultSizePercent, genPanelPercent(100 - defaultSizePercent)] : [0, 100]}
               minSize={0}
               onDragEnd={handleResize}
               className="flex overflow-hidden split-container split-horizontal"
@@ -186,8 +186,8 @@ export function Main({ id, className }: { id: string; className: string }) {
               cursor="col-resize"
             >
               <div className="overflow-y-scroll">
-                {snap.listBarType === LIST_BAR_DB && <DatabaseList />}
-                {snap.listBarType === LIST_BAR_TABLE && <TableList />}
+                {coreSnap.listBarType === LIST_BAR_DB && <DatabaseList />}
+                {coreSnap.listBarType === LIST_BAR_TABLE && <TableList />}
               </div>
 
               <div ref={mainRef} className="p-2">

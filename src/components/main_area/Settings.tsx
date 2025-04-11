@@ -7,7 +7,7 @@ import { getTableDdl } from "@/databases/adapter,";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
 import { HANS, HANT } from "@/i18n";
 import { invoker } from "@/invoker";
-import { addNotification, appState } from "@/store/valtio";
+import { addNotification, coreState } from "@/store/valtio";
 import { ConfigFileMain } from "@/types/conf_file";
 import { LabeledDiv } from "../LabeledDiv";
 import { TextNotification } from "../TextNotification";
@@ -19,7 +19,7 @@ import { Input } from "../ui/input";
 export function Settings() {
   const tab = getTab();
   if (tab === null) return <p>No tab found</p>;
-  const store = tab.store;
+  const tabState = tab.state;
 
   const { t, i18n } = useTranslation();
   const { setTheme } = useTheme();
@@ -53,17 +53,17 @@ export function Settings() {
 
     if (mainPassword !== "") {
       const sha256 = await invoker.sha256(mainPassword);
-      appState.setMainPasswordSha(sha256);
+      coreState.setMainPasswordSha(sha256);
     }
 
-    await appState.setConfig({
-      ...appState.config,
+    await coreState.setConfig({
+      ...coreState.config,
       settings: {
-        ...appState.config.settings,
+        ...coreState.config.settings,
         lang,
         colorScheme,
       },
-      dbConnections: [...appState.config.dbConnections],
+      dbConnections: [...coreState.config.dbConnections],
     } as ConfigFileMain);
     const message = t("Saved successfully");
     setOkMessage(message);
@@ -71,14 +71,14 @@ export function Settings() {
   }
 
   async function getData() {
-    const res = await getTableDdl(store.currentTableName);
+    const res = await getTableDdl(tabState.currentTableName);
     if (res && res.data) {
       // setTableData(res.data);
     }
   }
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(appState.activeTabId, "currentTableName", (_value: any) => {
+  useActiveTabStore(coreState.activeTabId, "currentTableName", (_value: any) => {
     getData();
   });
 

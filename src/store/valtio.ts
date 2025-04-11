@@ -6,9 +6,16 @@ import { invoker } from "@/invoker";
 import { ConfigFileMain } from "@/types/conf_file";
 import { ListBarType, TextNotificationData, TextNotificationType } from "@/types/types";
 import { saveConfigFile } from "@/utils/config_file";
-import { AppTab, createTabState } from "./tabs";
+import { TabState, createTabState } from "./tabs";
 
-interface AppState {
+// 标签页类型
+interface Tab {
+  id: string;
+  title: string;
+  state: TabState;
+}
+
+interface CoreState {
   // 配置文件相关
   config: ConfigFileMain;
   setConfig: (val: ConfigFileMain, notWriteToFile?: boolean) => Promise<void>;
@@ -41,12 +48,12 @@ interface AppState {
 
   // 通知
   textNotificationArr: TextNotificationData[];
-  addTextNotification: (val: TextNotificationData) => void;
+  setTextNotification: (val: TextNotificationData[]) => void;
 
   // Tab
-  tabs: AppTab[];
-  setTabs: (val: AppTab[]) => void;
-  addTabs: (val: AppTab) => void;
+  tabs: Tab[];
+  setTabs: (val: Tab[]) => void;
+  addTabs: (val: Tab) => void;
   activeTabId: string;
   setActiveTabId: (val: string) => void;
 
@@ -74,67 +81,66 @@ const emptyConfigFile: ConfigFileMain = {
   },
 };
 
-export const appState = proxy<AppState>({
+export const coreState = proxy<CoreState>({
   config: emptyConfigFile,
   async setConfig(val: ConfigFileMain, notWrite?: boolean): Promise<void> {
-    appState.config = val;
+    coreState.config = val;
     if (notWrite !== true) {
-      await saveConfigFile(val, appState.mainPasswordSha); // 保存到配置文件
+      await saveConfigFile(val, this.mainPasswordSha); // 保存到配置文件
     }
   },
   mainPasswordSha: defaultMainPasswordSha,
   setMainPasswordSha(val: string): void {
-    appState.mainPasswordSha = val;
+    this.mainPasswordSha = val;
   },
 
   aboutOpen: false,
   setAboutOpen(val: boolean): void {
-    appState.aboutOpen = val;
+    this.aboutOpen = val;
   },
 
   sideBarWidth: 0,
   setSideBarWidth(val: number): void {
-    appState.sideBarWidth = val;
+    this.sideBarWidth = val;
   },
   sideBarWidthPc: "10rem",
   setSideBarWidthPc(val: string): void {
-    appState.sideBarWidthPc = val;
+    this.sideBarWidthPc = val;
   },
   sideBarWidthMobile: "20rem",
   setSideBarWidthMobile(val: string): void {
-    appState.sideBarWidthMobile = val;
+    this.sideBarWidthMobile = val;
   },
 
   listBarOpen: true,
   setListBarOpen(val: boolean): void {
-    appState.listBarOpen = val;
+    this.listBarOpen = val;
   },
   listBarWidth: 0,
   setListBarWidth(val: number): void {
-    appState.listBarWidth = val;
+    this.listBarWidth = val;
   },
   listBarType: LIST_BAR_DB,
   setListBarType(val: ListBarType): void {
-    appState.listBarType = val;
+    this.listBarType = val;
   },
 
   textNotificationArr: [],
-  addTextNotification(val: TextNotificationData): void {
-    appState.textNotificationArr = [...appState.textNotificationArr, val];
+  setTextNotification(val: TextNotificationData[]): void {
+    this.textNotificationArr = val;
   },
 
   // Tab
   tabs: [],
-  setTabs(val: AppTab[]): void {
-    appState.tabs = val;
+  setTabs(val: Tab[]): void {
+    this.tabs = val;
   },
-  addTabs(val: AppTab): void {
-    appState.tabs = [...appState.tabs, val];
+  addTabs(val: Tab): void {
+    this.tabs = [...this.tabs, val];
   },
   activeTabId: "",
   setActiveTabId(val: string): void {
-    // console.log("设置标签页  ::: ", val);
-    appState.activeTabId = val;
+    this.activeTabId = val;
   },
 
   // 当前连接类型
@@ -152,36 +158,41 @@ export const appState = proxy<AppState>({
   setCurrentConnColor(val: string) {
     this.currentConnColor = val;
   },
-}) as AppState;
+}) as CoreState;
+
+// 以下是工具函数
 
 export function addNotification(message: string, type: TextNotificationType) {
-  appState.addTextNotification({
-    message,
-    type,
-    time: new Date(),
-  });
+  coreState.setTextNotification([
+    ...coreState.textNotificationArr,
+    {
+      message,
+      type,
+      time: new Date(),
+    },
+  ]);
 }
 
 export function addTab() {
   const tabId = `${new Date().getTime()}`;
-  const newTab: AppTab = {
+  const newTab: Tab = {
     id: tabId,
-    title: `Tab ${appState.tabs.length + 1}`,
-    store: createTabState(),
+    title: `Tab ${coreState.tabs.length + 1}`,
+    state: createTabState(),
   };
 
-  appState.setTabs([...appState.tabs, newTab]);
-  appState.setActiveTabId(tabId);
+  coreState.setTabs([...coreState.tabs, newTab]);
+  coreState.setActiveTabId(tabId);
 }
 
 export function delTab(id: string) {
-  const newTabs = appState.tabs.filter((item) => item.id !== id);
-  appState.setTabs(newTabs);
+  const newTabs = coreState.tabs.filter((item) => item.id !== id);
+  coreState.setTabs(newTabs);
 
-  const existId = appState.tabs.some((item) => item.id === appState.activeTabId);
-  if (!existId && appState.tabs) {
-    appState.setActiveTabId(newTabs[0].id);
+  const existId = coreState.tabs.some((item) => item.id === coreState.activeTabId);
+  if (!existId && coreState.tabs) {
+    coreState.setActiveTabId(newTabs[0].id);
   } else {
-    appState.setActiveTabId("");
+    coreState.setActiveTabId("");
   }
 }

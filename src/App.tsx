@@ -16,13 +16,13 @@ import { TooltipProvider } from "./components/ui/tooltip";
 import { APP_NAME, CONFIG_FILE_APPEARANCE, CONFIG_FILE_MAIN, MAIN_PASSWORD_DEFAULT } from "./constants";
 import i18n from "./i18n";
 import { invoker } from "./invoker";
-import { appState } from "./store/valtio";
+import { coreState } from "./store/valtio";
 import { ConfigFileAppearance, ConfigFileMain } from "./types/conf_file";
 import { readConfigFile } from "./utils/config_file";
 
 export function App() {
   const { t } = useTranslation();
-  const snap = useSnapshot(appState);
+  const coreSnap = useSnapshot(coreState);
   const [showLock, setShowLock] = useState(true);
   const [mainPassword, setMainPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -60,7 +60,7 @@ export function App() {
         console.log(`Error reading appearance configuration: ${error}`);
       }
 
-      await appState.setConfig(config, true);
+      await coreState.setConfig(config, true);
       return true;
     } catch (error) {
       console.log(
@@ -88,7 +88,7 @@ export function App() {
 
   async function onSubmit() {
     const sha256 = await invoker.sha256(mainPassword);
-    appState.setMainPasswordSha(sha256);
+    coreState.setMainPasswordSha(sha256);
 
     if (await initConfFile(sha256, false)) {
       setShowLock(false);
@@ -136,8 +136,8 @@ export function App() {
           <SidebarProvider
             defaultOpen={false}
             style={{
-              "--sidebar-width": snap.sideBarWidthPc,
-              "--sidebar-width-mobile": snap.sideBarWidthMobile,
+              "--sidebar-width": coreSnap.sideBarWidthPc,
+              "--sidebar-width-mobile": coreSnap.sideBarWidthMobile,
             }}
           >
             <TooltipProvider>

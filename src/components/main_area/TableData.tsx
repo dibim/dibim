@@ -6,7 +6,7 @@ import { DEFAULT_PAGE_SIZE } from "@/constants";
 import { getTab } from "@/context";
 import { getTableData } from "@/databases/adapter,";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
-import { addNotification, appState } from "@/store/valtio";
+import { addNotification, coreState } from "@/store/valtio";
 import { TableSection, TableSectionMethods } from "../TableSection";
 import { Checkbox } from "../ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
@@ -14,11 +14,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 export function TableData() {
   const tab = getTab();
   if (tab === null) return <p>No tab found</p>;
-  const store = tab.store;
-  const snapTab = useSnapshot(store);
+  const tabState = tab.state;
+  const snapTab = useSnapshot(tabState);
 
   const { t } = useTranslation();
-  const snap = useSnapshot(appState);
+  const snapCore = useSnapshot(coreState);
   const tableRef = useRef<TableSectionMethods | null>(null);
 
   // ========== 多选字段 ==========
@@ -29,8 +29,8 @@ export function TableData() {
     let res = checked ? [...prevVal, val] : prevVal.filter((item) => item !== val);
 
     // 确保必须有一个唯一字段
-    const pks = store.currentTableStructure.filter((item) => item.isPrimaryKey);
-    const uks = store.currentTableStructure.filter((item) => item.isUniqueKey);
+    const pks = tabState.currentTableStructure.filter((item) => item.isPrimaryKey);
+    const uks = tabState.currentTableStructure.filter((item) => item.isUniqueKey);
     let hasUk = false;
     pks.map((item) => {
       if (res.includes(item.name)) hasUk = true;
@@ -115,12 +115,12 @@ export function TableData() {
   // ========== 多选字段 结束 ==========
 
   const getData = async (page: number) => {
-    if (store.currentTableName === "") {
+    if (tabState.currentTableName === "") {
       return [];
     }
 
     const res = await getTableData({
-      tableName: store.currentTableName,
+      tableName: tabState.currentTableName,
       currentPage: page,
       fields: checkedField,
       pageSize: DEFAULT_PAGE_SIZE,
@@ -147,7 +147,7 @@ export function TableData() {
   }
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(appState.activeTabId, "currentDbNme", (_val: any) => {
+  useActiveTabStore(coreState.activeTabId, "currentDbNme", (_val: any) => {
     setCheckedField(["*"]);
   });
 
@@ -158,7 +158,7 @@ export function TableData() {
   return (
     <TableSection
       ref={tableRef}
-      width={`clac(100vw - ${snap.sideBarWidth + snap.listBarWidth + 40}px)`} // TODO: 临时减40px
+      width={`clac(100vw - ${snapCore.sideBarWidth + snapCore.listBarWidth + 40}px)`} // TODO: 临时减40px
       getData={getData}
       initData={initData}
       btnExt={btnExt}

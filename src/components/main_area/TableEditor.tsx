@@ -16,7 +16,7 @@ import { getTableDdl, getTableStructure } from "@/databases/adapter,";
 import { AllAlterAction, TableAlterAction } from "@/databases/types";
 import { getUniqueFieldName } from "@/databases/utils";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
-import { appState } from "@/store/valtio";
+import { coreState } from "@/store/valtio";
 import { Card, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
@@ -28,8 +28,8 @@ import { TableStructure } from "./TableStructure";
 export function TableEditor() {
   const tab = getTab();
   if (tab === null) return <p>No tab found</p>;
-  const store = tab.store;
-  const snapTab = useSnapshot(store);
+  const tabState = tab.state;
+  const tabSnap = useSnapshot(tabState);
 
   const { t } = useTranslation();
   const [alterData, setAlterData] = useState<AllAlterAction[]>([]); // 对表格和字段的修改数据
@@ -37,24 +37,24 @@ export function TableEditor() {
   const [editingTableComment, setEditingTableComment] = useState<string>(""); // 输入框中的表注释
 
   async function getData() {
-    if (store.currentTableName === "") {
+    if (tabState.currentTableName === "") {
       return;
     }
 
     // 获取表结构, 会在多个地方用, 在这里记录到 store
-    const res = await getTableStructure(store.currentTableName);
+    const res = await getTableStructure(tabState.currentTableName);
     if (res && res.data) {
-      store.setCurrentTableStructure(res.data);
-      store.setUniqueFieldName(getUniqueFieldName(res.data));
-      if (store.mainAreaTab === STR_EMPTY) store.setMainAreaTab(MAIN_AREA_TAB_DATA);
+      tabState.setCurrentTableStructure(res.data);
+      tabState.setUniqueFieldName(getUniqueFieldName(res.data));
+      if (tabState.mainAreaTab === STR_EMPTY) tabState.setMainAreaTab(MAIN_AREA_TAB_DATA);
     }
     // 获取建表语句, 会在多个地方用, 在这里记录到 store
-    const resDdl = await getTableDdl(store.currentTableName);
+    const resDdl = await getTableDdl(tabState.currentTableName);
     if (resDdl && resDdl.data) {
       let sql = resDdl.data;
       if (sql === "") sql = t("No DDL found");
 
-      store.setCurrentTableDdl(sql);
+      tabState.setCurrentTableDdl(sql);
     }
   }
 
@@ -76,9 +76,9 @@ export function TableEditor() {
 
     const actionData: TableAlterAction = {
       target: STR_TABLE,
-      action: store.isAddingTable ? STR_ADD : STR_EDIT,
+      action: tabState.isAddingTable ? STR_ADD : STR_EDIT,
       tableName: editingTableName, // 输入框里的表名
-      tableNameOld: store.currentTableName,
+      tableNameOld: tabState.currentTableName,
       comment: editingTableComment,
     };
 
@@ -98,8 +98,8 @@ export function TableEditor() {
   }, [editingTableName, editingTableComment]);
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(appState.activeTabId, "currentTableName", (value: string) => {
-    console.log("表名表话  ::: ", appState.activeTabId, value);
+  useActiveTabStore(coreState.activeTabId, "currentTableName", (value: string) => {
+    console.log("表名表话  ::: ", coreState.activeTabId, value);
 
     setEditingTableName(value);
     getData();
@@ -111,7 +111,7 @@ export function TableEditor() {
 
   return (
     // 注意: 使用 value 控制 Tabs 组件的显示, TabsTrigger 要添加 onClick 修改 mainContenTab
-    <Tabs value={snapTab.mainAreaTab} className="w-full">
+    <Tabs value={tabSnap.mainAreaTab} className="w-full">
       <div className="flex">
         <div className="flex items-center pe-4">
           <Input
@@ -128,7 +128,7 @@ export function TableEditor() {
             onClick={() => {
               console.log("111");
 
-              store.setMainAreaTab(MAIN_AREA_TAB_STRUCTURE);
+              tabState.setMainAreaTab(MAIN_AREA_TAB_STRUCTURE);
             }}
           >
             {t("Table structure")}
@@ -138,7 +138,7 @@ export function TableEditor() {
             value={MAIN_AREA_TAB_DDL}
             onClick={() => {
               console.log("222");
-              store.setMainAreaTab(MAIN_AREA_TAB_DDL);
+              tabState.setMainAreaTab(MAIN_AREA_TAB_DDL);
             }}
           >
             DDL
@@ -177,7 +177,7 @@ export function TableEditor() {
             value={MAIN_AREA_TAB_DATA}
             onClick={() => {
               console.log("333");
-              store.setMainAreaTab(MAIN_AREA_TAB_DATA);
+              tabState.setMainAreaTab(MAIN_AREA_TAB_DATA);
             }}
           >
             {t("Data")}

@@ -9,7 +9,7 @@ import { RowData } from "@/databases/types";
 import { modifyTableData } from "@/databases/utils";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
 import { cn } from "@/lib/utils";
-import { appState } from "@/store/valtio";
+import { coreState } from "@/store/valtio";
 import { rawRow2EtRow } from "@/utils/render";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { EditableTable, EditableTableMethods, ListRow, TableDataChange } from "./EditableTable";
@@ -42,8 +42,8 @@ export type TableSectionProps = {
 export function TableSection({ width, getData, initData, btnExt, ref }: TableSectionProps) {
   const tab = getTab();
   if (tab === null) return <p>No tab found</p>;
-  const store = tab.store;
-  const snapTab = useSnapshot(store);
+  const tabState = tab.state;
+  const tabSnap = useSnapshot(tabState);
 
   const { t } = useTranslation();
   const tableRef = useRef<EditableTableMethods | null>(null);
@@ -72,7 +72,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
 
   // ========== 按钮 ==========
   function handleApply() {
-    if (store.uniqueFieldName === "") return;
+    if (tabState.uniqueFieldName === "") return;
 
     const deletedSet = tableRef.current?.getMultiDeleteData() || new Set();
     const addedRows = tableRef.current?.getAddedRow() || [];
@@ -92,7 +92,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
   function handleAdd() {
     tableRef.current?.willRanderTable();
 
-    const fields = store.currentTableStructure.map((item) => item.name);
+    const fields = tabState.currentTableStructure.map((item) => item.name);
     const rowData = Object.fromEntries(fields.map((key) => [key, ""]));
     rowData[NEW_ROW_IS_ADDED_FIELD] = "true"; // 新添加的行的标记
     const newTableData = [...tableData, rowData]; // 为了避免和更新的行的索引有冲突, 添加到表格的最后
@@ -101,7 +101,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
   }
 
   function handleDelete() {
-    if (store.uniqueFieldName === "") return;
+    if (tabState.uniqueFieldName === "") return;
 
     tableRef.current?.willRanderTable();
     tableRef.current?.deleteMultiSelectedRow();
@@ -160,7 +160,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
   }));
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(appState.activeTabId, "currentTableName", (_val: any) => {
+  useActiveTabStore(coreState.activeTabId, "currentTableName", (_val: any) => {
     initData();
   });
 
@@ -183,7 +183,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
             itemsTotal={itemsTotal}
             getData={getData}
           />
-          {dataArr.length > 0 && snapTab.uniqueFieldName === "" && (
+          {dataArr.length > 0 && tabSnap.uniqueFieldName === "" && (
             <TextNotification type="error" message={t("&notUniqueKeyTip")}></TextNotification>
           )}
         </div>
@@ -193,10 +193,10 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
       <EditableTable
         ref={tableRef}
         fieldNames={fieldNames}
-        fieldNamesUnique={[snapTab.uniqueFieldName]}
+        fieldNamesUnique={[tabSnap.uniqueFieldName]}
         dataArr={dataArr}
         onChange={onChange}
-        editable={snapTab.uniqueFieldName !== ""}
+        editable={tabSnap.uniqueFieldName !== ""}
         multiSelect={true}
         height={`calc(100vh - var(--spacing) * ${HEDAER_H * 4})`}
         width={width}

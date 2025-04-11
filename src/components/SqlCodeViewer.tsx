@@ -4,7 +4,7 @@ import pgsql from "highlight.js/lib/languages/pgsql";
 import sql from "highlight.js/lib/languages/sql";
 import "highlight.js/styles/tokyo-night-dark.css";
 import { DB_POSTGRESQL } from "@/databases/constants";
-import { appState } from "@/store/valtio";
+import { coreState } from "@/store/valtio";
 import { formatSql } from "@/utils/format_sql";
 
 hljs.registerLanguage("sql", sql);
@@ -16,7 +16,7 @@ export function SqlCodeViewer({ ddl }: { ddl: string }) {
 
   // TODO: add support for SQLite, MySQ, Oracle
   function getLang() {
-    if (appState.currentConnType === DB_POSTGRESQL) return "postgresql";
+    if (coreState.currentConnType === DB_POSTGRESQL) return "postgresql";
 
     return "sql";
   }
@@ -29,7 +29,7 @@ export function SqlCodeViewer({ ddl }: { ddl: string }) {
   }, [sql]);
 
   useEffect(() => {
-    const res = formatSql(appState.currentConnType, ddl);
+    const res = formatSql(coreState.currentConnType, ddl);
     if (res.errorMessage === "") {
       setSql(res.result);
     } else {

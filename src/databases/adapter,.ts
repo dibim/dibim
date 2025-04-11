@@ -15,7 +15,7 @@ import {
   getTableStructurePg,
 } from "@/databases/postgresql/sql";
 import { invoker } from "@/invoker";
-import { appState } from "@/store/valtio";
+import { coreState } from "@/store/valtio";
 import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE } from "./constants";
 import { fieldTypeOptionsMysql } from "./mysql/select_options";
 import { genAlterCmdPg } from "./postgresql/alter_table";
@@ -44,7 +44,7 @@ import { AllAlterAction, DbConnectionParam, FieldWithValue, GetTableDataParam } 
 
 // 连接数据库
 export async function connect(p: DbConnectionParam) {
-  const { currentConnType, currentConnName } = appState;
+  const { currentConnType, currentConnName } = coreState;
   if (currentConnType === DB_MYSQL) return; // TODO:
   if (currentConnType === DB_POSTGRESQL) return connectPg(currentConnName, p);
   if (currentConnType === DB_SQLITE) return connectSqlite(currentConnName, p);
@@ -57,25 +57,25 @@ export async function disconnect(currentConnName: string) {
 
 // 查询语句
 export async function query(sql: string, streaming?: boolean, page?: number, pageSize?: number) {
-  const { currentConnName } = appState;
+  const { currentConnName } = coreState;
   return await invoker.querySql(currentConnName, sql, streaming, page, pageSize);
 }
 
 // 执行语句
 export async function exec(sql: string) {
-  const { currentConnName } = appState;
+  const { currentConnName } = coreState;
   return await invoker.execSql(currentConnName, sql);
 }
 
 // 执行语句
 export async function execMany(sql: string) {
-  const { currentConnName } = appState;
+  const { currentConnName } = coreState;
   return await invoker.execManySql(currentConnName, sql);
 }
 
 // 获取所有表名
 export async function getAllTableName() {
-  const { currentConnType, currentConnName } = appState;
+  const { currentConnType, currentConnName } = coreState;
 
   if (currentConnType === DB_MYSQL) return; // TODO:
   if (currentConnType === DB_POSTGRESQL) return getAllTableNamePg(currentConnName);
@@ -84,7 +84,7 @@ export async function getAllTableName() {
 
 // 获取所有表格的大小
 export async function getAllTableSize() {
-  const { currentConnType, currentConnName } = appState;
+  const { currentConnType, currentConnName } = coreState;
   if (currentConnType === DB_MYSQL) return; // TODO:
   if (currentConnType === DB_POSTGRESQL) return getAllTableSizePg(currentConnName);
   if (currentConnType === DB_SQLITE) return getAllTableSizeSqlite(currentConnName);
@@ -92,7 +92,7 @@ export async function getAllTableSize() {
 
 // 获取表表结构
 export async function getTableStructure(tbName: string) {
-  const { currentConnType, currentConnName } = appState;
+  const { currentConnType, currentConnName } = coreState;
 
   if (currentConnType === DB_MYSQL) return; // TODO:
   if (currentConnType === DB_POSTGRESQL) return getTableStructurePg(currentConnName, tbName);
@@ -101,7 +101,7 @@ export async function getTableStructure(tbName: string) {
 
 // 获取表格的 DDL
 export async function getTableDdl(tbName: string) {
-  const { currentConnType, currentConnName } = appState;
+  const { currentConnType, currentConnName } = coreState;
 
   if (currentConnType === DB_MYSQL) return; // TODO:
   if (currentConnType === DB_POSTGRESQL) return getTableDdlPg(currentConnName, tbName);
@@ -110,7 +110,7 @@ export async function getTableDdl(tbName: string) {
 
 // 获取表格数据
 export async function getTableData(params: GetTableDataParam) {
-  const { currentConnType, currentConnName } = appState;
+  const { currentConnType, currentConnName } = coreState;
 
   console.log("^^^^^^^^^^^   ", { currentConnType, currentConnName });
 
@@ -121,7 +121,7 @@ export async function getTableData(params: GetTableDataParam) {
 
 // 生成重命名表格的语句
 export function genRenameTableCmd(oldName: string, newName: string) {
-  const { currentConnType } = appState;
+  const { currentConnType } = coreState;
 
   if (currentConnType === DB_MYSQL) return ""; // TODO:
   if (currentConnType === DB_POSTGRESQL) return genRenameTableCmdPg(oldName, newName);
@@ -132,7 +132,7 @@ export function genRenameTableCmd(oldName: string, newName: string) {
 
 // 生成截断表格的语句
 export function genTruncateTableCmd(tbName: string) {
-  const { currentConnType } = appState;
+  const { currentConnType } = coreState;
 
   if (currentConnType === DB_MYSQL) return ""; // TODO:
   if (currentConnType === DB_POSTGRESQL) return genTruncateTableCmdPg(tbName);
@@ -143,7 +143,7 @@ export function genTruncateTableCmd(tbName: string) {
 
 // 生成删除表格的语句
 export function genDeleteTableCmd(tbName: string) {
-  const { currentConnType } = appState;
+  const { currentConnType } = coreState;
 
   if (currentConnType === DB_MYSQL) return ""; // TODO:
   if (currentConnType === DB_POSTGRESQL) return genDeleteTableCmdPg(tbName);
@@ -154,7 +154,7 @@ export function genDeleteTableCmd(tbName: string) {
 
 // 生成删除表格的语句
 export function genRenameFieldCmd(tbName: string, oldName: string, newName: string) {
-  const { currentConnType } = appState;
+  const { currentConnType } = coreState;
 
   if (currentConnType === DB_MYSQL) return ""; // TODO:
   if (currentConnType === DB_POSTGRESQL) return genRenameFieldCmdPg(tbName, oldName, newName);
@@ -165,7 +165,7 @@ export function genRenameFieldCmd(tbName: string, oldName: string, newName: stri
 
 // 生成删除表格的语句
 export function genDeleteFieldCmd(tbName: string, fieldName: string) {
-  const { currentConnType } = appState;
+  const { currentConnType } = coreState;
 
   if (currentConnType === DB_MYSQL) return ""; // TODO:
   if (currentConnType === DB_POSTGRESQL) return genDeleteFieldCmdPg(tbName, fieldName);
@@ -176,7 +176,7 @@ export function genDeleteFieldCmd(tbName: string, fieldName: string) {
 
 // 生成修改语句
 export function genAlterCmd(val: AllAlterAction[]) {
-  const { currentConnType } = appState;
+  const { currentConnType } = coreState;
 
   if (currentConnType === DB_MYSQL) return ""; // TODO:
   if (currentConnType === DB_POSTGRESQL) return genAlterCmdPg(val);
@@ -187,7 +187,7 @@ export function genAlterCmd(val: AllAlterAction[]) {
 
 // 生成变更一行的字段
 export function genUpdateFieldCmd(tbName: string, uniqueField: FieldWithValue, fieldArr: FieldWithValue[]) {
-  const { currentConnType } = appState;
+  const { currentConnType } = coreState;
 
   if (currentConnType === DB_MYSQL) return ""; // TODO:
   if (currentConnType === DB_POSTGRESQL) return genUpdateFieldCmdPg(tbName, uniqueField, fieldArr);
@@ -198,7 +198,7 @@ export function genUpdateFieldCmd(tbName: string, uniqueField: FieldWithValue, f
 
 // 生成删除多行的字段
 export function genDeleteRowsCmd(tbName: string, fieldName: string, fieldValues: any[]) {
-  const { currentConnType } = appState;
+  const { currentConnType } = coreState;
 
   if (currentConnType === DB_MYSQL) return ""; // TODO:
   if (currentConnType === DB_POSTGRESQL) return genDeleteRowsCmdPg(tbName, fieldName, fieldValues);
@@ -209,7 +209,7 @@ export function genDeleteRowsCmd(tbName: string, fieldName: string, fieldValues:
 
 // 生成插入多行数据
 export function genInsertRowsCmd(tbName: string, fieldNames: string[], fieldValues: any[]) {
-  const { currentConnType } = appState;
+  const { currentConnType } = coreState;
 
   if (currentConnType === DB_MYSQL) return ""; // TODO:
   if (currentConnType === DB_POSTGRESQL) return genInsertRowsCmdPg(tbName, fieldNames, fieldValues);
@@ -220,7 +220,7 @@ export function genInsertRowsCmd(tbName: string, fieldNames: string[], fieldValu
 
 // 根据数据类型名称返回对应的分类常量
 export function getDataTypeCategory(val: string) {
-  const { currentConnType } = appState;
+  const { currentConnType } = coreState;
 
   if (currentConnType === DB_MYSQL) return ""; // TODO:
   if (currentConnType === DB_POSTGRESQL) return getDataTypeCategoryPg(val);
@@ -231,7 +231,7 @@ export function getDataTypeCategory(val: string) {
 
 // 字段外形的下拉选项
 export function fieldTypeOptions() {
-  const { currentConnType } = appState;
+  const { currentConnType } = coreState;
 
   if (currentConnType === DB_MYSQL) return fieldTypeOptionsMysql;
   if (currentConnType === DB_POSTGRESQL) return fieldTypeOptionsPg;

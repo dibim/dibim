@@ -4,13 +4,13 @@ import { CirclePlus, Settings, Smile } from "lucide-react";
 import { APP_NAME, MAIN_AREA_ADD_CONNECTION, MAIN_AREA_SETTINGS, MAIN_PASSWORD_DEFAULT } from "@/constants";
 import { getTab } from "@/context";
 import { invoker } from "@/invoker";
-import { appState } from "@/store/valtio";
+import { coreState } from "@/store/valtio";
 import { Card, CardContent, CardDescription } from "../ui/card";
 
 export function Welcome() {
   const tab = getTab();
   if (tab === null) return;
-  const store = tab.store;
+  const tabState = tab.state;
 
   const { t } = useTranslation();
   const [showMainPasswordDiv, setShowMainPasswordDiv] = useState<boolean>(false);
@@ -18,7 +18,7 @@ export function Welcome() {
   async function checkMainPassword() {
     const sha256 = await invoker.sha256(MAIN_PASSWORD_DEFAULT);
 
-    setShowMainPasswordDiv(appState.mainPasswordSha === sha256);
+    setShowMainPasswordDiv(coreState.mainPasswordSha === sha256);
   }
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export function Welcome() {
             <div
               className="flex py-4 cursor-pointer"
               onClick={() => {
-                store.setMainAreaType(MAIN_AREA_SETTINGS);
+                tabState.setMainAreaType(MAIN_AREA_SETTINGS);
               }}
             >
               <div className="pe-4">
@@ -57,7 +57,7 @@ export function Welcome() {
           <div
             className="flex py-4 cursor-pointer"
             onClick={() => {
-              store.setMainAreaType(MAIN_AREA_ADD_CONNECTION);
+              tabState.setMainAreaType(MAIN_AREA_ADD_CONNECTION);
             }}
           >
             <div className="pe-4">

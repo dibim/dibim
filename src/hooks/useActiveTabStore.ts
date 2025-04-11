@@ -1,19 +1,19 @@
 import { useEffect, useRef } from "react";
 import { subscribeKey } from "valtio/utils";
-import type { TabStore } from "@/store/tabs";
-import { appState } from "@/store/valtio";
+import type { TabState } from "@/store/tabs";
+import { coreState } from "@/store/valtio";
 
-export const useActiveTabStore = <K extends keyof TabStore>(
+export const useActiveTabStore = <K extends keyof TabState>(
   tabId: string,
   key: K,
-  callback: (value: TabStore[K]) => void,
+  callback: (value: TabState[K]) => void,
 ) => {
   // 使用 ref 存储稳定的回调引用和状态
   const callbackRef = useRef(callback);
   const isolationRef = useRef<{
-    targetStore: TabStore | null;
+    targetStore: TabState | null;
     unsubscribe: () => void;
-    lastValue?: TabStore[K];
+    lastValue?: TabState[K];
     currentKey?: K;
   }>({
     targetStore: null,
@@ -32,14 +32,14 @@ export const useActiveTabStore = <K extends keyof TabStore>(
     const isolation = isolationRef.current;
 
     // 查找目标标签页
-    const targetTab = appState.tabs.find((t) => t.id === tabId);
+    const targetTab = coreState.tabs.find((t) => t.id === tabId);
     if (!targetTab) {
       console.warn(`Tab ${tabId} 不存在`);
       return;
     }
 
     // 获取目标存储对象
-    const targetStore = targetTab.store;
+    const targetStore = targetTab.state;
 
     // 如果目标存储未变化且 key 相同，跳过重复订阅
     if (isolation.targetStore === targetStore && isolation.currentKey === key) {
@@ -53,7 +53,7 @@ export const useActiveTabStore = <K extends keyof TabStore>(
     }
 
     // 创建隔离的订阅逻辑
-    const specificCallback = (value: TabStore[K]) => {
+    const specificCallback = (value: TabState[K]) => {
       // 严格检查当前存储是否匹配
       if (isolation.targetStore === targetStore) {
         if (value !== isolation.lastValue) {

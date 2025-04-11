@@ -13,7 +13,7 @@ import { exec, query } from "@/databases/adapter,";
 import { getPageCount } from "@/databases/postgresql/sql";
 import { RowData } from "@/databases/types";
 import { extractConditionClause } from "@/databases/utils";
-import { appState } from "@/store/valtio";
+import { coreState } from "@/store/valtio";
 import { DbResult, TextNotificationData } from "@/types/types";
 import { formatSql } from "@/utils/format_sql";
 import { genPanelPercent } from "@/utils/util";
@@ -48,16 +48,16 @@ const SQL_KEYWORDS = [
 export function SqlEditor() {
   const tab = getTab();
   if (tab === null) return;
-  const store = tab.store;
+  const tabState = tab.state;
 
   const { t } = useTranslation();
-  const snap = useSnapshot(appState);
+  const coreSnap = useSnapshot(coreState);
   const tableRef = useRef<TableSectionMethods | null>(null);
   const [messageData, setMessageData] = useState<TextNotificationData | null>(null);
 
   // ========== 执行语句 | Execute statements ==========
   async function queryPage(page: number) {
-    if (appState.currentConnName === "") {
+    if (coreState.currentConnName === "") {
       setMessageData({
         message: t("Please connect to the database first"),
         type: "error",
@@ -72,7 +72,7 @@ export function SqlEditor() {
 
       const condition = extractConditionClause(code);
       const res = await getPageCount(
-        appState.currentConnName,
+        coreState.currentConnName,
         condition.tableName,
         DEFAULT_PAGE_SIZE,
         condition.condition,
@@ -108,7 +108,7 @@ export function SqlEditor() {
 
   function formatCode() {
     const code = getEditorCode();
-    const res = formatSql(appState.currentConnType, code);
+    const res = formatSql(coreState.currentConnType, code);
     if (res.errorMessage !== "") {
       setMessageData({ message: res.errorMessage, type: "error" });
     } else {
@@ -198,7 +198,7 @@ export function SqlEditor() {
     editorRef.current = editor;
 
     // 恢复上次编辑的语句 | Restore the last edited statement
-    editor.setValue(store.sqlEditorContent);
+    editor.setValue(tabState.sqlEditorContent);
 
     // 添加快捷键 | Add shortcut keys
     editor.addCommand(monaco.KeyCode.F9, async () => {
@@ -266,7 +266,7 @@ export function SqlEditor() {
 
   const handleEditorChange: OnChange = (value: string | undefined, _ev: Monaco.editor.IModelContentChangedEvent) => {
     if (value !== undefined) {
-      store.setSqlEditorContent(value);
+      tabState.setSqlEditorContent(value);
     }
   };
 
@@ -373,7 +373,7 @@ export function SqlEditor() {
         <div className="flex flex-col">
           <TableSection
             ref={tableRef}
-            width={`clac(100vw - ${snap.sideBarWidth + snap.listBarWidth})`}
+            width={`clac(100vw - ${coreSnap.sideBarWidth + coreSnap.listBarWidth})`}
             getData={getData}
             initData={() => {}}
           />

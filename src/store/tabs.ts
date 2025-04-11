@@ -3,7 +3,7 @@ import { MAIN_AREA_WELCOME } from "@/constants";
 import { FieldStructure } from "@/databases/types";
 import { MainAreaTab, MainAreaType } from "@/types/types";
 
-export interface TabStore {
+export interface TabState {
   // 当前数据库名
   currentDbNme: string;
   setCurrentDbName: (val: string) => void;
@@ -97,14 +97,7 @@ export const createTabState = () => {
     setEditDbConnIndex(val: number) {
       this.editDbConnIndex = val;
     },
-  } as TabStore);
+  } as TabState);
 };
 
-// 标签页类型
-export interface AppTab {
-  id: string;
-  title: string;
-  store: TabStore;
-}
-
-export type TabState = ReturnType<typeof createTabState>;
+export type TabsState = ReturnType<typeof createTabState>;

@@ -11,8 +11,8 @@ import {
   MAIN_AREA_WELCOME,
 } from "@/constants";
 import { TabStateContext, useTabState } from "@/context";
-import { TabState } from "@/store/tabs";
-import { addTab, appState, delTab } from "@/store/valtio";
+import { TabsState } from "@/store/tabs";
+import { addTab, coreState, delTab } from "@/store/valtio";
 import { Connection } from "./Connection";
 import { Settings } from "./Settings";
 import { SqlEditor } from "./SqlEditor";
@@ -20,7 +20,7 @@ import { TableEditor } from "./TableEditor";
 import { Welcome } from "./Welcome";
 
 interface TabContainerProps {
-  state: TabState;
+  state: TabsState;
   children?: ReactNode;
 }
 
@@ -45,17 +45,17 @@ const TabContainer = ({ state, children }: TabContainerProps) => {
 };
 
 export const MainArea = () => {
-  const snap = useSnapshot(appState);
+  const coreSnap = useSnapshot(coreState);
 
   return (
     <>
       <div className="w-full flex gap-2">
-        {snap.tabs.map((tab) => (
+        {coreSnap.tabs.map((tab) => (
           <div
             key={tab.id}
-            className={`flex px-2 ${snap.activeTabId === tab.id ? "text-muted bg-muted-foreground" : ""}`}
+            className={`flex px-2 ${coreSnap.activeTabId === tab.id ? "text-muted bg-muted-foreground" : ""}`}
           >
-            <button onClick={() => appState.setActiveTabId(tab.id)}>{tab.title}</button>
+            <button onClick={() => coreState.setActiveTabId(tab.id)}>{tab.title}</button>
             <div
               className="ps-2"
               onClick={() => {
@@ -73,9 +73,9 @@ export const MainArea = () => {
       </div>
 
       <div className="p-2 border-t">
-        {snap.tabs.map((tab, index) => (
-          <div key={tab.id} style={{ display: snap.activeTabId === tab.id ? "block" : "none" }}>
-            <TabContainer state={appState.tabs[index].store}>
+        {coreSnap.tabs.map((tab, index) => (
+          <div key={tab.id} style={{ display: coreSnap.activeTabId === tab.id ? "block" : "none" }}>
+            <TabContainer state={coreState.tabs[index].state}>
               <MainAreaComponent />
             </TabContainer>
           </div>

@@ -15,7 +15,7 @@ import tr from "./locales/tr/translation.json";
 import uk from "./locales/uk/translation.json";
 import zh_hans from "./locales/zh-hans/translation.json";
 import zh_hant from "./locales/zh-hant/translation.json";
-import { appState } from "./store/valtio";
+import { coreState } from "./store/valtio";
 
 export const HANS = "zh_hans";
 export const HANT = "zh_hant";
@@ -98,8 +98,8 @@ i18n.use(initReactI18next).init({
 });
 
 function setWidth(pc: string, mobile: string) {
-  appState.setSideBarWidthPc(pc);
-  appState.setSideBarWidthMobile(mobile);
+  coreState.setSideBarWidthPc(pc);
+  coreState.setSideBarWidthMobile(mobile);
 }
 
 // 监听语言变化
