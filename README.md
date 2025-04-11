@@ -55,8 +55,7 @@
 | 按键         | 功能                       |
 |--------------|----------------------------|
 | `F1`         | ℹ️ 关于                    |
-| `F2`         | 🗄️ 切换侧边栏              |
-| `F3`         | 📜 切换列表栏              |
+| `F2`         | 📜 切换列表栏              |
 | `F8`         | 🧹 格式化SQL编辑器代码     |
 | `F9`         | ▶️ 执行SQL编辑器代码       |
 
@@ -65,8 +64,7 @@
 | Keys         | Function                  |
 |--------------|---------------------------|
 | `F1`         | ℹ️ About                  |
-| `F2`         | 🗄️ Toggle sidebar         |
-| `F3`         | 📜 Toggle list bar        |
+| `F2`         | 📜 Toggle list bar        |
 | `F8`         | 🧹 Format SQL editor code |
 | `F9`         | ▶️ Execute SQL code       |
 
@@ -81,8 +79,8 @@
 
 ### ⚛️ 状态管理（Valtio）
 
-在组件中使用 Valtio 时，通过 `const snap = useSnapshot(appState)` 获取的状态快照（snap）应当用于组件的渲染输出（return 语句）中读取值。  
-在事件处理、useEffect等逻辑中，应当直接操作原始状态对象 appState 而不是快照对象 snap。
+在组件中使用 Valtio 时，通过 `const snap = useSnapshot(coreState)` 获取的状态快照（snap）应当用于组件的渲染输出（return 语句）中读取值。  
+在事件处理、useEffect等逻辑中，应当直接操作原始状态对象 coreState 而不是快照对象 snap。
 
 ## 🛠️ Development
 
@@ -95,6 +93,6 @@
 
 ### ⚛️ State Management (Valtio)
 
-When using Valtio in a component, the state snapshot (snap) obtained through `const snap = useSnapshot(appState)` should be used to read values in the rendering output (return statement) of the component.
-In event handling, useEffect, and other logic, the original state object appState should be directly manipulated instead of the snapshot object snap.
+When using Valtio in a component, the state snapshot (snap) obtained through `const snap = useSnapshot(coreState)` should be used to read values in the rendering output (return statement) of the component.
+In event handling, useEffect, and other logic, the original state object coreState should be directly manipulated instead of the snapshot object snap.
 f

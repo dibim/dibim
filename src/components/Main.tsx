@@ -2,17 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useTranslation } from "react-i18next";
 import Split from "react-split";
-import { EllipsisVertical, PanelLeftDashed, PanelLeftIcon } from "lucide-react";
+import { EllipsisVertical, PanelLeftIcon } from "lucide-react";
 import { useSnapshot } from "valtio";
 import { subscribeKey } from "valtio/utils";
 import { DatabaseList } from "@/components/list_bar/DatabaseList";
 import { TableList } from "@/components/list_bar/TableList";
 import { MainArea } from "@/components/main_area";
 import { Button } from "@/components/ui/button";
-import { SidebarInset, useSidebar } from "@/components/ui/sidebar";
 import { APP_NAME, HEDAER_H, LIST_BAR_DB, LIST_BAR_DEFAULT_WIDTH, LIST_BAR_TABLE } from "@/constants";
+import { getTab } from "@/context";
 import { DB_SQLITE } from "@/databases/constants";
-import { appState } from "@/store/valtio";
+import { addTab, coreState } from "@/store/core";
 import { TextNotificationData } from "@/types/types";
 import { getPageWidth } from "@/utils/ media_query";
 import { genPanelPercent } from "@/utils/util";
@@ -24,24 +24,17 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 export function Main({ id, className }: { id: string; className: string }) {
   const { t } = useTranslation();
-  const snap = useSnapshot(appState);
+  const coreSnap = useSnapshot(coreState);
   const [mainWidth, setMainWidth] = useState("");
   const mainRef = useRef<HTMLDivElement | null>(null);
 
-  const { setOpenMobile, setOpen } = useSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   // ========== 快捷键 | Shortcut keys ==========
-  function toggleSidebarOpen() {
-    setOpenMobile(!appState.sidebarOpen);
-    setOpen(!appState.sidebarOpen);
-    appState.setSidebarOpen(!appState.sidebarOpen);
-  }
-  const toggleAboutOpen = () => appState.setAboutOpen(!appState.aboutOpen);
+  const toggleAboutOpen = () => coreState.setAboutOpen(!coreState.aboutOpen);
 
-  useHotkeys("f1", () => toggleAboutOpen(), [appState.aboutOpen]);
-  useHotkeys("f2", () => toggleSidebarOpen(), [appState.sidebarOpen]);
-  useHotkeys("f3", () => appState.setListBarOpen(!appState.listBarOpen), [appState.listBarOpen]);
+  useHotkeys("f1", () => toggleAboutOpen(), [coreState.aboutOpen]);
+  useHotkeys("f2", () => coreState.setListBarOpen(!coreState.listBarOpen), [coreState.listBarOpen]);
   // ========== 快捷键 结束 | Shortcut keys end==========
 
   // ========== 控制列表栏 | Control list bar ==========
@@ -52,8 +45,8 @@ export function Main({ id, className }: { id: string; className: string }) {
   };
 
   const resizeListBarWidth = (size: number) => {
-    const w = ((getPageWidth() - appState.sideBarWidth) * size) / 100;
-    appState.setListBarWidth(w);
+    const w = ((getPageWidth() - coreState.sideBarWidth) * size) / 100;
+    coreState.setListBarWidth(w);
   };
 
   useEffect(() => {
@@ -68,78 +61,56 @@ export function Main({ id, className }: { id: string; className: string }) {
   // ========== 控制列表栏 结束 | Control list bar end ==========
 
   // ========== 控制侧边栏 | Control sidebar ==========
-  const timerRef = useRef<number>(0);
   // 动画结束后执行的操作
   const handleAfterAnimation = () => {
-    if (sidebarRef.current) appState.setSideBarWidth(sidebarRef.current.clientWidth);
-  };
-
-  const handleTransitionEnd = (e: TransitionEvent) => {
-    if (e.propertyName === "width") {
-      window.clearTimeout(timerRef.current);
-      timerRef.current = window.setTimeout(handleAfterAnimation, 200);
-    }
+    if (sidebarRef.current) coreState.setSideBarWidth(sidebarRef.current.clientWidth);
   };
 
   useEffect(() => {
-    setMainWidth(`calc(100vw - ${snap.sideBarWidth}px - 10px)`); // TODO: 临时减 10px
-  }, [snap.sideBarWidth]);
+    setMainWidth(`calc(100vw - ${coreSnap.sideBarWidth}px - 10px)`); // TODO: 临时减 10px
+  }, [coreSnap.sideBarWidth]);
 
   // ========== 控制侧边栏 结束 | Control sidebar end ==========
 
   useEffect(() => {
-    setOpenMobile(appState.sidebarOpen);
-    setOpen(appState.sidebarOpen);
-
     // 初始化涉及到布局的尺寸 | Initialization involves the size of the layout
     handleAfterAnimation();
     resizeListBarWidth(defaultSizePercent);
-
-    // ========== 侧边栏 | Sidebar ==========
-    const sidebar = sidebarRef.current;
-    if (!sidebar) return;
-
-    sidebar.addEventListener("transitionend", handleTransitionEnd);
-
-    return () => {
-      sidebar.removeEventListener("transitionend", handleTransitionEnd);
-    };
   }, []);
 
   // ========== 按钮 | Button ==========
+  function renderConnName() {
+    const tab = getTab();
+    if (tab === null) return <span></span>;
+    const tabState = tab.state;
+
+    return (
+      <span
+        className="cursor-pointer"
+        style={{ borderBottom: `0.25rem solid ${coreSnap.currentConnColor || "rgba(0,0,0,0)"}` }}
+      >
+        {(coreSnap.currentConnType === DB_SQLITE ? coreSnap.currentConnName : tabState.currentDbNme) ||
+          t("No database connection")}
+      </span>
+    );
+  }
   const tooltipSectionData = [
-    {
-      trigger: (
-        <Button data-sidebar="trigger" variant="ghost" onClick={toggleSidebarOpen}>
-          <PanelLeftIcon />
-          <span className="sr-only">{t("Toggle sidebar")}</span>
-        </Button>
-      ),
-      content: <p>{t("Toggle sidebar")}(F2)</p>,
-    },
     {
       trigger: (
         <Button
           variant="ghost"
           onClick={() => {
-            snap.setListBarOpen(!snap.listBarOpen);
+            coreSnap.setListBarOpen(!coreSnap.listBarOpen);
           }}
         >
-          <PanelLeftDashed />
+          <PanelLeftIcon />
           <span className="sr-only">{t("toggle list bar")}</span>
         </Button>
       ),
       content: <p>{t("toggle list bar")}(F3)</p>,
     },
     {
-      trigger: (
-        <span
-          className="cursor-pointer"
-          style={{ borderBottom: `0.25rem solid ${snap.currentConnColor || "rgba(0,0,0,0)"}` }}
-        >
-          {(snap.currentDbType === DB_SQLITE ? snap.currentConnName : snap.currentDbNme) || t("No database connection")}
-        </span>
-      ),
+      trigger: renderConnName(),
       content: <p>{t("Current database connection")}</p>,
     },
   ];
@@ -147,7 +118,7 @@ export function Main({ id, className }: { id: string; className: string }) {
   // ========== 通知 | Notification ==========
   const [textNotification, setTextNotification] = useState<TextNotificationData | null>(null);
   function setTextNotificationData() {
-    setTextNotification(appState.textNotificationArr.at(-1) || null);
+    setTextNotification(coreState.textNotificationArr.at(-1) || null);
 
     setTimeout(() => {
       setTextNotification(null);
@@ -155,10 +126,11 @@ export function Main({ id, className }: { id: string; className: string }) {
   }
 
   useEffect(() => {
+    if (coreState.tabs.length === 0) addTab();
     setTextNotificationData();
 
     // 监听 store 的变化 | Monitor changes in the store
-    const unsubscribe = subscribeKey(appState, "textNotificationArr", (_val: TextNotificationData[]) => {
+    const unsubscribe = subscribeKey(coreState, "textNotificationArr", (_val: TextNotificationData[]) => {
       setTextNotificationData();
     });
     return () => unsubscribe();
@@ -166,66 +138,58 @@ export function Main({ id, className }: { id: string; className: string }) {
 
   return (
     <>
-      <Sidebar id="sidebar" ref={sidebarRef} />
-      <SidebarInset>
-        <main>
-          <div id={id} className={className} style={{ width: mainWidth }}>
-            <header className={`flex justify-between h-${HEDAER_H}  items-center  border-b px-4`}>
-              <div className="shrink-0 gap-2">
-                {!snap.sidebarOpen && <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>}
-                <TooltipGroup dataArr={tooltipSectionData} />
-              </div>
-
-              <div className="flex-1 flex justify-end ps-8 text-end">
-                {textNotification && (
-                  <>
-                    <TextNotification message={textNotification.message} type={textNotification.type} />
-                  </>
-                )}
-
-                {snap.textNotificationArr.length > 0 && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <EllipsisVertical />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="min-w-[10vw] max-w-[80vw]">
-                      {snap.textNotificationArr.map((item, index) => (
-                        <DropdownMenuItem key={index}>
-                          <TextNotification
-                            message={`${item.time ? item.time.toLocaleString() + " " : ""}${item.message}`}
-                            type={item.type}
-                          />
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-              </div>
-            </header>
-
-            <Split
-              sizes={snap.listBarOpen ? [defaultSizePercent, genPanelPercent(100 - defaultSizePercent)] : [0, 100]}
-              minSize={0}
-              onDragEnd={handleResize}
-              className="flex overflow-hidden split-container split-horizontal"
-              style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}
-              direction="horizontal"
-              cursor="col-resize"
-            >
-              <div className="overflow-y-scroll">
-                {snap.listBarType === LIST_BAR_DB && <DatabaseList />}
-                {snap.listBarType === LIST_BAR_TABLE && <TableList />}
-              </div>
-
-              <div ref={mainRef} className="p-2">
-                <MainArea />
-              </div>
-            </Split>
-
-            <About />
+      <Sidebar ref={sidebarRef} />
+      <div id={id} className={`ml-16 ${className}`} style={{ width: mainWidth }}>
+        <header className={`flex justify-between h-${HEDAER_H}  items-center  border-b px-4`}>
+          <div className="shrink-0 gap-2">
+            <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>
+            <TooltipGroup dataArr={tooltipSectionData} />
           </div>
-        </main>
-      </SidebarInset>
+
+          <div className="flex-1 flex justify-end ps-8 text-end">
+            {textNotification && <TextNotification message={textNotification.message} type={textNotification.type} />}
+
+            {coreSnap.textNotificationArr.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <EllipsisVertical />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="min-w-[10vw] max-w-[80vw]">
+                  {coreSnap.textNotificationArr.map((item, index) => (
+                    <DropdownMenuItem key={index}>
+                      <TextNotification
+                        message={`${item.time ? item.time.toLocaleString() + " " : ""}${item.message}`}
+                        type={item.type}
+                      />
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+        </header>
+
+        <Split
+          sizes={coreSnap.listBarOpen ? [defaultSizePercent, genPanelPercent(100 - defaultSizePercent)] : [0, 100]}
+          minSize={0}
+          onDragEnd={handleResize}
+          className="flex overflow-hidden split-container split-horizontal"
+          style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}
+          direction="horizontal"
+          cursor="col-resize"
+        >
+          <div className="overflow-y-scroll">
+            {coreSnap.listBarType === LIST_BAR_DB && <DatabaseList />}
+            {coreSnap.listBarType === LIST_BAR_TABLE && <TableList />}
+          </div>
+
+          <div ref={mainRef} className="p-2">
+            <MainArea />
+          </div>
+        </Split>
+
+        <About />
+      </div>
     </>
   );
 }

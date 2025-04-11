@@ -7,10 +7,11 @@ import MysqlLogo from "@/assets/db_logo/mysql.svg?react";
 import PostgresqlLogo from "@/assets/db_logo/postgresql.svg?react";
 import SqliteLogo from "@/assets/db_logo/sqlite.svg?react";
 import { LIST_BAR_TABLE, MAIN_AREA_EDIT_CONNECTION, MAIN_AREA_TABLE_EDITOR } from "@/constants";
+import { getTab } from "@/context";
 import { connect } from "@/databases/adapter,";
 import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE } from "@/databases/constants";
 import { invoker } from "@/invoker";
-import { addNotification, appState } from "@/store/valtio";
+import { addNotification, coreState } from "@/store/core";
 import { DbConnections } from "@/types/conf_file";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
@@ -18,28 +19,34 @@ import { ListItem, ListWithAction } from "../ListWithAction";
 
 export function DatabaseList() {
   const { t } = useTranslation();
-  const snap = useSnapshot(appState);
+  const coreSnap = useSnapshot(coreState);
+
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [itemIndex, setItemIndex] = useState<number>(-1);
 
   function handleDelConn() {
     const newConfig = {
-      ...appState.config,
+      ...coreState.config,
       dbConnections: [
-        ...appState.config.dbConnections.slice(0, itemIndex),
-        ...appState.config.dbConnections.slice(itemIndex + 1),
+        ...coreState.config.dbConnections.slice(0, itemIndex),
+        ...coreState.config.dbConnections.slice(itemIndex + 1),
       ],
     };
-    appState.setConfig(newConfig);
+    coreState.setConfig(newConfig);
 
     setShowDialog(false);
   }
 
   async function handleClickConn(conn: DbConnections) {
+    const tab = getTab();
+    if (tab === null) return;
+    const tbState = tab.state;
+
     // 先设置这两项, 否则 connect 里获取不到
     // Set these two items first, otherwise they won't be available in the connect.
-    appState.setCurrentDbType(conn.dbType);
-    appState.setCurrentConnName(conn.name);
+    coreState.setCurrentConnType(conn.dbType);
+    coreState.setCurrentConnName(conn.name);
+    coreState.setCurrentConnColor(conn.color);
 
     const res = await connect({
       dbName: conn.dbName,
@@ -50,22 +57,22 @@ export function DatabaseList() {
       filePath: conn.filePath,
     });
 
-    if (res) {
-      if (res.errorMessage !== "" && !res.errorMessage.includes("Duplicate connection name")) {
-        addNotification(res.errorMessage, "error");
-      } else {
-        appState.setCurrentDbName(conn.dbName);
-        appState.setCurrentConnColor(conn.color);
-        appState.setMainContenType(MAIN_AREA_TABLE_EDITOR);
-        appState.setListBarType(LIST_BAR_TABLE);
-      }
+    if (!res) {
+      addNotification("The result of connect is null", "error");
+    } else if (res.errorMessage !== "" && !res.errorMessage.includes("Duplicate connection name")) {
+      addNotification(res.errorMessage, "error");
+    } else {
+      tbState.setCurrentDbName(conn.dbName);
+      tbState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
+
+      coreState.setListBarType(LIST_BAR_TABLE);
     }
   }
 
   const [listData, setListData] = useState<ListItem[]>([]);
   function getData() {
     const arr: ListItem[] = [];
-    appState.config.dbConnections.map((item, index) => {
+    coreState.config.dbConnections.map((item, index) => {
       arr.push({
         id: item.name,
         content: (
@@ -86,8 +93,12 @@ export function DatabaseList() {
           {
             label: t("Edit"),
             onClick: () => {
-              appState.setEditDbConnIndex(index);
-              appState.setMainContenType(MAIN_AREA_EDIT_CONNECTION);
+              const tab = getTab();
+              if (tab === null) return;
+              const tbState = tab.state;
+
+              tbState.setEditDbConnIndex(index);
+              tbState.setMainAreaType(MAIN_AREA_EDIT_CONNECTION);
             },
             icon: <Edit className="h-4 w-4" />,
           },
@@ -95,7 +106,7 @@ export function DatabaseList() {
           {
             label: t("Disconnect"),
             onClick: () => {
-              invoker.disconnectSql(appState.currentConnName);
+              invoker.disconnectSql(coreState.currentConnName);
             },
             icon: <Unlink className="h-4 w-4" color="var(--fvm-warning-clr)" />,
           },
@@ -119,7 +130,7 @@ export function DatabaseList() {
     getData();
 
     // 监听 store 的变化 | Monitor changes in the store
-    const unsubscribe = subscribeKey(appState, "config", (_value: any) => {
+    const unsubscribe = subscribeKey(coreState, "config", (_value: any) => {
       getData();
     });
     return () => unsubscribe();
@@ -127,7 +138,7 @@ export function DatabaseList() {
 
   return (
     <div className="p-2">
-      {!snap.config.dbConnections ? <EmptyList /> : <ListWithAction items={listData} itemClassName="py-2" />}
+      {!coreSnap.config.dbConnections ? <EmptyList /> : <ListWithAction items={listData} itemClassName="py-2" />}
 
       <ConfirmDialog
         open={showDialog}

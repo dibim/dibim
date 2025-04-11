@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useSnapshot } from "valtio";
 import Logo from "@/assets/logo.svg?react";
 import { APP_NAME, APP_VERSION } from "@/constants";
-import { appState } from "@/store/valtio";
+import { coreState } from "@/store/core";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,10 +15,10 @@ import {
 
 export function About() {
   const { t } = useTranslation();
-  const snap = useSnapshot(appState);
+  const coreSnap = useSnapshot(coreState);
 
   return (
-    <AlertDialog open={snap.aboutOpen}>
+    <AlertDialog open={coreSnap.aboutOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{t("About")}</AlertDialogTitle>
@@ -51,7 +51,7 @@ export function About() {
         <AlertDialogFooter>
           <AlertDialogAction
             onClick={() => {
-              appState.setAboutOpen(false);
+              coreState.setAboutOpen(false);
             }}
           >
             {t("Confirm")}
