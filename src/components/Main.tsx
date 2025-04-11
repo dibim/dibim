@@ -126,7 +126,7 @@ export function Main({ id, className }: { id: string; className: string }) {
   }
 
   useEffect(() => {
-    addTab(); // 添加默认的一个标签页
+    if (coreState.tabs.length === 0) addTab();
     setTextNotificationData();
 
     // 监听 store 的变化 | Monitor changes in the store
