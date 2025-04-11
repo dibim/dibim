@@ -120,7 +120,7 @@ export function PaginationSection({ currentPage, setCurrentPage, pageTotal, item
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p>{t("&Go to page", { page: inputedPage })}</p>
+                <p>{t("&goToPage", { page: inputedPage })}</p>
               </TooltipContent>
             </Tooltip>
           </PaginationItem>

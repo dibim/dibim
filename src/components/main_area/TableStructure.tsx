@@ -648,7 +648,7 @@ export function TableStructure({
 
       <ConfirmDialog
         open={showDialogAlter}
-        title={t("Are you sure you want to save the changes?")}
+        title={t("&confirmChanges")}
         description={t("&confirmStatement")}
         content={
           <>

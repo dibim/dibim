@@ -205,7 +205,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
       {/* 确认要执行的变更语句 */}
       <ConfirmDialog
         open={showDialogAlter}
-        title={t("Are you sure you want to save the changes?")}
+        title={t("&confirmChanges")}
         description={t("&confirmStatement")}
         content={<SqlCodeViewer ddl={willExecCmd} />}
         cancelText={t("Cancel")}

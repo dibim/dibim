@@ -69,7 +69,7 @@ export function Connection(props: ConnectionProps) {
 
   function valueIsError(condition: boolean, msg: string) {
     if (condition) {
-      const message = t("&Please enter", { name: msg });
+      const message = t("&pleaseEnter", { name: msg });
       setErrorMessage(message);
       addNotification(message, "error");
       return true;
@@ -101,7 +101,7 @@ export function Connection(props: ConnectionProps) {
 
     if (dbType === DB_SQLITE) {
       if (filePath === "") {
-        setErrorMessage(t("&Please enter", { name: t("File path").toLowerCase() }));
+        setErrorMessage(t("&pleaseEnter", { name: t("File path").toLowerCase() }));
         return;
       }
     }
