@@ -1,21 +1,20 @@
 import { initReactI18next } from "react-i18next";
 import i18n from "i18next";
-import ar from "./locales/ar/translation.json";
-import de from "./locales/de/translation.json";
-import en from "./locales/en/translation.json";
-import es from "./locales/es/translation.json";
-import fr from "./locales/fr/translation.json";
-import it from "./locales/it/translation.json";
-import ja from "./locales/ja/translation.json";
-import ko from "./locales/ko/translation.json";
-import nl from "./locales/nl/translation.json";
-import pl from "./locales/pl/translation.json";
-import ru from "./locales/ru/translation.json";
-import tr from "./locales/tr/translation.json";
-import uk from "./locales/uk/translation.json";
-import zh_hans from "./locales/zh-hans/translation.json";
-import zh_hant from "./locales/zh-hant/translation.json";
-import { coreState } from "./store/core";
+import ar from "./locales/ar.json";
+import de from "./locales/de.json";
+import en from "./locales/en.json";
+import es from "./locales/es.json";
+import fr from "./locales/fr.json";
+import it from "./locales/it.json";
+import ja from "./locales/ja.json";
+import ko from "./locales/ko.json";
+import nl from "./locales/nl.json";
+import pl from "./locales/pl.json";
+import ru from "./locales/ru.json";
+import tr from "./locales/tr.json";
+import uk from "./locales/uk.json";
+import zh_hans from "./locales/zh_hans.json";
+import zh_hant from "./locales/zh_hant.json";
 
 export const HANS = "zh_hans";
 export const HANT = "zh_hant";
@@ -97,23 +96,7 @@ i18n.use(initReactI18next).init({
   },
 });
 
-function setWidth(pc: string, mobile: string) {
-  coreState.setSideBarWidthPc(pc);
-  coreState.setSideBarWidthMobile(mobile);
-}
-
 // 监听语言变化
-i18n.on("languageChanged", (lang) => {
-  // 根据语言设置侧边栏的宽度限制
-  if (["ar", "en", "ja"].includes(lang)) setWidth("14rem", "14rem");
-  if (["de", "it", "pl"].includes(lang)) setWidth("18rem", "18rem");
-  if (["es", "nl"].includes(lang)) setWidth("17rem", "17rem");
-  if (["fr"].includes(lang)) setWidth("22rem", "22rem");
-  if (["ko"].includes(lang)) setWidth("13rem", "13rem");
-  if (["ru"].includes(lang)) setWidth("21rem", "21rem");
-  if (["tr"].includes(lang)) setWidth("15rem", "15rem");
-  if (["uk"].includes(lang)) setWidth("19rem", "19rem");
-  if ([HANS, HANT].includes(lang)) setWidth("10rem", "10rem");
-});
+// i18n.on("languageChanged", (lang) => {});
 
 export default i18n;

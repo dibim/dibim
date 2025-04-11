@@ -94,6 +94,7 @@ export function Main({ id, className }: { id: string; className: string }) {
       </span>
     );
   }
+
   const tooltipSectionData = [
     {
       trigger: (
@@ -107,7 +108,7 @@ export function Main({ id, className }: { id: string; className: string }) {
           <span className="sr-only">{t("toggle list bar")}</span>
         </Button>
       ),
-      content: <p>{t("toggle list bar")}(F3)</p>,
+      content: <p>{t("toggle list bar")}(F2)</p>,
     },
     {
       trigger: renderConnName(),
