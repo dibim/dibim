@@ -63,7 +63,7 @@ export function MainArea() {
               {tab.title}
             </div>
             <div
-              className="ps-2"
+              className="ps-2 hover:text-[var(--fvm-danger-clr)]"
               onClick={() => {
                 delTab(tab.id);
               }}
@@ -73,9 +73,9 @@ export function MainArea() {
           </div>
         ))}
 
-        <button onClick={addTab}>
+        <div onClick={addTab} className="cursor-pointer hover:text-[var(--fvm-primary-clr)]">
           <Plus />
-        </button>
+        </div>
       </div>
 
       <div className="p-2 border-t">
