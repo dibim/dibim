@@ -1,18 +1,25 @@
 import { useEffect, useState } from "react";
 import { HEDAER_H } from "@/constants";
-import { appState } from "@/store/valtio";
+import { getTab } from "@/context";
+import { useActiveTabStore } from "@/hooks/useActiveTabStore";
+import { coreState } from "@/store/core";
 import { SqlCodeViewer } from "../SqlCodeViewer";
 
 export function TableDdl() {
+  const tab = getTab();
+  if (tab === null) return <p>No tab found</p>;
+  const tabState = tab.state;
+
   const [ddl, setDdl] = useState<string>("");
 
   async function getData() {
-    setDdl(appState.currentTableDdl);
+    setDdl(tabState.currentTableDdl);
   }
 
-  useEffect(() => {
+  // 监听 store 的变化 | Monitor changes in the store
+  useActiveTabStore(coreState.activeTabId, "currentTableName", (_val: any) => {
     getData();
-  }, [appState.currentTableName]);
+  });
 
   useEffect(() => {
     getData();

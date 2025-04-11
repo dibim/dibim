@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { I18nextProvider, useTranslation } from "react-i18next";
 import { AlertCircle } from "lucide-react";
-import { useSnapshot } from "valtio";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import "@/styles/app.scss";
 import "@/styles/index.css";
@@ -11,18 +10,16 @@ import { Alert, AlertDescription, AlertTitle } from "./components/ui/alert";
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./components/ui/card";
 import { Input } from "./components/ui/input";
-import { SidebarProvider } from "./components/ui/sidebar";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { APP_NAME, CONFIG_FILE_APPEARANCE, CONFIG_FILE_MAIN, MAIN_PASSWORD_DEFAULT } from "./constants";
 import i18n from "./i18n";
 import { invoker } from "./invoker";
-import { appState } from "./store/valtio";
+import { coreState } from "./store/core";
 import { ConfigFileAppearance, ConfigFileMain } from "./types/conf_file";
 import { readConfigFile } from "./utils/config_file";
 
 export function App() {
   const { t } = useTranslation();
-  const snap = useSnapshot(appState);
   const [showLock, setShowLock] = useState(true);
   const [mainPassword, setMainPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -60,7 +57,7 @@ export function App() {
         console.log(`Error reading appearance configuration: ${error}`);
       }
 
-      await appState.setConfig(config, true);
+      await coreState.setConfig(config, true);
       return true;
     } catch (error) {
       console.log(
@@ -88,7 +85,7 @@ export function App() {
 
   async function onSubmit() {
     const sha256 = await invoker.sha256(mainPassword);
-    appState.setMainPasswordSha(sha256);
+    coreState.setMainPasswordSha(sha256);
 
     if (await initConfFile(sha256, false)) {
       setShowLock(false);
@@ -133,17 +130,9 @@ export function App() {
             </div>
           </div>
         ) : (
-          <SidebarProvider
-            defaultOpen={false}
-            style={{
-              "--sidebar-width": snap.sideBarWidthPc,
-              "--sidebar-width-mobile": snap.sideBarWidthMobile,
-            }}
-          >
-            <TooltipProvider>
-              <Main id="main" className={""} />
-            </TooltipProvider>
-          </SidebarProvider>
+          <TooltipProvider>
+            <Main id="main" className={""} />
+          </TooltipProvider>
         )}
       </I18nextProvider>
     </ThemeProvider>

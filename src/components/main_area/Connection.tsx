@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSnapshot } from "valtio";
 import { open } from "@tauri-apps/plugin-dialog";
 import MysqlLogo from "@/assets/db_logo/mysql.svg?react";
 import PostgresqlLogo from "@/assets/db_logo/postgresql.svg?react";
@@ -8,9 +7,11 @@ import SqliteLogo from "@/assets/db_logo/sqlite.svg?react";
 import { LabeledDiv } from "@/components/LabeledDiv";
 import { Input } from "@/components/ui/input";
 import { DIR_H, STR_ADD, STR_EDIT } from "@/constants";
+import { getTab } from "@/context";
 import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE } from "@/databases/constants";
 import { DbType } from "@/databases/types";
-import { addNotification, appState } from "@/store/valtio";
+import { useActiveTabStore } from "@/hooks/useActiveTabStore";
+import { addNotification, coreState } from "@/store/core";
 import { SvgComponentType } from "@/types/types";
 import { generateHexString } from "@/utils/util";
 import { TextNotification } from "../TextNotification";
@@ -23,8 +24,11 @@ type ConnectionProps = {
 };
 
 export function Connection(props: ConnectionProps) {
+  const tab = getTab();
+  if (tab === null) return;
+  const tabState = tab.state;
+
   const { t } = useTranslation();
-  const snap = useSnapshot(appState);
   const [name, setName] = useState<string>(""); // 连接名称 | Name of the connection
   const [dbType, setDbType] = useState<DbType>(DB_POSTGRESQL);
   const [host, setHost] = useState<string>("");
@@ -82,7 +86,7 @@ export function Connection(props: ConnectionProps) {
       return;
     }
 
-    if (props.action === STR_ADD && appState.config.dbConnections.some((item) => item.name === name)) {
+    if (props.action === STR_ADD && coreState.config.dbConnections.some((item) => item.name === name)) {
       setErrorMessage(t("&connectionNameExists", { name: name }));
       return;
     }
@@ -115,18 +119,18 @@ export function Connection(props: ConnectionProps) {
     };
 
     if (props.action === STR_ADD) {
-      await appState.setConfig({
-        ...appState.config,
-        dbConnections: [...appState.config.dbConnections, ...(Array.isArray(dbConf) ? dbConf : [dbConf])],
+      await coreState.setConfig({
+        ...coreState.config,
+        dbConnections: [...coreState.config.dbConnections, ...(Array.isArray(dbConf) ? dbConf : [dbConf])],
       });
       setOkMessage(t("Added"));
     }
 
     if (props.action === STR_EDIT) {
-      await appState.setConfig({
-        ...appState.config,
-        dbConnections: appState.config.dbConnections.map((item, index) =>
-          index === appState.editDbConnIndex ? dbConf : item,
+      await coreState.setConfig({
+        ...coreState.config,
+        dbConnections: coreState.config.dbConnections.map((item, index) =>
+          index === tabState.editDbConnIndex ? dbConf : item,
         ),
       });
       setOkMessage(t("Edited"));
@@ -167,7 +171,7 @@ export function Connection(props: ConnectionProps) {
 
     // 编辑连接的要获取数据 | Load data when editing connection
     if (props.action === STR_EDIT) {
-      const conn = appState.config.dbConnections[appState.editDbConnIndex];
+      const conn = coreState.config.dbConnections[tabState.editDbConnIndex];
       setColor(conn.color);
       setDbName(conn.dbName);
       setDbType(conn.dbType);
@@ -180,9 +184,10 @@ export function Connection(props: ConnectionProps) {
     }
   }
 
-  useEffect(() => {
+  // 监听 store 的变化 | Monitor changes in the store
+  useActiveTabStore(coreState.activeTabId, "editDbConnIndex", (_value: any) => {
     setEditingData();
-  }, [snap.editDbConnIndex]);
+  });
 
   useEffect(() => {
     setEditingData();

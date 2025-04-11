@@ -1,7 +1,7 @@
 import { TableDataChange } from "@/components/EditableTable";
 import { RE_IS_SINGLET_QUERY, RE_WHERE_CLAUSE } from "@/constants";
 import { NEW_ROW_IS_ADDED_FIELD } from "@/constants";
-import { appState } from "@/store/valtio";
+import { getTab } from "@/context";
 import { genDeleteRowsCmd, genInsertRowsCmd, genUpdateFieldCmd } from "./adapter,";
 import { FieldStructure, RowData, SqlValueCommon } from "./types";
 import { FieldWithValue } from "./types";
@@ -171,7 +171,13 @@ export function modifyTableData(
   tableData: RowData[],
   addedRows: RowData[],
 ) {
-  const tbName = appState.currentTableName;
+  const sqls: string[] = [];
+
+  const tab = getTab();
+  if (tab === null) return sqls;
+  const tbState = tab.state;
+
+  const tbName = tbState.currentTableName;
 
   // 处理变更数据的行
   const rowDataMap = new Map<number, TableDataChange[]>();
@@ -186,11 +192,10 @@ export function modifyTableData(
     }
   }
 
-  const sqls: string[] = [];
   rowDataMap.forEach((changes, rowIndex) => {
     const uniqueField: FieldWithValue = {
-      field: appState.uniqueFieldName,
-      value: tableData[rowIndex][appState.uniqueFieldName],
+      field: tbState.uniqueFieldName,
+      value: tableData[rowIndex][tbState.uniqueFieldName],
     };
     const fieldArr: FieldWithValue[] = [];
     for (const c of changes) {
@@ -208,10 +213,10 @@ export function modifyTableData(
   for (let index = 0; index < tableData.length; index++) {
     const row = tableData[index];
     if (deletedSet.has(index)) {
-      arr.push(row[appState.uniqueFieldName]);
+      arr.push(row[tbState.uniqueFieldName]);
     }
   }
-  if (arr.length > 0) sqls.push(genDeleteRowsCmd(tbName, appState.uniqueFieldName, arr));
+  if (arr.length > 0) sqls.push(genDeleteRowsCmd(tbName, tbState.uniqueFieldName, arr));
 
   // 处理新添加的行
   if (addedRows.length > 0) {

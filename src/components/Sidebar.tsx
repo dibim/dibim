@@ -1,18 +1,7 @@
-import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Database, FilePenLine, Link, Settings, Table } from "lucide-react";
 import { useSnapshot } from "valtio";
 import Logo from "@/assets/logo.svg?react";
-import {
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarRail,
-  Sidebar as SidebarSc,
-} from "@/components/ui/sidebar";
 import {
   LIST_BAR_DB,
   LIST_BAR_TABLE,
@@ -20,160 +9,120 @@ import {
   MAIN_AREA_SETTINGS,
   MAIN_AREA_SQL_EDITOR,
 } from "@/constants";
-import { appState } from "@/store/valtio";
+import { getTab } from "@/context";
+import { cn } from "@/lib/utils";
+import { coreState } from "@/store/core";
+import { MainAreaType } from "@/types/types";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
-export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {
+interface SidebarProps {
+  ref: React.Ref<HTMLDivElement>;
+}
+
+export function Sidebar({ ref }: SidebarProps) {
   const { t } = useTranslation();
-  const snap = useSnapshot(appState);
+  const coreSnap = useSnapshot(coreState);
 
+  function setMainAreaType(val: MainAreaType) {
+    coreState.setListBarOpen(true);
+
+    const tab = getTab();
+    if (tab !== null) {
+      tab.state.setMainAreaType(val);
+    }
+  }
   return (
-    <SidebarSc collapsible="icon" {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton>
-              <Logo className="-p-2 -m-2 me-2 !size-8" />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
+    <div
+      className={cn("hidden md:flex md:flex-col", "h-full w-16 fixed left-0 top-0 z-10", "border-r bg-background")}
+      ref={ref}
+    >
+      {/* 头部 | Header */}
+      <div className="flex h-16 items-center justify-center border-b p-4">
+        <div className="h-8 w-8 rounded-md flex items-center justify-center">
+          <Logo className=" size-8" />
+        </div>
+      </div>
 
-      <SidebarContent>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip={t("Databases")}
+      {/* 主要部分 | Main content */}
+      <nav className="flex-1 flex flex-col items-center gap-4 p-2">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
               onClick={() => {
-                snap.setListBarType(LIST_BAR_DB);
-                snap.setListBarOpen(true);
+                coreState.setListBarType(LIST_BAR_DB);
+                coreState.setListBarOpen(true);
               }}
             >
-              <Database
-                className="ms-2"
-                color={`var(${snap.listBarType === LIST_BAR_DB ? "--fvm-primary-clr" : "--foreground"})`}
-              />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+              <Database color={`var(${coreSnap.listBarType === LIST_BAR_DB ? "--fvm-primary-clr" : "--foreground"})`} />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{t("Databases")}</p>
+          </TooltipContent>
+        </Tooltip>
 
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip={t("Tables")}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
               onClick={() => {
-                snap.setListBarType(LIST_BAR_TABLE);
-                snap.setListBarOpen(true);
+                coreState.setListBarType(LIST_BAR_TABLE);
+                coreState.setListBarOpen(true);
               }}
             >
-              <Table
-                className="ms-2"
-                color={`var(${snap.listBarType === LIST_BAR_TABLE ? "--fvm-primary-clr" : "--foreground"})`}
-              />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-        {/* 
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip={t("Functions")}
-              onClick={() => {
-                snap.setListBarType(LIST_BAR_TYPE_FUNC_LIST);
-                snap.setListBarOpen(true);
-              }}
-            >
-              <SquareFunction
-                className="ms-2"
-                color={`var(${snap.listBarType === LIST_BAR_TYPE_FUNC_LIST ? "--fvm-primary-clr" : "--foreground"})`} 
-              />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+              <Table color={`var(${coreSnap.listBarType === LIST_BAR_TABLE ? "--fvm-primary-clr" : "--foreground"})`} />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{t("Tables")}</p>
+          </TooltipContent>
+        </Tooltip>
+      </nav>
 
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip={t("Views")}
+      {/* 尾部 | Footer */}
+      <div className="p-4 flex flex-col items-center gap-4 border-t">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
               onClick={() => {
-                snap.setListBarType(LIST_SUB_SIDEBAR_TYPE_VIEW_LIST);
-                snap.setListBarOpen(true);
+                setMainAreaType(MAIN_AREA_ADD_CONNECTION);
               }}
             >
-              <View 
-                className="ms-2"
-                color={`var(${snap.listBarType === LIST_SUB_SIDEBAR_TYPE_VIEW_LIST ? "--fvm-primary-clr" : "--foreground"})`} 
-              />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-         */}
-      </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip={t("Add database connection")}
+              <Link />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{t("Add database connection")}</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
               onClick={() => {
-                snap.setMainAreaType(MAIN_AREA_ADD_CONNECTION);
-                snap.setListBarOpen(true);
+                setMainAreaType(MAIN_AREA_SQL_EDITOR);
               }}
             >
-              <Link
-                color={`var(${snap.mainAreaType === MAIN_AREA_ADD_CONNECTION ? "--fvm-primary-clr" : "--foreground"})`}
-              />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip={t("SQL editor")}
+              <FilePenLine />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{t("SQL editor")}</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
               onClick={() => {
-                snap.setMainAreaType(MAIN_AREA_SQL_EDITOR);
-                snap.setListBarOpen(true);
+                setMainAreaType(MAIN_AREA_SETTINGS);
               }}
             >
-              <FilePenLine
-                color={`var(${snap.mainAreaType === MAIN_AREA_SQL_EDITOR ? "--fvm-primary-clr" : "--foreground"})`}
-              />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-
-        {/* 
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip={t("Backup")}
-              onClick={() => {
-                snap.setMainContenType(MAIN_CONTEN_TYPE_SETTINGS);
-                snap.setListBarOpen(true);
-              }}
-            >
-              <DatabaseBackup color={`var(${snap.mainContenType === LIST_SUB_SIDEBAR_TYPE_VIEW_LIST ? "--fvm-primary-clr" : "--foreground"})`} />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu> 
-        */}
-
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip={t("Settings")}
-              onClick={() => {
-                snap.setMainAreaType(MAIN_AREA_SETTINGS);
-                snap.setListBarOpen(true);
-              }}
-            >
-              <Settings
-                color={`var(${snap.mainAreaType === MAIN_AREA_SETTINGS ? "--fvm-primary-clr" : "--foreground"})`}
-              />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-      <SidebarRail />
-    </SidebarSc>
+              <Settings />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{t("Settings")}</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    </div>
   );
 }
