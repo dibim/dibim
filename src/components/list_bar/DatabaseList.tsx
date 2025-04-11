@@ -64,6 +64,7 @@ export function DatabaseList() {
     } else {
       tbState.setCurrentDbName(conn.dbName);
       tbState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
+      tbState.setColor(conn.color);
 
       coreState.setListBarType(LIST_BAR_TABLE);
     }

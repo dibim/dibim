@@ -11,8 +11,8 @@ import {
   MAIN_AREA_WELCOME,
 } from "@/constants";
 import { TabStateContext, useTabState } from "@/context";
-import { TabsState } from "@/store/tabs";
 import { addTab, coreState, delTab } from "@/store/core";
+import { TabsState } from "@/store/tabs";
 import { Connection } from "./Connection";
 import { Settings } from "./Settings";
 import { SqlEditor } from "./SqlEditor";
@@ -44,18 +44,24 @@ const TabContainer = ({ state, children }: TabContainerProps) => {
   return <TabStateContext.Provider value={state}>{children}</TabStateContext.Provider>;
 };
 
-export const MainArea = () => {
+export function MainArea() {
   const coreSnap = useSnapshot(coreState);
 
   return (
     <>
       <div className="w-full flex gap-2">
         {coreSnap.tabs.map((tab) => (
-          <div
-            key={tab.id}
-            className={`flex px-2 ${coreSnap.activeTabId === tab.id ? "text-muted bg-muted-foreground" : ""}`}
-          >
-            <button onClick={() => coreState.setActiveTabId(tab.id)}>{tab.title}</button>
+          <div key={tab.id} className={`flex px-2`}>
+            <div
+              className="cursor-pointer"
+              style={{
+                color: tab.state.color,
+                borderBottom: `solid ${coreSnap.activeTabId === tab.id ? tab.state.color + " 2px " : "0px"}`,
+              }}
+              onClick={() => coreState.setActiveTabId(tab.id)}
+            >
+              {tab.title}
+            </div>
             <div
               className="ps-2"
               onClick={() => {
@@ -83,4 +89,4 @@ export const MainArea = () => {
       </div>
     </>
   );
-};
+}

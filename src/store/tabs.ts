@@ -4,6 +4,9 @@ import { FieldStructure } from "@/databases/types";
 import { MainAreaTab, MainAreaType } from "@/types/types";
 
 export interface TabState {
+  color: string;
+  setColor: (val: string) => void;
+
   currentDbNme: string;
   setCurrentDbName: (val: string) => void;
 
@@ -31,7 +34,6 @@ export interface TabState {
   sqlEditorContent: string;
   setSqlEditorContent: (val: string) => void;
 
-  
   isAddingTable: boolean;
   setIsAddingTable: (val: boolean) => void;
 
@@ -42,6 +44,11 @@ export interface TabState {
 
 export const createTabState = () => {
   return proxy({
+    color: "",
+    setColor(val: string) {
+      this.color = val;
+    },
+
     currentDbNme: "",
     setCurrentDbName(val: string) {
       this.currentDbNme = val;
