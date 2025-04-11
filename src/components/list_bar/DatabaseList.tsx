@@ -42,11 +42,10 @@ export function DatabaseList() {
     if (tab === null) return;
     const tbState = tab.state;
 
-    // 先设置这两项, 否则 connect 里获取不到
-    // Set these two items first, otherwise they won't be available in the connect.
     coreState.setCurrentConnType(conn.dbType);
     coreState.setCurrentConnName(conn.name);
     coreState.setCurrentConnColor(conn.color);
+    tbState.setColor(conn.color);
 
     const res = await connect({
       dbName: conn.dbName,

@@ -13,7 +13,7 @@ import {
   getAllTableSize,
 } from "@/databases/adapter,";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
-import { addNotification, coreState } from "@/store/core";
+import { addNotification, coreState, setTabTitle } from "@/store/core";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
@@ -56,6 +56,7 @@ export function TableList() {
 
     tabState.setCurrentTableName(item.id);
     tabState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
+    setTabTitle(item.id);
   }
 
   function addTable() {

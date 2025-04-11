@@ -11,7 +11,7 @@ import {
 } from "@/constants";
 import { getTab } from "@/context";
 import { cn } from "@/lib/utils";
-import { coreState } from "@/store/core";
+import { coreState, setTabTitle } from "@/store/core";
 import { MainAreaType } from "@/types/types";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
@@ -85,6 +85,7 @@ export function Sidebar({ ref }: SidebarProps) {
             <div
               onClick={() => {
                 setMainAreaType(MAIN_AREA_ADD_CONNECTION);
+                setTabTitle(t("Add database connection"));
               }}
             >
               <Link />
@@ -99,6 +100,7 @@ export function Sidebar({ ref }: SidebarProps) {
             <div
               onClick={() => {
                 setMainAreaType(MAIN_AREA_SQL_EDITOR);
+                setTabTitle(t("SQL editor"));
               }}
             >
               <FilePenLine />
@@ -113,6 +115,7 @@ export function Sidebar({ ref }: SidebarProps) {
             <div
               onClick={() => {
                 setMainAreaType(MAIN_AREA_SETTINGS);
+                setTabTitle(t("Settings"));
               }}
             >
               <Settings />

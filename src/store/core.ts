@@ -144,9 +144,9 @@ export const coreState = proxy<CoreState>({
   },
 }) as CoreState;
 
-// 
+//
 // 以下是工具函数 | Here are the utility functions
-// 
+//
 
 export function addNotification(message: string, type: TextNotificationType) {
   coreState.setTextNotification([
@@ -169,6 +169,13 @@ export function addTab() {
 
   coreState.setTabs([...coreState.tabs, newTab]);
   coreState.setActiveTabId(tabId);
+}
+
+export function setTabTitle(title: string) {
+  const tab = coreState.tabs.find((item) => item.id === coreState.activeTabId);
+  if (tab) {
+    tab.title = title;
+  }
 }
 
 export function delTab(id: string) {
