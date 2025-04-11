@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import hljs from "highlight.js/lib/core";
 import pgsql from "highlight.js/lib/languages/pgsql";
 import sql from "highlight.js/lib/languages/sql";
@@ -11,6 +12,8 @@ hljs.registerLanguage("sql", sql);
 hljs.registerLanguage("postgresql", pgsql);
 
 export function SqlCodeViewer({ ddl }: { ddl: string }) {
+  const { t } = useTranslation();
+
   const codeRef = useRef<HTMLElement>(null);
   const [sql, setSql] = useState<string>("");
 
@@ -38,10 +41,13 @@ export function SqlCodeViewer({ ddl }: { ddl: string }) {
   }, [ddl]);
 
   return (
-    <pre>
-      <code ref={codeRef} className={`language-${getLang()}`}>
-        {sql}
-      </code>
-    </pre>
+    <>
+      <p>{t("Copy")}</p>
+      <pre>
+        <code ref={codeRef} className={`language-${getLang()}`}>
+          {sql}
+        </code>
+      </pre>
+    </>
   );
 }
