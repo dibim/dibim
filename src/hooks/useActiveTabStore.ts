@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { subscribeKey } from "valtio/utils";
 import type { TabState } from "@/store/tabs";
-import { coreState } from "@/store/valtio";
+import { coreState } from "@/store/core";
 
 export const useActiveTabStore = <K extends keyof TabState>(
   tabId: string,

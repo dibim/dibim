@@ -13,7 +13,7 @@ import { SidebarInset } from "@/components/ui/sidebar";
 import { APP_NAME, HEDAER_H, LIST_BAR_DB, LIST_BAR_DEFAULT_WIDTH, LIST_BAR_TABLE } from "@/constants";
 import { getTab } from "@/context";
 import { DB_SQLITE } from "@/databases/constants";
-import { addTab, coreState } from "@/store/valtio";
+import { addTab, coreState } from "@/store/core";
 import { TextNotificationData } from "@/types/types";
 import { getPageWidth } from "@/utils/ media_query";
 import { genPanelPercent } from "@/utils/util";
@@ -83,14 +83,14 @@ export function Main({ id, className }: { id: string; className: string }) {
   function renderConnName() {
     const tab = getTab();
     if (tab === null) return <span></span>;
-    const state = tab.state;
+    const tabState = tab.state;
 
     return (
       <span
         className="cursor-pointer"
         style={{ borderBottom: `0.25rem solid ${coreSnap.currentConnColor || "rgba(0,0,0,0)"}` }}
       >
-        {(coreSnap.currentConnType === DB_SQLITE ? coreSnap.currentConnName : state.currentDbNme) ||
+        {(coreSnap.currentConnType === DB_SQLITE ? coreSnap.currentConnName : tabState.currentDbNme) ||
           t("No database connection")}
       </span>
     );

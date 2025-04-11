@@ -4,7 +4,7 @@ import pgsql from "highlight.js/lib/languages/pgsql";
 import sql from "highlight.js/lib/languages/sql";
 import "highlight.js/styles/tokyo-night-dark.css";
 import { DB_POSTGRESQL } from "@/databases/constants";
-import { coreState } from "@/store/valtio";
+import { coreState } from "@/store/core";
 import { formatSql } from "@/utils/format_sql";
 
 hljs.registerLanguage("sql", sql);

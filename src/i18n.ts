@@ -15,7 +15,7 @@ import tr from "./locales/tr/translation.json";
 import uk from "./locales/uk/translation.json";
 import zh_hans from "./locales/zh-hans/translation.json";
 import zh_hant from "./locales/zh-hant/translation.json";
-import { coreState } from "./store/valtio";
+import { coreState } from "./store/core";
 
 export const HANS = "zh_hans";
 export const HANT = "zh_hant";

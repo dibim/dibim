@@ -2,7 +2,7 @@
  * 修改字段的功能 - SQLite版本
  */
 import { STR_ADD, STR_DELETE, STR_EDIT, STR_FIELD, STR_TABLE } from "@/constants";
-import { coreState } from "@/store/valtio";
+import { getTab } from "@/context";
 import { AllAlterAction, FieldAlterAction, TableAlterAction } from "../types";
 import { formatToSqlValueSqlite } from "./format";
 import { TableStructure, genCreateTableDdl, parseCreateTableDdl } from "./utils";
@@ -226,6 +226,10 @@ function needRecreateTable(faa: FieldAlterAction) {
 export function genAlterCmdSqlite(val: AllAlterAction[]) {
   let res: string[] = [];
 
+  const tab = getTab();
+  if (tab === null) return res;
+  const tbState = tab.state;
+
   // 注意: 如果是建表, 需要把字段的数据全部传过去, 并直接返回
   for (const item of val) {
     if (item.target === STR_TABLE) {
@@ -280,7 +284,7 @@ export function genAlterCmdSqlite(val: AllAlterAction[]) {
   }
   // 有导致要重新建表的操作, 先重新建表, 其它修改再执行
   if (NeedToRecreateTableCmds.length > 0) {
-    const sql = coreState.currentTableDdl;
+    const sql = tbState.currentTableDdl;
     try {
       const sd = parseCreateTableDdl(sql);
       res = res.concat(recreateTable(sd, NeedToRecreateTableCmds));

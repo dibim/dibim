@@ -9,7 +9,7 @@ import { RowData } from "@/databases/types";
 import { modifyTableData } from "@/databases/utils";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
 import { cn } from "@/lib/utils";
-import { coreState } from "@/store/valtio";
+import { coreState } from "@/store/core";
 import { rawRow2EtRow } from "@/utils/render";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { EditableTable, EditableTableMethods, ListRow, TableDataChange } from "./EditableTable";

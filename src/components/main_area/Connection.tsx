@@ -11,7 +11,7 @@ import { getTab } from "@/context";
 import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE } from "@/databases/constants";
 import { DbType } from "@/databases/types";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
-import { addNotification, coreState } from "@/store/valtio";
+import { addNotification, coreState } from "@/store/core";
 import { SvgComponentType } from "@/types/types";
 import { generateHexString } from "@/utils/util";
 import { TextNotification } from "../TextNotification";

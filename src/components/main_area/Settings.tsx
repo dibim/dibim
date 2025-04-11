@@ -7,7 +7,7 @@ import { getTableDdl } from "@/databases/adapter,";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
 import { HANS, HANT } from "@/i18n";
 import { invoker } from "@/invoker";
-import { addNotification, coreState } from "@/store/valtio";
+import { addNotification, coreState } from "@/store/core";
 import { ConfigFileMain } from "@/types/conf_file";
 import { LabeledDiv } from "../LabeledDiv";
 import { TextNotification } from "../TextNotification";

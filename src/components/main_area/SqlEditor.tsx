@@ -13,7 +13,7 @@ import { exec, query } from "@/databases/adapter,";
 import { getPageCount } from "@/databases/postgresql/sql";
 import { RowData } from "@/databases/types";
 import { extractConditionClause } from "@/databases/utils";
-import { coreState } from "@/store/valtio";
+import { coreState } from "@/store/core";
 import { DbResult, TextNotificationData } from "@/types/types";
 import { formatSql } from "@/utils/format_sql";
 import { genPanelPercent } from "@/utils/util";

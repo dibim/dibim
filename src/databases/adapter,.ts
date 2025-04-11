@@ -15,7 +15,7 @@ import {
   getTableStructurePg,
 } from "@/databases/postgresql/sql";
 import { invoker } from "@/invoker";
-import { coreState } from "@/store/valtio";
+import { coreState } from "@/store/core";
 import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE } from "./constants";
 import { fieldTypeOptionsMysql } from "./mysql/select_options";
 import { genAlterCmdPg } from "./postgresql/alter_table";

@@ -6,7 +6,7 @@ import { DEFAULT_PAGE_SIZE } from "@/constants";
 import { getTab } from "@/context";
 import { getTableData } from "@/databases/adapter,";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
-import { addNotification, coreState } from "@/store/valtio";
+import { addNotification, coreState } from "@/store/core";
 import { TableSection, TableSectionMethods } from "../TableSection";
 import { Checkbox } from "../ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";

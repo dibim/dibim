@@ -11,7 +11,7 @@ import { getTab } from "@/context";
 import { connect } from "@/databases/adapter,";
 import { DB_MYSQL, DB_POSTGRESQL, DB_SQLITE } from "@/databases/constants";
 import { invoker } from "@/invoker";
-import { addNotification, coreState } from "@/store/valtio";
+import { addNotification, coreState } from "@/store/core";
 import { DbConnections } from "@/types/conf_file";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
@@ -40,7 +40,7 @@ export function DatabaseList() {
   async function handleClickConn(conn: DbConnections) {
     const tab = getTab();
     if (tab === null) return;
-    const state = tab.state;
+    const tbState = tab.state;
 
     // 先设置这两项, 否则 connect 里获取不到
     // Set these two items first, otherwise they won't be available in the connect.
@@ -62,8 +62,8 @@ export function DatabaseList() {
     } else if (res.errorMessage !== "" && !res.errorMessage.includes("Duplicate connection name")) {
       addNotification(res.errorMessage, "error");
     } else {
-      state.setCurrentDbName(conn.dbName);
-      state.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
+      tbState.setCurrentDbName(conn.dbName);
+      tbState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
 
       coreState.setListBarType(LIST_BAR_TABLE);
     }
@@ -95,10 +95,10 @@ export function DatabaseList() {
             onClick: () => {
               const tab = getTab();
               if (tab === null) return;
-              const state = tab.state;
+              const tbState = tab.state;
 
-              state.setEditDbConnIndex(index);
-              state.setMainAreaType(MAIN_AREA_EDIT_CONNECTION);
+              tbState.setEditDbConnIndex(index);
+              tbState.setMainAreaType(MAIN_AREA_EDIT_CONNECTION);
             },
             icon: <Edit className="h-4 w-4" />,
           },

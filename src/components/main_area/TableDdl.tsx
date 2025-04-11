@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { HEDAER_H } from "@/constants";
 import { getTab } from "@/context";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
-import { coreState } from "@/store/valtio";
+import { coreState } from "@/store/core";
 import { SqlCodeViewer } from "../SqlCodeViewer";
 
 export function TableDdl() {

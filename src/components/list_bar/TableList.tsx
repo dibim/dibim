@@ -13,7 +13,7 @@ import {
   getAllTableSize,
 } from "@/databases/adapter,";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
-import { addNotification, coreState } from "@/store/valtio";
+import { addNotification, coreState } from "@/store/core";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";

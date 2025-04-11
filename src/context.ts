@@ -1,7 +1,7 @@
 import React from "react";
 import { useContext } from "react";
 import { TabsState } from "@/store/tabs";
-import { coreState } from "./store/valtio";
+import { coreState } from "./store/core";
 
 // Context
 export const TabStateContext = React.createContext<TabsState | null>(null);

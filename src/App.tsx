@@ -16,7 +16,7 @@ import { TooltipProvider } from "./components/ui/tooltip";
 import { APP_NAME, CONFIG_FILE_APPEARANCE, CONFIG_FILE_MAIN, MAIN_PASSWORD_DEFAULT } from "./constants";
 import i18n from "./i18n";
 import { invoker } from "./invoker";
-import { coreState } from "./store/valtio";
+import { coreState } from "./store/core";
 import { ConfigFileAppearance, ConfigFileMain } from "./types/conf_file";
 import { readConfigFile } from "./utils/config_file";
 

@@ -4,7 +4,7 @@ import { CirclePlus, Settings, Smile } from "lucide-react";
 import { APP_NAME, MAIN_AREA_ADD_CONNECTION, MAIN_AREA_SETTINGS, MAIN_PASSWORD_DEFAULT } from "@/constants";
 import { getTab } from "@/context";
 import { invoker } from "@/invoker";
-import { coreState } from "@/store/valtio";
+import { coreState } from "@/store/core";
 import { Card, CardContent, CardDescription } from "../ui/card";
 
 export function Welcome() {

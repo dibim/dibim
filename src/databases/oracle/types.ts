@@ -8,7 +8,7 @@ export interface FieldDefinitionOracle extends SqlFieldDefinitionCommon {
     expression: string;
   } | null;
   /** 关联的序列名称 */
-  sequenceName: string | null; // ✅ 已明确包含
+  sequenceName: string | null;
   /** 序列缓存配置 */
   sequenceCache: number | null;
 }

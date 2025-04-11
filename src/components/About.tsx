@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useSnapshot } from "valtio";
 import Logo from "@/assets/logo.svg?react";
 import { APP_NAME, APP_VERSION } from "@/constants";
-import { coreState } from "@/store/valtio";
+import { coreState } from "@/store/core";
 import {
   AlertDialog,
   AlertDialogAction,

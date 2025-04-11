@@ -21,7 +21,7 @@ import {
   MAIN_AREA_SQL_EDITOR,
 } from "@/constants";
 import { getTab } from "@/context";
-import { coreState } from "@/store/valtio";
+import { coreState } from "@/store/core";
 import { MainAreaType } from "@/types/types";
 
 export function Sidebar({ ...props }: React.ComponentProps<typeof SidebarSc>) {

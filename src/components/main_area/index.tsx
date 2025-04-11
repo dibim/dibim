@@ -12,7 +12,7 @@ import {
 } from "@/constants";
 import { TabStateContext, useTabState } from "@/context";
 import { TabsState } from "@/store/tabs";
-import { addTab, coreState, delTab } from "@/store/valtio";
+import { addTab, coreState, delTab } from "@/store/core";
 import { Connection } from "./Connection";
 import { Settings } from "./Settings";
 import { SqlEditor } from "./SqlEditor";
