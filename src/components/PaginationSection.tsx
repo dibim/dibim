@@ -76,7 +76,7 @@ export function PaginationSection({ currentPage, setCurrentPage, pageTotal, item
   }, []);
 
   return (
-    <div className="flex">
+    <div className="flex items-center">
       <Pagination className="flex-1 justify-start px-8">
         <PaginationContent>
           <PaginationItem>

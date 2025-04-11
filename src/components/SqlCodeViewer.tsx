@@ -55,7 +55,7 @@ export function SqlCodeViewer({ ddl }: { ddl: string }) {
 
   return (
     <>
-      <p className="flex text-muted-foreground cursor-pointer" onClick={handleClick}>
+      <p className="flex text-muted-foreground cursor-pointer pb-2" onClick={handleClick}>
         <Copy />
         <span className="ps-4">{t("Copy")}</span>
       </p>

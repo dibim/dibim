@@ -172,7 +172,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
     <>
       {/* 按钮栏 */}
       <div className="flex flex-wrap pb-2">
-        <div className={cn("gap-4 px-2 pb-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
+        <div className={cn("gap-4 px-2 sm:pl-2.5 inline-flex items-center justify-center ")}>
           <TooltipGroup dataArr={tooltipSectionData} />
         </div>
         <div className="flex flex-1">
