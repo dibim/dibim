@@ -9,7 +9,6 @@ import { DatabaseList } from "@/components/list_bar/DatabaseList";
 import { TableList } from "@/components/list_bar/TableList";
 import { MainArea } from "@/components/main_area";
 import { Button } from "@/components/ui/button";
-import { SidebarInset } from "@/components/ui/sidebar";
 import { APP_NAME, HEDAER_H, LIST_BAR_DB, LIST_BAR_DEFAULT_WIDTH, LIST_BAR_TABLE } from "@/constants";
 import { getTab } from "@/context";
 import { DB_SQLITE } from "@/databases/constants";
@@ -139,66 +138,58 @@ export function Main({ id, className }: { id: string; className: string }) {
 
   return (
     <>
-      <Sidebar id="sidebar" ref={sidebarRef} />
-      <SidebarInset>
-        <main>
-          <div id={id} className={className} style={{ width: mainWidth }}>
-            <header className={`flex justify-between h-${HEDAER_H}  items-center  border-b px-4`}>
-              <div className="shrink-0 gap-2">
-                <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>
-                <TooltipGroup dataArr={tooltipSectionData} />
-              </div>
-
-              <div className="flex-1 flex justify-end ps-8 text-end">
-                {textNotification && (
-                  <>
-                    <TextNotification message={textNotification.message} type={textNotification.type} />
-                  </>
-                )}
-
-                {coreSnap.textNotificationArr.length > 0 && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <EllipsisVertical />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="min-w-[10vw] max-w-[80vw]">
-                      {coreSnap.textNotificationArr.map((item, index) => (
-                        <DropdownMenuItem key={index}>
-                          <TextNotification
-                            message={`${item.time ? item.time.toLocaleString() + " " : ""}${item.message}`}
-                            type={item.type}
-                          />
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-              </div>
-            </header>
-
-            <Split
-              sizes={coreSnap.listBarOpen ? [defaultSizePercent, genPanelPercent(100 - defaultSizePercent)] : [0, 100]}
-              minSize={0}
-              onDragEnd={handleResize}
-              className="flex overflow-hidden split-container split-horizontal"
-              style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}
-              direction="horizontal"
-              cursor="col-resize"
-            >
-              <div className="overflow-y-scroll">
-                {coreSnap.listBarType === LIST_BAR_DB && <DatabaseList />}
-                {coreSnap.listBarType === LIST_BAR_TABLE && <TableList />}
-              </div>
-
-              <div ref={mainRef} className="p-2">
-                <MainArea />
-              </div>
-            </Split>
-
-            <About />
+      <Sidebar ref={sidebarRef} />
+      <div id={id} className={`ml-16 ${className}`} style={{ width: mainWidth }}>
+        <header className={`flex justify-between h-${HEDAER_H}  items-center  border-b px-4`}>
+          <div className="shrink-0 gap-2">
+            <span className="text-xl font-semibold cursor-pointer">{APP_NAME}</span>
+            <TooltipGroup dataArr={tooltipSectionData} />
           </div>
-        </main>
-      </SidebarInset>
+
+          <div className="flex-1 flex justify-end ps-8 text-end">
+            {textNotification && <TextNotification message={textNotification.message} type={textNotification.type} />}
+
+            {coreSnap.textNotificationArr.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <EllipsisVertical />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="min-w-[10vw] max-w-[80vw]">
+                  {coreSnap.textNotificationArr.map((item, index) => (
+                    <DropdownMenuItem key={index}>
+                      <TextNotification
+                        message={`${item.time ? item.time.toLocaleString() + " " : ""}${item.message}`}
+                        type={item.type}
+                      />
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+        </header>
+
+        <Split
+          sizes={coreSnap.listBarOpen ? [defaultSizePercent, genPanelPercent(100 - defaultSizePercent)] : [0, 100]}
+          minSize={0}
+          onDragEnd={handleResize}
+          className="flex overflow-hidden split-container split-horizontal"
+          style={{ height: `calc(100vh - var(--spacing) * ${HEDAER_H})` }}
+          direction="horizontal"
+          cursor="col-resize"
+        >
+          <div className="overflow-y-scroll">
+            {coreSnap.listBarType === LIST_BAR_DB && <DatabaseList />}
+            {coreSnap.listBarType === LIST_BAR_TABLE && <TableList />}
+          </div>
+
+          <div ref={mainRef} className="p-2">
+            <MainArea />
+          </div>
+        </Split>
+
+        <About />
+      </div>
     </>
   );
 }

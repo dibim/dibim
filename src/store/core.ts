@@ -29,12 +29,6 @@ interface CoreState {
   // 侧边栏的宽度
   sideBarWidth: number;
   setSideBarWidth: (val: number) => void;
-  // 大屏幕下侧边栏的宽度, 传递给 SidebarProvider
-  sideBarWidthPc: string;
-  setSideBarWidthPc: (val: string) => void;
-  // 小屏幕下侧边栏的宽度, 传递给 SidebarProvider
-  sideBarWidthMobile: string;
-  setSideBarWidthMobile: (val: string) => void;
 
   // 列表栏是否显示
   listBarOpen: boolean;
@@ -102,14 +96,6 @@ export const coreState = proxy<CoreState>({
   sideBarWidth: 0,
   setSideBarWidth(val: number): void {
     this.sideBarWidth = val;
-  },
-  sideBarWidthPc: "10rem",
-  setSideBarWidthPc(val: string): void {
-    this.sideBarWidthPc = val;
-  },
-  sideBarWidthMobile: "20rem",
-  setSideBarWidthMobile(val: string): void {
-    this.sideBarWidthMobile = val;
   },
 
   listBarOpen: true,

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { I18nextProvider, useTranslation } from "react-i18next";
 import { AlertCircle } from "lucide-react";
-import { useSnapshot } from "valtio";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import "@/styles/app.scss";
 import "@/styles/index.css";
@@ -11,7 +10,6 @@ import { Alert, AlertDescription, AlertTitle } from "./components/ui/alert";
 import { Button } from "./components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./components/ui/card";
 import { Input } from "./components/ui/input";
-import { SidebarProvider } from "./components/ui/sidebar";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { APP_NAME, CONFIG_FILE_APPEARANCE, CONFIG_FILE_MAIN, MAIN_PASSWORD_DEFAULT } from "./constants";
 import i18n from "./i18n";
@@ -22,7 +20,6 @@ import { readConfigFile } from "./utils/config_file";
 
 export function App() {
   const { t } = useTranslation();
-  const coreSnap = useSnapshot(coreState);
   const [showLock, setShowLock] = useState(true);
   const [mainPassword, setMainPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -133,17 +130,9 @@ export function App() {
             </div>
           </div>
         ) : (
-          <SidebarProvider
-            defaultOpen={false}
-            style={{
-              "--sidebar-width": coreSnap.sideBarWidthPc,
-              "--sidebar-width-mobile": coreSnap.sideBarWidthMobile,
-            }}
-          >
-            <TooltipProvider>
-              <Main id="main" className={""} />
-            </TooltipProvider>
-          </SidebarProvider>
+          <TooltipProvider>
+            <Main id="main" className={""} />
+          </TooltipProvider>
         )}
       </I18nextProvider>
     </ThemeProvider>
