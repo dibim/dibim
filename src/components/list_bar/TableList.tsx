@@ -56,6 +56,7 @@ export function TableList() {
 
     tabState.setCurrentTableName(item.id);
     tabState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
+    tabState.setColor(coreState.currentConnColor);
     setTabTitle(item.id);
   }
 
@@ -231,14 +232,20 @@ export function TableList() {
               </div>
 
               {/* 索引大小 | Index size */}
-              <div className="flex-shrink-0 bg-muted text-muted-foreground text-sm ">
+              <div className="flex-shrink-0 bg-muted text-muted-foreground text-sm">
                 <div className="relative" style={{ position: "relative" }}>
-                  <div className="absolute inset-0 bg-blue-500 z-0 opacity-25" />
                   <div
-                    className={`absolute h-full  bg-blue-500 z-10 opacity-50`}
-                    style={{ width: `${(item.indexSizeByte / item.totalSizeByte) * 100}%` }}
+                    className="absolute inset-0 z-0 opacity-25"
+                    style={{ backgroundColor: `${coreState.currentConnColor}` }}
+                  />
+                  <div
+                    className={`absolute h-full z-10 opacity-50`}
+                    style={{
+                      backgroundColor: `${coreState.currentConnColor}`,
+                      width: `${(item.indexSizeByte / item.totalSizeByte) * 100}%`,
+                    }}
                   ></div>
-                  <div className="relative z-20">{item.totalSize}</div>
+                  <div className="relative z-20 px-1">{item.totalSize}</div>
                 </div>
               </div>
             </div>
