@@ -138,6 +138,7 @@ export function TableList() {
       await navigator.clipboard.writeText(tableName);
       addNotification(t("Copied"), "success");
     } catch (err) {
+      console.log("Copy failed, error: ", err);
       addNotification(t("Copy failed"), "error");
     }
   }

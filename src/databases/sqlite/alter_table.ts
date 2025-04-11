@@ -227,7 +227,7 @@ export function genAlterCmdSqlite(val: AllAlterAction[]) {
   let res: string[] = [];
 
   const tab = getTab();
-  if (tab === null) return res;
+  if (tab === null) return "";
   const tbState = tab.state;
 
   // 注意: 如果是建表, 需要把字段的数据全部传过去, 并直接返回

@@ -4,8 +4,9 @@ import hljs from "highlight.js/lib/core";
 import pgsql from "highlight.js/lib/languages/pgsql";
 import sql from "highlight.js/lib/languages/sql";
 import "highlight.js/styles/tokyo-night-dark.css";
+import { Copy } from "lucide-react";
 import { DB_POSTGRESQL } from "@/databases/constants";
-import { coreState } from "@/store/core";
+import { addNotification, coreState } from "@/store/core";
 import { formatSql } from "@/utils/format_sql";
 
 hljs.registerLanguage("sql", sql);
@@ -22,6 +23,18 @@ export function SqlCodeViewer({ ddl }: { ddl: string }) {
     if (coreState.currentConnType === DB_POSTGRESQL) return "postgresql";
 
     return "sql";
+  }
+
+  async function handleClick() {
+    try {
+      if (codeRef.current) {
+        await navigator.clipboard.writeText(codeRef.current.innerText);
+        addNotification(t("Copied"), "success");
+      }
+    } catch (err) {
+      console.log("Copy failed, error: ", err);
+      addNotification(t("Copy failed"), "error");
+    }
   }
 
   useEffect(() => {
@@ -42,7 +55,10 @@ export function SqlCodeViewer({ ddl }: { ddl: string }) {
 
   return (
     <>
-      <p>{t("Copy")}</p>
+      <p className="flex text-muted-foreground cursor-pointer" onClick={handleClick}>
+        <Copy />
+        <span className="ps-4">{t("Copy")}</span>
+      </p>
       <pre>
         <code ref={codeRef} className={`language-${getLang()}`}>
           {sql}
