@@ -52,12 +52,16 @@ export function SqlEditor() {
   const { t } = useTranslation();
   const coreSnap = useSnapshot(coreState);
   const tableRef = useRef<TableSectionMethods | null>(null);
-  const [messageData, setMessageData] = useState<TextNotificationData | null>(null);
+  const [messageData, setMessageData] = useState<TextNotificationData[]>([]);
+  function addMessageData(data: TextNotificationData) {
+    data.time = new Date();
+    setMessageData([...(messageData || []), data]);
+  }
 
   // ========== 执行语句 | Execute statements ==========
   async function queryPage(page: number) {
     if (coreState.currentConnName === "") {
-      setMessageData({
+      addMessageData({
         message: t("Please connect to the database first"),
         type: "error",
       });
@@ -86,19 +90,19 @@ export function SqlEditor() {
 
       if (dbRes.errorMessage !== "") {
         if (dbRes.errorMessage.startsWith("error returned from database: ")) {
-          setMessageData({
+          addMessageData({
             message: dbRes.errorMessage.replace("error returned from database: ", " "),
             type: "error",
           });
         } else {
-          setMessageData({
+          addMessageData({
             message: dbRes.errorMessage,
             type: "info",
           });
         }
       }
     } else {
-      setMessageData({
+      addMessageData({
         message: "The query returned null.",
         type: "info",
       });
@@ -109,7 +113,7 @@ export function SqlEditor() {
     const code = getEditorCode();
     const res = formatSql(coreState.currentConnType, code);
     if (res.errorMessage !== "") {
-      setMessageData({ message: res.errorMessage, type: "error" });
+      addMessageData({ message: res.errorMessage, type: "error" });
     } else {
       setEditorCode(res.result);
     }
@@ -132,20 +136,21 @@ export function SqlEditor() {
         const resData = res as unknown as DbResult;
         if (resData.errorMessage !== "") {
           if (resData.errorMessage.startsWith("error returned from database: ")) {
-            setMessageData({
-              message: resData.errorMessage.replace("error returned from database: ", " "),
+            addMessageData({
+              message: resData.errorMessage.replace("error returned from database: ", ""),
               type: "error",
             });
+          } else {
+            addMessageData({
+              message: resData.errorMessage,
+              type: "info",
+            });
           }
-          setMessageData({
-            message: resData.errorMessage,
-            type: "info",
-          });
         } else {
           //  TODO: 显示影响的行数
         }
       } else {
-        setMessageData({
+        addMessageData({
           message: "The query returned null.",
           type: "error",
         });
@@ -389,8 +394,16 @@ export function SqlEditor() {
             initData={() => {}}
           />
         </div>
+
         <div>
-          <TextNotification message={messageData?.message || ""} type={messageData?.type}></TextNotification>
+          {messageData?.length > 0 &&
+            messageData.map((item, index) => (
+              <TextNotification
+                key={index}
+                message={`${item.time ? item.time.toLocaleString() + " " : ""}${item.message}`}
+                type={item?.type}
+              ></TextNotification>
+            ))}
         </div>
       </Split>
     </div>
