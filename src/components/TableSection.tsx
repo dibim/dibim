@@ -33,8 +33,8 @@ export type TableSectionMethods = {
 
 export type TableSectionProps = {
   width: string;
-  getData: (val: number) => Promise<any>;
-  initData: () => void;
+  getData: (val: number, isInit?: boolean) => Promise<any>;
+  initData: (isInit?: boolean) => void;
   btnExt?: TooltipSectionItem[];
   ref?: React.Ref<TableSectionMethods>;
 };
@@ -161,11 +161,11 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
 
   // 监听 store 的变化 | Monitor changes in the store
   useActiveTabStore(coreState.activeTabId, "currentTableName", (_val: any) => {
-    initData();
+    initData(true);
   });
 
   useEffect(() => {
-    initData();
+    initData(true);
   }, []);
 
   return (

@@ -1,10 +1,12 @@
-# DIBIM 协议
+# DIBIM 协议 | DIBIM Agreement
 
-## 第一条 协议目的
+## 中文版
+
+### 第一条 协议目的
 
 为支持符合条件的用户免费使用，规避未经授权的商业化使用，并保障本项目的持续开发，特制定本协议。
 
-## 第二条 定义
+### 第二条 定义
 
 2.1 **代码仓库**：存储源代码的仓库。
 
@@ -30,7 +32,7 @@
 
 2.10 **下游项目**：基于**本项目**、**衍生项目**或**副本项目**的项目，或代码基于/可追溯至上述任一项目的项目。包含代码**逻辑**与**本项目**相似度≥50%（不含**本项目**使用的第三方库除）的项目。
 
-## 第三条 免费授权
+### 第三条 免费授权
 
 3.1 授权对象
 
@@ -52,7 +54,7 @@
 
 3.3 符合条件的授权对象可直接使用，无需**本项目的所有者**给予授权证明。
 
-## 第四条 商业授权
+### 第四条 商业授权
 
 4.1 授权对象：不符合第 3.1 条的所有对象。
 
@@ -68,13 +70,13 @@
 
 4.4 购买商业授权后，**本项目的所有者**会给予授权证明。
 
-## 第五条 **衍生项目**、**副本项目**及**下游项目**
+### 第五条 **衍生项目**、**副本项目**及**下游项目**
 
 5.1 **衍生项目**、**副本项目**及**下游项目**必须开源，应当在文档及网站首页注明**本项目**名称和官方网址。
 
 5.2 **衍生项目**、**副本项目**及**下游项目**均继承本协议，在项目根目录保留本协议文件，不得修改协议内容，不得再采用其它协议。
 
-## 第六条 禁止条款
+### 第六条 禁止条款
 
 6.1 未经**本项目的所有者**允许，禁止删除或篡改源代码及编译后的软件中的图标/版权信息/协议条款等。
 
@@ -82,7 +84,7 @@
 
 6.3 未经**本项目的所有者**允许，禁止售卖**本项目**、**衍生项目**、**副本项目**、**下游项目**的源代码及其编译后的软件。
 
-## 第七条 责任
+### 第七条 责任
 
 7.1 **用户**责任
 
@@ -113,16 +115,139 @@
 - **第三方因素**：如硬件故障、网络中断、恶意软件；
 - **用户未履行义务**：如未设置主密码、未备份数据或未购买商业授权。
 
-## 第八条 协议修订
+### 第八条 协议修订
 
 本协议最终解释权归**本项目的所有者**所有，保留修订权利，但需确保条款不违反当地法律中的**强制性规定**（如消费者保护、数据隐私等）。
 
 协议修订后，新代码将遵循更新后的协议，重大修订（涉及授权费用/禁止条款变更）需邮件通知现有商业授权用户。
 
-## 第九条 协议生效
+### 第九条 协议生效
 
 有以下任一行为即视为接受本协议：
 
 - 复制（克隆）、修改、编译**本项目**、**衍生项目**、**副本项目**、**下游项目**的**代码仓库**源代码；
 
 - 下载、运行**本项目**、**衍生项目**、**副本项目**、**下游项目**的可执行文件。
+
+## English version
+
+### Article 1 Purpose of the Agreement  
+
+This Agreement is formulated to support eligible users with free usage, prevent unauthorized commercialization, and ensure the sustainable development of this project.
+
+### Article 2 Definitions  
+
+2.1 **Code Repository**: A repository storing source code.  
+
+2.2 **Project Name**: **DIBIM**.  
+
+2.3 **This Project**: The source code in the official **Code Repository** of the **DIBIM** project and its compiled software. Official **Code Repository** addresses:  
+
+- GitHub: [https://github.com/dibim/dibim](https://github.com/dibim/dibim)  
+- Gitee (China): [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)  
+- Codeberg (Germany): [https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)  
+
+2.4 **Owner of This Project**: The actual holder of the account owning the official **Code Repository**.  
+
+2.5 **Contributor to This Project**: The actual holder of an account (limited to individual accounts) whose code merge requests to this project's **Code Repository** have been accepted.  
+
+2.6 **User**: A natural person using **This Project**.  
+
+2.7 **Major Modification**: Substantive modifications exceeding 75% of the implementation logic of existing features, or the addition of complete functionalities. Excludes third-party libraries used by **This Project** and interface style modifications.  
+
+2.8 **Derivative Project**: A project based on **This Project**'s code, containing at least 20 **Major Modifications**.  
+
+2.9 **Replica Project**: A project based on **This Project**'s code with minor or no modifications, not meeting the definition of a **Derivative Project**.  
+
+2.10 **Downstream Project**: A project based on **This Project**, **Derivative Project**, or **Replica Project**, or whose code originates from/traces to any of the aforementioned projects. Includes projects with code logic similarity ≥50% to **This Project** (excluding third-party libraries used by **This Project**).  
+
+### Article 3 Free License  
+
+3.1 Licensees  
+
+3.1.1 For using **This Project**:  
+
+- **Contributors to This Project**;  
+- Individual Users (for personally independent projects);  
+- Employees of the following organizations (for their institutional work):  
+  - Administrative agencies (excluding subordinate enterprises/institutions/organizations);  
+  - Public non-profit organizations (e.g., public schools, hospitals, museums);  
+  - Legally registered private non-profit organizations (e.g., charities, social service agencies);  
+  - For-profit organizations with fewer than 10 **Users**.  
+
+3.1.2 For using **Derivative Projects**:  
+
+- All entities.  
+
+3.2 Scope: Copying, modifying, compiling source code, and running compiled software.  
+
+3.3 Eligible licensees may use directly without requiring authorization proof from the **Owner of This Project**.  
+
+### Article 4 Commercial License  
+
+4.1 Licensees: All entities not meeting Article 3.1.  
+
+4.1.1 If a licensee becomes ineligible due to internal changes, commercial authorization must be purchased within 30 days.  
+
+4.2 Term: Annual basis, requiring renewal upon expiration.  
+
+4.3 Pricing (per **User** annually):  
+
+- Users in China (including Hong Kong, Macau, and Taiwan regions): 100 CNY;  
+- Users in the U.S., Canada, EU member states, UK, Switzerland, Norway, Iceland, Japan, South Korea, Singapore, Israel, Australia, New Zealand: 30 USD/EUR/GBP;  
+- Other countries/regions: 15 USD/EUR/GBP.  
+
+4.4 Authorization proof will be provided after purchase.  
+
+### Article 5 Derivative Projects, Replica Projects, and Downstream Projects  
+
+5.1 **Derivative Projects**, **Replica Projects**, and **Downstream Projects** must be open-source, explicitly stating **This Project**'s name and official URL in documentation and website headers.  
+
+5.2 All such projects inherit this Agreement, retain this Agreement file in root directories, and shall not modify the Agreement or adopt other licenses.  
+
+### Article 6 Prohibitions  
+
+6.1 Deleting or tampering with icons/copyright information/agreement terms in source code or compiled software without permission.  
+
+6.2 Converting **This Project**, **Derivative Projects**, **Replica Projects**, or **Downstream Projects** into network services (e.g., SaaS/PaaS, APIs, web apps) without permission.  
+
+6.3 Selling source code or compiled software of the aforementioned projects without permission.  
+
+### Article 7 Responsibilities  
+
+7.1 **User Responsibilities**  
+7.1.1 Set a master password.  
+7.1.2 Regularly back up configuration files.  
+7.1.3 Comply with local laws and this Agreement; no illegal usage.  
+
+7.2 **Owner Responsibilities**  
+7.2.1 No intentional backdoors or malicious programs.  
+7.2.2 Security measures for sensitive data:  
+
+- All configuration files encrypted via **AES-GCM**;  
+- Use default master password with startup reminders if unset;  
+- Display SQL write operations for user confirmation.  
+
+7.2.3 No liability for losses (e.g., data loss, system failures) except for **willful misconduct or gross negligence** (e.g., intentional defect concealment, fraud).  
+
+7.2.4 Exemptions for:  
+
+- **Force Majeure**: Natural disasters, wars, government actions;  
+- **User Errors**: Accidental data deletion, misconfigurations;  
+- **Third-Party Factors**: Hardware failures, network outages, malware;  
+- **User Non-Compliance**: Unset passwords, unbacked data, or unpaid licenses.  
+
+### Article 8 Agreement Amendments  
+
+The **Owner of This Project** retains final interpretation rights and may revise terms provided they comply with local **mandatory laws** (e.g., consumer protection, data privacy).  
+
+New code follows updated agreements. Major revisions (affecting fees/prohibitions) require email notification to commercial licensees.  
+
+### Article 9 Agreement Effectiveness  
+
+Acceptance occurs through any of:  
+
+- Copying (cloning), modifying, or compiling source code from **This Project**, **Derivative Projects**, **Replica Projects**, or **Downstream Projects**;  
+- Downloading or executing binaries of the aforementioned projects.  
+
+*In case of any discrepancies, the Chinese version shall prevail.*

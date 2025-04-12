@@ -71,7 +71,7 @@ export function TableStructure({
   const [size, setSize] = useState<string>("");
   const [type, setType] = useState<string>("");
   // 备份原先的数据 | Backup original data
-  const [autoIncrementOld, setAutoIncrementOld] = useState<boolean>(false);
+  // const [autoIncrementOld, setAutoIncrementOld] = useState<boolean>(false);
   const [commentOld, setCommentOld] = useState<string>("");
   const [defalutValueOld, setDefaultValueOld] = useState<string>("");
   const [indexNameOld, setIndexNameOld] = useState<string>("");
@@ -94,7 +94,7 @@ export function TableStructure({
     setSize(faa?.size || "");
     setType(faa?.type || "");
 
-    setAutoIncrementOld(faa?.autoIncrement || false);
+    // setAutoIncrementOld(faa?.autoIncrement || false);
     setCommentOld(faa?.comment || "");
     setDefaultValueOld(faa?.defaultValue || "");
     setIndexNameOld(faa?.indexName || "");

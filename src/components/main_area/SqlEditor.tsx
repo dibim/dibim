@@ -17,7 +17,6 @@ import { coreState } from "@/store/core";
 import { DbResult, TextNotificationData } from "@/types/types";
 import { formatSql } from "@/utils/format_sql";
 import { genPanelPercent } from "@/utils/util";
-import { TableDataChange } from "../EditableTable";
 import { TableSection, TableSectionMethods } from "../TableSection";
 import { TextNotification } from "../TextNotification";
 import { TooltipGroup } from "../TooltipGroup";
@@ -279,11 +278,11 @@ export function SqlEditor() {
 
   // 修改已有数据的变更记录, 不含添加和删除
   // Change logs for modifying existing data, excluding additions and deletions.
-  const [changes, setChanges] = useState<TableDataChange[]>([]);
-  function onChange(val: TableDataChange[]) {
-    setChanges(val);
-    // FIXME: 保存时生成语句
-  }
+  // const [changes, setChanges] = useState<TableDataChange[]>([]);
+  // function onChange(val: TableDataChange[]) {
+  //   setChanges(val);
+  //   // FIXME: 保存时生成语句
+  // }
 
   async function getData(page: number) {
     if (getEditorCode() === "") return;

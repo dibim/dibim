@@ -17,7 +17,6 @@ import { AllAlterAction, TableAlterAction } from "@/databases/types";
 import { getUniqueFieldName } from "@/databases/utils";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
 import { coreState } from "@/store/core";
-import { Card, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { TableConstraint } from "./TableConstraint";

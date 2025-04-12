@@ -11,6 +11,8 @@ import { TableSection, TableSectionMethods } from "../TableSection";
 import { Checkbox } from "../ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
+const ALL_FIELD = ["*"];
+
 export function TableData() {
   const tab = getTab();
   if (tab === null) return <p>No tab found</p>;
@@ -22,7 +24,7 @@ export function TableData() {
   const tableRef = useRef<TableSectionMethods | null>(null);
 
   // ========== 多选字段 ==========
-  const [checkedField, setCheckedField] = useState<string[]>(["*"]);
+  const [checkedField, setCheckedField] = useState<string[]>(ALL_FIELD);
 
   function changeCheckedField(val: string, checked: boolean) {
     const prevVal = checkedField.filter((item) => item !== "*");
@@ -37,17 +39,17 @@ export function TableData() {
 
       if (!hasUk && !res.includes(item.name)) {
         res = [item.name, ...res];
+        addNotification(t("&ceckUniqueTip"), "warning"); // TODO: 补充翻译
         hasUk = true;
       }
     });
     uks.map((item) => {
       if (!hasUk && !res.includes(item.name)) {
         res = [item.name, ...res];
+        addNotification(t("&ceckUniqueTip"), "warning"); // TODO: 补充翻译
         hasUk = true;
       }
     });
-
-    addNotification(t("&ceckUniqueTip"), "warning");
 
     setCheckedField(res);
   }
@@ -113,7 +115,14 @@ export function TableData() {
 
   // ========== 多选字段 结束 ==========
 
-  const getData = async (page: number) => {
+  /**
+   *获取数据
+   *
+   * @param {number} page 要获取的数据的页码
+   * @param {boolean} [isInit] 如果为 true, 使用初始值获取
+   * @return {*}
+   */
+  async function getData(page: number, isInit?: boolean) {
     if (tabState.currentTableName === "") {
       return [];
     }
@@ -121,7 +130,7 @@ export function TableData() {
     const res = await getTableData({
       tableName: tabState.currentTableName,
       currentPage: page,
-      fields: checkedField,
+      fields: isInit ? ALL_FIELD : checkedField,
       pageSize: DEFAULT_PAGE_SIZE,
       where: "",
     });
@@ -138,10 +147,10 @@ export function TableData() {
     }
 
     return [];
-  };
+  }
 
-  async function initData() {
-    await getData(1);
+  async function initData(isInit?: boolean) {
+    await getData(1, isInit);
     tableRef.current?.setCurrentPage(1);
   }
 

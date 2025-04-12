@@ -145,12 +145,12 @@ export function TableList() {
     }
   }
 
-  function handleImport(tableName: string) {
+  function handleImport(_tableName: string) {
     // TODO:
     addNotification("not implemented", "error");
   }
 
-  function handleExport(tableName: string) {
+  function handleExport(_tableName: string) {
     // TODO:
     addNotification("not implemented", "error");
   }
