@@ -1,7 +1,7 @@
 
 # 📝 TODO
 
-## v0.1.0 PostgreSQL ✅
+## v0.1 PostgreSQL ✅
 
 - 支持 PostgreSQL 基础功能 ✅
 - 优化表格数据的尺寸✅

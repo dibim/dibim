@@ -315,11 +315,23 @@ export function SqlEditor() {
       content: <p>{t("Format")}(F8)</p>,
     },
     {
-      trigger: <Grid3x3 className="mb-2" onClick={() => setShowResultBar(!showResultBar)} />,
+      trigger: (
+        <Grid3x3
+          className="mb-2"
+          onClick={() => setShowResultBar(!showResultBar)}
+          color={`var(${showResultBar ? "--fvm-primary-clr" : "--foreground"})`}
+        />
+      ),
       content: <p>{t("Toggle result sets")}</p>,
     },
     {
-      trigger: <ShieldAlert className="mb-2" onClick={() => setShowStatusBar(!showStatusBar)} />,
+      trigger: (
+        <ShieldAlert
+          className="mb-2"
+          onClick={() => setShowStatusBar(!showStatusBar)}
+          color={`var(${showStatusBar ? "--fvm-primary-clr" : "--foreground"})`}
+        />
+      ),
       content: <p>{t("Toggle status bar")}</p>,
     },
   ];
