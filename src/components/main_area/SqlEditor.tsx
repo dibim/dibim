@@ -9,8 +9,7 @@ import { useSnapshot } from "valtio";
 import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
 import { DEFAULT_PAGE_SIZE, RE_IS_SINGLET_QUERY } from "@/constants";
 import { getTab } from "@/context";
-import { exec, getAllTableName, query } from "@/databases/adapter,";
-import { getPageCount } from "@/databases/postgresql/sql";
+import { exec, getAllTableName, getPageCount, query } from "@/databases/adapter,";
 import { RowData } from "@/databases/types";
 import { extractConditionClause } from "@/databases/utils";
 import { coreState } from "@/store/core";
@@ -81,11 +80,18 @@ export function SqlEditor() {
         condition.condition,
       );
 
-      if (tableRef.current) {
-        tableRef.current.setFieldNames(dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : []);
-        tableRef.current.setTableData(data);
-        tableRef.current.setPageTotal(res.pageTotal);
-        tableRef.current.setItemsTotal(res.itemsTotal);
+      if (res) {
+        if (tableRef.current) {
+          tableRef.current.setFieldNames(dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : []);
+          tableRef.current.setTableData(data);
+          tableRef.current.setPageTotal(res.pageTotal);
+          tableRef.current.setItemsTotal(res.itemsTotal);
+        }
+      } else {
+        addMessageData({
+          message: "The query returned null.",
+          type: "info",
+        });
       }
 
       if (dbRes.errorMessage !== "") {

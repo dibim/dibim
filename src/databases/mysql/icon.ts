@@ -79,7 +79,7 @@ const typeCategoryMap: Record<string, string> = {
  * @param typeName 类型名称（不区分大小写，支持别名）
  * @returns 分类常量，未找到时返回 undefined
  */
-export function getDataTypeCategorySqlite(typeName: string): string | undefined {
+export function getDataTypeCategoryMysql(typeName: string): string | undefined {
   if (!typeName) return undefined;
 
   // 标准化输入：转小写、移除多余空格、移除[]（如 `int4[]` -> `_int4`）
