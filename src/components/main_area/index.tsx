@@ -56,7 +56,7 @@ export function MainArea() {
               className="cursor-pointer"
               style={{
                 color: tab.state.color,
-                borderBottom: `solid ${coreSnap.activeTabId === tab.id ? tab.state.color + " 2px " : "0px"}`,
+                borderBottom: `solid ${coreSnap.activeTabId === tab.id ? tab.state.color + " 2px " : "#000000 0px"}`,
               }}
               onClick={() => coreState.setActiveTabId(tab.id)}
             >

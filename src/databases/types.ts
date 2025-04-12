@@ -38,7 +38,7 @@ export interface DbConnectionParam {
 }
 
 export type GetTableDataParam = {
-  currentPage: number; // 当前页码
+  currentPage: number;
   fields: string[];
   pageSize: number; // 每页的数据条数
   tableName: string;
@@ -46,7 +46,7 @@ export type GetTableDataParam = {
 };
 
 export type GetTableDataRes = {
-  currentPage: number; // 当前页码
+  currentPage: number;
   data: string; // 当前页的数据, json 字符串
   pageSize: number; // 每页的数据条数
   total: number; // 数据总条数

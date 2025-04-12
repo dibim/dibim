@@ -40,12 +40,12 @@ export function DatabaseList() {
   async function handleClickConn(conn: DbConnections) {
     const tab = getTab();
     if (tab === null) return;
-    const tbState = tab.state;
+    const tabState = tab.state;
 
     coreState.setCurrentConnType(conn.dbType);
     coreState.setCurrentConnName(conn.name);
     coreState.setCurrentConnColor(conn.color);
-    tbState.setColor(conn.color);
+    tabState.setColor(conn.color);
 
     const res = await connect({
       dbName: conn.dbName,
@@ -61,9 +61,9 @@ export function DatabaseList() {
     } else if (res.errorMessage !== "" && !res.errorMessage.includes("Duplicate connection name")) {
       addNotification(res.errorMessage, "error");
     } else {
-      tbState.setCurrentDbName(conn.dbName);
-      tbState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
-      tbState.setColor(conn.color);
+      tabState.setCurrentDbName(conn.dbName);
+      tabState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
+      tabState.setColor(conn.color);
 
       coreState.setListBarType(LIST_BAR_TABLE);
     }

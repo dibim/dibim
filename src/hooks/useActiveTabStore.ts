@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { subscribeKey } from "valtio/utils";
-import type { TabState } from "@/store/tabs";
 import { coreState } from "@/store/core";
+import type { TabState } from "@/store/tabs";
 
 export const useActiveTabStore = <K extends keyof TabState>(
   tabId: string,
@@ -31,14 +31,12 @@ export const useActiveTabStore = <K extends keyof TabState>(
   useEffect(() => {
     const isolation = isolationRef.current;
 
-    // 查找目标标签页
     const targetTab = coreState.tabs.find((t) => t.id === tabId);
     if (!targetTab) {
       console.warn(`Tab ${tabId} 不存在`);
       return;
     }
 
-    // 获取目标存储对象
     const targetStore = targetTab.state;
 
     // 如果目标存储未变化且 key 相同，跳过重复订阅
@@ -49,7 +47,6 @@ export const useActiveTabStore = <K extends keyof TabState>(
     // 清理旧订阅
     if (isolation.unsubscribe) {
       isolation.unsubscribe();
-      console.log("清理旧订阅");
     }
 
     // 创建隔离的订阅逻辑
@@ -64,7 +61,6 @@ export const useActiveTabStore = <K extends keyof TabState>(
     };
 
     // 建立新订阅
-    console.log("建立隔离订阅", { tabId, key });
     isolation.unsubscribe = subscribeKey(targetStore, key, specificCallback);
     isolation.targetStore = targetStore;
     isolation.currentKey = key; // 正确设置当前键
@@ -82,7 +78,6 @@ export const useActiveTabStore = <K extends keyof TabState>(
         isolation.unsubscribe();
         isolation.targetStore = null;
         isolation.currentKey = undefined; // 清理时重置
-        console.log("正常清理隔离订阅", { tabId, key });
       }
     };
   }, [tabId, key]);
