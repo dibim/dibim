@@ -291,3 +291,8 @@ export function genInsertRowsCmdMysql(tbName: string, fieldNames: string[], fiel
 
   return `INSERT INTO \`${tbName}\` (\`${fields}\`) VALUES (${valArr.join("),(")});`;
 }
+
+// 生成复制表格的语句
+export function genCopyTableCmdMysql(tbName: string, tbNameNew: string) {
+  return `CREATE TABLE ${"`" + tbNameNew + "`"} AS SELECT * FROM ${"`" + tbName + "`"}";`;
+}

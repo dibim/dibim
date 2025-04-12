@@ -1,5 +1,6 @@
 import {
   connectPg,
+  genCopyTableCmdPg,
   genDeleteFieldCmdPg,
   genDeleteRowsCmdPg,
   genDeleteTableCmdPg,
@@ -26,6 +27,7 @@ import { getDataTypeCategorySqlite } from "./sqlite/icon";
 import { fieldTypeOptionsSqlite } from "./sqlite/select_options";
 import {
   connectSqlite,
+  genCopyTableCmdSqlite,
   genDeleteFieldCmdSqlite,
   genDeleteRowsCmdSqlite,
   genDeleteTableCmdSqlite,
@@ -214,6 +216,15 @@ export function genInsertRowsCmd(tbName: string, fieldNames: string[], fieldValu
   if (currentConnType === DB_SQLITE) return genInsertRowsCmdSqlite(tbName, fieldNames, fieldValues);
 
   return "";
+}
+
+// 生成复制表格的语句
+export function genCopyTableCmd(tbName: string, tbNameNew: string) {
+  const { currentConnType } = coreState;
+
+  if (currentConnType === DB_MYSQL) return; // TODO:
+  if (currentConnType === DB_POSTGRESQL) return genCopyTableCmdPg(tbName, tbNameNew);
+  if (currentConnType === DB_SQLITE) return genCopyTableCmdSqlite(tbName, tbNameNew);
 }
 
 // 根据数据类型名称返回对应的分类常量

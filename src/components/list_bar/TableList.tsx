@@ -6,6 +6,7 @@ import { MAIN_AREA_TABLE_EDITOR, MAIN_AREA_TAB_STRUCTURE, STR_EMPTY } from "@/co
 import { getTab } from "@/context";
 import {
   exec,
+  genCopyTableCmd,
   genDeleteTableCmd,
   genRenameTableCmd,
   genTruncateTableCmd,
@@ -118,8 +119,16 @@ export function TableList() {
   const [operateTableName, setOperateTableName] = useState<string>("");
   const [showDialogDelete, setShowDialogDelete] = useState<boolean>(false);
   const [showDialogRename, setShowDialogRename] = useState<boolean>(false);
+  const [showDialogCopyTable, setShowDialogCopyTable] = useState<boolean>(false);
   const [showDialogTruncate, setShowDialogTruncate] = useState<boolean>(false);
   const [willExecCmd, setWillExecCmd] = useState<string>("");
+
+  function closeDialog() {
+    setShowDialogDelete(false);
+    setShowDialogRename(false);
+    setShowDialogCopyTable(false);
+    setShowDialogTruncate(false);
+  }
 
   async function handleRenamePopup(tableName: string) {
     setOperateTableName(tableName);
@@ -135,7 +144,7 @@ export function TableList() {
     getData();
   }
 
-  async function handleCopy(tableName: string) {
+  async function handleCopyTableName(tableName: string) {
     try {
       await navigator.clipboard.writeText(tableName);
       addNotification(t("Copied"), "success");
@@ -143,6 +152,20 @@ export function TableList() {
       console.log("Copy failed, error: ", err);
       addNotification(t("Copy failed"), "error");
     }
+  }
+
+  async function handleCopyTablePopup(tableName: string) {
+    setOperateTableName(tableName);
+    setShowDialogCopyTable(true);
+  }
+
+  async function handleCopyTableInput(e: React.FormEvent<HTMLInputElement>) {
+    setWillExecCmd(genCopyTableCmd(operateTableName, e.currentTarget.value) || "");
+  }
+
+  async function handleCopyTable() {
+    exec(willExecCmd);
+    getData();
   }
 
   function handleImport(_tableName: string) {
@@ -169,6 +192,8 @@ export function TableList() {
 
   async function handleConfirm() {
     const res = await exec(willExecCmd);
+    // TODO: res 为空
+
     if (!res) {
       addNotification("The result of exec is null", "error");
     } else if (res.errorMessage !== "") {
@@ -176,6 +201,8 @@ export function TableList() {
     } else {
       getData();
     }
+
+    closeDialog();
   }
 
   // ========== 上下文按钮 结束 | Context button end ==========
@@ -280,7 +307,13 @@ export function TableList() {
             {
               label: t("Copy table name"),
               onClick: () => {
-                handleCopy(item.tableName);
+                handleCopyTableName(item.tableName);
+              },
+            },
+            {
+              label: t("Create table copy"),
+              onClick: () => {
+                handleCopyTablePopup(item.tableName);
               },
             },
             {
@@ -380,6 +413,30 @@ export function TableList() {
         }}
         okText={t("Confirm")}
         okCb={handleRename}
+      />
+
+      <ConfirmDialog
+        open={showDialogCopyTable}
+        title={t("&pleaseEnter", { name: t("Table name").toLowerCase() })}
+        content={
+          <>
+            <div className="flex items-center">
+              <div className="pe-4">{t("New nmame")}</div>
+              <div className="flex-1">
+                <Input onInput={handleCopyTableInput} />
+              </div>
+            </div>
+            <div className="pt-4">
+              <SqlCodeViewer ddl={willExecCmd} />
+            </div>
+          </>
+        }
+        cancelText={t("Cancel")}
+        cancelCb={() => {
+          setShowDialogCopyTable(false);
+        }}
+        okText={t("Confirm")}
+        okCb={handleCopyTable}
       />
 
       <ConfirmDialog
