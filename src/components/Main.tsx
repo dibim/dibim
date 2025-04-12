@@ -101,7 +101,7 @@ export function Main({ id, className }: { id: string; className: string }) {
         <Button
           variant="ghost"
           onClick={() => {
-            coreSnap.setListBarOpen(!coreSnap.listBarOpen);
+            coreState.setListBarOpen(!coreState.listBarOpen);
           }}
         >
           <PanelLeftIcon />
