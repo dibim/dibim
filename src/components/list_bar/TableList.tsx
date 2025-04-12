@@ -232,21 +232,38 @@ export function TableList() {
               </div>
 
               {/* 索引大小 | Index size */}
-              <div className="flex-shrink-0 bg-muted text-muted-foreground text-sm">
-                <div className="relative" style={{ position: "relative" }}>
-                  <div
-                    className="absolute inset-0 z-0 opacity-25"
-                    style={{ backgroundColor: `${coreState.currentConnColor}` }}
-                  />
-                  <div
-                    className={`absolute h-full z-10 opacity-50`}
-                    style={{
-                      backgroundColor: `${coreState.currentConnColor}`,
-                      width: `${(item.indexSizeByte / item.totalSizeByte) * 100}%`,
-                    }}
-                  ></div>
-                  <div className="relative z-20 px-1">{item.totalSize}</div>
-                </div>
+              <div className="flex-shrink-0 bg-muted">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex flex-col">
+                      <div className="text-muted-foreground text-sm">{item.totalSize}</div>
+                      <div className="relative h-1">
+                        <div
+                          className="absolute inset-0 z-0 opacity-50"
+                          style={{ backgroundColor: `${coreState.currentConnColor}` }}
+                        />
+                        <div
+                          className={`absolute h-full z-10`}
+                          style={{
+                            backgroundColor: `${coreState.currentConnColor}`,
+                            width: `${(item.indexSizeByte / item.totalSizeByte) * 100}%`,
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      {t("Total database size")}: {item.totalSize}
+                    </p>
+                    <p>
+                      {t("Data storage size")}: {item.tableSize}
+                    </p>
+                    <p>
+                      {t("Index storage size")}: {item.indexSize}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </div>
           ),
