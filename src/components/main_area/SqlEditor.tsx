@@ -9,7 +9,7 @@ import { useSnapshot } from "valtio";
 import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
 import { DEFAULT_PAGE_SIZE, RE_IS_SINGLET_QUERY } from "@/constants";
 import { getTab } from "@/context";
-import { exec, query } from "@/databases/adapter,";
+import { exec, getAllTableName, query } from "@/databases/adapter,";
 import { getPageCount } from "@/databases/postgresql/sql";
 import { RowData } from "@/databases/types";
 import { extractConditionClause } from "@/databases/utils";
@@ -213,43 +213,103 @@ export function SqlEditor() {
     });
   };
 
-  const beforeMount: BeforeMount = useMemo(
-    () => (monacoInstance: typeof Monaco) => {
-      monacoInstance.languages.register({ id: "sql" });
+  function getFields() {
+    // FIXME: 现在只能获取已打开的表的字段, 要根据当前语句获取表名, 再查询表结构
+    // 或者像  monaco-sql-languages 一样, 直接把所有的表 / 视图 /字段 都列出来
+    // extractTableNames()
+    return tabState.currentTableStructure.map((item) => item.name);
+  }
 
-      // 代码补全 | Code completion
-      monacoInstance.languages.registerCompletionItemProvider("sql", {
-        triggerCharacters: SQL_KEYWORDS.map((k) => k[0].toLowerCase()),
-        provideCompletionItems: (model, position) => {
-          // 获取当前光标前的单词范围
+  const beforeMount: BeforeMount = useMemo(
+    () => (monaco: typeof Monaco) => {
+      monaco.languages.registerCompletionItemProvider("sql", {
+        provideCompletionItems: async (model, position) => {
           const word = model.getWordUntilPosition(position);
 
-          const prefix = model
-            .getValueInRange({
-              startLineNumber: position.lineNumber,
-              startColumn: word.startColumn,
-              endLineNumber: position.lineNumber,
-              endColumn: position.column,
-            })
-            .toLowerCase();
+          const range = {
+            startLineNumber: position.lineNumber,
+            endLineNumber: position.lineNumber,
+            startColumn: word.startColumn,
+            endColumn: word.endColumn,
+          };
+
+          // 获取用户输入的前一个单词
+          const lineContent = model.getLineContent(position.lineNumber);
+          const previousWord = lineContent
+            .substring(0, position.column - 1)
+            .trim()
+            .split(/\s+/)
+            .pop();
 
           // 生成补全建议
-          const suggestions = SQL_KEYWORDS.filter((k) => k.toLowerCase().startsWith(prefix)).map((keyword) => ({
-            label: keyword,
-            kind: monacoInstance.languages.CompletionItemKind.Keyword,
-            insertText: keyword + (SQL_KEYWORDS.includes(keyword) ? " " : ""), // 添加空格
-            range: new monacoInstance.Range( // 替换范围
-              position.lineNumber,
-              word.startColumn, // 输入起始位置
-              position.lineNumber,
-              word.endColumn, // 输入结束位置
-            ),
-            filterText: keyword.toLowerCase(), // 强制小写匹配
-            sortText: "0" + keyword, // 确保正确排序
-          }));
+          let suggestions: Monaco.languages.CompletionItem[] = [];
+
+          if (previousWord?.toUpperCase() === "SELECT") {
+            // 如果前一个单词是 SELECT，则提示字段名
+
+            suggestions = getFields().map((tableName) => ({
+              label: tableName,
+              kind: monaco.languages.CompletionItemKind.Folder,
+              insertText: tableName,
+              range: range,
+            }));
+          } else if (previousWord?.toUpperCase() === "FROM" || previousWord?.toUpperCase() === "JOIN") {
+            // 如果前一个单词是 FROM 或 JOIN，则提示表名
+            const res = await getAllTableName();
+            if (res && res.data) {
+              suggestions = res.data.map((tableName) => ({
+                label: tableName,
+                kind: monaco.languages.CompletionItemKind.Folder,
+                insertText: tableName,
+                range: range,
+              }));
+            }
+          } else if (previousWord?.toUpperCase() === "WHERE") {
+            // 如果前一个单词是 WHERE，则提示字段名
+            suggestions = getFields().map((fn) => ({
+              label: fn,
+              kind: monaco.languages.CompletionItemKind.Variable,
+              insertText: fn,
+              range: range,
+            }));
+          } else if (previousWord?.toUpperCase() === "USE") {
+            // 如果前一个单词是 USE，则提示数据库名
+            // TODO: 实现功能
+            //   suggestions = databaseNames.map((dbName) => ({
+            //     label: dbName,
+            //     kind: monaco.languages.CompletionItemKind.Module,
+            //     insertText: dbName,
+            //     range: range,
+            //   }));
+          } else {
+            // 默认提示 SQL 关键字
+            const prefix = model
+              .getValueInRange({
+                startLineNumber: position.lineNumber,
+                startColumn: word.startColumn,
+                endLineNumber: position.lineNumber,
+                endColumn: position.column,
+              })
+              .toLowerCase();
+
+            suggestions = SQL_KEYWORDS.filter((k) => k.toLowerCase().startsWith(prefix)).map((keyword) => ({
+              label: keyword,
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertText: keyword + (SQL_KEYWORDS.includes(keyword) ? " " : ""), // 添加空格
+              range: new monaco.Range( // 替换范围
+                position.lineNumber,
+                word.startColumn, // 输入起始位置
+                position.lineNumber,
+                word.endColumn, // 输入结束位置
+              ),
+              filterText: keyword.toLowerCase(), // 强制小写匹配
+              sortText: "0" + keyword, // 确保正确排序
+            }));
+          }
 
           return { suggestions };
         },
+        triggerCharacters: [" ", "\n"], // 触发提示的字符
       });
     },
     [],
