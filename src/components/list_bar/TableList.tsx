@@ -13,7 +13,7 @@ import {
   getAllTableSize,
 } from "@/databases/adapter,";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
-import { addNotification, coreState } from "@/store/core";
+import { addNotification, coreState, setTabTitle } from "@/store/core";
 import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
@@ -56,6 +56,8 @@ export function TableList() {
 
     tabState.setCurrentTableName(item.id);
     tabState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
+    tabState.setColor(coreState.currentConnColor);
+    setTabTitle(item.id);
   }
 
   function addTable() {
@@ -138,6 +140,7 @@ export function TableList() {
       await navigator.clipboard.writeText(tableName);
       addNotification(t("Copied"), "success");
     } catch (err) {
+      console.log("Copy failed, error: ", err);
       addNotification(t("Copy failed"), "error");
     }
   }
@@ -229,15 +232,38 @@ export function TableList() {
               </div>
 
               {/* 索引大小 | Index size */}
-              <div className="flex-shrink-0 bg-muted text-muted-foreground text-sm ">
-                <div className="relative" style={{ position: "relative" }}>
-                  <div className="absolute inset-0 bg-blue-500 z-0 opacity-25" />
-                  <div
-                    className={`absolute h-full  bg-blue-500 z-10 opacity-50`}
-                    style={{ width: `${(item.indexSizeByte / item.totalSizeByte) * 100}%` }}
-                  ></div>
-                  <div className="relative z-20">{item.totalSize}</div>
-                </div>
+              <div className="flex-shrink-0 bg-muted">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex flex-col">
+                      <div className="text-muted-foreground text-sm">{item.totalSize}</div>
+                      <div className="relative h-1">
+                        <div
+                          className="absolute inset-0 z-0 opacity-50"
+                          style={{ backgroundColor: `${coreState.currentConnColor}` }}
+                        />
+                        <div
+                          className={`absolute h-full z-10`}
+                          style={{
+                            backgroundColor: `${coreState.currentConnColor}`,
+                            width: `${(item.indexSizeByte / item.totalSizeByte) * 100}%`,
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      {t("Total database size")}: {item.totalSize}
+                    </p>
+                    <p>
+                      {t("Data storage size")}: {item.tableSize}
+                    </p>
+                    <p>
+                      {t("Index storage size")}: {item.indexSize}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </div>
           ),

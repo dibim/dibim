@@ -8,7 +8,6 @@ import { ListBarType, TextNotificationData, TextNotificationType } from "@/types
 import { saveConfigFile } from "@/utils/config_file";
 import { TabState, createTabState } from "./tabs";
 
-// 标签页类型
 interface Tab {
   id: string;
   title: string;
@@ -16,54 +15,50 @@ interface Tab {
 }
 
 interface CoreState {
-  // 配置文件相关
+  // 配置文件 | Configuration file
   config: ConfigFileMain;
   setConfig: (val: ConfigFileMain, notWriteToFile?: boolean) => Promise<void>;
   mainPasswordSha: string;
   setMainPasswordSha: (val: string) => void;
 
-  // 关于
+  // 关于 | About
   aboutOpen: boolean;
   setAboutOpen: (val: boolean) => void;
 
-  // 侧边栏的宽度
+  // 侧边栏 | Sidebar
   sideBarWidth: number;
   setSideBarWidth: (val: number) => void;
 
-  // 列表栏是否显示
+  // 列表栏 | List bar
   listBarOpen: boolean;
   setListBarOpen: (val: boolean) => void;
-  // 列表栏的宽度
   listBarWidth: number;
   setListBarWidth: (val: number) => void;
-  // 列表栏的类型
   listBarType: ListBarType;
   setListBarType: (val: ListBarType) => void;
 
-  // 通知
+  // 通知 | Notification
   textNotificationArr: TextNotificationData[];
   setTextNotification: (val: TextNotificationData[]) => void;
 
-  // Tab
+  // 标签页 | Tabs
   tabs: Tab[];
   setTabs: (val: Tab[]) => void;
   addTabs: (val: Tab) => void;
   activeTabId: string;
   setActiveTabId: (val: string) => void;
 
-  //
-  // 当前连接类型
+  // 数据库连接 | Database connection
   currentConnType: DbType;
   setCurrentConnType: (val: DbType) => void;
-  // 当前连接名
   currentConnName: string;
   setCurrentConnName: (val: string) => void;
-  // 当前连接颜色
   currentConnColor: string;
   setCurrentConnColor: (val: string) => void;
 }
 
 // 按照默认密码生成默认的 sha
+// TODO: 使用更安全的存储方式
 export const defaultMainPasswordSha = await invoker.sha256(MAIN_PASSWORD_DEFAULT);
 
 const emptyConfigFile: ConfigFileMain = {
@@ -76,6 +71,7 @@ const emptyConfigFile: ConfigFileMain = {
 };
 
 export const coreState = proxy<CoreState>({
+  // 配置文件 | Configuration file
   config: emptyConfigFile,
   async setConfig(val: ConfigFileMain, notWrite?: boolean): Promise<void> {
     coreState.config = val;
@@ -88,16 +84,19 @@ export const coreState = proxy<CoreState>({
     this.mainPasswordSha = val;
   },
 
+  // 关于 | About
   aboutOpen: false,
   setAboutOpen(val: boolean): void {
     this.aboutOpen = val;
   },
 
+  // 侧边栏 | Sidebar
   sideBarWidth: 0,
   setSideBarWidth(val: number): void {
     this.sideBarWidth = val;
   },
 
+  // 列表栏 | List bar
   listBarOpen: true,
   setListBarOpen(val: boolean): void {
     this.listBarOpen = val;
@@ -111,12 +110,13 @@ export const coreState = proxy<CoreState>({
     this.listBarType = val;
   },
 
+  // 通知 | Notification
   textNotificationArr: [],
   setTextNotification(val: TextNotificationData[]): void {
     this.textNotificationArr = val;
   },
 
-  // Tab
+  // Tabs
   tabs: [],
   setTabs(val: Tab[]): void {
     this.tabs = val;
@@ -129,24 +129,24 @@ export const coreState = proxy<CoreState>({
     this.activeTabId = val;
   },
 
-  // 当前连接类型
+  // 数据库连接 | Database connection
   currentConnType: DB_POSTGRESQL,
   setCurrentConnType(val: DbType) {
     this.currentConnType = val;
   },
-  // 当前连接名
   currentConnName: "",
   setCurrentConnName(val: string) {
     this.currentConnName = val;
   },
-  // 当前连接颜色
   currentConnColor: "",
   setCurrentConnColor(val: string) {
     this.currentConnColor = val;
   },
 }) as CoreState;
 
-// 以下是工具函数
+//
+// 以下是工具函数 | Here are the utility functions
+//
 
 export function addNotification(message: string, type: TextNotificationType) {
   coreState.setTextNotification([
@@ -169,6 +169,13 @@ export function addTab() {
 
   coreState.setTabs([...coreState.tabs, newTab]);
   coreState.setActiveTabId(tabId);
+}
+
+export function setTabTitle(title: string) {
+  const tab = coreState.tabs.find((item) => item.id === coreState.activeTabId);
+  if (tab) {
+    tab.title = title;
+  }
 }
 
 export function delTab(id: string) {

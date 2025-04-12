@@ -100,7 +100,7 @@ export function SqlEditor() {
       }
     } else {
       setMessageData({
-        message: "The query returned null.", // TODO: 添加翻译
+        message: "The query returned null.",
         type: "info",
       });
     }
@@ -147,7 +147,7 @@ export function SqlEditor() {
         }
       } else {
         setMessageData({
-          message: "The query returned null.", // TODO: 添加翻译
+          message: "The query returned null.",
           type: "error",
         });
       }

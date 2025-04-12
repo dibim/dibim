@@ -76,7 +76,7 @@ export function PaginationSection({ currentPage, setCurrentPage, pageTotal, item
   }, []);
 
   return (
-    <div className="flex">
+    <div className="flex items-center">
       <Pagination className="flex-1 justify-start px-8">
         <PaginationContent>
           <PaginationItem>
@@ -120,7 +120,7 @@ export function PaginationSection({ currentPage, setCurrentPage, pageTotal, item
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p>{t("&Go to page", { page: inputedPage })}</p>
+                <p>{t("&goToPage", { page: inputedPage })}</p>
               </TooltipContent>
             </Tooltip>
           </PaginationItem>

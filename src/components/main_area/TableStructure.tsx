@@ -346,6 +346,7 @@ export function TableStructure({
       await navigator.clipboard.writeText(field.name);
       addNotification(t("Copied"), "success");
     } catch (err) {
+      console.log("Copy failed, error: ", err);
       addNotification(t("Copy failed"), "error");
     }
   }
@@ -356,6 +357,7 @@ export function TableStructure({
       await navigator.clipboard.writeText(field.type);
       addNotification(t("Copied"), "success");
     } catch (err) {
+      console.log("Copy failed, error: ", err);
       addNotification(t("Copy failed"), "error");
     }
   }
@@ -646,7 +648,7 @@ export function TableStructure({
 
       <ConfirmDialog
         open={showDialogAlter}
-        title={t("Are you sure you want to save the changes?")}
+        title={t("&confirmChanges")}
         description={t("&confirmStatement")}
         content={
           <>

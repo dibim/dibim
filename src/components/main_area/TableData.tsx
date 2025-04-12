@@ -47,8 +47,7 @@ export function TableData() {
       }
     });
 
-    // TODO: 添加翻译
-    addNotification("获取表格数据必须有一个主键字段或唯一约束字段, 已自动添加", "warning");
+    addNotification(t("&ceckUniqueTip"), "warning");
 
     setCheckedField(res);
   }
@@ -77,7 +76,7 @@ export function TableData() {
                 htmlFor="check-all"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                {t("Check all")} {/* TODO: 添加翻译 */}
+                {t("Check all")}
               </label>
             </DropdownMenuItem>
 

@@ -126,8 +126,6 @@ export function TableEditor() {
           <TabsTrigger
             value={MAIN_AREA_TAB_STRUCTURE}
             onClick={() => {
-              console.log("111");
-
               tabState.setMainAreaTab(MAIN_AREA_TAB_STRUCTURE);
             }}
           >
@@ -137,7 +135,6 @@ export function TableEditor() {
           <TabsTrigger
             value={MAIN_AREA_TAB_DDL}
             onClick={() => {
-              console.log("222");
               tabState.setMainAreaTab(MAIN_AREA_TAB_DDL);
             }}
           >
@@ -176,7 +173,6 @@ export function TableEditor() {
           <TabsTrigger
             value={MAIN_AREA_TAB_DATA}
             onClick={() => {
-              console.log("333");
               tabState.setMainAreaTab(MAIN_AREA_TAB_DATA);
             }}
           >
@@ -185,39 +181,23 @@ export function TableEditor() {
         </TabsList>
       </div>
       <TabsContent value={MAIN_AREA_TAB_STRUCTURE}>
-        <Card className="p-4">
-          <CardContent className="p-0">
-            <TableStructure
-              getData={getData}
-              changeTable={changeTable}
-              alterData={alterData}
-              setAlterData={setAlterData}
-              editingTableComment={editingTableComment}
-              setEditingTableComment={setEditingTableComment}
-            />
-          </CardContent>
-        </Card>
+        <TableStructure
+          getData={getData}
+          changeTable={changeTable}
+          alterData={alterData}
+          setAlterData={setAlterData}
+          editingTableComment={editingTableComment}
+          setEditingTableComment={setEditingTableComment}
+        />
       </TabsContent>
       <TabsContent value={MAIN_AREA_TAB_DDL}>
-        <Card className="p-4">
-          <CardContent className="p-0">
-            <TableDdl />
-          </CardContent>
-        </Card>
+        <TableDdl />
       </TabsContent>
       <TabsContent value={MAIN_AREA_TAB_CONSTRAINT}>
-        <Card className="p-4">
-          <CardContent className="p-0">
-            <TableConstraint />
-          </CardContent>
-        </Card>
+        <TableConstraint />
       </TabsContent>
       <TabsContent value={MAIN_AREA_TAB_DATA}>
-        <Card className="p-4">
-          <CardContent className="p-0">
-            <TableData />
-          </CardContent>
-        </Card>
+        <TableData />
       </TabsContent>
     </Tabs>
   );

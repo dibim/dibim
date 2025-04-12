@@ -88,6 +88,7 @@ export function getUniqueFieldName(tsa: FieldStructure[]) {
 }
 
 /**
+ * @deprecated
  * 目前已弃用
  *
  * 查询表格数据的时候, 必须使用一个排序字段
