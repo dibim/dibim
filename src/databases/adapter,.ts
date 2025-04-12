@@ -112,8 +112,6 @@ export async function getTableDdl(tbName: string) {
 export async function getTableData(params: GetTableDataParam) {
   const { currentConnType, currentConnName } = coreState;
 
-  console.log("^^^^^^^^^^^   ", { currentConnType, currentConnName });
-
   if (currentConnType === DB_MYSQL) return; // TODO:
   if (currentConnType === DB_POSTGRESQL) return getTableDataPg(currentConnName, params);
   if (currentConnType === DB_SQLITE) return getTableDataSqlite(currentConnName, params);
