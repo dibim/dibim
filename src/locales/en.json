@@ -1,5 +1,5 @@
 {
-  "&ceckUniqueTip": "To obtain table data, there must be a primary key field or a unique constraint field, which has been automatically checked",
+  "&checkUniqueTip": "To obtain table data, there must be a primary key field or a unique constraint field, which has been automatically checked",
   "&confirmChanges": "Are you sure you want to save the changes?",
   "&confirmDelete": "Are you sure you want to delete?",
   "&confirmDeleteTable": "Are you sure you want to delete the table \"{{name}}\"?",

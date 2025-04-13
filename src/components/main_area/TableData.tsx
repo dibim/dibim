@@ -39,14 +39,14 @@ export function TableData() {
 
       if (!hasUk && !res.includes(item.name)) {
         res = [item.name, ...res];
-        addNotification(t("&ceckUniqueTip"), "warning"); // TODO: 补充翻译
+        addNotification(t("&checkUniqueTip"), "warning");
         hasUk = true;
       }
     });
     uks.map((item) => {
       if (!hasUk && !res.includes(item.name)) {
         res = [item.name, ...res];
-        addNotification(t("&ceckUniqueTip"), "warning"); // TODO: 补充翻译
+        addNotification(t("&checkUniqueTip"), "warning");
         hasUk = true;
       }
     });
