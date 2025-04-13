@@ -4,8 +4,11 @@ import { FieldStructure } from "@/databases/types";
 import { MainAreaTab, MainAreaType } from "@/types/types";
 
 export interface TabState {
-  color: string;
-  setColor: (val: string) => void;
+  connColor: string;
+  setConnColor: (val: string) => void;
+
+  connName: string;
+  setConnName: (val: string) => void;
 
   currentDbNme: string;
   setCurrentDbName: (val: string) => void;
@@ -44,9 +47,14 @@ export interface TabState {
 
 export const createTabState = () => {
   return proxy({
-    color: "",
-    setColor(val: string) {
-      this.color = val;
+    connColor: "",
+    setConnColor(val: string) {
+      this.connColor = val;
+    },
+
+    connName: "",
+    setConnName(val: string) {
+      this.connName = val;
     },
 
     currentDbNme: "",

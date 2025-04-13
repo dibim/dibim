@@ -58,7 +58,7 @@ export function TableList() {
 
     tabState.setCurrentTableName(item.id);
     tabState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
-    tabState.setColor(coreState.currentConnColor);
+    tabState.setConnColor(coreState.currentConnColor);
     setTabTitle(item.id);
   }
 

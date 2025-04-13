@@ -55,10 +55,14 @@ export function MainArea() {
             <div
               className="cursor-pointer"
               style={{
-                color: tab.state.color,
-                borderBottom: `solid ${coreSnap.activeTabId === tab.id ? tab.state.color + " 2px " : "#000000 0px"}`,
+                color: tab.state.connColor,
+                borderBottom: `solid ${coreSnap.activeTabId === tab.id ? tab.state.connColor + " 2px " : "#000000 0px"}`,
               }}
-              onClick={() => coreState.setActiveTabId(tab.id)}
+              onClick={() => {
+                coreState.setActiveTabId(tab.id);
+                coreState.setCurrentConnColor(tab.state.connColor);
+                coreState.setCurrentConnName(tab.state.connName);
+              }}
             >
               {tab.title}
             </div>
