@@ -19,6 +19,7 @@ import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
 import { SqlCodeViewer } from "../SqlCodeViewer";
+import { TextNotification } from "../TextNotification";
 import { Input } from "../ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
@@ -121,6 +122,8 @@ export function TableList() {
   const [showDialogRename, setShowDialogRename] = useState<boolean>(false);
   const [showDialogCopyTable, setShowDialogCopyTable] = useState<boolean>(false);
   const [showDialogTruncate, setShowDialogTruncate] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [okMessage, setOkMessage] = useState<string>("");
   const [willExecCmd, setWillExecCmd] = useState<string>("");
 
   function closeDialog() {
@@ -186,9 +189,12 @@ export function TableList() {
 
     if (!res) {
       addNotification("The result of exec is null", "error");
+      setErrorMessage("The result of exec is null");
     } else if (res.errorMessage !== "") {
       addNotification(res.errorMessage, "error");
+      setErrorMessage(res.errorMessage);
     } else {
+      setOkMessage("Ok");
       getData();
     }
 
@@ -433,7 +439,13 @@ export function TableList() {
         open={showDialogTruncate}
         title={t("&confirmTruncateTable", { name: operateTableName })}
         description={t("&confirmStatement")}
-        content={<SqlCodeViewer ddl={willExecCmd} />}
+        content={
+          <>
+            <SqlCodeViewer ddl={willExecCmd} />
+            {errorMessage && <TextNotification type="error" message={errorMessage}></TextNotification>}
+            {okMessage && <TextNotification type="success" message={okMessage}></TextNotification>}
+          </>
+        }
         cancelText={t("Cancel")}
         cancelCb={() => {
           setShowDialogTruncate(false);
@@ -446,7 +458,13 @@ export function TableList() {
         open={showDialogDelete}
         title={t("&confirmDeleteTable", { name: operateTableName })}
         description={t("&confirmStatement")}
-        content={<SqlCodeViewer ddl={willExecCmd} />}
+        content={
+          <>
+            <SqlCodeViewer ddl={willExecCmd} />
+            {errorMessage && <TextNotification type="error" message={errorMessage}></TextNotification>}
+            {okMessage && <TextNotification type="success" message={okMessage}></TextNotification>}
+          </>
+        }
         cancelText={t("Cancel")}
         cancelCb={() => {
           setShowDialogDelete(false);

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { useSnapshot } from "valtio";
-import { DIR_H, ERROR_FROMDB_PREFIX, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
+import { DIR_H, ERROR_FROM_DB_PREFIX, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
 import { getTab } from "@/context";
 import { execMany, fieldTypeOptions, genAlterCmd } from "@/databases/adapter,";
 import { AllAlterAction, AlterAction, FieldAlterAction } from "@/databases/types";
@@ -392,11 +392,7 @@ export function TableStructure({
 
       //  TODO: 显示影响的行数
     } else {
-      let message = res.errorMessage;
-      if (res.errorMessage.startsWith(ERROR_FROMDB_PREFIX)) {
-        message = message.replace(ERROR_FROMDB_PREFIX, "");
-      }
-
+      let message = res.errorMessage.replace(ERROR_FROM_DB_PREFIX, "");
       setErrorMessage(message);
       addNotification(message, "error");
     }

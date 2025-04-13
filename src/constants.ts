@@ -86,4 +86,4 @@ export const DEFAULT_PAGE_SIZE = 50;
 export const NEW_ROW_IS_ADDED_FIELD = "; -- IS-NEW-ROW -- ;";
 
 //
-export const ERROR_FROMDB_PREFIX = "error returned from database: ";
+export const ERROR_FROM_DB_PREFIX = "error returned from database: ";

@@ -7,7 +7,7 @@ import sqlWorker from "monaco-editor/esm/vs/basic-languages/sql/sql?worker";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import { useSnapshot } from "valtio";
 import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
-import { DEFAULT_PAGE_SIZE, ERROR_FROMDB_PREFIX, RE_IS_SINGLET_QUERY } from "@/constants";
+import { DEFAULT_PAGE_SIZE, ERROR_FROM_DB_PREFIX, RE_IS_SINGLET_QUERY } from "@/constants";
 import { getTab } from "@/context";
 import { exec, getAllTableName, getPageCount, query } from "@/databases/adapter,";
 import { RowData } from "@/databases/types";
@@ -95,17 +95,10 @@ export function SqlEditor() {
       }
 
       if (dbRes.errorMessage !== "") {
-        if (dbRes.errorMessage.startsWith(ERROR_FROMDB_PREFIX)) {
-          addMessageData({
-            message: dbRes.errorMessage.replace(ERROR_FROMDB_PREFIX, " "),
-            type: "error",
-          });
-        } else {
-          addMessageData({
-            message: dbRes.errorMessage,
-            type: "info",
-          });
-        }
+        addMessageData({
+          message: dbRes.errorMessage.replace(ERROR_FROM_DB_PREFIX, " "),
+          type: "error",
+        });
       }
     } else {
       addMessageData({
@@ -141,17 +134,10 @@ export function SqlEditor() {
       if (res) {
         const resData = res as unknown as DbResult;
         if (resData.errorMessage !== "") {
-          if (resData.errorMessage.startsWith(ERROR_FROMDB_PREFIX)) {
-            addMessageData({
-              message: resData.errorMessage.replace(ERROR_FROMDB_PREFIX, ""),
-              type: "error",
-            });
-          } else {
-            addMessageData({
-              message: resData.errorMessage,
-              type: "info",
-            });
-          }
+          addMessageData({
+            message: resData.errorMessage.replace(ERROR_FROM_DB_PREFIX, " "),
+            type: "error",
+          });
         } else {
           //  TODO: 显示影响的行数
         }
