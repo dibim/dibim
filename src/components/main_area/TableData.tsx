@@ -5,6 +5,7 @@ import { useSnapshot } from "valtio";
 import { DEFAULT_PAGE_SIZE } from "@/constants";
 import { getTab } from "@/context";
 import { getTableData } from "@/databases/adapter,";
+import { getDefultOrderField } from "@/databases/utils";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
 import { addNotification, coreState } from "@/store/core";
 import { TableSection, TableSectionMethods } from "../TableSection";
@@ -127,12 +128,14 @@ export function TableData() {
       return [];
     }
 
+    const sortField = getDefultOrderField(tabState.currentTableStructure);
     const res = await getTableData({
       tableName: tabState.currentTableName,
       currentPage: page,
       fields: isInit ? ALL_FIELD : checkedField,
       pageSize: DEFAULT_PAGE_SIZE,
       where: "",
+      sortField: [{ fieldName: sortField, direction: "ASC" }],
     });
 
     if (res) {

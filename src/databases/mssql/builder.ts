@@ -215,8 +215,13 @@ export class GeneratorMssql {
 
     let offset = p.pageSize * (p.currentPage - 1);
     if (offset < 0) offset = 0;
-    let fields = p.fields.length === 1 && p.fields[0] === "*" ? "*" : `[${p.fields.join("],[")}]`;
-    const sql = `SELECT ${fields} FROM [${p.tableName}] ${p.where} ORDER BY (SELECT NULL) OFFSET ${offset} ROWS FETCH NEXT ${p.pageSize} ROWS ONLY;`;
+    let fieldStr = p.fields.length === 1 && p.fields[0] === "*" ? "*" : `[${p.fields.join("],[")}]`;
+    let sortStr =
+      p.sortField.length > 0
+        ? `ORDER BY ${p.sortField.map((item) => `[${item.fieldName}] ${item.direction}`).join(",")}`
+        : "ORDER BY (SELECT NULL)";
+    // const sql = `SELECT ${fieldStr} FROM [${p.tableName}] ${p.where} ORDER BY (SELECT NULL) OFFSET ${offset} ROWS FETCH NEXT ${p.pageSize} ROWS ONLY;`;
+    const sql = `SELECT ${fieldStr} FROM [${p.tableName}] ${p.where} ${sortStr} OFFSET ${offset} ROWS FETCH NEXT ${p.pageSize} ROWS ONLY;`;
     const dbRes = await invoker.querySql(connName, sql);
 
     return {

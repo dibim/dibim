@@ -37,9 +37,15 @@ export interface DbConnectionParam {
   user: string;
 }
 
+export type SortField = {
+  fieldName: string; // 排序字段名
+  direction: "ASC" | "DESC"; // 排序顺序
+};
+
 export type GetTableDataParam = {
   currentPage: number;
   fields: string[];
+  sortField: SortField[]; // 排序字段
   pageSize: number; // 每页的数据条数
   tableName: string;
   where: string;
