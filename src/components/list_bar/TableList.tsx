@@ -56,7 +56,7 @@ export function TableList() {
     if (tab === null) return;
     const tabState = tab.state;
 
-    tabState.setCurrentTableName(item.id);
+    tabState.setTableName(item.id);
     tabState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
     tabState.setConnColor(coreState.currentConnColor);
     setTabTitle(item.id);
@@ -68,9 +68,9 @@ export function TableList() {
     const tabState = tab.state;
 
     tabState.setIsAddingTable(true);
-    tabState.setCurrentTableName("");
+    tabState.setTableName("");
     tabState.setMainAreaTab(MAIN_AREA_TAB_STRUCTURE);
-    tabState.setCurrentTableStructure([]);
+    tabState.setTableStructure([]);
   }
 
   // ========== 排序 | Sort ==========
@@ -361,7 +361,7 @@ export function TableList() {
   }, [tablData]);
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(coreState.activeTabId, "currentDbNme", (_val: any) => {
+  useActiveTabStore(coreState.activeTabId, "dbNme", (_val: any) => {
     getData();
   });
 

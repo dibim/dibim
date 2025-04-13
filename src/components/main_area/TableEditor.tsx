@@ -36,24 +36,24 @@ export function TableEditor() {
   const [editingTableComment, setEditingTableComment] = useState<string>(""); // 输入框中的表注释
 
   async function getData() {
-    if (tabState.currentTableName === "") {
+    if (tabState.tableName === "") {
       return;
     }
 
     // 获取表结构, 会在多个地方用, 在这里记录到 store
-    const res = await getTableStructure(tabState.currentTableName);
+    const res = await getTableStructure(tabState.tableName);
     if (res && res.data) {
-      tabState.setCurrentTableStructure(res.data);
+      tabState.setTableStructure(res.data);
       tabState.setUniqueFieldName(getUniqueFieldName(res.data));
       if (tabState.mainAreaTab === STR_EMPTY) tabState.setMainAreaTab(MAIN_AREA_TAB_DATA);
     }
     // 获取建表语句, 会在多个地方用, 在这里记录到 store
-    const resDdl = await getTableDdl(tabState.currentTableName);
+    const resDdl = await getTableDdl(tabState.tableName);
     if (resDdl && resDdl.data) {
       let sql = resDdl.data;
       if (sql === "") sql = t("No DDL found");
 
-      tabState.setCurrentTableDdl(sql);
+      tabState.setTableDdl(sql);
     }
   }
 
@@ -77,7 +77,7 @@ export function TableEditor() {
       target: STR_TABLE,
       action: tabState.isAddingTable ? STR_ADD : STR_EDIT,
       tableName: editingTableName, // 输入框里的表名
-      tableNameOld: tabState.currentTableName,
+      tableNameOld: tabState.tableName,
       comment: editingTableComment,
     };
 
@@ -97,7 +97,7 @@ export function TableEditor() {
   }, [editingTableName, editingTableComment]);
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(coreState.activeTabId, "currentTableName", (value: string) => {
+  useActiveTabStore(coreState.activeTabId, "tableName", (value: string) => {
     setEditingTableName(value);
     getData();
   });

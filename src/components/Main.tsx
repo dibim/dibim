@@ -89,7 +89,7 @@ export function Main({ id, className }: { id: string; className: string }) {
         className="cursor-pointer"
         style={{ borderBottom: `0.25rem solid ${coreSnap.currentConnColor || "rgba(0,0,0,0)"}` }}
       >
-        {(coreSnap.currentConnType === DB_SQLITE ? coreSnap.currentConnName : tabState.currentDbNme) ||
+        {(coreSnap.currentConnType === DB_SQLITE ? coreSnap.currentConnName : tabState.dbNme) ||
           t("No database connection")}
       </span>
     );

@@ -209,7 +209,7 @@ export function SqlEditor() {
     // FIXME: 现在只能获取已打开的表的字段, 要根据当前语句获取表名, 再查询表结构
     // 或者像  monaco-sql-languages 一样, 直接把所有的表 / 视图 /字段 都列出来
     // extractTableNames()
-    return tabState.currentTableStructure.map((item) => item.name);
+    return tabState.tableStructure.map((item) => item.name);
   }
 
   const beforeMount: BeforeMount = useMemo(

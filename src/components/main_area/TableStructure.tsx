@@ -128,7 +128,7 @@ export function TableStructure({
     return {
       target: STR_FIELD,
       action,
-      tableName: tabState.currentTableName,
+      tableName: tabState.tableName,
 
       autoIncrement: autoIncrement,
       comment: comment,
@@ -191,19 +191,19 @@ export function TableStructure({
 
     // 找到 alterData 里对应的字段的数据 | Find the data corresponding to the field in alterData
     let fieldDataIndex = -1;
-    tabState.currentTableStructure.map((item, index) => {
+    tabState.tableStructure.map((item, index) => {
       if (item.name === nameOld) {
         fieldDataIndex = index;
       }
     });
 
     if (dialogAction === STR_ADD) {
-      tabState.setCurrentTableStructure([...tabState.currentTableStructure, newFieldData]);
+      tabState.setTableStructure([...tabState.tableStructure, newFieldData]);
     }
 
     if (dialogAction === STR_EDIT) {
-      tabState.setCurrentTableStructure(
-        tabState.currentTableStructure.map((field, index) => (index === fieldDataIndex ? newFieldData : field)),
+      tabState.setTableStructure(
+        tabState.tableStructure.map((field, index) => (index === fieldDataIndex ? newFieldData : field)),
       );
 
       // 向 TableSection 内部添加变化 | Add changes to the inside of the TableSection
@@ -241,7 +241,7 @@ export function TableStructure({
   function handleDelSelectedField() {
     const arr = tableRef.current?.getMultiSelectData() || [];
     for (const index of arr) {
-      const field = tabState.currentTableStructure[index];
+      const field = tabState.tableStructure[index];
 
       // 创建表格时不需要记录字段的删除动作
       // When creating a table, do not need to delete a record field
@@ -249,7 +249,7 @@ export function TableStructure({
         const action = {
           target: STR_FIELD,
           action: STR_DELETE,
-          tableName: tabState.currentTableName,
+          tableName: tabState.tableName,
 
           comment: "",
           defaultValue: "",
@@ -289,7 +289,7 @@ export function TableStructure({
   }
 
   function handleEditFieldPopup(index: number) {
-    const field = tabState.currentTableStructure[index];
+    const field = tabState.tableStructure[index];
 
     let isPrimaryKey = field.isPrimaryKey;
     let isUniqueKey = field.isUniqueKey;
@@ -314,7 +314,7 @@ export function TableStructure({
     resetDialogData({
       target: STR_FIELD,
       action: STR_EDIT,
-      tableName: tabState.currentTableName,
+      tableName: tabState.tableName,
 
       autoIncrement: false, // FIXME: 添加支持
       comment: field.comment,
@@ -344,7 +344,7 @@ export function TableStructure({
   }
 
   async function handleCopyFieldName(index: number) {
-    const field = tabState.currentTableStructure[index];
+    const field = tabState.tableStructure[index];
     try {
       await navigator.clipboard.writeText(field.name);
       addNotification(t("Copied"), "success");
@@ -355,7 +355,7 @@ export function TableStructure({
   }
 
   async function handleCopyFieldType(index: number) {
-    const field = tabState.currentTableStructure[index];
+    const field = tabState.tableStructure[index];
     try {
       await navigator.clipboard.writeText(field.type);
       addNotification(t("Copied"), "success");
@@ -366,7 +366,7 @@ export function TableStructure({
   }
 
   function handleDeleteField(index: number) {
-    const field = tabState.currentTableStructure[index];
+    const field = tabState.tableStructure[index];
     const actionDataIndex = getActionDataIndex();
     const actionData = genActionData(STR_DELETE);
     actionData.name = field.name;
@@ -473,7 +473,7 @@ export function TableStructure({
   const [dataArr, setDataArr] = useState<ListRow[]>([]);
 
   function updateDataArr() {
-    const dataArrTemp = tabState.currentTableStructure.map(
+    const dataArrTemp = tabState.tableStructure.map(
       (row) =>
         ({
           name: { value: row.name, render: (val: any) => <div>{val}</div> },
@@ -506,14 +506,14 @@ export function TableStructure({
   // ========== 表格处理 结束 | Table data processing end ==========
 
   function resetData(resetAlterData: boolean) {
-    // 监听 currentTableStructure 变化后不可以执行 setAlterData, 否则应用表结构变化的数据会被清空
+    // 监听 tableStructure 变化后不可以执行 setAlterData, 否则应用表结构变化的数据会被清空
     if (resetAlterData) setAlterData([]);
     tableRef.current?.resetData();
     updateDataArr();
   }
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(coreState.activeTabId, "currentTableStructure", (_value: any) => {
+  useActiveTabStore(coreState.activeTabId, "tableStructure", (_value: any) => {
     resetData(false);
   });
 
@@ -600,7 +600,7 @@ export function TableStructure({
                   onClick={() => {
                     setIsPrimaryKey(!isPrimaryKey);
                     if (!isPrimaryKey) setIsUniqueKey(false);
-                    setIndexName(!isPrimaryKey ? `${name}_${tabSnap.currentTableName}_pkey` : "");
+                    setIndexName(!isPrimaryKey ? `${name}_${tabSnap.tableName}_pkey` : "");
                   }}
                   className="me-4"
                   id="indexPrimaryKey"
@@ -629,7 +629,7 @@ export function TableStructure({
                   onClick={() => {
                     if (!isUniqueKey) setIsPrimaryKey(false);
                     setIsUniqueKey(!isUniqueKey);
-                    setIndexName(!isUniqueKey ? `${name}_${tabSnap.currentTableName}_key` : "");
+                    setIndexName(!isUniqueKey ? `${name}_${tabSnap.tableName}_key` : "");
                   }}
                   className="me-4"
                   id="indexUniqueKey"

@@ -8,7 +8,7 @@ export function TableConstraint() {
   const tabState = tab.state;
 
   async function getData() {
-    await getTableStructure(tabState.currentTableName);
+    await getTableStructure(tabState.tableName);
   }
 
   useEffect(() => {

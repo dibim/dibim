@@ -102,7 +102,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
   function handleAdd() {
     tableRef.current?.willRanderTable();
 
-    const fields = tabState.currentTableStructure.map((item) => item.name);
+    const fields = tabState.tableStructure.map((item) => item.name);
     const rowData = Object.fromEntries(fields.map((key) => [key, ""]));
     rowData[NEW_ROW_IS_ADDED_FIELD] = "true"; // 新添加的行的标记
     const newTableData = [...tableData, rowData]; // 为了避免和更新的行的索引有冲突, 添加到表格的最后
@@ -187,7 +187,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
   }));
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(coreState.activeTabId, "currentTableName", (_val: any) => {
+  useActiveTabStore(coreState.activeTabId, "tableName", (_val: any) => {
     initData(true);
   });
 

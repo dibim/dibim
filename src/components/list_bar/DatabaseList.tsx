@@ -62,7 +62,7 @@ export function DatabaseList() {
     } else if (res.errorMessage !== "" && !res.errorMessage.includes("Duplicate connection name")) {
       addNotification(res.errorMessage, "error");
     } else {
-      tabState.setCurrentDbName(conn.dbName);
+      tabState.setDbName(conn.dbName);
       tabState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
       tabState.setConnColor(conn.color);
 
