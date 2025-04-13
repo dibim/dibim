@@ -7,7 +7,7 @@ import sqlWorker from "monaco-editor/esm/vs/basic-languages/sql/sql?worker";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import { useSnapshot } from "valtio";
 import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
-import { DEFAULT_PAGE_SIZE, RE_IS_SINGLET_QUERY } from "@/constants";
+import { DEFAULT_PAGE_SIZE, ERROR_FROMDB_PREFIX, RE_IS_SINGLET_QUERY } from "@/constants";
 import { getTab } from "@/context";
 import { exec, getAllTableName, getPageCount, query } from "@/databases/adapter,";
 import { RowData } from "@/databases/types";
@@ -95,9 +95,9 @@ export function SqlEditor() {
       }
 
       if (dbRes.errorMessage !== "") {
-        if (dbRes.errorMessage.startsWith("error returned from database: ")) {
+        if (dbRes.errorMessage.startsWith(ERROR_FROMDB_PREFIX)) {
           addMessageData({
-            message: dbRes.errorMessage.replace("error returned from database: ", " "),
+            message: dbRes.errorMessage.replace(ERROR_FROMDB_PREFIX, " "),
             type: "error",
           });
         } else {
@@ -141,9 +141,9 @@ export function SqlEditor() {
       if (res) {
         const resData = res as unknown as DbResult;
         if (resData.errorMessage !== "") {
-          if (resData.errorMessage.startsWith("error returned from database: ")) {
+          if (resData.errorMessage.startsWith(ERROR_FROMDB_PREFIX)) {
             addMessageData({
-              message: resData.errorMessage.replace("error returned from database: ", ""),
+              message: resData.errorMessage.replace(ERROR_FROMDB_PREFIX, ""),
               type: "error",
             });
           } else {

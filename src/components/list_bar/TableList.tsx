@@ -5,7 +5,7 @@ import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, CirclePlus, LucideIco
 import { MAIN_AREA_TABLE_EDITOR, MAIN_AREA_TAB_STRUCTURE, STR_EMPTY } from "@/constants";
 import { getTab } from "@/context";
 import {
-  exec,
+  execMany,
   genCopyTableCmd,
   genDeleteTableCmd,
   genRenameTableCmd,
@@ -182,7 +182,7 @@ export function TableList() {
   }
 
   async function handleConfirm() {
-    const res = await exec(willExecCmd);
+    const res = await execMany(willExecCmd);
 
     if (!res) {
       addNotification("The result of exec is null", "error");

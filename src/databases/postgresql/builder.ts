@@ -411,7 +411,12 @@ export class BuilderPg {
 
   // 生成复制表格的语句
   static genCopyTableCmd(tbName: string, tbNameNew: string) {
-    return `CREATE TABLE "${tbNameNew}" AS SELECT * FROM "${tbName}";`;
+    // 此语句不能复制索引, 要使用后面的语句才行
+    // return `CREATE TABLE "${tbNameNew}" AS SELECT * FROM "${tbName}";`;
+    return `
+      CREATE TABLE "${tbNameNew}" (LIKE ${tbName} INCLUDING ALL);
+      INSERT INTO "${tbNameNew}" SELECT * FROM "${tbName}";
+    `;
   }
 
   // 生成变更表格的语句

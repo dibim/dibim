@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { useSnapshot } from "valtio";
-import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
+import { DIR_H, ERROR_FROMDB_PREFIX, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
 import { getTab } from "@/context";
 import { execMany, fieldTypeOptions, genAlterCmd } from "@/databases/adapter,";
 import { AllAlterAction, AlterAction, FieldAlterAction } from "@/databases/types";
@@ -13,6 +13,7 @@ import { ConfirmDialog } from "../ConfirmDialog";
 import { DataTypeIcon } from "../DataTypeIcon";
 import { EditableTable, EditableTableMethods, ListRow } from "../EditableTable";
 import { LabeledDiv } from "../LabeledDiv";
+import { Null } from "../Null";
 import { SearchableSelect } from "../SearchableSelect";
 import { SqlCodeViewer } from "../SqlCodeViewer";
 import { TextNotification } from "../TextNotification";
@@ -277,6 +278,8 @@ export function TableStructure({
     }
 
     setWillExecCmd(genAlterCmd(alterData) || "");
+    setErrorMessage("");
+    setOkMessage("");
     setShowDialogAlter(true);
   }
 
@@ -386,9 +389,16 @@ export function TableStructure({
       resetData(true);
       setOkMessage("OK");
       addNotification("OK", "success");
+
+      //  TODO: 显示影响的行数
     } else {
-      setErrorMessage(res.errorMessage);
-      addNotification(res.errorMessage, "error");
+      let message = res.errorMessage;
+      if (res.errorMessage.startsWith(ERROR_FROMDB_PREFIX)) {
+        message = message.replace(ERROR_FROMDB_PREFIX, "");
+      }
+
+      setErrorMessage(message);
+      addNotification(message, "error");
     }
   }
 
@@ -481,7 +491,10 @@ export function TableStructure({
           },
           // 注意显示的是非空, 不是 isNullable 本身, 要取反
           isNotNull: { value: !(row.isNullable === true), render: (val: any) => <div>{val ? "✅" : ""}</div> },
-          defaultValue: { value: row.defaultValue, render: (val: any) => <div>{val}</div> },
+          defaultValue: {
+            value: row.defaultValue,
+            render: (val: any) => (val === null ? <Null /> : <div>{val}</div>),
+          },
           isPrimaryKey: { value: row.isPrimaryKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
           isUniqueKey: { value: row.isUniqueKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
           hasCheckConditions: { value: row.hasCheckConditions, render: (val: any) => <div>{val ? "✅" : ""}</div> },
@@ -588,7 +601,11 @@ export function TableStructure({
               <div className="flex items-center">
                 <Checkbox
                   checked={isPrimaryKey}
-                  onClick={() => setIsPrimaryKey(!isPrimaryKey)}
+                  onClick={() => {
+                    setIsPrimaryKey(!isPrimaryKey);
+                    if (!isPrimaryKey) setIsUniqueKey(false);
+                    setIndexName(!isPrimaryKey ? `${name}_${tabSnap.currentTableName}_pkey` : "");
+                  }}
                   className="me-4"
                   id="indexPrimaryKey"
                 />
@@ -613,7 +630,11 @@ export function TableStructure({
               <div className="flex items-center">
                 <Checkbox
                   checked={isUniqueKey}
-                  onClick={() => setIsUniqueKey(isUniqueKey)}
+                  onClick={() => {
+                    if (!isUniqueKey) setIsPrimaryKey(false);
+                    setIsUniqueKey(!isUniqueKey);
+                    setIndexName(!isUniqueKey ? `${name}_${tabSnap.currentTableName}_key` : "");
+                  }}
                   className="me-4"
                   id="indexUniqueKey"
                 />

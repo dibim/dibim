@@ -135,7 +135,8 @@ pub async fn execute_many(
 
                 #[cfg(debug_assertions)]
                 {
-                    print_sql(query.sql(), 2);
+                    let sql = format!("{};\n", query.sql());
+                    print_sql(&sql, 2);
                 }
                 query.execute(&mut *tx).await?;
             }
@@ -165,7 +166,8 @@ pub async fn execute_many(
 
                 #[cfg(debug_assertions)]
                 {
-                    print_sql(query.sql(), 2);
+                    let sql = format!("{};\n", query.sql());
+                    print_sql(&sql, 2);
                 }
                 query.execute(&mut *tx).await?;
             }
@@ -195,7 +197,8 @@ pub async fn execute_many(
 
                 #[cfg(debug_assertions)]
                 {
-                    print_sql(query.sql(), 2);
+                    let sql = format!("{};\n", query.sql());
+                    print_sql(&sql, 2);
                 }
                 query.execute(&mut *tx).await?;
             }

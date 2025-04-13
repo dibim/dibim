@@ -1,4 +1,5 @@
 import { ListRow } from "@/components/EditableTable";
+import { Null } from "@/components/Null";
 import { RowData } from "@/databases/types";
 
 export function rawRow2EtRow(data: RowData[]) {
@@ -10,7 +11,7 @@ export function rawRow2EtRow(data: RowData[]) {
         wrappedRow[key] = {
           value: (row as any)[key],
           render: (val: any) => {
-            if (val === null) return <div className="text-gray-500">NULL</div>;
+            if (val === null) return <Null />;
 
             return <div>{val}</div>;
           },

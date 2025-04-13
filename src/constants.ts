@@ -84,3 +84,6 @@ export const DEFAULT_PAGE_SIZE = 50;
 // 新添加的行的标记, 这是一个非法的 sql 字段名, 避免和已有的字段名重名
 // The tag for the newly added row is an invalid SQL field name, chosen to avoid conflicts with existing field names.
 export const NEW_ROW_IS_ADDED_FIELD = "; -- IS-NEW-ROW -- ;";
+
+//
+export const ERROR_FROMDB_PREFIX = "error returned from database: ";

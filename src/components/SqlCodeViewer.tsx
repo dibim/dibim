@@ -6,8 +6,10 @@ import sql from "highlight.js/lib/languages/sql";
 import "highlight.js/styles/tokyo-night-dark.css";
 import { Copy } from "lucide-react";
 import { DB_POSTGRESQL } from "@/databases/constants";
-import { addNotification, coreState } from "@/store/core";
+import { coreState } from "@/store/core";
+import { TextNotificationData } from "@/types/types";
 import { formatSql } from "@/utils/format_sql";
+import { TextNotification } from "./TextNotification";
 
 hljs.registerLanguage("sql", sql);
 hljs.registerLanguage("postgresql", pgsql);
@@ -17,6 +19,7 @@ export function SqlCodeViewer({ ddl }: { ddl: string }) {
 
   const codeRef = useRef<HTMLElement>(null);
   const [sql, setSql] = useState<string>("");
+  const [messageData, setMessageData] = useState<TextNotificationData | null>(null);
 
   // TODO: add support for SQLite, MySQ, Oracle
   function getLang() {
@@ -29,11 +32,14 @@ export function SqlCodeViewer({ ddl }: { ddl: string }) {
     try {
       if (codeRef.current) {
         await navigator.clipboard.writeText(codeRef.current.innerText);
-        addNotification(t("Copied"), "success");
+        setMessageData({
+          message: t("Copied"),
+          type: "success",
+        });
       }
     } catch (err) {
       console.log("Copy failed, error: ", err);
-      addNotification(t("Copy failed"), "error");
+      setMessageData({ message: t("Copy failed"), type: "error" });
     }
   }
 
@@ -55,10 +61,20 @@ export function SqlCodeViewer({ ddl }: { ddl: string }) {
 
   return (
     <>
-      <p className="flex text-muted-foreground cursor-pointer pb-2" onClick={handleClick}>
-        <Copy />
-        <span className="ps-4">{t("Copy")}</span>
-      </p>
+      <div className="flex">
+        <div className="flex text-muted-foreground cursor-pointer pb-2" onClick={handleClick}>
+          <Copy />
+          <span className="ps-4">{t("Copy")}</span>
+        </div>
+        <div>
+          {messageData && (
+            <TextNotification
+              message={`${messageData.time ? messageData.time.toLocaleString() + " " : ""}${messageData.message}`}
+              type={messageData?.type}
+            ></TextNotification>
+          )}
+        </div>
+      </div>
       <pre>
         <code ref={codeRef} className={`language-${getLang()}`}>
           {sql}
