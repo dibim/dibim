@@ -139,11 +139,6 @@ export function TableList() {
     setWillExecCmd(genRenameTableCmd(operateTableName, e.currentTarget.value) || "");
   }
 
-  async function handleRename() {
-    exec(willExecCmd);
-    getData();
-  }
-
   async function handleCopyTableName(tableName: string) {
     try {
       await navigator.clipboard.writeText(tableName);
@@ -157,15 +152,11 @@ export function TableList() {
   async function handleCopyTablePopup(tableName: string) {
     setOperateTableName(tableName);
     setShowDialogCopyTable(true);
+    setWillExecCmd(genCopyTableCmd(tableName, tableName + "_bak") || "");
   }
 
   async function handleCopyTableInput(e: React.FormEvent<HTMLInputElement>) {
     setWillExecCmd(genCopyTableCmd(operateTableName, e.currentTarget.value) || "");
-  }
-
-  async function handleCopyTable() {
-    exec(willExecCmd);
-    getData();
   }
 
   function handleImport(_tableName: string) {
@@ -192,7 +183,6 @@ export function TableList() {
 
   async function handleConfirm() {
     const res = await exec(willExecCmd);
-    // TODO: res 为空
 
     if (!res) {
       addNotification("The result of exec is null", "error");
@@ -412,7 +402,7 @@ export function TableList() {
           setShowDialogRename(false);
         }}
         okText={t("Confirm")}
-        okCb={handleRename}
+        okCb={handleConfirm}
       />
 
       <ConfirmDialog
@@ -423,7 +413,7 @@ export function TableList() {
             <div className="flex items-center">
               <div className="pe-4">{t("New nmame")}</div>
               <div className="flex-1">
-                <Input onInput={handleCopyTableInput} />
+                <Input defaultValue={operateTableName + "_bak"} onInput={handleCopyTableInput} />
               </div>
             </div>
             <div className="pt-4">
@@ -436,7 +426,7 @@ export function TableList() {
           setShowDialogCopyTable(false);
         }}
         okText={t("Confirm")}
-        okCb={handleCopyTable}
+        okCb={handleConfirm}
       />
 
       <ConfirmDialog
@@ -451,6 +441,7 @@ export function TableList() {
         okText={t("Confirm")}
         okCb={handleConfirm}
       />
+
       <ConfirmDialog
         open={showDialogDelete}
         title={t("&confirmDeleteTable", { name: operateTableName })}
