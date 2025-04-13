@@ -9,8 +9,7 @@ import { useSnapshot } from "valtio";
 import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
 import { DEFAULT_PAGE_SIZE, RE_IS_SINGLET_QUERY } from "@/constants";
 import { getTab } from "@/context";
-import { exec, query } from "@/databases/adapter,";
-import { getPageCount } from "@/databases/postgresql/sql";
+import { exec, getAllTableName, getPageCount, query } from "@/databases/adapter,";
 import { RowData } from "@/databases/types";
 import { extractConditionClause } from "@/databases/utils";
 import { coreState } from "@/store/core";
@@ -52,12 +51,16 @@ export function SqlEditor() {
   const { t } = useTranslation();
   const coreSnap = useSnapshot(coreState);
   const tableRef = useRef<TableSectionMethods | null>(null);
-  const [messageData, setMessageData] = useState<TextNotificationData | null>(null);
+  const [messageData, setMessageData] = useState<TextNotificationData[]>([]);
+  function addMessageData(data: TextNotificationData) {
+    data.time = new Date();
+    setMessageData([...(messageData || []), data]);
+  }
 
   // ========== 执行语句 | Execute statements ==========
   async function queryPage(page: number) {
     if (coreState.currentConnName === "") {
-      setMessageData({
+      addMessageData({
         message: t("Please connect to the database first"),
         type: "error",
       });
@@ -77,28 +80,35 @@ export function SqlEditor() {
         condition.condition,
       );
 
-      if (tableRef.current) {
-        tableRef.current.setFieldNames(dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : []);
-        tableRef.current.setTableData(data);
-        tableRef.current.setPageTotal(res.pageTotal);
-        tableRef.current.setItemsTotal(res.itemsTotal);
+      if (res) {
+        if (tableRef.current) {
+          tableRef.current.setFieldNames(dbRes.columnName ? (JSON.parse(dbRes.columnName) as string[]) : []);
+          tableRef.current.setTableData(data);
+          tableRef.current.setPageTotal(res.pageTotal);
+          tableRef.current.setItemsTotal(res.itemsTotal);
+        }
+      } else {
+        addMessageData({
+          message: "The query returned null.",
+          type: "info",
+        });
       }
 
       if (dbRes.errorMessage !== "") {
         if (dbRes.errorMessage.startsWith("error returned from database: ")) {
-          setMessageData({
+          addMessageData({
             message: dbRes.errorMessage.replace("error returned from database: ", " "),
             type: "error",
           });
         } else {
-          setMessageData({
+          addMessageData({
             message: dbRes.errorMessage,
             type: "info",
           });
         }
       }
     } else {
-      setMessageData({
+      addMessageData({
         message: "The query returned null.",
         type: "info",
       });
@@ -109,7 +119,7 @@ export function SqlEditor() {
     const code = getEditorCode();
     const res = formatSql(coreState.currentConnType, code);
     if (res.errorMessage !== "") {
-      setMessageData({ message: res.errorMessage, type: "error" });
+      addMessageData({ message: res.errorMessage, type: "error" });
     } else {
       setEditorCode(res.result);
     }
@@ -132,20 +142,21 @@ export function SqlEditor() {
         const resData = res as unknown as DbResult;
         if (resData.errorMessage !== "") {
           if (resData.errorMessage.startsWith("error returned from database: ")) {
-            setMessageData({
-              message: resData.errorMessage.replace("error returned from database: ", " "),
+            addMessageData({
+              message: resData.errorMessage.replace("error returned from database: ", ""),
               type: "error",
             });
+          } else {
+            addMessageData({
+              message: resData.errorMessage,
+              type: "info",
+            });
           }
-          setMessageData({
-            message: resData.errorMessage,
-            type: "info",
-          });
         } else {
           //  TODO: 显示影响的行数
         }
       } else {
-        setMessageData({
+        addMessageData({
           message: "The query returned null.",
           type: "error",
         });
@@ -208,43 +219,103 @@ export function SqlEditor() {
     });
   };
 
-  const beforeMount: BeforeMount = useMemo(
-    () => (monacoInstance: typeof Monaco) => {
-      monacoInstance.languages.register({ id: "sql" });
+  function getFields() {
+    // FIXME: 现在只能获取已打开的表的字段, 要根据当前语句获取表名, 再查询表结构
+    // 或者像  monaco-sql-languages 一样, 直接把所有的表 / 视图 /字段 都列出来
+    // extractTableNames()
+    return tabState.currentTableStructure.map((item) => item.name);
+  }
 
-      // 代码补全 | Code completion
-      monacoInstance.languages.registerCompletionItemProvider("sql", {
-        triggerCharacters: SQL_KEYWORDS.map((k) => k[0].toLowerCase()),
-        provideCompletionItems: (model, position) => {
-          // 获取当前光标前的单词范围
+  const beforeMount: BeforeMount = useMemo(
+    () => (monaco: typeof Monaco) => {
+      monaco.languages.registerCompletionItemProvider("sql", {
+        provideCompletionItems: async (model, position) => {
           const word = model.getWordUntilPosition(position);
 
-          const prefix = model
-            .getValueInRange({
-              startLineNumber: position.lineNumber,
-              startColumn: word.startColumn,
-              endLineNumber: position.lineNumber,
-              endColumn: position.column,
-            })
-            .toLowerCase();
+          const range = {
+            startLineNumber: position.lineNumber,
+            endLineNumber: position.lineNumber,
+            startColumn: word.startColumn,
+            endColumn: word.endColumn,
+          };
+
+          // 获取用户输入的前一个单词
+          const lineContent = model.getLineContent(position.lineNumber);
+          const previousWord = lineContent
+            .substring(0, position.column - 1)
+            .trim()
+            .split(/\s+/)
+            .pop();
 
           // 生成补全建议
-          const suggestions = SQL_KEYWORDS.filter((k) => k.toLowerCase().startsWith(prefix)).map((keyword) => ({
-            label: keyword,
-            kind: monacoInstance.languages.CompletionItemKind.Keyword,
-            insertText: keyword + (SQL_KEYWORDS.includes(keyword) ? " " : ""), // 添加空格
-            range: new monacoInstance.Range( // 替换范围
-              position.lineNumber,
-              word.startColumn, // 输入起始位置
-              position.lineNumber,
-              word.endColumn, // 输入结束位置
-            ),
-            filterText: keyword.toLowerCase(), // 强制小写匹配
-            sortText: "0" + keyword, // 确保正确排序
-          }));
+          let suggestions: Monaco.languages.CompletionItem[] = [];
+
+          if (previousWord?.toUpperCase() === "SELECT") {
+            // 如果前一个单词是 SELECT，则提示字段名
+
+            suggestions = getFields().map((tableName) => ({
+              label: tableName,
+              kind: monaco.languages.CompletionItemKind.Folder,
+              insertText: tableName,
+              range: range,
+            }));
+          } else if (previousWord?.toUpperCase() === "FROM" || previousWord?.toUpperCase() === "JOIN") {
+            // 如果前一个单词是 FROM 或 JOIN，则提示表名
+            const res = await getAllTableName();
+            if (res && res.data) {
+              suggestions = res.data.map((tableName) => ({
+                label: tableName,
+                kind: monaco.languages.CompletionItemKind.Folder,
+                insertText: tableName,
+                range: range,
+              }));
+            }
+          } else if (previousWord?.toUpperCase() === "WHERE") {
+            // 如果前一个单词是 WHERE，则提示字段名
+            suggestions = getFields().map((fn) => ({
+              label: fn,
+              kind: monaco.languages.CompletionItemKind.Variable,
+              insertText: fn,
+              range: range,
+            }));
+          } else if (previousWord?.toUpperCase() === "USE") {
+            // 如果前一个单词是 USE，则提示数据库名
+            // TODO: 实现功能
+            //   suggestions = databaseNames.map((dbName) => ({
+            //     label: dbName,
+            //     kind: monaco.languages.CompletionItemKind.Module,
+            //     insertText: dbName,
+            //     range: range,
+            //   }));
+          } else {
+            // 默认提示 SQL 关键字
+            const prefix = model
+              .getValueInRange({
+                startLineNumber: position.lineNumber,
+                startColumn: word.startColumn,
+                endLineNumber: position.lineNumber,
+                endColumn: position.column,
+              })
+              .toLowerCase();
+
+            suggestions = SQL_KEYWORDS.filter((k) => k.toLowerCase().startsWith(prefix)).map((keyword) => ({
+              label: keyword,
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertText: keyword + (SQL_KEYWORDS.includes(keyword) ? " " : ""), // 添加空格
+              range: new monaco.Range( // 替换范围
+                position.lineNumber,
+                word.startColumn, // 输入起始位置
+                position.lineNumber,
+                word.endColumn, // 输入结束位置
+              ),
+              filterText: keyword.toLowerCase(), // 强制小写匹配
+              sortText: "0" + keyword, // 确保正确排序
+            }));
+          }
 
           return { suggestions };
         },
+        triggerCharacters: [" ", "\n"], // 触发提示的字符
       });
     },
     [],
@@ -315,11 +386,23 @@ export function SqlEditor() {
       content: <p>{t("Format")}(F8)</p>,
     },
     {
-      trigger: <Grid3x3 className="mb-2" onClick={() => setShowResultBar(!showResultBar)} />,
+      trigger: (
+        <Grid3x3
+          className="mb-2"
+          onClick={() => setShowResultBar(!showResultBar)}
+          color={`var(${showResultBar ? "--fvm-primary-clr" : "--foreground"})`}
+        />
+      ),
       content: <p>{t("Toggle result sets")}</p>,
     },
     {
-      trigger: <ShieldAlert className="mb-2" onClick={() => setShowStatusBar(!showStatusBar)} />,
+      trigger: (
+        <ShieldAlert
+          className="mb-2"
+          onClick={() => setShowStatusBar(!showStatusBar)}
+          color={`var(${showStatusBar ? "--fvm-primary-clr" : "--foreground"})`}
+        />
+      ),
       content: <p>{t("Toggle status bar")}</p>,
     },
   ];
@@ -377,8 +460,16 @@ export function SqlEditor() {
             initData={() => {}}
           />
         </div>
+
         <div>
-          <TextNotification message={messageData?.message || ""} type={messageData?.type}></TextNotification>
+          {messageData?.length > 0 &&
+            messageData.map((item, index) => (
+              <TextNotification
+                key={index}
+                message={`${item.time ? item.time.toLocaleString() + " " : ""}${item.message}`}
+                type={item?.type}
+              ></TextNotification>
+            ))}
         </div>
       </Split>
     </div>

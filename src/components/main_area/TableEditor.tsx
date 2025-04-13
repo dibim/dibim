@@ -98,8 +98,6 @@ export function TableEditor() {
 
   // 监听 store 的变化 | Monitor changes in the store
   useActiveTabStore(coreState.activeTabId, "currentTableName", (value: string) => {
-    console.log("表名表话  ::: ", coreState.activeTabId, value);
-
     setEditingTableName(value);
     getData();
   });
