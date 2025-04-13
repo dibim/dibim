@@ -118,19 +118,18 @@ export function TableList() {
 
   // ========== 上下文按钮 | Context button ==========
   const [operateTableName, setOperateTableName] = useState<string>("");
-  const [showDialogDelete, setShowDialogDelete] = useState<boolean>(false);
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [showDialogTitle, setShowDialogTitle] = useState<string>("");
   const [showDialogRename, setShowDialogRename] = useState<boolean>(false);
   const [showDialogCopyTable, setShowDialogCopyTable] = useState<boolean>(false);
-  const [showDialogTruncate, setShowDialogTruncate] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [okMessage, setOkMessage] = useState<string>("");
   const [willExecCmd, setWillExecCmd] = useState<string>("");
 
   function closeDialog() {
-    setShowDialogDelete(false);
     setShowDialogRename(false);
     setShowDialogCopyTable(false);
-    setShowDialogTruncate(false);
+    setShowDialog(false);
   }
 
   async function handleRenamePopup(tableName: string) {
@@ -173,15 +172,17 @@ export function TableList() {
   }
 
   function handleTruncatePopup(tableName: string) {
-    setOperateTableName(tableName);
-    setShowDialogTruncate(true);
+    setShowDialogTitle(t("&confirmTruncateTable", { name: operateTableName }));
     setWillExecCmd(genTruncateTableCmd(tableName) || "");
+    setOperateTableName(tableName);
+    setShowDialog(true);
   }
 
   function handleDeletePopup(tableName: string) {
-    setOperateTableName(tableName);
-    setShowDialogDelete(true);
+    setShowDialogTitle(t("&confirmDeleteTable", { name: operateTableName }));
     setWillExecCmd(genDeleteTableCmd(tableName) || "");
+    setOperateTableName(tableName);
+    setShowDialog(true);
   }
 
   async function handleConfirm() {
@@ -436,8 +437,8 @@ export function TableList() {
       />
 
       <ConfirmDialog
-        open={showDialogTruncate}
-        title={t("&confirmTruncateTable", { name: operateTableName })}
+        open={showDialog}
+        title={showDialogTitle}
         description={t("&confirmStatement")}
         content={
           <>
@@ -448,26 +449,7 @@ export function TableList() {
         }
         cancelText={t("Cancel")}
         cancelCb={() => {
-          setShowDialogTruncate(false);
-        }}
-        okText={t("Confirm")}
-        okCb={handleConfirm}
-      />
-
-      <ConfirmDialog
-        open={showDialogDelete}
-        title={t("&confirmDeleteTable", { name: operateTableName })}
-        description={t("&confirmStatement")}
-        content={
-          <>
-            <SqlCodeViewer ddl={willExecCmd} />
-            {errorMessage && <TextNotification type="error" message={errorMessage}></TextNotification>}
-            {okMessage && <TextNotification type="success" message={okMessage}></TextNotification>}
-          </>
-        }
-        cancelText={t("Cancel")}
-        cancelCb={() => {
-          setShowDialogDelete(false);
+          setShowDialog(false);
         }}
         okText={t("Confirm")}
         okCb={handleConfirm}
