@@ -63,6 +63,8 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
 
   // 修改主键
   if (faa.isPrimaryKey) {
+    /*
+    FIXME: There may be an error here
     // 编辑主键的, 先都删除原先的, 如果有索引名再新建一个
     res.push(`
       -- 删除关联到${faa.name}字段的主键约束名称
@@ -89,6 +91,7 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
         END IF;
       END $$; 
     `);
+    */
 
     if (faa.indexName) {
       // 处理自增
@@ -106,6 +109,8 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
 
   // 修改唯一索引
   if (faa.isUniqueKey) {
+    /*
+    FIXME: There may be an error here
     // 编辑唯一索引的, 先都删除原先的, 如果有索引名再新建一个
     res.push(`
       -- 删除关联到${faa.name}字段的唯一索引（不包括主键）
@@ -134,12 +139,15 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
         END IF;
       END $$;
     `);
+    */
 
     if (faa.indexName) {
       res.push(`CREATE UNIQUE INDEX "${faa.indexName}" ON "${faa.tableName}" ("${faa.name}");`);
     }
   }
   if (!faa.isPrimaryKey && !faa.isUniqueKey) {
+    /*
+    FIXME: There may be an error here
     // 没有设置主键和唯一索引的, 删除这一字段的主键和唯一索引
     res.push(`    
       -- 删除关联到${faa.name}字段的唯一约束（包括主键）
@@ -174,6 +182,7 @@ export function genAlterFieldEdit(faa: FieldAlterAction) {
         END IF;
       END $$;
     `);
+    */
   }
 
   // 设置字段为 NOT NULL
@@ -240,7 +249,7 @@ export function genAlterTableEdit(taa: TableAlterAction) {
   if (taa.comment) {
     res.push(`COMMENT ON TABLE "${taa.tableName}" IS '${taa.comment}';`);
   } else {
-    res.push(`COMMENT ON TABLE "${taa.tableName}" IS NULL`);
+    res.push(`COMMENT ON TABLE "${taa.tableName}" IS NULL;`);
   }
 
   if (taa.tableName !== taa.tableNameOld) {

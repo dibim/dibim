@@ -5,6 +5,7 @@ import { useSnapshot } from "valtio";
 import { DEFAULT_PAGE_SIZE } from "@/constants";
 import { getTab } from "@/context";
 import { getTableData } from "@/databases/adapter,";
+import { getDefultOrderField } from "@/databases/utils";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
 import { addNotification, coreState } from "@/store/core";
 import { TableSection, TableSectionMethods } from "../TableSection";
@@ -31,8 +32,8 @@ export function TableData() {
     let res = checked ? [...prevVal, val] : prevVal.filter((item) => item !== val);
 
     // 确保必须有一个唯一字段
-    const pks = tabState.currentTableStructure.filter((item) => item.isPrimaryKey);
-    const uks = tabState.currentTableStructure.filter((item) => item.isUniqueKey);
+    const pks = tabState.tableStructure.filter((item) => item.isPrimaryKey);
+    const uks = tabState.tableStructure.filter((item) => item.isUniqueKey);
     let hasUk = false;
     pks.map((item) => {
       if (res.includes(item.name)) hasUk = true;
@@ -82,7 +83,7 @@ export function TableData() {
               </label>
             </DropdownMenuItem>
 
-            {snapTab.currentTableStructure.map((item, index) => (
+            {snapTab.tableStructure.map((item, index) => (
               <DropdownMenuItem
                 key={index}
                 onSelect={(e) => {
@@ -123,16 +124,18 @@ export function TableData() {
    * @return {*}
    */
   async function getData(page: number, isInit?: boolean) {
-    if (tabState.currentTableName === "") {
+    if (tabState.tableName === "") {
       return [];
     }
 
+    const sortField = getDefultOrderField(tabState.tableStructure);
     const res = await getTableData({
-      tableName: tabState.currentTableName,
+      tableName: tabState.tableName,
       currentPage: page,
       fields: isInit ? ALL_FIELD : checkedField,
       pageSize: DEFAULT_PAGE_SIZE,
       where: "",
+      sortField: [{ fieldName: sortField, direction: "ASC" }],
     });
 
     if (res) {
@@ -155,7 +158,7 @@ export function TableData() {
   }
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(coreState.activeTabId, "currentDbNme", (_val: any) => {
+  useActiveTabStore(coreState.activeTabId, "dbNme", (_val: any) => {
     setCheckedField(["*"]);
   });
 

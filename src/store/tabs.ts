@@ -4,14 +4,17 @@ import { FieldStructure } from "@/databases/types";
 import { MainAreaTab, MainAreaType } from "@/types/types";
 
 export interface TabState {
-  color: string;
-  setColor: (val: string) => void;
+  connColor: string;
+  setConnColor: (val: string) => void;
 
-  currentDbNme: string;
-  setCurrentDbName: (val: string) => void;
+  connName: string;
+  setConnName: (val: string) => void;
 
-  currentTableName: string;
-  setCurrentTableName: (val: string) => void;
+  dbNme: string;
+  setDbName: (val: string) => void;
+
+  tableName: string;
+  setTableName: (val: string) => void;
 
   // 唯一字段(主键或唯一索引)的字段名
   // The field name of a unique field (primary key or unique index)
@@ -20,11 +23,11 @@ export interface TabState {
 
   // 当前表的建表语句
   // The table creation statement for the current table
-  currentTableDdl: string;
-  setCurrentTableDdl: (val: string) => void;
+  tableDdl: string;
+  setTableDdl: (val: string) => void;
 
-  currentTableStructure: FieldStructure[];
-  setCurrentTableStructure: (val: FieldStructure[]) => void;
+  tableStructure: FieldStructure[];
+  setTableStructure: (val: FieldStructure[]) => void;
 
   mainAreaType: MainAreaType;
   setMainAreaType: (val: MainAreaType) => void;
@@ -44,19 +47,24 @@ export interface TabState {
 
 export const createTabState = () => {
   return proxy({
-    color: "",
-    setColor(val: string) {
-      this.color = val;
+    connColor: "",
+    setConnColor(val: string) {
+      this.connColor = val;
     },
 
-    currentDbNme: "",
-    setCurrentDbName(val: string) {
-      this.currentDbNme = val;
+    connName: "",
+    setConnName(val: string) {
+      this.connName = val;
     },
 
-    currentTableName: "",
-    setCurrentTableName(val: string) {
-      this.currentTableName = val;
+    dbNme: "",
+    setDbName(val: string) {
+      this.dbNme = val;
+    },
+
+    tableName: "",
+    setTableName(val: string) {
+      this.tableName = val;
     },
 
     uniqueFieldName: "",
@@ -64,14 +72,14 @@ export const createTabState = () => {
       this.uniqueFieldName = val;
     },
 
-    currentTableDdl: "",
-    setCurrentTableDdl(val: string) {
-      this.currentTableDdl = val;
+    tableDdl: "",
+    setTableDdl(val: string) {
+      this.tableDdl = val;
     },
 
-    currentTableStructure: [],
-    setCurrentTableStructure(val: FieldStructure[]) {
-      this.currentTableStructure = val;
+    tableStructure: [],
+    setTableStructure(val: FieldStructure[]) {
+      this.tableStructure = val;
     },
 
     mainAreaType: MAIN_AREA_WELCOME,

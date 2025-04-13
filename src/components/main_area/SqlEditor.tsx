@@ -7,7 +7,7 @@ import sqlWorker from "monaco-editor/esm/vs/basic-languages/sql/sql?worker";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import { useSnapshot } from "valtio";
 import Editor, { BeforeMount, OnChange, OnMount } from "@monaco-editor/react";
-import { DEFAULT_PAGE_SIZE, RE_IS_SINGLET_QUERY } from "@/constants";
+import { DEFAULT_PAGE_SIZE, ERROR_FROM_DB_PREFIX, RE_IS_SINGLET_QUERY } from "@/constants";
 import { getTab } from "@/context";
 import { exec, getAllTableName, getPageCount, query } from "@/databases/adapter,";
 import { RowData } from "@/databases/types";
@@ -95,17 +95,10 @@ export function SqlEditor() {
       }
 
       if (dbRes.errorMessage !== "") {
-        if (dbRes.errorMessage.startsWith("error returned from database: ")) {
-          addMessageData({
-            message: dbRes.errorMessage.replace("error returned from database: ", " "),
-            type: "error",
-          });
-        } else {
-          addMessageData({
-            message: dbRes.errorMessage,
-            type: "info",
-          });
-        }
+        addMessageData({
+          message: dbRes.errorMessage.replace(ERROR_FROM_DB_PREFIX, " "),
+          type: "error",
+        });
       }
     } else {
       addMessageData({
@@ -141,17 +134,10 @@ export function SqlEditor() {
       if (res) {
         const resData = res as unknown as DbResult;
         if (resData.errorMessage !== "") {
-          if (resData.errorMessage.startsWith("error returned from database: ")) {
-            addMessageData({
-              message: resData.errorMessage.replace("error returned from database: ", ""),
-              type: "error",
-            });
-          } else {
-            addMessageData({
-              message: resData.errorMessage,
-              type: "info",
-            });
-          }
+          addMessageData({
+            message: resData.errorMessage.replace(ERROR_FROM_DB_PREFIX, " "),
+            type: "error",
+          });
         } else {
           //  TODO: 显示影响的行数
         }
@@ -223,7 +209,7 @@ export function SqlEditor() {
     // FIXME: 现在只能获取已打开的表的字段, 要根据当前语句获取表名, 再查询表结构
     // 或者像  monaco-sql-languages 一样, 直接把所有的表 / 视图 /字段 都列出来
     // extractTableNames()
-    return tabState.currentTableStructure.map((item) => item.name);
+    return tabState.tableStructure.map((item) => item.name);
   }
 
   const beforeMount: BeforeMount = useMemo(
@@ -347,14 +333,6 @@ export function SqlEditor() {
   }
   // ========== 编辑器 结束 | Editor end ==========
 
-  // 修改已有数据的变更记录, 不含添加和删除
-  // Change logs for modifying existing data, excluding additions and deletions.
-  // const [changes, setChanges] = useState<TableDataChange[]>([]);
-  // function onChange(val: TableDataChange[]) {
-  //   setChanges(val);
-  //   // FIXME: 保存时生成语句
-  // }
-
   async function getData(page: number) {
     if (getEditorCode() === "") return;
 
@@ -378,17 +356,17 @@ export function SqlEditor() {
 
   const tooltipSectionData = [
     {
-      trigger: <Play className="mb-2" onClick={execCode} />,
+      trigger: <Play className="mb-4" onClick={execCode} />,
       content: <p>{t("Execute")}(F9)</p>,
     },
     {
-      trigger: <NotebookText className="mb-2" onClick={formatCode} />,
+      trigger: <NotebookText className="mb-4" onClick={formatCode} />,
       content: <p>{t("Format")}(F8)</p>,
     },
     {
       trigger: (
         <Grid3x3
-          className="mb-2"
+          className="mb-4"
           onClick={() => setShowResultBar(!showResultBar)}
           color={`var(${showResultBar ? "--fvm-primary-clr" : "--foreground"})`}
         />
@@ -398,7 +376,7 @@ export function SqlEditor() {
     {
       trigger: (
         <ShieldAlert
-          className="mb-2"
+          className="mb-4"
           onClick={() => setShowStatusBar(!showStatusBar)}
           color={`var(${showStatusBar ? "--fvm-primary-clr" : "--foreground"})`}
         />

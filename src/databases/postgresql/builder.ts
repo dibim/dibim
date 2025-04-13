@@ -342,8 +342,12 @@ export class BuilderPg {
 
     let offset = p.pageSize * (p.currentPage - 1);
     if (offset < 0) offset = 0;
-    let fields = p.fields.length === 1 && p.fields[0] === "*" ? "*" : `"${p.fields.join('","')}"`;
-    const sql = `SELECT ${fields} FROM "${p.tableName}" ${p.where} LIMIT ${p.pageSize} OFFSET ${offset};`;
+    let fieldStr = p.fields.length === 1 && p.fields[0] === "*" ? "*" : `"${p.fields.join('","')}"`;
+    let sortStr =
+      p.sortField.length > 0
+        ? `ORDER BY ${p.sortField.map((item) => `"${item.fieldName}" ${item.direction}`).join(",")}`
+        : "";
+    const sql = `SELECT ${fieldStr} FROM "${p.tableName}" ${p.where} ${sortStr} LIMIT ${p.pageSize} OFFSET ${offset};`;
     const dbRes = await invoker.querySql(connName, sql);
 
     return {
@@ -411,7 +415,12 @@ export class BuilderPg {
 
   // 生成复制表格的语句
   static genCopyTableCmd(tbName: string, tbNameNew: string) {
-    return `CREATE TABLE "${tbNameNew}" AS SELECT * FROM "${tbName}";`;
+    // 此语句不能复制索引, 要使用后面的语句才行
+    // return `CREATE TABLE "${tbNameNew}" AS SELECT * FROM "${tbName}";`;
+    return `
+      CREATE TABLE "${tbNameNew}" (LIKE ${tbName} INCLUDING ALL);
+      INSERT INTO "${tbNameNew}" SELECT * FROM "${tbName}";
+    `;
   }
 
   // 生成变更表格的语句

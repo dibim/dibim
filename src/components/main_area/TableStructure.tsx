@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { useSnapshot } from "valtio";
-import { DIR_H, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
+import { DIR_H, ERROR_FROM_DB_PREFIX, HEDAER_H, STR_ADD, STR_DELETE, STR_EDIT, STR_EMPTY, STR_FIELD } from "@/constants";
 import { getTab } from "@/context";
 import { execMany, fieldTypeOptions, genAlterCmd } from "@/databases/adapter,";
 import { AllAlterAction, AlterAction, FieldAlterAction } from "@/databases/types";
@@ -13,6 +13,7 @@ import { ConfirmDialog } from "../ConfirmDialog";
 import { DataTypeIcon } from "../DataTypeIcon";
 import { EditableTable, EditableTableMethods, ListRow } from "../EditableTable";
 import { LabeledDiv } from "../LabeledDiv";
+import { Null } from "../Null";
 import { SearchableSelect } from "../SearchableSelect";
 import { SqlCodeViewer } from "../SqlCodeViewer";
 import { TextNotification } from "../TextNotification";
@@ -127,7 +128,7 @@ export function TableStructure({
     return {
       target: STR_FIELD,
       action,
-      tableName: tabState.currentTableName,
+      tableName: tabState.tableName,
 
       autoIncrement: autoIncrement,
       comment: comment,
@@ -190,19 +191,19 @@ export function TableStructure({
 
     // 找到 alterData 里对应的字段的数据 | Find the data corresponding to the field in alterData
     let fieldDataIndex = -1;
-    tabState.currentTableStructure.map((item, index) => {
+    tabState.tableStructure.map((item, index) => {
       if (item.name === nameOld) {
         fieldDataIndex = index;
       }
     });
 
     if (dialogAction === STR_ADD) {
-      tabState.setCurrentTableStructure([...tabState.currentTableStructure, newFieldData]);
+      tabState.setTableStructure([...tabState.tableStructure, newFieldData]);
     }
 
     if (dialogAction === STR_EDIT) {
-      tabState.setCurrentTableStructure(
-        tabState.currentTableStructure.map((field, index) => (index === fieldDataIndex ? newFieldData : field)),
+      tabState.setTableStructure(
+        tabState.tableStructure.map((field, index) => (index === fieldDataIndex ? newFieldData : field)),
       );
 
       // 向 TableSection 内部添加变化 | Add changes to the inside of the TableSection
@@ -240,7 +241,7 @@ export function TableStructure({
   function handleDelSelectedField() {
     const arr = tableRef.current?.getMultiSelectData() || [];
     for (const index of arr) {
-      const field = tabState.currentTableStructure[index];
+      const field = tabState.tableStructure[index];
 
       // 创建表格时不需要记录字段的删除动作
       // When creating a table, do not need to delete a record field
@@ -248,7 +249,7 @@ export function TableStructure({
         const action = {
           target: STR_FIELD,
           action: STR_DELETE,
-          tableName: tabState.currentTableName,
+          tableName: tabState.tableName,
 
           comment: "",
           defaultValue: "",
@@ -277,6 +278,8 @@ export function TableStructure({
     }
 
     setWillExecCmd(genAlterCmd(alterData) || "");
+    setErrorMessage("");
+    setOkMessage("");
     setShowDialogAlter(true);
   }
 
@@ -286,7 +289,7 @@ export function TableStructure({
   }
 
   function handleEditFieldPopup(index: number) {
-    const field = tabState.currentTableStructure[index];
+    const field = tabState.tableStructure[index];
 
     let isPrimaryKey = field.isPrimaryKey;
     let isUniqueKey = field.isUniqueKey;
@@ -311,7 +314,7 @@ export function TableStructure({
     resetDialogData({
       target: STR_FIELD,
       action: STR_EDIT,
-      tableName: tabState.currentTableName,
+      tableName: tabState.tableName,
 
       autoIncrement: false, // FIXME: 添加支持
       comment: field.comment,
@@ -341,7 +344,7 @@ export function TableStructure({
   }
 
   async function handleCopyFieldName(index: number) {
-    const field = tabState.currentTableStructure[index];
+    const field = tabState.tableStructure[index];
     try {
       await navigator.clipboard.writeText(field.name);
       addNotification(t("Copied"), "success");
@@ -352,7 +355,7 @@ export function TableStructure({
   }
 
   async function handleCopyFieldType(index: number) {
-    const field = tabState.currentTableStructure[index];
+    const field = tabState.tableStructure[index];
     try {
       await navigator.clipboard.writeText(field.type);
       addNotification(t("Copied"), "success");
@@ -363,7 +366,7 @@ export function TableStructure({
   }
 
   function handleDeleteField(index: number) {
-    const field = tabState.currentTableStructure[index];
+    const field = tabState.tableStructure[index];
     const actionDataIndex = getActionDataIndex();
     const actionData = genActionData(STR_DELETE);
     actionData.name = field.name;
@@ -386,9 +389,12 @@ export function TableStructure({
       resetData(true);
       setOkMessage("OK");
       addNotification("OK", "success");
+
+      //  TODO: 显示影响的行数
     } else {
-      setErrorMessage(res.errorMessage);
-      addNotification(res.errorMessage, "error");
+      let message = res.errorMessage.replace(ERROR_FROM_DB_PREFIX, "");
+      setErrorMessage(message);
+      addNotification(message, "error");
     }
   }
 
@@ -467,7 +473,7 @@ export function TableStructure({
   const [dataArr, setDataArr] = useState<ListRow[]>([]);
 
   function updateDataArr() {
-    const dataArrTemp = tabState.currentTableStructure.map(
+    const dataArrTemp = tabState.tableStructure.map(
       (row) =>
         ({
           name: { value: row.name, render: (val: any) => <div>{val}</div> },
@@ -481,7 +487,10 @@ export function TableStructure({
           },
           // 注意显示的是非空, 不是 isNullable 本身, 要取反
           isNotNull: { value: !(row.isNullable === true), render: (val: any) => <div>{val ? "✅" : ""}</div> },
-          defaultValue: { value: row.defaultValue, render: (val: any) => <div>{val}</div> },
+          defaultValue: {
+            value: row.defaultValue,
+            render: (val: any) => (val === null ? <Null /> : <div>{val}</div>),
+          },
           isPrimaryKey: { value: row.isPrimaryKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
           isUniqueKey: { value: row.isUniqueKey, render: (val: any) => <div>{val ? "✅" : ""}</div> },
           hasCheckConditions: { value: row.hasCheckConditions, render: (val: any) => <div>{val ? "✅" : ""}</div> },
@@ -497,14 +506,14 @@ export function TableStructure({
   // ========== 表格处理 结束 | Table data processing end ==========
 
   function resetData(resetAlterData: boolean) {
-    // 监听 currentTableStructure 变化后不可以执行 setAlterData, 否则应用表结构变化的数据会被清空
+    // 监听 tableStructure 变化后不可以执行 setAlterData, 否则应用表结构变化的数据会被清空
     if (resetAlterData) setAlterData([]);
     tableRef.current?.resetData();
     updateDataArr();
   }
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(coreState.activeTabId, "currentTableStructure", (_value: any) => {
+  useActiveTabStore(coreState.activeTabId, "tableStructure", (_value: any) => {
     resetData(false);
   });
 
@@ -588,7 +597,11 @@ export function TableStructure({
               <div className="flex items-center">
                 <Checkbox
                   checked={isPrimaryKey}
-                  onClick={() => setIsPrimaryKey(!isPrimaryKey)}
+                  onClick={() => {
+                    setIsPrimaryKey(!isPrimaryKey);
+                    if (!isPrimaryKey) setIsUniqueKey(false);
+                    setIndexName(!isPrimaryKey ? `${name}_${tabSnap.tableName}_pkey` : "");
+                  }}
                   className="me-4"
                   id="indexPrimaryKey"
                 />
@@ -613,7 +626,11 @@ export function TableStructure({
               <div className="flex items-center">
                 <Checkbox
                   checked={isUniqueKey}
-                  onClick={() => setIsUniqueKey(isUniqueKey)}
+                  onClick={() => {
+                    if (!isUniqueKey) setIsPrimaryKey(false);
+                    setIsUniqueKey(!isUniqueKey);
+                    setIndexName(!isUniqueKey ? `${name}_${tabSnap.tableName}_key` : "");
+                  }}
                   className="me-4"
                   id="indexUniqueKey"
                 />

@@ -16,7 +16,7 @@ export function modifyTableData(
   if (tab === null) return sqls;
   const tbState = tab.state;
 
-  const tbName = tbState.currentTableName;
+  const tbName = tbState.tableName;
 
   // 处理变更数据的行
   const rowDataMap = new Map<number, TableDataChange[]>();

@@ -17,10 +17,9 @@ pub fn print_sql(content: &str, item_code: i8) {
     // header
     if item_code == 1 || item_code == 7 {
         print!(
-            "\n{} {} {}\n",
-            "=".repeat(10).bright_blue(),
+            "\n{} {}\n",
+            ">".repeat(10).bright_blue(),
             header_text.bright_green(),
-            "=".repeat(10).bright_blue(),
         );
     }
 
@@ -32,10 +31,9 @@ pub fn print_sql(content: &str, item_code: i8) {
     // footer
     if item_code == 4 || item_code == 7 {
         print!(
-            "\n{} {} {}",
-            "=".repeat(10).bright_green(),
+            "\n{} {}",
+            "<".repeat(10).bright_green(),
             footer_text.bright_blue(),
-            "=".repeat(10).bright_green(),
         );
     }
 }

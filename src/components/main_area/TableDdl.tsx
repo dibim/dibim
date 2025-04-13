@@ -13,11 +13,11 @@ export function TableDdl() {
   const [ddl, setDdl] = useState<string>("");
 
   async function getData() {
-    setDdl(tabState.currentTableDdl);
+    setDdl(tabState.tableDdl);
   }
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(coreState.activeTabId, "currentTableName", (_val: any) => {
+  useActiveTabStore(coreState.activeTabId, "tableDdl", (_val: any) => {
     getData();
   });
 

@@ -8,7 +8,61 @@ use crate::{
     types::{ExecResult, QueryResult},
     utils::{common::print_sql, sqlx_common::DbType},
 };
+use sqlparser::{
+    dialect::{Dialect, MySqlDialect, PostgreSqlDialect, SQLiteDialect},
+    parser::{Parser, ParserError},
+    tokenizer::Token,
+};
 use sqlx::{Error, Execute};
+
+// TODO: 判断 SQL 语句的光标位置
+pub fn get_cursor_context(sql: &str, cursor_pos: usize) -> String {
+    let prefix = &sql[..cursor_pos];
+    let tokens: Vec<&str> = prefix.split_whitespace().collect();
+
+    match tokens.last() {
+        Some(&"FROM") | Some(&"JOIN") => "TABLE_NAMES".to_string(),
+        Some(&"SELECT") => "FIELD_NAMES".to_string(), // TODO: 这里需要知道后面的 表名才更准确
+        Some(&"WHERE") => "FIELD_NAMES".to_string(),
+        Some(&"ORDER BY") => "FIELD_NAMES".to_string(),
+        Some(&"GROUP BY") => "FIELD_NAMES".to_string(),
+        _ => "UNKNOW".to_string(),
+    }
+}
+
+fn split_sql_statements(sql: &str, dialect: &dyn Dialect) -> Result<Vec<String>, ParserError> {
+    let mut parser = Parser::new(dialect).try_with_sql(sql)?;
+    let mut statements = Vec::new();
+
+    loop {
+        // 尝试解析语句
+        let stmt = match parser.parse_statement() {
+            Ok(stmt) => stmt,
+            // 通过 Token 类型判断是否结束
+            Err(e) => {
+                if matches!(parser.peek_token().token, Token::EOF) {
+                    break;
+                } else {
+                    return Err(e);
+                }
+            }
+        };
+
+        statements.push(stmt.to_string());
+
+        // 显式跳过语句终止符（分号）
+        if parser.peek_token().token == Token::SemiColon {
+            parser.next_token(); // 消费分号
+        }
+
+        // 如果下一个 Token 是 EOF，结束循环
+        if parser.peek_token().token == Token::EOF {
+            break;
+        }
+    }
+
+    Ok(statements)
+}
 
 pub fn get_db_type(url: &str) -> Result<DbType, Error> {
     let url_lower = url.to_lowercase();
@@ -130,12 +184,15 @@ pub async fn execute_many(
                 print_sql("Transaction start", 1);
             }
 
-            for stmt in sql.split(';').map(|s| s.trim()).filter(|s| !s.is_empty()) {
-                let query = sqlx::query(stmt);
+            let dialect = PostgreSqlDialect {};
+            let statements = split_sql_statements(sql, &dialect)?;
+            for stmt in statements {
+                let query = sqlx::query(&stmt);
 
                 #[cfg(debug_assertions)]
                 {
-                    print_sql(query.sql(), 2);
+                    let sql = format!("{};\n", query.sql());
+                    print_sql(&sql, 2);
                 }
                 query.execute(&mut *tx).await?;
             }
@@ -160,12 +217,15 @@ pub async fn execute_many(
                 print_sql("Transaction start", 1);
             }
 
-            for stmt in sql.split(';').map(|s| s.trim()).filter(|s| !s.is_empty()) {
-                let query = sqlx::query(stmt);
+            let dialect = MySqlDialect {};
+            let statements = split_sql_statements(sql, &dialect)?;
+            for stmt in statements {
+                let query = sqlx::query(&stmt);
 
                 #[cfg(debug_assertions)]
                 {
-                    print_sql(query.sql(), 2);
+                    let sql = format!("{};\n", query.sql());
+                    print_sql(&sql, 2);
                 }
                 query.execute(&mut *tx).await?;
             }
@@ -190,12 +250,15 @@ pub async fn execute_many(
                 print_sql("Transaction start", 1);
             }
 
-            for stmt in sql.split(';').map(|s| s.trim()).filter(|s| !s.is_empty()) {
-                let query = sqlx::query(stmt);
+            let dialect = SQLiteDialect {};
+            let statements = split_sql_statements(sql, &dialect)?;
+            for stmt in statements {
+                let query = sqlx::query(&stmt);
 
                 #[cfg(debug_assertions)]
                 {
-                    print_sql(query.sql(), 2);
+                    let sql = format!("{};\n", query.sql());
+                    print_sql(&sql, 2);
                 }
                 query.execute(&mut *tx).await?;
             }

@@ -284,7 +284,7 @@ export function genAlterCmdSqlite(val: AllAlterAction[]) {
   }
   // 有导致要重新建表的操作, 先重新建表, 其它修改再执行
   if (NeedToRecreateTableCmds.length > 0) {
-    const sql = tbState.currentTableDdl;
+    const sql = tbState.tableDdl;
     try {
       const sd = parseCreateTableDdl(sql);
       res = res.concat(recreateTable(sd, NeedToRecreateTableCmds));

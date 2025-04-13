@@ -83,9 +83,6 @@ export function getUniqueFieldName(tsa: FieldStructure[]) {
 }
 
 /**
- * @deprecated
- * 目前已弃用
- *
  * 查询表格数据的时候, 必须使用一个排序字段
  *
  * 优先级: 主键 > 唯一索引 > 索引 > 普通字段
@@ -95,21 +92,20 @@ export function getUniqueFieldName(tsa: FieldStructure[]) {
  * @param tsa 表结构数据
  */
 export function getDefultOrderField(tsa: FieldStructure[]) {
-  // 优先使用索引字段
+  // 主键
   for (const f of tsa) {
-    // 主键
     if (f.isPrimaryKey) {
       return f.name;
     }
-
-    // 唯一索引
+  }
+  // 唯一索引
+  for (const f of tsa) {
     if (f.isUniqueKey) {
       return f.name;
     }
   }
 
-  // 找不到索引字段的, 找数字或时间字段
-  // 找数字字段
+  // 数字字段
   for (const f of tsa) {
     if (
       f.type.includes("int") ||
@@ -132,7 +128,6 @@ export function getDefultOrderField(tsa: FieldStructure[]) {
   }
 
   // 找字符串字段
-  // 找不到索引字段的, 也找数字或时间字段, 找字符串字段
   for (const f of tsa) {
     if (f.type.includes("text") || f.type.includes("char")) {
       return f.name;
@@ -142,7 +137,7 @@ export function getDefultOrderField(tsa: FieldStructure[]) {
   return "";
 }
 
-// 匹配 色了传统语句里 where 及之后的部分
+// 匹配 SQL 语句里 where 及之后的部分
 export function extractConditionClause(sql: string) {
   const res = {
     tableName: "",

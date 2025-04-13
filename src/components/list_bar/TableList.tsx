@@ -5,7 +5,7 @@ import { ArrowDown01, ArrowDownAZ, ArrowDownZA, ArrowUp01, CirclePlus, LucideIco
 import { MAIN_AREA_TABLE_EDITOR, MAIN_AREA_TAB_STRUCTURE, STR_EMPTY } from "@/constants";
 import { getTab } from "@/context";
 import {
-  exec,
+  execMany,
   genCopyTableCmd,
   genDeleteTableCmd,
   genRenameTableCmd,
@@ -19,6 +19,7 @@ import { ConfirmDialog } from "../ConfirmDialog";
 import { EmptyList } from "../EmptyList";
 import { ListItem, ListWithAction } from "../ListWithAction";
 import { SqlCodeViewer } from "../SqlCodeViewer";
+import { TextNotification } from "../TextNotification";
 import { Input } from "../ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
@@ -55,9 +56,9 @@ export function TableList() {
     if (tab === null) return;
     const tabState = tab.state;
 
-    tabState.setCurrentTableName(item.id);
+    tabState.setTableName(item.id);
     tabState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
-    tabState.setColor(coreState.currentConnColor);
+    tabState.setConnColor(coreState.currentConnColor);
     setTabTitle(item.id);
   }
 
@@ -67,9 +68,9 @@ export function TableList() {
     const tabState = tab.state;
 
     tabState.setIsAddingTable(true);
-    tabState.setCurrentTableName("");
+    tabState.setTableName("");
     tabState.setMainAreaTab(MAIN_AREA_TAB_STRUCTURE);
-    tabState.setCurrentTableStructure([]);
+    tabState.setTableStructure([]);
   }
 
   // ========== 排序 | Sort ==========
@@ -117,17 +118,18 @@ export function TableList() {
 
   // ========== 上下文按钮 | Context button ==========
   const [operateTableName, setOperateTableName] = useState<string>("");
-  const [showDialogDelete, setShowDialogDelete] = useState<boolean>(false);
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [showDialogTitle, setShowDialogTitle] = useState<string>("");
   const [showDialogRename, setShowDialogRename] = useState<boolean>(false);
   const [showDialogCopyTable, setShowDialogCopyTable] = useState<boolean>(false);
-  const [showDialogTruncate, setShowDialogTruncate] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [okMessage, setOkMessage] = useState<string>("");
   const [willExecCmd, setWillExecCmd] = useState<string>("");
 
   function closeDialog() {
-    setShowDialogDelete(false);
     setShowDialogRename(false);
     setShowDialogCopyTable(false);
-    setShowDialogTruncate(false);
+    setShowDialog(false);
   }
 
   async function handleRenamePopup(tableName: string) {
@@ -170,25 +172,30 @@ export function TableList() {
   }
 
   function handleTruncatePopup(tableName: string) {
-    setOperateTableName(tableName);
-    setShowDialogTruncate(true);
+    setShowDialogTitle(t("&confirmTruncateTable", { name: operateTableName }));
     setWillExecCmd(genTruncateTableCmd(tableName) || "");
+    setOperateTableName(tableName);
+    setShowDialog(true);
   }
 
   function handleDeletePopup(tableName: string) {
-    setOperateTableName(tableName);
-    setShowDialogDelete(true);
+    setShowDialogTitle(t("&confirmDeleteTable", { name: operateTableName }));
     setWillExecCmd(genDeleteTableCmd(tableName) || "");
+    setOperateTableName(tableName);
+    setShowDialog(true);
   }
 
   async function handleConfirm() {
-    const res = await exec(willExecCmd);
+    const res = await execMany(willExecCmd);
 
     if (!res) {
       addNotification("The result of exec is null", "error");
+      setErrorMessage("The result of exec is null");
     } else if (res.errorMessage !== "") {
       addNotification(res.errorMessage, "error");
+      setErrorMessage(res.errorMessage);
     } else {
+      setOkMessage("Ok");
       getData();
     }
 
@@ -354,7 +361,7 @@ export function TableList() {
   }, [tablData]);
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(coreState.activeTabId, "currentDbNme", (_val: any) => {
+  useActiveTabStore(coreState.activeTabId, "dbNme", (_val: any) => {
     getData();
   });
 
@@ -430,26 +437,19 @@ export function TableList() {
       />
 
       <ConfirmDialog
-        open={showDialogTruncate}
-        title={t("&confirmTruncateTable", { name: operateTableName })}
+        open={showDialog}
+        title={showDialogTitle}
         description={t("&confirmStatement")}
-        content={<SqlCodeViewer ddl={willExecCmd} />}
+        content={
+          <>
+            <SqlCodeViewer ddl={willExecCmd} />
+            {errorMessage && <TextNotification type="error" message={errorMessage}></TextNotification>}
+            {okMessage && <TextNotification type="success" message={okMessage}></TextNotification>}
+          </>
+        }
         cancelText={t("Cancel")}
         cancelCb={() => {
-          setShowDialogTruncate(false);
-        }}
-        okText={t("Confirm")}
-        okCb={handleConfirm}
-      />
-
-      <ConfirmDialog
-        open={showDialogDelete}
-        title={t("&confirmDeleteTable", { name: operateTableName })}
-        description={t("&confirmStatement")}
-        content={<SqlCodeViewer ddl={willExecCmd} />}
-        cancelText={t("Cancel")}
-        cancelCb={() => {
-          setShowDialogDelete(false);
+          setShowDialog(false);
         }}
         okText={t("Confirm")}
         okCb={handleConfirm}

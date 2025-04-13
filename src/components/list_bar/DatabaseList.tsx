@@ -45,7 +45,8 @@ export function DatabaseList() {
     coreState.setCurrentConnType(conn.dbType);
     coreState.setCurrentConnName(conn.name);
     coreState.setCurrentConnColor(conn.color);
-    tabState.setColor(conn.color);
+    tabState.setConnColor(conn.color);
+    tabState.setConnName(conn.name);
 
     const res = await connect({
       dbName: conn.dbName,
@@ -61,9 +62,9 @@ export function DatabaseList() {
     } else if (res.errorMessage !== "" && !res.errorMessage.includes("Duplicate connection name")) {
       addNotification(res.errorMessage, "error");
     } else {
-      tabState.setCurrentDbName(conn.dbName);
+      tabState.setDbName(conn.dbName);
       tabState.setMainAreaType(MAIN_AREA_TABLE_EDITOR);
-      tabState.setColor(conn.color);
+      tabState.setConnColor(conn.color);
 
       coreState.setListBarType(LIST_BAR_TABLE);
     }

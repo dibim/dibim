@@ -71,14 +71,14 @@ export function Settings() {
   }
 
   async function getData() {
-    const res = await getTableDdl(tabState.currentTableName);
+    const res = await getTableDdl(tabState.tableName);
     if (res && res.data) {
       // setTableData(res.data);
     }
   }
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(coreState.activeTabId, "currentTableName", (_value: any) => {
+  useActiveTabStore(coreState.activeTabId, "tableName", (_value: any) => {
     getData();
   });
 

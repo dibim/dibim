@@ -2,14 +2,14 @@ import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CircleCheck, CircleMinus, CirclePlus, CircleX, RotateCw } from "lucide-react";
 import { useSnapshot } from "valtio";
-import { HEDAER_H, NEW_ROW_IS_ADDED_FIELD } from "@/constants";
+import { ERROR_FROM_DB_PREFIX, HEDAER_H, NEW_ROW_IS_ADDED_FIELD } from "@/constants";
 import { getTab } from "@/context";
-import { exec } from "@/databases/adapter,";
+import { execMany } from "@/databases/adapter,";
 import { modifyTableData } from "@/databases/adapter_uils";
 import { RowData } from "@/databases/types";
 import { useActiveTabStore } from "@/hooks/useActiveTabStore";
 import { cn } from "@/lib/utils";
-import { coreState } from "@/store/core";
+import { addNotification, coreState } from "@/store/core";
 import { rawRow2EtRow } from "@/utils/render";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { EditableTable, EditableTableMethods, ListRow, TableDataChange } from "./EditableTable";
@@ -50,6 +50,8 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
 
   const [tableData, setTableData] = useState<RowData[]>([]);
   const [fieldNames, setFieldNames] = useState<string[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [okMessage, setOkMessage] = useState<string>("");
   const [willExecCmd, setWillExecCmd] = useState<string>("");
   const [showDialogAlter, setShowDialogAlter] = useState<boolean>(false);
 
@@ -68,6 +70,11 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
   function onChange(val: TableDataChange[]) {
     setChanges(val);
   }
+
+  async function getData2(page: number) {
+    tableRef.current?.resetData();
+    await getData(page);
+  }
   // ========== 分页 结束 ==========
 
   // ========== 按钮 ==========
@@ -78,7 +85,15 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
     const addedRows = tableRef.current?.getAddedRow() || [];
     const sqls = modifyTableData(deletedSet, changes, tableData, addedRows);
 
+    if (sqls.length === 0) {
+      // TODO: addNotification
+      return;
+    }
+
     setWillExecCmd(sqls.join(""));
+
+    setErrorMessage("");
+    setOkMessage("");
     setShowDialogAlter(true);
   }
 
@@ -92,7 +107,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
   function handleAdd() {
     tableRef.current?.willRanderTable();
 
-    const fields = tabState.currentTableStructure.map((item) => item.name);
+    const fields = tabState.tableStructure.map((item) => item.name);
     const rowData = Object.fromEntries(fields.map((key) => [key, ""]));
     rowData[NEW_ROW_IS_ADDED_FIELD] = "true"; // 新添加的行的标记
     const newTableData = [...tableData, rowData]; // 为了避免和更新的行的索引有冲突, 添加到表格的最后
@@ -107,9 +122,25 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
     tableRef.current?.deleteMultiSelectedRow();
   }
 
-  // 确定执行语句
-  function handleConfirm() {
-    exec(willExecCmd);
+  async function handleConfirm() {
+    const res = await execMany(willExecCmd);
+    if (res) {
+      if (res.errorMessage !== "") {
+        let message = res.errorMessage.replace(ERROR_FROM_DB_PREFIX, "");
+        setErrorMessage(message);
+        addNotification(message, "error");
+      } else {
+        setOkMessage("Ok");
+        // 清理数据
+        handleCancel();
+        setTimeout(() => {
+          setShowDialogAlter(false);
+        }, 500);
+      }
+    } else {
+      setErrorMessage("The result of exec is null"); // TODO: 添加翻译
+    }
+
     initData();
   }
 
@@ -160,7 +191,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
   }));
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(coreState.activeTabId, "currentTableName", (_val: any) => {
+  useActiveTabStore(coreState.activeTabId, "tableName", (_val: any) => {
     initData(true);
   });
 
@@ -181,7 +212,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
             setCurrentPage={(val) => setCurrentPage(val)}
             pageTotal={pageTotal}
             itemsTotal={itemsTotal}
-            getData={getData}
+            getData={getData2}
           />
           {dataArr.length > 0 && tabSnap.uniqueFieldName === "" && (
             <TextNotification type="error" message={t("&notUniqueKeyTip")}></TextNotification>
@@ -207,7 +238,13 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
         open={showDialogAlter}
         title={t("&confirmChanges")}
         description={t("&confirmStatement")}
-        content={<SqlCodeViewer ddl={willExecCmd} />}
+        content={
+          <>
+            <SqlCodeViewer ddl={willExecCmd} />
+            {errorMessage && <TextNotification type="error" message={errorMessage}></TextNotification>}
+            {okMessage && <TextNotification type="success" message={okMessage}></TextNotification>}
+          </>
+        }
         cancelText={t("Cancel")}
         cancelCb={() => {
           setShowDialogAlter(false);
