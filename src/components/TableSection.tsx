@@ -80,7 +80,15 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
     const addedRows = tableRef.current?.getAddedRow() || [];
     const sqls = modifyTableData(deletedSet, changes, tableData, addedRows);
 
+    if (sqls.length === 0) {
+      // TODO: addNotification
+      return;
+    }
+
     setWillExecCmd(sqls.join(""));
+
+    setErrorMessage("");
+    setOkMessage("");
     setShowDialogAlter(true);
   }
 
@@ -119,6 +127,11 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
         addNotification(message, "error");
       } else {
         setOkMessage("Ok");
+        // 清理数据
+        handleCancel();
+        setTimeout(() => {
+          setShowDialogAlter(false);
+        }, 500);
       }
     } else {
       setErrorMessage("The result of exec is null"); // TODO: 添加翻译
