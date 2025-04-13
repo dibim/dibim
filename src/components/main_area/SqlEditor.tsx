@@ -364,17 +364,17 @@ export function SqlEditor() {
 
   const tooltipSectionData = [
     {
-      trigger: <Play className="mb-2" onClick={execCode} />,
+      trigger: <Play className="mb-4" onClick={execCode} />,
       content: <p>{t("Execute")}(F9)</p>,
     },
     {
-      trigger: <NotebookText className="mb-2" onClick={formatCode} />,
+      trigger: <NotebookText className="mb-4" onClick={formatCode} />,
       content: <p>{t("Format")}(F8)</p>,
     },
     {
       trigger: (
         <Grid3x3
-          className="mb-2"
+          className="mb-4"
           onClick={() => setShowResultBar(!showResultBar)}
           color={`var(${showResultBar ? "--fvm-primary-clr" : "--foreground"})`}
         />
@@ -384,7 +384,7 @@ export function SqlEditor() {
     {
       trigger: (
         <ShieldAlert
-          className="mb-2"
+          className="mb-4"
           onClick={() => setShowStatusBar(!showStatusBar)}
           color={`var(${showStatusBar ? "--fvm-primary-clr" : "--foreground"})`}
         />
