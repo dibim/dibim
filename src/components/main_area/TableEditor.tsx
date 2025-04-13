@@ -47,6 +47,7 @@ export function TableEditor() {
       tabState.setUniqueFieldName(getUniqueFieldName(res.data));
       if (tabState.mainAreaTab === STR_EMPTY) tabState.setMainAreaTab(MAIN_AREA_TAB_DATA);
     }
+
     // 获取建表语句, 会在多个地方用, 在这里记录到 store
     const resDdl = await getTableDdl(tabState.tableName);
     if (resDdl && resDdl.data) {

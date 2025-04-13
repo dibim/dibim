@@ -17,7 +17,7 @@ export function TableDdl() {
   }
 
   // 监听 store 的变化 | Monitor changes in the store
-  useActiveTabStore(coreState.activeTabId, "tableName", (_val: any) => {
+  useActiveTabStore(coreState.activeTabId, "tableDdl", (_val: any) => {
     getData();
   });
 

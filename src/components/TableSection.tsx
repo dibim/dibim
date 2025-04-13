@@ -70,6 +70,11 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
   function onChange(val: TableDataChange[]) {
     setChanges(val);
   }
+
+  async function getData2(page: number) {
+    tableRef.current?.resetData();
+    await getData(page);
+  }
   // ========== 分页 结束 ==========
 
   // ========== 按钮 ==========
@@ -117,7 +122,6 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
     tableRef.current?.deleteMultiSelectedRow();
   }
 
-  // 确定执行语句
   async function handleConfirm() {
     const res = await execMany(willExecCmd);
     if (res) {
@@ -208,7 +212,7 @@ export function TableSection({ width, getData, initData, btnExt, ref }: TableSec
             setCurrentPage={(val) => setCurrentPage(val)}
             pageTotal={pageTotal}
             itemsTotal={itemsTotal}
-            getData={getData}
+            getData={getData2}
           />
           {dataArr.length > 0 && tabSnap.uniqueFieldName === "" && (
             <TextNotification type="error" message={t("&notUniqueKeyTip")}></TextNotification>
