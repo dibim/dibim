@@ -14,9 +14,9 @@
 
 2.3 **本项目**：**DIBIM** 项目官方**代码仓库**中的源代码及其编译后的软件。官方**代码仓库**地址：
 
-- GitHub：[https://github.com/dibim/dibim](https://github.com/dibim/dibim)
 - Gitee（中国）：[https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)
 - Codeberg（德国）：[https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)
+- GitHub：[https://github.com/dibim/dibim](https://github.com/dibim/dibim)
 
 2.4 **本项目的所有者**：官方**代码仓库**所有者账户的实际持有人。
 
@@ -101,7 +101,7 @@
 7.2.2 采取安全措施保护敏感数据，包括：
 
 - 所有配置文件均采用 **AES-GCM 算法加密**；
-  
+
 - 在**用户**未设置主密码的情况下，将使用默认主密码进行加密，并在每次启动软件时在显著位置提醒用户设置主密码；
 
 - 所有对数据库的写操作均会生成 SQL 语句并在用户界面中显示，需经**用户**确认后才会执行。
@@ -131,123 +131,123 @@
 
 ## English version
 
-### Article 1 Purpose of the Agreement  
+### Article 1 Purpose of the Agreement
 
 This Agreement is formulated to support eligible users with free usage, prevent unauthorized commercialization, and ensure the sustainable development of this project.
 
-### Article 2 Definitions  
+### Article 2 Definitions
 
-2.1 **Code Repository**: A repository storing source code.  
+2.1 **Code Repository**: A repository storing source code.
 
-2.2 **Project Name**: **DIBIM**.  
+2.2 **Project Name**: **DIBIM**.
 
-2.3 **This Project**: The source code in the official **Code Repository** of the **DIBIM** project and its compiled software. Official **Code Repository** addresses:  
+2.3 **This Project**: The source code in the official **Code Repository** of the **DIBIM** project and its compiled software. Official **Code Repository** addresses:
 
-- GitHub: [https://github.com/dibim/dibim](https://github.com/dibim/dibim)  
-- Gitee (China): [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)  
-- Codeberg (Germany): [https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)  
+- Gitee (China): [https://gitee.com/dibim/dibim](https://gitee.com/dibim/dibim)
+- Codeberg (Germany): [https://codeberg.org/dibim/dibim](https://codeberg.org/dibim/dibim)
+- GitHub: [https://github.com/dibim/dibim](https://github.com/dibim/dibim)
 
-2.4 **Owner of This Project**: The actual holder of the account owning the official **Code Repository**.  
+2.4 **Owner of This Project**: The actual holder of the account owning the official **Code Repository**.
 
-2.5 **Contributor to This Project**: The actual holder of an account (limited to individual accounts) whose code merge requests to this project's **Code Repository** have been accepted.  
+2.5 **Contributor to This Project**: The actual holder of an account (limited to individual accounts) whose code merge requests to this project's **Code Repository** have been accepted.
 
-2.6 **User**: A natural person using **This Project**.  
+2.6 **User**: A natural person using **This Project**.
 
-2.7 **Major Modification**: Substantive modifications exceeding 75% of the implementation logic of existing features, or the addition of complete functionalities. Excludes third-party libraries used by **This Project** and interface style modifications.  
+2.7 **Major Modification**: Substantive modifications exceeding 75% of the implementation logic of existing features, or the addition of complete functionalities. Excludes third-party libraries used by **This Project** and interface style modifications.
 
-2.8 **Derivative Project**: A project based on **This Project**'s code, containing at least 20 **Major Modifications**.  
+2.8 **Derivative Project**: A project based on **This Project**'s code, containing at least 20 **Major Modifications**.
 
-2.9 **Replica Project**: A project based on **This Project**'s code with minor or no modifications, not meeting the definition of a **Derivative Project**.  
+2.9 **Replica Project**: A project based on **This Project**'s code with minor or no modifications, not meeting the definition of a **Derivative Project**.
 
-2.10 **Downstream Project**: A project based on **This Project**, **Derivative Project**, or **Replica Project**, or whose code originates from/traces to any of the aforementioned projects. Includes projects with code logic similarity ≥50% to **This Project** (excluding third-party libraries used by **This Project**).  
+2.10 **Downstream Project**: A project based on **This Project**, **Derivative Project**, or **Replica Project**, or whose code originates from/traces to any of the aforementioned projects. Includes projects with code logic similarity ≥50% to **This Project** (excluding third-party libraries used by **This Project**).
 
-### Article 3 Free License  
+### Article 3 Free License
 
-3.1 Licensees  
+3.1 Licensees
 
-3.1.1 For using **This Project**:  
+3.1.1 For using **This Project**:
 
-- **Contributors to This Project**;  
-- Individual Users (for personally independent projects);  
-- Employees of the following organizations (for their institutional work):  
-  - Administrative agencies (excluding subordinate enterprises/institutions/organizations);  
-  - Public non-profit organizations (e.g., public schools, hospitals, museums);  
-  - Legally registered private non-profit organizations (e.g., charities, social service agencies);  
-  - For-profit organizations with fewer than 10 **Users**.  
+- **Contributors to This Project**;
+- Individual Users (for personally independent projects);
+- Employees of the following organizations (for their institutional work):
+  - Administrative agencies (excluding subordinate enterprises/institutions/organizations);
+  - Public non-profit organizations (e.g., public schools, hospitals, museums);
+  - Legally registered private non-profit organizations (e.g., charities, social service agencies);
+  - For-profit organizations with fewer than 10 **Users**.
 
-3.1.2 For using **Derivative Projects**:  
+3.1.2 For using **Derivative Projects**:
 
-- All entities.  
+- All entities.
 
-3.2 Scope: Copying, modifying, compiling source code, and running compiled software.  
+3.2 Scope: Copying, modifying, compiling source code, and running compiled software.
 
-3.3 Eligible licensees may use directly without requiring authorization proof from the **Owner of This Project**.  
+3.3 Eligible licensees may use directly without requiring authorization proof from the **Owner of This Project**.
 
-### Article 4 Commercial License  
+### Article 4 Commercial License
 
-4.1 Licensees: All entities not meeting Article 3.1.  
+4.1 Licensees: All entities not meeting Article 3.1.
 
-4.1.1 If a licensee becomes ineligible due to internal changes, commercial authorization must be purchased within 30 days.  
+4.1.1 If a licensee becomes ineligible due to internal changes, commercial authorization must be purchased within 30 days.
 
-4.2 Term: Annual basis, requiring renewal upon expiration.  
+4.2 Term: Annual basis, requiring renewal upon expiration.
 
-4.3 Pricing (per **User** annually):  
+4.3 Pricing (per **User** annually):
 
-- Users in China (including Hong Kong, Macau, and Taiwan regions): 100 CNY;  
-- Users in the U.S., Canada, EU member states, UK, Switzerland, Norway, Iceland, Japan, South Korea, Singapore, Israel, Australia, New Zealand: 30 USD/EUR/GBP;  
-- Other countries/regions: 15 USD/EUR/GBP.  
+- Users in China (including Hong Kong, Macau, and Taiwan regions): 100 CNY;
+- Users in the U.S., Canada, EU member states, UK, Switzerland, Norway, Iceland, Japan, South Korea, Singapore, Israel, Australia, New Zealand: 30 USD/EUR/GBP;
+- Other countries/regions: 15 USD/EUR/GBP.
 
-4.4 Authorization proof will be provided after purchase.  
+4.4 Authorization proof will be provided after purchase.
 
-### Article 5 Derivative Projects, Replica Projects, and Downstream Projects  
+### Article 5 Derivative Projects, Replica Projects, and Downstream Projects
 
-5.1 **Derivative Projects**, **Replica Projects**, and **Downstream Projects** must be open-source, explicitly stating **This Project**'s name and official URL in documentation and website headers.  
+5.1 **Derivative Projects**, **Replica Projects**, and **Downstream Projects** must be open-source, explicitly stating **This Project**'s name and official URL in documentation and website headers.
 
-5.2 All such projects inherit this Agreement, retain this Agreement file in root directories, and shall not modify the Agreement or adopt other licenses.  
+5.2 All such projects inherit this Agreement, retain this Agreement file in root directories, and shall not modify the Agreement or adopt other licenses.
 
-### Article 6 Prohibitions  
+### Article 6 Prohibitions
 
-6.1 Deleting or tampering with icons/copyright information/agreement terms in source code or compiled software without permission.  
+6.1 Deleting or tampering with icons/copyright information/agreement terms in source code or compiled software without permission.
 
-6.2 Converting **This Project**, **Derivative Projects**, **Replica Projects**, or **Downstream Projects** into network services (e.g., SaaS/PaaS, APIs, web apps) without permission.  
+6.2 Converting **This Project**, **Derivative Projects**, **Replica Projects**, or **Downstream Projects** into network services (e.g., SaaS/PaaS, APIs, web apps) without permission.
 
-6.3 Selling source code or compiled software of the aforementioned projects without permission.  
+6.3 Selling source code or compiled software of the aforementioned projects without permission.
 
-### Article 7 Responsibilities  
+### Article 7 Responsibilities
 
-7.1 **User Responsibilities**  
-7.1.1 Set a master password.  
-7.1.2 Regularly back up configuration files.  
-7.1.3 Comply with local laws and this Agreement; no illegal usage.  
+7.1 **User Responsibilities**
+7.1.1 Set a master password.
+7.1.2 Regularly back up configuration files.
+7.1.3 Comply with local laws and this Agreement; no illegal usage.
 
-7.2 **Owner Responsibilities**  
-7.2.1 No intentional backdoors or malicious programs.  
-7.2.2 Security measures for sensitive data:  
+7.2 **Owner Responsibilities**
+7.2.1 No intentional backdoors or malicious programs.
+7.2.2 Security measures for sensitive data:
 
-- All configuration files encrypted via **AES-GCM**;  
-- Use default master password with startup reminders if unset;  
-- Display SQL write operations for user confirmation.  
+- All configuration files encrypted via **AES-GCM**;
+- Use default master password with startup reminders if unset;
+- Display SQL write operations for user confirmation.
 
-7.2.3 No liability for losses (e.g., data loss, system failures) except for **willful misconduct or gross negligence** (e.g., intentional defect concealment, fraud).  
+7.2.3 No liability for losses (e.g., data loss, system failures) except for **willful misconduct or gross negligence** (e.g., intentional defect concealment, fraud).
 
-7.2.4 Exemptions for:  
+7.2.4 Exemptions for:
 
-- **Force Majeure**: Natural disasters, wars, government actions;  
-- **User Errors**: Accidental data deletion, misconfigurations;  
-- **Third-Party Factors**: Hardware failures, network outages, malware;  
-- **User Non-Compliance**: Unset passwords, unbacked data, or unpaid licenses.  
+- **Force Majeure**: Natural disasters, wars, government actions;
+- **User Errors**: Accidental data deletion, misconfigurations;
+- **Third-Party Factors**: Hardware failures, network outages, malware;
+- **User Non-Compliance**: Unset passwords, unbacked data, or unpaid licenses.
 
-### Article 8 Agreement Amendments  
+### Article 8 Agreement Amendments
 
-The **Owner of This Project** retains final interpretation rights and may revise terms provided they comply with local **mandatory laws** (e.g., consumer protection, data privacy).  
+The **Owner of This Project** retains final interpretation rights and may revise terms provided they comply with local **mandatory laws** (e.g., consumer protection, data privacy).
 
-New code follows updated agreements. Major revisions (affecting fees/prohibitions) require email notification to commercial licensees.  
+New code follows updated agreements. Major revisions (affecting fees/prohibitions) require email notification to commercial licensees.
 
-### Article 9 Agreement Effectiveness  
+### Article 9 Agreement Effectiveness
 
-Acceptance occurs through any of:  
+Acceptance occurs through any of:
 
-- Copying (cloning), modifying, or compiling source code from **This Project**, **Derivative Projects**, **Replica Projects**, or **Downstream Projects**;  
-- Downloading or executing binaries of the aforementioned projects.  
+- Copying (cloning), modifying, or compiling source code from **This Project**, **Derivative Projects**, **Replica Projects**, or **Downstream Projects**;
+- Downloading or executing binaries of the aforementioned projects.
 
 *In case of any discrepancies, the Chinese version shall prevail.*
